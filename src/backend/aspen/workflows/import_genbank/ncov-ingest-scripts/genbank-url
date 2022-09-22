@@ -26,7 +26,7 @@ params = {
     'fq': [
         '{!tag=SLen_i}SLen_i:([180000 TO 220000])', # Sequence length
         '{!tag=SeqType_s}SeqType_s:("Nucleotide")', # Nucleotide sequences (as opposed to protein)
-        'VirusLineageId_ss:(10244)',              # NCBI Taxon id for SARS-CoV-2,
+        'VirusLineageId_ss:(10244)',              # NCBI Taxon id for Monkeypox
 #        '{!tag=Region_s}Region_s:("Africa")',       # Useful for debugging
 #        '{!tag=SLen_i}SLen_i:(["15000 TO 50000"])', # doesn't work, but might be useful
     ],
