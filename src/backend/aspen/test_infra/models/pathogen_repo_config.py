@@ -1,14 +1,14 @@
 from aspen.database.models import Pathogen, PathogenRepoConfig, PublicRepository
-from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.database.models.usergroup import generate_random_id
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 
 
 def setup_gisaid_and_genbank_repo_configs(
-    async_session, 
+    async_session,
     pathogen=None,
-    gisaid_prefix=generate_random_id(5), 
-    genbank_prefix=generate_random_id(5), 
-    ) -> Pathogen:
+    gisaid_prefix=generate_random_id(5),
+    genbank_prefix=generate_random_id(5),
+) -> Pathogen:
 
     repo_info = {
         "GISAID": {"prefix": gisaid_prefix},

@@ -2,8 +2,6 @@ import csv
 import datetime
 import io
 from typing import Any, List
-from aspen.test_infra.models.pathogen import random_pathogen_factory
-from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 
 import pytest
 from httpx import AsyncClient
@@ -13,8 +11,10 @@ from aspen.api.utils import (
     GenBankSubmissionFormTSVStreamer,
     GisaidSubmissionFormCSVStreamer,
 )
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
     setup_gisaid_and_genbank_repo_configs,
 )
@@ -39,7 +39,9 @@ async def test_submission_template_download_gisaid(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen = random_pathogen_factory()
-    pathogen = setup_gisaid_and_genbank_repo_configs(async_session, pathogen, "hCoV-19", "SARS-CoV-2/human")
+    pathogen = setup_gisaid_and_genbank_repo_configs(
+        async_session, pathogen, "hCoV-19", "SARS-CoV-2/human"
+    )
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
@@ -123,8 +125,10 @@ async def test_submission_template_download_genbank(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen = random_pathogen_factory()
-    setup_gisaid_and_genbank_repo_configs(async_session, pathogen, "hCoV-19", "SARS-CoV-2/human")
-    
+    setup_gisaid_and_genbank_repo_configs(
+        async_session, pathogen, "hCoV-19", "SARS-CoV-2/human"
+    )
+
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
@@ -204,7 +208,9 @@ async def test_submission_template_prefix_stripping(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen = random_pathogen_factory()
-    pathogen = setup_gisaid_and_genbank_repo_configs(async_session, pathogen, "hCoV-19", "SARS-CoV-2/human")
+    pathogen = setup_gisaid_and_genbank_repo_configs(
+        async_session, pathogen, "hCoV-19", "SARS-CoV-2/human"
+    )
 
     pangolin_output = {
         "scorpio_call": "B.1.167",

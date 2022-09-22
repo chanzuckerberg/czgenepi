@@ -8,13 +8,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from aspen.database.models import Group, PhyloRun, PhyloTree, Sample, User
 from aspen.database.models.pathogens import Pathogen
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
     setup_gisaid_and_genbank_repo_configs,
 )
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
-from aspen.test_infra.models.pathogen import random_pathogen_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -131,7 +131,7 @@ async def test_update_phylo_tree_wrong_group(
         samples,
         phylo_run,
         phylo_tree,
-        _
+        _,
     ) = await make_shared_test_data(async_session)
     group_that_did_not_make_tree = group_factory(name="i_want_to_see_trees")
     user_that_did_not_make_tree = await userrole_factory(

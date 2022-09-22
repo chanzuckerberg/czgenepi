@@ -1,6 +1,4 @@
 import json
-from aspen.test_infra.models.pathogen import random_pathogen_factory
-from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 
 import boto3
 import pytest
@@ -8,8 +6,9 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models.pathogens import Pathogen
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
     setup_gisaid_and_genbank_repo_configs,
 )
@@ -52,7 +51,7 @@ async def test_phylo_tree_rename(
     http_client: AsyncClient,
     async_session: AsyncSession,
     mock_s3_resource: boto3.resource,
-    split_client: SplitClient
+    split_client: SplitClient,
 ):
     """Create a set of samples belonging to different groups with different levels of
     can-see relationships.  Rename the nodes according to the can-see rules, and verify
@@ -158,7 +157,7 @@ async def test_phylo_tree_rename(
     )
 
     tree = result.json()
-    
+
     assert tree["tree"] == {
         "name": "private_identifier_0",
         "GISAID_ID": f"{pathogen_repo_config.prefix}/public_identifier_0",
@@ -178,9 +177,15 @@ async def test_phylo_tree_rename(
                         "GISAID_ID": f"{pathogen_repo_config.prefix}/public_identifier_1",
                         "name": "private_identifier_1",
                     },
-                    {"name": f"{pathogen_repo_config.prefix}/public_identifier_wrong_1"},
-                    {"name": f"{pathogen_repo_config.prefix}/public_identifier_nosee_0"},
-                    {"name": f"{pathogen_repo_config.prefix}/public_identifier_nosee_1"},
+                    {
+                        "name": f"{pathogen_repo_config.prefix}/public_identifier_wrong_1"
+                    },
+                    {
+                        "name": f"{pathogen_repo_config.prefix}/public_identifier_nosee_0"
+                    },
+                    {
+                        "name": f"{pathogen_repo_config.prefix}/public_identifier_nosee_1"
+                    },
                 ],
             },
         ],

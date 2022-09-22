@@ -1,8 +1,6 @@
 import json
 from copy import deepcopy
 from typing import Dict
-from aspen.database.models.pathogens import Pathogen
-from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 
 import boto3
 import pytest
@@ -10,6 +8,7 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.api.views.tests.data.phylo_tree_data import TEST_TREE
 from aspen.api.views.tests.test_list_phylo_runs import make_all_test_data
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
@@ -53,7 +52,8 @@ async def test_phylo_tree_can_see(
         pathogen, "GISAID", async_session
     )
     matching_mapped_json: Dict = create_id_mapped_tree(
-        align_json_with_model(deepcopy(TEST_TREE), phylo_tree), pathogen_repo_config.prefix
+        align_json_with_model(deepcopy(TEST_TREE), phylo_tree),
+        pathogen_repo_config.prefix,
     )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
@@ -110,7 +110,7 @@ async def test_phylo_tree_no_can_see(
     mock_s3_resource: boto3.resource,
     split_client: SplitClient,
     n_trees=1,
-    n_samples=5,  
+    n_samples=5,
 ):
     owner_group: Group = group_factory()
     viewer_group: Group = group_factory(name="CADPH")

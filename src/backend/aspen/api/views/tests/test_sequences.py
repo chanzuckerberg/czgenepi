@@ -30,7 +30,9 @@ async def setup_sequences_download_test_data(
     group = group_factory()
     user = await userrole_factory(async_session, group)
     pathogen = random_pathogen_factory()
-    setup_gisaid_and_genbank_repo_configs(async_session, pathogen, "hCoV-19", "SARS-CoV-2/human")
+    setup_gisaid_and_genbank_repo_configs(
+        async_session, pathogen, "hCoV-19", "SARS-CoV-2/human"
+    )
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )

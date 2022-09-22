@@ -1,9 +1,6 @@
 import json
 import re
 from base64 import urlsafe_b64decode, urlsafe_b64encode
-from aspen.database.models.pathogens import Pathogen
-from aspen.util.split import SplitClient
-from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 
 import boto3
 import pytest
@@ -11,11 +8,13 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.api.views.tests.data.location_data import TEST_COUNTRY_DATA
 from aspen.api.views.tests.data.phylo_tree_data import TEST_TREE
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
+from aspen.util.split import SplitClient
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -96,7 +95,10 @@ async def test_valid_auspice_link_access(
     for index in range(1, 2):
         child = test_children[index - 1]
         assert child["name"] == f"private_identifier_{index}"
-        assert child["GISAID_ID"] == f"{pathogen_repo_config.prefix}/public_identifier_{index}"
+        assert (
+            child["GISAID_ID"]
+            == f"{pathogen_repo_config.prefix}/public_identifier_{index}"
+        )
 
 
 async def test_unauth_user_auspice_link_generation(

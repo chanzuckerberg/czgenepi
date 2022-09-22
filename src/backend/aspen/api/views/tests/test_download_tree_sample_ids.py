@@ -1,8 +1,5 @@
 import json
 import uuid
-from aspen.test_infra.models.pathogen import random_pathogen_factory
-from aspen.util.split import SplitClient
-from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 
 import boto3
 import pytest
@@ -10,9 +7,11 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
-from aspen.database.models import Group, Pathogen, PhyloTree, Sample
+from aspen.database.models import Group, PhyloTree, Sample
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
     setup_gisaid_and_genbank_repo_configs,
 )
@@ -24,6 +23,7 @@ from aspen.test_infra.models.usergroup import (
     grouprole_factory,
     userrole_factory,
 )
+from aspen.util.split import SplitClient
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -105,7 +105,10 @@ async def create_phylotree_with_inputs(
         samples.append(sample)
         input_entities.append(input_entity)
 
-    db_gisaid_samples = [f"{pathogen_repo_config.prefix}/gisaid_identifier", f"{pathogen_repo_config.prefix}/gisaid_identifier2"]
+    db_gisaid_samples = [
+        f"{pathogen_repo_config.prefix}/gisaid_identifier",
+        f"{pathogen_repo_config.prefix}/gisaid_identifier2",
+    ]
 
     phylo_run = phylorun_factory(
         owner_group,
@@ -117,7 +120,10 @@ async def create_phylotree_with_inputs(
         phylo_run,
         samples,
     )
-    tree_gisaid_samples = ["gisaid_identifier", f"{pathogen_repo_config.prefix}/GISAID_identifier2"]
+    tree_gisaid_samples = [
+        "gisaid_identifier",
+        f"{pathogen_repo_config.prefix}/GISAID_identifier2",
+    ]
     upload_s3_file(mock_s3_resource, phylo_tree, samples, tree_gisaid_samples)
 
     async_session.add_all([phylo_tree])
@@ -166,7 +172,7 @@ async def test_tree_metadata_download(
     mock_s3_resource: boto3.resource,
     async_session: AsyncSession,
     http_client: AsyncClient,
-    split_client: SplitClient
+    split_client: SplitClient,
 ):
     """
     Test a regular tsv download for a sample submitted by the user's group
@@ -186,7 +192,8 @@ async def test_tree_metadata_download(
     )
     expected_filename = f"{phylo_tree.id}_sample_ids.tsv"
     expected_document = (
-        "Sample Identifier\tSelected\r\n" f"{pathogen_repo_config.prefix}/root_identifier_1	no\r\n"
+        "Sample Identifier\tSelected\r\n"
+        f"{pathogen_repo_config.prefix}/root_identifier_1	no\r\n"
     )
     for sample in samples:
         expected_document += f"{sample.private_identifier}	no\r\n"
@@ -212,7 +219,7 @@ async def test_private_id_matrix(
     mock_s3_resource: boto3.resource,
     async_session: AsyncSession,
     http_client: AsyncClient,
-    split_client: SplitClient
+    split_client: SplitClient,
 ):
     """
     Test that we use public ids in the fasta file if the requester only has access to the
@@ -273,7 +280,7 @@ async def test_tree_metadata_replaces_all_ids(
     mock_s3_resource: boto3.resource,
     async_session: AsyncSession,
     http_client: AsyncClient,
-    split_client: SplitClient
+    split_client: SplitClient,
 ):
     """
     Test a regular tsv download for a sample submitted by the user's group
@@ -324,7 +331,7 @@ async def test_public_tree_metadata_replaces_all_ids(
     mock_s3_resource: boto3.resource,
     async_session: AsyncSession,
     http_client: AsyncClient,
-    split_client: SplitClient
+    split_client: SplitClient,
 ):
     """
     Test a regular tsv download for public identifiers
@@ -375,7 +382,7 @@ async def test_download_samples_unauthorized(
     mock_s3_resource: boto3.resource,
     async_session: AsyncSession,
     http_client: AsyncClient,
-    split_client: SplitClient
+    split_client: SplitClient,
 ):
     """
     Test downloading samples for a tree you don't have access to.

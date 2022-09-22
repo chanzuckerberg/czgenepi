@@ -16,6 +16,7 @@ from aspen.database.models import (
     WorkflowStatusType,
 )
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
     setup_gisaid_and_genbank_repo_configs,
 )
@@ -27,7 +28,6 @@ from aspen.test_infra.models.usergroup import (
     grouprole_factory,
     userrole_factory,
 )
-from aspen.test_infra.models.pathogen import random_pathogen_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
