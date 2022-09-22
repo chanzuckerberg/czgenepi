@@ -44,7 +44,9 @@
                     "ms-toolsai.jupyter",
                     "ms-toolsai.jupyter-keymap",
                     "ms-toolsai.jupyter-renderers",
-		    "GitHub.copilot"
+		    "ms-python.isort",
+		    "GitHub.copilot",
+		    "ms-python.black-formatter"
                 ]
             }
         }
