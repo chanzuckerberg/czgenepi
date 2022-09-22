@@ -37,7 +37,13 @@ from aspen.api.authn import (
     require_group_membership,
 )
 from aspen.api.authz import AuthZSession, get_authz_session
-from aspen.api.deps import get_db, get_pathogen, get_settings, get_splitio
+from aspen.api.deps import (
+    get_db,
+    get_pathogen,
+    get_pathogen_repo_config,
+    get_settings,
+    get_splitio,
+)
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.auspice import (
     GenerateAuspiceMagicLinkRequest,
@@ -45,8 +51,8 @@ from aspen.api.schemas.auspice import (
 )
 from aspen.api.settings import APISettings
 from aspen.api.utils import process_phylo_tree, verify_and_access_phylo_tree
-from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.database.models import Group, Pathogen, User
+from aspen.database.models.pathogens import PathogenRepoConfig
 from aspen.util.split import SplitClient
 
 router = APIRouter()
@@ -66,6 +72,7 @@ async def generate_auspice_string(
     ac: AuthContext = Depends(get_auth_context),
     group: Group = Depends(require_group_membership),
     pathogen: Pathogen = Depends(get_pathogen),
+    pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ):
     request_body = await request.json()
     validated_body = GenerateAuspiceMagicLinkRequest.parse_obj(request_body)
@@ -108,20 +115,10 @@ async def auspice_view(
     db: AsyncSession = Depends(get_db),
     pathogen: Pathogen = Depends(get_pathogen),
     splitio: SplitClient = Depends(get_splitio),
+    pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ):
     # Load tree
     phylo_tree_id = payload["tree_id"]
-    preferred_public_db = splitio.get_pathogen_treatment(
-        "PATHOGEN_public_repository", pathogen
-    )
-    # get the pathogen_repo_config  for given public_repository and pathogen
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
-        pathogen, preferred_public_db, db
-    )
-    if pathogen_repo_config is None:
-        raise ex.ServerException(
-            "no public repository found for given pathogen public repository"
-        )
     tree_json = await process_phylo_tree(
         db, az, phylo_tree_id, pathogen, pathogen_repo_config
     )

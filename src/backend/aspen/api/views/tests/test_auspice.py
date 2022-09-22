@@ -23,12 +23,14 @@ pytestmark = pytest.mark.asyncio
 async def test_valid_auspice_link_generation(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
     auth_headers = {"user_id": user.auth0_user_id}
     request_body = {"tree_id": phylo_tree.entity_id}
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/auspice/generate",
         json=request_body,

@@ -8,14 +8,8 @@ from sqlalchemy.orm import aliased, contains_eager
 from starlette.requests import Request
 
 from aspen.api.authz import AuthZSession, get_authz_session
-from aspen.api.deps import get_db, get_pathogen, get_splitio
-from aspen.api.error import http_exceptions as ex
-from aspen.api.utils import (
-    extract_accessions,
-    get_pathogen_repo_config_for_pathogen,
-    MetadataTSVStreamer,
-    process_phylo_tree,
-)
+from aspen.api.deps import get_db, get_pathogen, get_pathogen_repo_config, get_splitio
+from aspen.api.utils import extract_accessions, MetadataTSVStreamer, process_phylo_tree
 from aspen.database.models import (
     Pathogen,
     PhyloRun,
@@ -37,20 +31,10 @@ async def get_single_phylo_tree(
     az: AuthZSession = Depends(get_authz_session),
     pathogen: Pathogen = Depends(get_pathogen),
     splitio: SplitClient = Depends(get_splitio),
+    pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ) -> JSONResponse:
     # get public repository for a given pathogen
 
-    preferred_public_db = splitio.get_pathogen_treatment(
-        "PATHOGEN_public_repository", pathogen
-    )
-    # get the pathogen_repo_config  for given public_repository and pathogen
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
-        pathogen, preferred_public_db, db
-    )
-    if pathogen_repo_config is None:
-        raise ex.ServerException(
-            "no public repository found for given pathogen public repository"
-        )
     phylo_tree_data = await process_phylo_tree(
         db,
         az,
@@ -122,18 +106,8 @@ async def get_tree_metadata(
     az: AuthZSession = Depends(get_authz_session),
     pathogen: Pathogen = Depends(get_pathogen),
     splitio: SplitClient = Depends(get_splitio),
+    pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ):
-    preferred_public_db = splitio.get_pathogen_treatment(
-        "PATHOGEN_public_repository", pathogen
-    )
-    # get the pathogen_repo_config  for given public_repository and pathogen
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
-        pathogen, preferred_public_db, db
-    )
-    if pathogen_repo_config is None:
-        raise ex.ServerException(
-            "no public repository found for given pathogen public repository"
-        )
     phylo_tree_data = await process_phylo_tree(
         db,
         az,

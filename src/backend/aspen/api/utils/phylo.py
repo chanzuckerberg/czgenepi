@@ -14,6 +14,7 @@ from sqlalchemy.sql.expression import and_, or_
 from aspen.api.authz import AuthZSession
 from aspen.api.error import http_exceptions as ex
 from aspen.database.models import Group, Location, Pathogen, PhyloRun, PhyloTree, Sample
+from aspen.database.models.pathogens import PathogenRepoConfig
 
 # 16 colors
 NEXTSTRAIN_COLOR_SCALE = [
@@ -276,7 +277,7 @@ async def process_phylo_tree(
     az: AuthZSession,
     phylo_tree_id: int,
     pathogen: Pathogen,
-    pathogen_repo_config,
+    pathogen_repo_config: PathogenRepoConfig,
     id_style: Optional[str] = None,
 ) -> dict:
     (
