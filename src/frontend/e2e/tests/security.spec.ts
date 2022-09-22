@@ -1,3 +1,4 @@
+import { expect, test } from "@playwright/test";
 import { readFileSync } from "fs";
 
 const checkExpirationDate = (path: string) => {
@@ -12,8 +13,10 @@ const checkExpirationDate = (path: string) => {
   if (expirationDate < now) throw Error("security.txt files need updating");
 };
 
-test("ensure security.txt file has not expired", () => {
-  expect(() =>
-    checkExpirationDate("public/.well-known/security.txt")
-  ).not.toThrow();
+test.describe("Security tests", () => {
+  test.only("ensure security.txt file has not expired", () => {
+    expect(() =>
+      checkExpirationDate("public/.well-known/security.txt")
+    ).not.toThrow();
+  });
 });

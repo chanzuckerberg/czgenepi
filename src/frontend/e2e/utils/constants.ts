@@ -7,3 +7,11 @@ export const SAMPLE_PAGE = {
   SAMPLE_STATUS: "div[data-test-id='sample-status']",
   UPLOAD_BTN: "a[href='/upload/step1']",
 };
+
+export const footer: Record<string, string> = {
+  Github: "https://github.com/chanzuckerberg/czgenepi/",
+  Careers:
+    "https://chanzuckerberg.com/careers/career-opportunities/?initiative=science",
+  "Learning Center":
+    "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
+};
