@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, contains_eager
 from sqlalchemy.sql.expression import and_
 
 from aspen.database.models import Pathogen, PathogenRepoConfig, PublicRepository
@@ -20,8 +20,7 @@ async def get_public_repository_prefix(pathogen: Pathogen, public_repository_nam
     res = await db.execute(prefix)
     pathogen_repo_config = res.scalars().one_or_none()
 
-    if pathogen_repo_config:
-        return pathogen_repo_config.prefix
+    return pathogen_repo_config.prefix
 
 
 async def get_pathogen_repo_config_for_pathogen(
@@ -30,21 +29,20 @@ async def get_pathogen_repo_config_for_pathogen(
 
     q = (
         sa.select(PathogenRepoConfig)  # type: ignore
-        .options(  # type: ignore
-            joinedload(PathogenRepoConfig.public_repository),
-            joinedload(PathogenRepoConfig.pathogen),
+        .join(PathogenRepoConfig.public_repository)
+        .join(PathogenRepoConfig.pathogen)
+        .options(
+            contains_eager(PathogenRepoConfig.public_repository),
+            contains_eager(PathogenRepoConfig.pathogen)
         )
-        .where(
+        .filter(
             and_(
                 PathogenRepoConfig.pathogen == pathogen,
-                PathogenRepoConfig.public_repository.has(
-                    PublicRepository.name == preferred_public_database
-                ),
+                PublicRepository.name == preferred_public_database
             )
         )
     )
     res = await db.execute(q)
     pathogen_repo_config = res.scalars().one_or_none()
 
-    if pathogen_repo_config:
-        return pathogen_repo_config
+    return pathogen_repo_config
