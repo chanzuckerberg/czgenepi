@@ -63,12 +63,16 @@ test.describe("Sample page tests with mocked data", () => {
     // Verify data on UI against our mock
     for (let i = 0; i < responseSamples.length; i++) {
       const item = responseSamples[i];
-      const mockStatusText =
-        item.czb_failed_genome_recovery === true ? "complete" : "failed";
+      console.log("***************");
+      console.log(item.czb_failed_genome_recovery);
+      const mockStatusText = item.czb_failed_genome_recovery
+        ? "failed"
+        : "complete";
       const statusTextOnUi = await page
         .locator('[data-test-id="sample-status"]')
         .nth(i)
         .textContent();
+      console.log(statusTextOnUi);
       // verify status on UI
       expect(statusTextOnUi).toBe(mockStatusText); //this fails but because I am not sure how is the status determined; it is not coming from reponse
 
