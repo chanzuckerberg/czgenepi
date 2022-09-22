@@ -100,23 +100,35 @@ export abstract class FilterSample {
     return filterDate;
   }
 
-  //based on a given date string create a date in the past with the amount of days minus the original date
-  public static getPastDateBasedOnSampleResponse(filteredDate: string): Date{
-    const today = new Date();
-    const pastDate =  new Date(filteredDate);
-    const difference = today.getTime() - pastDate.getTime();
-    const daysForFilter = Math.ceil(difference / (1000 * 3600 * 24));
-   if(daysForFilter <= 7){
-        today.setDate(today.getDate() - 7)
-   }else if(daysForFilter <= 30){
-         today.setDate(today.getDate() - 30)
-   }else if(daysForFilter <= 90){
-         today.setDate(today.getDate() - 90)
-   }else if(daysForFilter <= 180){
-         today.setDate(today.getDate() - 180)
-   }else {today.setDate(today.getDate() - daysForFilter)}
-   return today;
+  public static async getStatusBySampleName(page: Page ,sampleName: string): Promise<string>{
+   return await page.locator("//span[text()='${VAR}']/following-sibling::div/span".replace('${VAR}',sampleName)).textContent() as string;
   }
+  
+  public static async filterByLineage(page: Page, lineage: string) {
+      await page.waitForFunction(sample => !! document.querySelector(sample),"div[data-test-id='table-row']:nth-last-child(1)");
+      await page.locator("//span[text()='Lineage']").click();
+      await page.locator("//div[@role='presentation']/descendant::div[text()='${VAR}']".replace('${VAR}',lineage)).click();
+      await page.keyboard.press('Escape');
+  }
+
+  public static async removeSelectedFilter(page: Page){
+    await page.locator("svg[class*='MuiChip-deleteIcon']").click();
+  }
+
+  public static async getColumnContent(page: Page, textFiltered: string): Promise<string[]>{
+   return await page.locator("//div[@data-test-id='table-row']/descendant::div[text()='${VAR}']".replace('${VAR}',textFiltered)).allTextContents();
+  }
+
+  public static async filterBycollectionDate(page: Page, collectionDatePeriod: string){
+    await page.locator("//span[text()='Collection Date']").click();
+    await page.locator("//div[not(contains(@style,'hidden'))]/ul//descendant::span[text()='${VAR}']".replace('${VAR}',collectionDatePeriod)).click();
+  }
+
+  public static async filterByUploadDate(page:Page, uploadDate: string){
+    await page.locator("//span[text()='Upload Date']").click();
+    await page.locator("//div[not(contains(@style,'hidden'))]/ul//descendant::span[text()='${VAR}']".replace('${VAR}',uploadDate)).click();
+  }
+
 
 }
 
