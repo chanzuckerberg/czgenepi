@@ -44,15 +44,7 @@ module.exports = {
     "no-console": "error",
     "react/jsx-no-target-blank": 0,
     "react/prop-types": "off",
-    "sort-keys": [
-      "error",
-      "asc",
-      {
-        caseSensitive: true,
-        minKeys: 5, // 4 keys or fewer means this rule does not kick in
-        natural: false,
-      },
-    ],
+    "sort-keys": "off",
     "prettier/prettier": 0,
     "@typescript-eslint/no-var-requires": 0,
   },
