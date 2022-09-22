@@ -239,7 +239,6 @@ typings/
 
 # dotenv environment variables file
 .env.test
-.env*.local
 
 # parcel-bundler cache (https://parceljs.org/)
 .parcel-cache
@@ -311,7 +310,6 @@ static
 .next
 
 # e2e tests
-src/frontend/.env.local
 src/frontend/.env.staging
 src/frontend/e2e/report/
 

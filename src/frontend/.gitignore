@@ -1,5 +1,4 @@
 .env
-.env.local
 .env.staging
 node_modules/
 e2e/report
