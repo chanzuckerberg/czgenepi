@@ -95,6 +95,7 @@
     "@types/react-csv": "^1.1.1",
     "@types/react-virtualized-auto-sizer": "^1.0.0",
     "@types/react-window": "^1.8.2",
+    "babel-plugin-jsx-remove-data-test-id": "^3.0.0",
     "babel-plugin-transform-imports": "^2.0.0",
     "concurrently": "^6.5.1",
     "dotenv-cli": "^6.0.0",
