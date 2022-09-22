@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 
 dotenv.config({
-  path: path.resolve(__dirname, "../../", ".env.local.ts"),
+  path: path.resolve(__dirname, "../../", ".env.local"),
 });
 
 const config: PlaywrightTestConfig = {

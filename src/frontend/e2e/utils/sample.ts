@@ -9,7 +9,7 @@ const defaultSequence =
   "ATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTC";
 const locationId = 166768; //todo: will be good to get this from API and then choose randomly
 const lineages = ["A", "BA.1.1", "BA.1.15"]; //todo: will be good to get this from API and then choose randomly
-
+const trueOrFalse = [true, false];
 export class SampleUtil {
   /**
    * This method generates sample data that can be used for uploading
@@ -42,7 +42,7 @@ export class SampleUtil {
         ) as number,
         private: GeneralUtil.getValueOrDefault(
           defaults?.sample?.private,
-          false
+          sample(trueOrFalse)
         ) as boolean,
         private_identifier: GeneralUtil.getValueOrDefault(
           defaults?.sample?.private_identifier,
@@ -52,7 +52,6 @@ export class SampleUtil {
           defaults?.sample?.public_identifier,
           GeneralUtil.generatePublicSampleId()
         ) as string,
-        status: "complete"
       },
     };
   }
@@ -65,8 +64,8 @@ export class SampleUtil {
    * @returns GetSampleResponseData
    */
   public static getSampleResponseData(
-    defaults?: GetSampleResponseData,
-    maxCollectionDateAge = 10
+    maxCollectionDateAge = 10,
+    defaults?: GetSampleResponseData
   ): GetSampleResponseData {
     return {
       collection_date: GeneralUtil.getADateInThePast(maxCollectionDateAge),
@@ -77,7 +76,10 @@ export class SampleUtil {
         location: faker.address.county(),
         region: faker.address.state(),
       },
-      czb_failed_genome_recovery: true,
+      czb_failed_genome_recovery: GeneralUtil.getValueOrDefault(
+        defaults?.czb_failed_genome_recovery,
+        sample(trueOrFalse)
+      ) as boolean,
       gisaid: {
         gisaid_id: "",
         status: "Not Found",
@@ -97,12 +99,11 @@ export class SampleUtil {
       },
       private: GeneralUtil.getValueOrDefault(
         defaults?.private,
-        true
+        sample(trueOrFalse)
       ) as boolean,
       private_identifier: GeneralUtil.generatePrivateSampleId(),
       public_identifier: GeneralUtil.generatePublicSampleId(),
       sequencing_date: GeneralUtil.getADateInThePast(),
-      status:"",
       submitting_group: {
         id: 74,
         name: "QA Automation",
@@ -127,7 +128,6 @@ export interface SampleUploadData {
     private: boolean;
     private_identifier: string;
     public_identifier: string;
-    status: string;
   };
 }
 
@@ -168,5 +168,4 @@ export interface GetSampleResponseData {
     id: number;
     name: string;
   };
-  status: string
 }

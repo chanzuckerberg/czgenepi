@@ -113,6 +113,4 @@ test("Should filter by failed Collection Date", async ({ page }) => {
   await FilterSample.removeSelectedFilter(page);
 
 });
-
-
 });
