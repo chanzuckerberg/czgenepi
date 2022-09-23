@@ -14,9 +14,10 @@ const footer: Record<string, string> = {
 };
 
 test.describe("Home page tests", () => {
-  test("Should verify home page", async ({ page }) => {
-    await page.goto(process.env.BASEURL as string);
-    await expect(page.locator(getByTestID("navbar-landing"))).not.toBeEmpty();
+  test.only("Should verify home page", async ({ page }, workerInfo) => {
+    const { baseURL } = workerInfo.config.projects[0].use;
+    await page.goto(`${baseURL}` as string);
+    await expect(page.locator(getByTestID("navbar-landing"))).toBeVisible();
     await expect(
       page.locator(getByTestID("navbar-sign-in-link"))
     ).toBeVisible();

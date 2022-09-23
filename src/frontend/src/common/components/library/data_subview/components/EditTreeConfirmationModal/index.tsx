@@ -1,8 +1,9 @@
 import { Button, Icon } from "czifui";
 import { useEffect, useState } from "react";
 import { useEditTree } from "src/common/queries/trees";
+import { addNotification } from "src/common/redux/actions";
+import { useDispatch } from "src/common/redux/hooks";
 import BaseDialog from "src/components/BaseDialog";
-import Notification from "src/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { StyledDiv, StyledIconButton, StyledTitle } from "./style";
 
@@ -17,10 +18,7 @@ export const EditTreeConfirmationModal = ({
   open,
   phyloRun,
 }: Props): JSX.Element | null => {
-  const [shouldShowErrorNotification, setShouldShowErrorNotification] =
-    useState<boolean>(false);
-  const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
-    useState<boolean>(false);
+  const dispatch = useDispatch();
   const [newTreeName, setNewTreeName] = useState<string>("");
 
   const treeNameLength = newTreeName.length;
@@ -33,24 +31,29 @@ export const EditTreeConfirmationModal = ({
     if (name) {
       setNewTreeName(name);
     }
-
-    // when we have a new tree name that also means that we should reset
-    // shouldShow notifications to false since the component is now focused on editing a new tree
-    setShouldShowSuccessNotification(false);
-    setShouldShowErrorNotification(false);
   }, [
     phyloRun,
     setNewTreeName,
-    setShouldShowSuccessNotification,
-    setShouldShowErrorNotification,
   ]);
 
   const editTreeMutation = useEditTree({
     componentOnSuccess: () => {
-      setShouldShowSuccessNotification(true);
+      dispatch(addNotification({
+        autoDismiss: true,
+        dismissDirection: "left",
+        intent: "info",
+        shouldShowCloseButton: true,
+        text: "Tree name was successfully updated.",
+      }));
     },
     componentOnError: () => {
-      setShouldShowErrorNotification(true);
+      dispatch(addNotification({
+        autoDismiss: true,
+        dismissDirection: "left",
+        intent: "error",
+        shouldShowCloseButton: true,
+        text: "Something went wrong and we were unable to update your tree name. Please try again later.",
+      }));
     },
   });
 
@@ -104,40 +107,13 @@ export const EditTreeConfirmationModal = ({
   );
 
   return (
-    <>
-      {shouldShowSuccessNotification && (
-        <Notification
-          autoDismiss
-          buttonOnClick={() => setShouldShowSuccessNotification(false)}
-          buttonText="DISMISS"
-          dismissDirection="left"
-          dismissed={!shouldShowSuccessNotification}
-          intent="info"
-        >
-          Tree name was successfully updated.
-        </Notification>
-      )}
-      {shouldShowErrorNotification && (
-        <Notification
-          autoDismiss
-          buttonOnClick={() => setShouldShowErrorNotification(false)}
-          buttonText="DISMISS"
-          dismissDirection="left"
-          dismissed={!shouldShowErrorNotification}
-          intent="error"
-        >
-          Something went wrong and we were unable to update your tree name.
-          Please try again later.
-        </Notification>
-      )}
-      <BaseDialog
-        open={open}
-        onClose={handleClose}
-        title={title}
-        content={content}
-        actionButton={confirmButton}
-        closeIcon={closeIcon}
-      />
-    </>
+    <BaseDialog
+      open={open}
+      onClose={handleClose}
+      title={title}
+      content={content}
+      actionButton={confirmButton}
+      closeIcon={closeIcon}
+    />
   );
 };

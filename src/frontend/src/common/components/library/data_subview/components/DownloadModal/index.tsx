@@ -17,7 +17,8 @@ import {
   PUBLIC_REPOSITORY_NAME,
   useFileDownload,
 } from "src/common/queries/samples";
-import { B } from "src/common/styles/basicStyle";
+import { addNotification } from "src/common/redux/actions";
+import { useDispatch } from "src/common/redux/hooks";
 import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
@@ -25,11 +26,10 @@ import {
 import { pluralize } from "src/common/utils/strUtils";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import Dialog from "src/components/Dialog";
-import Notification from "src/components/Notification";
+import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { isFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
-import { ContactUsLink } from "../ContactUsLink";
 import {
   CheckBoxInfo,
   CheckboxLabel,
@@ -59,6 +59,7 @@ const DownloadModal = ({
   open,
   onClose,
 }: Props): JSX.Element => {
+  const dispatch = useDispatch();
   const { data: userInfo } = useUserInfo();
 
   const [tsvRows, setTsvRows] = useState<string[][]>([]);
@@ -71,7 +72,6 @@ const DownloadModal = ({
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
   const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
-  const [shouldShouldError, setShouldShowError] = useState<boolean>(false);
 
   const flag = useTreatments([USER_FEATURE_FLAGS.prep_files]);
   const isPrepFilesFlagOn = isFlagOn(flag, USER_FEATURE_FLAGS.prep_files);
@@ -132,7 +132,11 @@ const DownloadModal = ({
   const useFileMutationGenerator = () =>
     useFileDownload({
       componentOnError: () => {
-        setShouldShowError(true);
+        dispatch(addNotification({
+          componentKey: NotificationComponents.DOWNLOAD_FILES_FAILURE,
+          intent: "error",
+          shouldShowCloseButton: true,
+        }));
         handleCloseModal();
       },
       componentOnSuccess: ({ data, filename }: FileDownloadResponsePayload) => {
@@ -161,19 +165,6 @@ const DownloadModal = ({
 
   return (
     <>
-      <Notification
-        buttonOnClick={() => setShouldShowError(false)}
-        buttonText="DISMISS"
-        dismissDirection="right"
-        dismissed={!shouldShouldError}
-        intent="error"
-      >
-        <B>
-          Something went wrong and we were unable to complete one or more of
-          your downloads
-        </B>{" "}
-        <ContactUsLink />
-      </Notification>
       <Dialog disableEscapeKeyDown open={open} onClose={handleCloseModal}>
         <DialogTitle>
           <StyledCloseIconButton
