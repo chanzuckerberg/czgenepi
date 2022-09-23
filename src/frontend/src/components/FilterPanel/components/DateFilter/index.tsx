@@ -10,7 +10,6 @@ interface Props {
   inputLabel: string;
   updateDateFilter: UpdateDateFilterType;
   menuOptions: DateMenuOption[];
-  "data-test-id": string;
 }
 
 const DateFilter = ({
