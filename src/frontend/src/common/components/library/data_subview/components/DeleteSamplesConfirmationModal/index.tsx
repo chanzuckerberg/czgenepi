@@ -2,11 +2,12 @@ import { isEmpty } from "lodash";
 import { useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useDeleteSamples } from "src/common/queries/samples";
+import { addNotification } from "src/common/redux/actions";
+import { useDispatch } from "src/common/redux/hooks";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { DeleteDialog } from "src/components/DeleteDialog";
-import Notification from "src/components/Notification";
 import { StyledCallout } from "./style";
 
 interface Props {
@@ -20,10 +21,8 @@ const DeleteSamplesConfirmationModal = ({
   onClose,
   open,
 }: Props): JSX.Element | null => {
-  const [shouldShowErrorNotification, setShouldShowErrorNotification] =
-    useState<boolean>(false);
-  const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
-    useState<boolean>(false);
+  const dispatch = useDispatch();
+
   const [numDeletedSamples, setNumDeletedSamples] = useState<number>(0);
   const { data: userInfo } = useUserInfo();
   const currentGroup = getCurrentGroupFromUserInfo(userInfo);
@@ -34,10 +33,20 @@ const DeleteSamplesConfirmationModal = ({
 
   const deleteSampleMutation = useDeleteSamples({
     componentOnError: () => {
-      setShouldShowErrorNotification(true);
+      dispatch(addNotification({
+        autoDismiss: true,
+        intent: "error",
+        shouldShowCloseButton: true,
+        text: "We were unable to delete the selected samples. Please try again later.",
+      }));
     },
     componentOnSuccess: () => {
-      setShouldShowSuccessNotification(true);
+      dispatch(addNotification({
+        autoDismiss: true,
+        intent: "info",
+        shouldShowCloseButton: true,
+        text: `${numDeletedSamples} ${pluralize("sample", numDeletedSamples)} ${pluralize("has", numDeletedSamples)} been deleted.`,
+      }));
     },
   });
 
@@ -76,42 +85,14 @@ const DeleteSamplesConfirmationModal = ({
   );
 
   return (
-    <>
-      {!open && (
-        <>
-          <Notification
-            autoDismiss
-            buttonOnClick={() => setShouldShowSuccessNotification(false)}
-            buttonText="DISMISS"
-            dismissDirection="right"
-            dismissed={!shouldShowSuccessNotification}
-            intent="info"
-          >
-            {numDeletedSamples} {pluralize("sample", numDeletedSamples)}{" "}
-            {numDeletedSamples === 1 ? "has" : "have"} been deleted.
-          </Notification>
-          <Notification
-            autoDismiss
-            buttonOnClick={() => setShouldShowErrorNotification(false)}
-            buttonText="DISMISS"
-            dismissDirection="right"
-            dismissed={!shouldShowErrorNotification}
-            intent="error"
-          >
-            We were unable to delete the selected samples. Please try again
-            later.
-          </Notification>
-        </>
-      )}
-      <DeleteDialog
-        open={open}
-        onClose={onClose}
-        onDelete={onDelete}
-        isDeleteDisabled={isEmpty(samplesToDelete)}
-        title={title}
-        content={content}
-      />
-    </>
+    <DeleteDialog
+      open={open}
+      onClose={onClose}
+      onDelete={onDelete}
+      isDeleteDisabled={isEmpty(samplesToDelete)}
+      title={title}
+      content={content}
+    />
   );
 };
 
