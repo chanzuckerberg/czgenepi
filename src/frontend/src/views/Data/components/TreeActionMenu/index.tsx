@@ -1,5 +1,6 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
-import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
+import { isFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { MoreActionsMenu } from "./components/MoreActionsMenu";
 import { OpenInGalagoButton } from "./components/OpenInGalagoButton";
 import { OpenInNextstrainButton } from "./components/OpenInNextstrainButton";
@@ -36,10 +37,10 @@ const TreeActionMenu = ({
   onEditTreeModalOpen,
   userInfo,
 }: Props): JSX.Element => {
-  const flag = useTreatments([FEATURE_FLAGS.galago_integration]);
+  const flag = useTreatments([USER_FEATURE_FLAGS.galago_integration]);
   const isGalagoIntegrationFlagOn = isFlagOn(
     flag,
-    FEATURE_FLAGS.galago_integration
+    USER_FEATURE_FLAGS.galago_integration
   );
 
   return (

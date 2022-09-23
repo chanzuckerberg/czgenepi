@@ -26,7 +26,8 @@ import { pluralize } from "src/common/utils/strUtils";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import Dialog from "src/components/Dialog";
 import Notification from "src/components/Notification";
-import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
+import { isFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { ContactUsLink } from "../ContactUsLink";
 import {
@@ -72,8 +73,8 @@ const DownloadModal = ({
   const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
   const [shouldShouldError, setShouldShowError] = useState<boolean>(false);
 
-  const flag = useTreatments([FEATURE_FLAGS.prep_files]);
-  const isPrepFilesFlagOn = isFlagOn(flag, FEATURE_FLAGS.prep_files);
+  const flag = useTreatments([USER_FEATURE_FLAGS.prep_files]);
+  const isPrepFilesFlagOn = isFlagOn(flag, USER_FEATURE_FLAGS.prep_files);
 
   const completedSampleIds = checkedSampleIds.filter(
     (id) => !failedSampleIds.includes(id)
