@@ -96,6 +96,7 @@ interface Props {
  * functionality of our dev server because the config won't be rebuilt.
  */
 const SplitInitializer = ({ children }: Props): JSX.Element | null => {
+  const pathogen = useSelector(selectCurrentPathogen);
   const { data: userInfo, isLoading: isLoadingUserInfo } = useUserInfo();
   const [splitConfig, setSplitConfig] =
     useState<SplitIO.IBrowserSettings | null>(null);
@@ -118,13 +119,16 @@ const SplitInitializer = ({ children }: Props): JSX.Element | null => {
       // To ease dev experience, we mock flags, setting them all to "on"
       // NOTE: Below just sets /all/ current flags to treatment of "on".
       // If you need some off or a more complicated flag, modify the below.
-      const flagsToSetOn = Object.values(FEATURE_FLAGS);
-      const mockedFeatureFlags = createSimpleFlagsForLocal(flagsToSetOn);
-      splitConf.features = mockedFeatureFlags;
+      const simpleFlagsToSetOn = Object.values(USER_FEATURE_FLAGS);
+      const mockedSimpleFeatureFlags = createSimpleFlagsForLocal(simpleFlagsToSetOn);
+      const mockedComplexFeatureFlags = createPathogenFlagsForLocal(pathogen);
+
+      const allLocalFlags = { ...mockedSimpleFeatureFlags, ...mockedComplexFeatureFlags }
+      splitConf.features = allLocalFlags;
     }
 
     setSplitConfig(splitConf);
-  }, [isLoadingUserInfo, userInfo]);
+  }, [isLoadingUserInfo, userInfo, pathogen]);
 
   if (!splitConfig) {
     // If we haven't fetched a userinfo response yet, don't enable split.
