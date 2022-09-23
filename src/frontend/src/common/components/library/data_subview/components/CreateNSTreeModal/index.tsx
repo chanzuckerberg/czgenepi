@@ -2,7 +2,6 @@ import RadioGroup from "@mui/material/RadioGroup";
 import { Icon } from "czifui";
 import { uniq } from "lodash";
 import Image from "next/image";
-import NextLink from "next/link";
 import { SyntheticEvent, useEffect, useState } from "react";
 import {
   AnalyticsTreeCreationNextstrain,
@@ -15,16 +14,15 @@ import { TreeTypes } from "src/common/constants/types";
 import GisaidLogo from "src/common/images/gisaid-logo-full.png";
 import { useLineages } from "src/common/queries/lineages";
 import { RawTreeCreationWithId, useCreateTree } from "src/common/queries/trees";
-import { ROUTES } from "src/common/routes";
-import { B } from "src/common/styles/basicStyle";
+import { addNotification } from "src/common/redux/actions";
+import { useDispatch } from "src/common/redux/hooks";
 import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
-import Notification from "src/components/Notification";
+import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
-import { ContactUsLink } from "../ContactUsLink";
 import { Header } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
@@ -42,7 +40,6 @@ import {
   ImageSizer,
   NextstrainLogo,
   Separator,
-  StyledButton,
   StyledDialog,
   StyledDialogContent,
   StyledDialogTitle,
@@ -74,12 +71,6 @@ export const CreateNSTreeModal = ({
   const [shouldReset, setShouldReset] = useState<boolean>(false);
   const [treeType, setTreeType] = useState<TreeType | undefined>();
   const [missingInputSamples, setMissingInputSamples] = useState<string[]>([]);
-  const [shouldShowErrorNotification, setShouldShowErrorNotification] =
-    useState<boolean>(false);
-  const [
-    shouldShowTreeCreatedNotification,
-    setShouldShowTreeCreatedNotification,
-  ] = useState<boolean>(false);
   const [validatedInputSamples, setValidatedInputSamples] = useState<string[]>(
     []
   );
@@ -90,6 +81,8 @@ export const CreateNSTreeModal = ({
   const [selectedLineages, setSelectedLineages] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (shouldReset) setShouldReset(false);
@@ -128,7 +121,13 @@ export const CreateNSTreeModal = ({
 
   const mutation = useCreateTree({
     componentOnError: () => {
-      setShouldShowErrorNotification(true);
+      dispatch(
+        addNotification({
+          intent: "error",
+          componentKey: NotificationComponents.CREATE_NS_TREE_FAILURE,
+          shouldShowCloseButton: true,
+        })
+      );
       handleClose();
     },
     componentOnSuccess: (respData: RawTreeCreationWithId) => {
@@ -142,7 +141,14 @@ export const CreateNSTreeModal = ({
         }
       );
 
-      setShouldShowTreeCreatedNotification(true);
+      dispatch(
+        addNotification({
+          autoDismiss: 12000,
+          intent: "info",
+          componentKey: NotificationComponents.CREATE_NS_TREE_SUCCESS,
+        })
+      );
+
       handleClose();
     },
   });
@@ -182,45 +188,8 @@ export const CreateNSTreeModal = ({
     });
   };
 
-  const handleDismissErrorNotification = () => {
-    setShouldShowErrorNotification(false);
-  };
-
   return (
     <>
-      <Notification
-        buttonOnClick={handleDismissErrorNotification}
-        buttonText="DISMISS"
-        dismissDirection="right"
-        dismissed={!shouldShowErrorNotification}
-        intent="error"
-      >
-        <B>Something went wrong and we were unable to start your tree build</B>{" "}
-        <ContactUsLink />
-      </Notification>
-      <Notification
-        autoDismiss={12000}
-        dismissDirection="right"
-        dismissed={!shouldShowTreeCreatedNotification}
-        intent="info"
-      >
-        <span data-test-id="create-tree-confirmation-message">
-          Your tree is being created. It may take up to 12 hours to process. To
-          check your tree’s status, visit the Phylogenetic Tree tab.
-        </span>
-        <NextLink href={ROUTES.PHYLO_TREES} passHref>
-          <a href="passRef">
-            <StyledButton
-              sdsType="primary"
-              sdsStyle="minimal"
-              onClick={() => setShouldShowTreeCreatedNotification(false)}
-              data-test-id="view-my-trees"
-            >
-              VIEW MY TREES
-            </StyledButton>
-          </a>
-        </NextLink>
-      </Notification>
       <StyledDialog
         disableEscapeKeyDown
         disableBackdropClick

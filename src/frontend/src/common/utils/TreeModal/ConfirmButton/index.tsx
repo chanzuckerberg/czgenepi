@@ -7,12 +7,24 @@ import {
 } from "src/common/api";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import ENV from "src/common/constants/ENV";
+import { ROUTES } from "src/common/routes";
+
+type OutgoingDestination = "galago" | "nextstrain";
 
 interface Props extends ButtonProps {
   treeId: number;
+  outgoingDestination: OutgoingDestination;
 }
 
-const getTreeUrl = async (treeId: number) => {
+// How our various destinations construct their fetch routes
+const ROUTE_LOOKUP: Record<OutgoingDestination, string> = {
+  galago: ROUTES.GALAGO + "#/fetch/",
+  nextstrain: ROUTES.NEXTSTRAIN + "fetch/"
+};
+
+// Get URL for where we should send user based on tree + destination.
+const getOutgoingUrl = async (treeId: number, outgoingDestination: OutgoingDestination) => {
+  // Start by having BE make a URL we can get the tree's JSON from publicly.
   const requestData = { tree_id: treeId };
   const result = await fetch(
     `${ENV.API_URL}${generateOrgSpecificUrl(ORG_API.AUSPICE)}`,
@@ -21,10 +33,10 @@ const getTreeUrl = async (treeId: number) => {
       ...DEFAULT_POST_OPTIONS,
     }
   );
-
   const json = await result.json();
 
-  return "https://nextstrain.org/fetch/" + json.url;
+  const destinationFetchRoute = ROUTE_LOOKUP[outgoingDestination];
+  return destinationFetchRoute + json.url;
 };
 
 const getButtonText = ({
@@ -39,8 +51,16 @@ const getButtonText = ({
   return "Confirm";
 };
 
+/**
+ * Button to send user to a different site to do analysis on a tree they made.
+ *
+ * We send the user to various other apps so they can do analysis on a tree
+ * they produced in our app. This component has the logic to pull a public
+ * URL for specified tree from BE, then send the user to the specified
+ * destination with that tree embedded in the link out when clicked.
+ */
 export const ConfirmButton = (props: Props): JSX.Element => {
-  const { treeId, ...rest } = props;
+  const { treeId, outgoingDestination, ...rest } = props;
 
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -49,7 +69,7 @@ export const ConfirmButton = (props: Props): JSX.Element => {
   useEffect(() => {
     const getUrl = async () => {
       try {
-        setUrl(await getTreeUrl(treeId));
+        setUrl(await getOutgoingUrl(treeId, outgoingDestination));
         setIsLoading(false);
       } catch {
         setIsLoading(false);

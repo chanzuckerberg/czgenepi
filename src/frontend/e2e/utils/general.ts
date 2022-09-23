@@ -1,20 +1,15 @@
-import { faker } from "@faker-js/faker";
-
 export class GeneralUtil {
   public static getValueOrDefault = function <T>(value: T, defaultValue: T): T {
     return value !== undefined ? value : defaultValue;
   };
 
   public static getRandomNumber(): number {
-    return faker.datatype.number({
-      min: 10000,
-      max: 99999,
-    });
+    return Math.floor(Math.random() * 99999) + 1;
   }
 
   public static generatePublicSampleId(country?: string): string {
     const prefix = "hCoV-19";
-    const _country = country !== undefined ? country : faker.address.country();
+    const _country = country !== undefined ? country : "USA";
     const _number = GeneralUtil.getRandomNumber();
     const year = new Date().getFullYear();
 
@@ -38,21 +33,15 @@ export class GeneralUtil {
   @param {number} howRecent: how recent the date should be, defaults to 10, meaning the date can be 1 - 10 days in the past
   @param {string} refDate: reference date to use, especially useful for sequencing date that needs to be older that collection date
   */
-  public static getADateInThePast(
-    howRecent?: number,
-    refDate?: string
-  ): string {
-    const days =
-      howRecent !== undefined
-        ? howRecent
-        : faker.datatype.number({
-            min: 1,
-            max: 10,
-          });
-    if (refDate !== undefined) {
-      return faker.date.recent(days, refDate).toISOString().substring(0, 10);
-    } else {
-      return faker.date.recent(days).toISOString().substring(0, 10);
-    }
+  public static getADateInThePast(earliest = 10, refDate?: string): string {
+    // if current date if no refence date
+    const fromDate = refDate !== undefined ? new Date(refDate) : new Date();
+    let d = fromDate;
+    do {
+      d = fromDate;
+      const randomNumber = Math.floor(Math.random() * earliest);
+      d.setDate(d.getDate() - randomNumber);
+    } while (d.getTime() < fromDate.getTime());
+    return d.toISOString().substring(0, 10);
   }
 }

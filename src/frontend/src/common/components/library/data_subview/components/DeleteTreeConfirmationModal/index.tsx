@@ -1,7 +1,7 @@
-import { useState } from "react";
 import { useDeletePhyloRun } from "src/common/queries/phyloRuns";
+import { addNotification } from "src/common/redux/actions";
+import { useDispatch } from "src/common/redux/hooks";
 import { DeleteDialog } from "src/components/DeleteDialog";
-import Notification from "src/components/Notification";
 
 interface Props {
   onClose(): void;
@@ -14,17 +14,24 @@ const DeleteTreeConfirmationModal = ({
   open,
   phyloRun,
 }: Props): JSX.Element | null => {
-  const [shouldShowErrorNotification, setShouldShowErrorNotification] =
-    useState<boolean>(false);
-  const [shouldShowSuccessNotification, setShouldShowSuccessNotification] =
-    useState<boolean>(false);
+  const dispatch = useDispatch();
 
   const deletePhyloRunMutation = useDeletePhyloRun({
     componentOnSuccess: () => {
-      setShouldShowSuccessNotification(true);
+      dispatch(addNotification({
+        autoDismiss: true,
+        intent: "info",
+        shouldShowCloseButton: true,
+        text: "Your tree has been deleted.",
+      }));
     },
     componentOnError: () => {
-      setShouldShowErrorNotification(true);
+      dispatch(addNotification({
+        autoDismiss: true,
+        intent: "error",
+        shouldShowCloseButton: true,
+        text: "We were unable to delete your tree. Please try again later.",
+      }));
     },
   });
 
@@ -50,39 +57,13 @@ const DeleteTreeConfirmationModal = ({
   );
 
   return (
-    <>
-      {shouldShowSuccessNotification && (
-        <Notification
-          autoDismiss
-          buttonOnClick={() => setShouldShowSuccessNotification(false)}
-          buttonText="DISMISS"
-          dismissDirection="right"
-          dismissed={!shouldShowSuccessNotification}
-          intent="info"
-        >
-          Your tree has been deleted.
-        </Notification>
-      )}
-      {shouldShowErrorNotification && (
-        <Notification
-          autoDismiss
-          buttonOnClick={() => setShouldShowErrorNotification(false)}
-          buttonText="DISMISS"
-          dismissDirection="right"
-          dismissed={!shouldShowErrorNotification}
-          intent="error"
-        >
-          We were unable to delete your tree. Please try again later.
-        </Notification>
-      )}
-      <DeleteDialog
-        open={open}
-        onDelete={onDelete}
-        onClose={onClose}
-        title={title}
-        content={content}
-      />
-    </>
+    <DeleteDialog
+      open={open}
+      onDelete={onDelete}
+      onClose={onClose}
+      title={title}
+      content={content}
+    />
   );
 };
 

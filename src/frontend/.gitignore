@@ -1,5 +1,4 @@
 .env
 .env.staging
 node_modules/
-e2e/storage/
 e2e/report

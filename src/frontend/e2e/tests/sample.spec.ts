@@ -1,5 +1,9 @@
 import { expect, Page, test } from "@playwright/test";
 import { getByTestID, getByText } from "../utils/selectors";
+import path from "path";
+import dotenv from 'dotenv';
+
+dotenv.config({path: path.resolve(`.env.${process.env.NODE_ENV}`),});
 
 const TAB_COUNT = 2;
 
@@ -30,12 +34,21 @@ test.describe("Samples page tests", () => {
   });
 
   test("Should verify sample data", async ({ page }: { page: Page }) => {
+    await page.goto(process.env.BASEURL+"data/samples" as string);
+
     //wait until data is displayed
     await page.waitForSelector('[data-test-id="table-row"]');
-
-    // assert table is populated with at least one record
-    expect(
-      await page.locator(getByTestID("table-row")).count()
-    ).toBeGreaterThan(0);
+    await expect(page.locator('text="20SCPH11281"')).not.toBeEmpty();
+    await expect(
+      page.locator('text="hCoV-19/USA/ADMIN-18181/2022"')
+    ).not.toBeEmpty();
+    await expect(page.locator('text="A"').first()).not.toBeEmpty();
+    await expect(page.locator('text="2022-07-10"').first()).not.toBeEmpty();
+    await expect(page.locator('text="2022-07-18"').first()).not.toBeEmpty();
+    await expect(
+      page.locator('text="San Mateo County"').first()
+    ).not.toBeEmpty();
+    await expect(page.locator('text="2022-07-12"').first()).not.toBeEmpty();
+    await expect(page.locator('text="Not Found"').first()).not.toBeEmpty();
   });
 });

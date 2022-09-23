@@ -4,6 +4,13 @@ ARG DEBIAN_FRONTEND=noninteractive
 LABEL maintainer = "CZ Gen Epi"
 LABEL description = "Image for CZ Gen Epi ingest-gisaid workflow"
 
+# TODO -- Preferably want to drop to non-root user for job runs.
+# RUN commands below necessitate root for some of them. Nextstrain now has
+# a non-root user (`USER nextstrain:nextstrain) as part of its Dockerfile
+# https://github.com/nextstrain/docker-base/blob/master/Dockerfile#L259
+# Probably want to use that once we have chance to test its fine for job runs.
+USER root
+
 RUN sed -i s/archive.ubuntu.com/us-west-2.ec2.archive.ubuntu.com/ /etc/apt/sources.list; \
     echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/98idseq; \
     echo 'APT::Install-Suggests "false";' > /etc/apt/apt.conf.d/99idseq

@@ -24,7 +24,7 @@ export default function RightNav(): JSX.Element {
             href="passHref"
             sdsType="secondary"
             sdsStyle="rounded"
-            data-test-id="sample-page-upload-btn"
+            data-test-id="upload-btn"
           >
             Upload
           </UploadButton>
