@@ -4,7 +4,7 @@ export type ActionType<T> = (payload?: T) => {
 };
 
 export enum Pathogen {
-  COVID = "covid",
+  COVID = "SC2",
 }
 
 // export action type for use in reducers and middleware
