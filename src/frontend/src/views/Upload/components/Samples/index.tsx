@@ -120,14 +120,13 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
             </span>,
           ]}
         />
-        <ContentWrapper>
+        <ContentWrapper data-test-id="upload-select-sample-files-btn">
           <StyledFilePicker
             text={"Select Sample Files"}
             multiple
             handleFiles={handleFileChange}
             accept=".fasta,.fa,.txt,.gz,.zip"
             isLoading={isLoadingFile}
-            data-test-id="upload-select-sample-files-btn"
           />
           {parseErrors && (
             <AlertAccordion

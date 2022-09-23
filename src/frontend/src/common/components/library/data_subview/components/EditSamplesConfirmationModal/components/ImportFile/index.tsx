@@ -230,7 +230,6 @@ export default function ImportFile({
           "Your existing metadata will be replaced with the " +
           "information found in the new import file."
         }
-        data-test-id="upload-select-metadatafile-btn"
       />
       <ImportFileWarnings
         hasImportedFile={hasImportedMetadataFile}

@@ -82,7 +82,6 @@ export const EditTreeConfirmationModal = ({
         withCollapsibleInstructions={false}
         textInputLabel={"Tree Name: "}
         isTextInputMultiLine={true}
-        data-test-id="tree-name-input"
       />
     </StyledDiv>
   );

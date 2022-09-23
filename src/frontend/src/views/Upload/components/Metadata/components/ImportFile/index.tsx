@@ -161,7 +161,6 @@ export default function ImportFile({
             "information found in the new import file."
           }
           isLoading={isLoading}
-          data-test-id="upload-select-metadatafile-btn"
         />
       </div>
 

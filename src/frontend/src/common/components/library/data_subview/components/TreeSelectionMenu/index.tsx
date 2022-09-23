@@ -58,7 +58,6 @@ const TreeSelectionMenu = ({
         sdsIcon="treeHorizontal"
         tooltipTextDisabled={TREE_BUILD_TOOLTIP_TEXT(true)}
         tooltipTextEnabled={TREE_BUILD_TOOLTIP_TEXT(false)}
-        data-test-id="sample-page-run-phylo-tree-btn"
       />
       <Menu
         anchorEl={anchorEl}
@@ -73,8 +72,9 @@ const TreeSelectionMenu = ({
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
+        data-test-id="run-nextstrain-phylo-analysis-icon"
       >
-        <MenuItem onClick={handleClickNS}>
+        <MenuItem onClick={handleClickNS} data-test-id="nextstrain-phylo-tree">
           Nextstrain Phylogenetic Tree
         </MenuItem>
         <Tooltip

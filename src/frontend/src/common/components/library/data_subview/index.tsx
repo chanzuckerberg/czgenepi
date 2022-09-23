@@ -252,7 +252,12 @@ const DataSubview: FunctionComponent<Props> = ({
     if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
       sampleActions = (
         <DownloadWrapper>
-          <StyledChip isRounded label={checkedSampleIds.length} status="info" />
+          <StyledChip
+            isRounded
+            label={checkedSampleIds.length}
+            status="info"
+            data-test-id="selected-sample-count"
+          />
           <StyledDiv>Selected </StyledDiv>
           <Divider />
           <TreeSelectionMenu
@@ -260,7 +265,6 @@ const DataSubview: FunctionComponent<Props> = ({
             handleCreateUsherTreeOpen={() => setShouldStartUsherFlow(true)}
             isMenuDisabled={hasTooManySamples}
             isUsherDisabled={!hasCheckedSamples}
-            data-test-id="sample-page-create-ns-tree-btn"
           />
           <IconButton
             onClick={handleDownloadClickOpen}
@@ -269,7 +273,6 @@ const DataSubview: FunctionComponent<Props> = ({
             tooltipTextDisabled={DOWNLOAD_TOOLTIP_TEXT_DISABLED}
             tooltipTextEnabled={DOWNLOAD_TOOLTIP_TEXT_ENABLED}
             size="large"
-            data-test-id="sample-page-dowload-btn"
           />
           <MoreActionsMenu
             disabled={!hasCheckedSamples}

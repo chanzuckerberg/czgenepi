@@ -6,6 +6,7 @@ import {
   TreeNameTooLongAlert,
 } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
+import { string } from "yup/lib/locale";
 import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
@@ -22,6 +23,7 @@ interface Props {
   instructionHeader?: string;
   textInputLabel?: string;
   isTextInputMultiLine?: boolean;
+  "data-test-id"?: string;
 }
 
 const TreeNameInput = ({
@@ -99,6 +101,7 @@ const TreeNameInput = ({
         onChange={onChangeTreeName}
         multiline={isTextInputMultiLine ? true : false}
         maxRows={isTextInputMultiLine ? 3 : undefined}
+        data-test-id="tree-name-input"
       />
       {isTreeNameTooLong && (
         <TreeNameTooLongAlert>

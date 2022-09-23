@@ -302,7 +302,6 @@ export const CreateNSTreeModal = ({
                     setEndDate={setEndDate}
                   />
                 }
-                data-test-id="tree-type-overview"
               />
               <StyledFormControlLabel
                 value={TreeTypes.Targeted}
@@ -313,7 +312,6 @@ export const CreateNSTreeModal = ({
                     selected={treeType === TreeTypes.Targeted}
                   />
                 }
-                data-test-id="tree-type-targeted"
               />
               <StyledFormControlLabel
                 value={TreeTypes.NonContextualized}
@@ -331,7 +329,6 @@ export const CreateNSTreeModal = ({
                     setEndDate={setEndDate}
                   />
                 }
-                data-test-id="tree-type-non-contextual"
               />
             </RadioGroup>
           </TreeTypeSection>
@@ -352,7 +349,6 @@ export const CreateNSTreeModal = ({
             isInEditMode={isInputInEditMode}
             treeType={treeType}
             onClick={handleSubmit}
-            data-test-id="create-tree-btn"
           />
           <CreateTreeInfo>
             Creating a new tree can take up to 12 hours.
