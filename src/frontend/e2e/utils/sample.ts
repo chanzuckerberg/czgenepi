@@ -1,5 +1,11 @@
 import { sample } from "lodash";
-import { CommonUtil } from "./common";
+import {
+  generatePrivateSampleId,
+  generatePublicSampleId,
+  getADateInThePast,
+  getRandomNumber,
+  getValueOrDefault,
+} from "./common";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -22,39 +28,35 @@ export function getSampleUploadData(
   minCollectionDays = 0,
   maxCollectionDays = 10
 ): SampleUploadData {
-  const collectionDate = CommonUtil.getValueOrDefault(
+  const collectionDate = getValueOrDefault(
     defaults?.sample?.collection_date,
-    CommonUtil.getADateInThePast(minCollectionDays)
+    getADateInThePast(minCollectionDays)
   );
   return {
     pathogen_genome: {
       sequence: defaultSequence,
-      sequencing_date: CommonUtil.getValueOrDefault(
+      sequencing_date: getValueOrDefault(
         defaults?.pathogen_genome?.sequencing_date,
-        CommonUtil.getADateInThePast(
-          minCollectionDays,
-          maxCollectionDays,
-          collectionDate
-        )
+        getADateInThePast(minCollectionDays, maxCollectionDays, collectionDate)
       ) as string,
     },
     sample: {
       collection_date: collectionDate as string,
-      location_id: CommonUtil.getValueOrDefault(
+      location_id: getValueOrDefault(
         defaults?.sample?.location_id,
         locationId
       ) as number,
-      private: CommonUtil.getValueOrDefault(
+      private: getValueOrDefault(
         defaults?.sample?.private,
         sample(trueOrFalse)
       ) as boolean,
-      private_identifier: CommonUtil.getValueOrDefault(
+      private_identifier: getValueOrDefault(
         defaults?.sample?.private_identifier,
-        CommonUtil.generatePrivateSampleId()
+        generatePrivateSampleId()
       ) as string,
-      public_identifier: CommonUtil.getValueOrDefault(
+      public_identifier: getValueOrDefault(
         defaults?.sample?.public_identifier,
-        CommonUtil.generatePublicSampleId()
+        generatePublicSampleId()
       ) as string,
     },
   };
@@ -73,18 +75,18 @@ export function getSampleResponseData(
   maxDays = 10
 ): SampleResponseData {
   return {
-    collection_date: CommonUtil.getADateInThePast(minDays, maxDays),
+    collection_date: getADateInThePast(minDays, maxDays),
     collection_location: {
       country: "USA",
       division: "California",
-      id: CommonUtil.getValueOrDefault(
+      id: getValueOrDefault(
         defaults?.collection_location,
         locationId
       ) as number,
       location: "Corodano",
       region: "California",
     },
-    czb_failed_genome_recovery: CommonUtil.getValueOrDefault(
+    czb_failed_genome_recovery: getValueOrDefault(
       defaults?.czb_failed_genome_recovery,
       sample(trueOrFalse)
     ) as boolean,
@@ -92,30 +94,27 @@ export function getSampleResponseData(
       gisaid_id: "",
       status: "Not Found",
     },
-    id: CommonUtil.getValueOrDefault(
-      defaults?.id,
-      CommonUtil.getRandomNumber()
-    ) as number,
+    id: getValueOrDefault(defaults?.id, getRandomNumber()) as number,
     lineage: {
       confidence: "",
-      last_updated: CommonUtil.getADateInThePast(),
-      lineage: sample(lineages) as string,
+      last_updated: getADateInThePast(),
+      lineage: getValueOrDefault(defaults?.lineage, sample(lineages)) as string,
       qc_status: "pass",
       scorpio_call: "Omicron (BA.1-like)",
       scorpio_support: 0.93,
       version: "PUSHER-v1.13",
     },
-    private: CommonUtil.getValueOrDefault(defaults?.private, true) as boolean,
-    private_identifier: CommonUtil.generatePrivateSampleId(),
-    public_identifier: CommonUtil.generatePublicSampleId(),
-    sequencing_date: CommonUtil.getADateInThePast(),
+    private: getValueOrDefault(defaults?.private, true) as boolean,
+    private_identifier: generatePrivateSampleId(),
+    public_identifier: generatePublicSampleId(),
+    sequencing_date: getADateInThePast(),
     submitting_group: {
       id: 74,
       name: "QA Automation",
     },
-    upload_date: CommonUtil.getValueOrDefault(
+    upload_date: getValueOrDefault(
       defaults?.upload_date,
-      CommonUtil.getADateInThePast()
+      getADateInThePast()
     ) as string,
     uploaded_by: {
       id: 108,

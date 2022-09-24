@@ -4,7 +4,7 @@ import { applyFilter, convertDaysToDate } from "../pages/filter";
 import path from "path";
 import * as dotenv from "dotenv";
 import { getByTestID } from "../utils/selectors";
-import { CommonUtil } from "../utils/common";
+import { getADateInThePast } from "../utils/common";
 
 dotenv.config({
   path: path.resolve(__dirname, "../../", `.env.${process.env.NODE_ENV}`),
@@ -38,7 +38,7 @@ test.describe("Sample filtering tests", () => {
     await page.goto(url);
   });
 
-  test.only("Should filter samples by 'Complete' status", async ({
+  test("Should filter samples by 'Complete' status", async ({
     page,
     context,
   }) => {
@@ -92,19 +92,38 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter samples by lineage", async ({ page }) => {
+  test.only("Should filter samples by lineage", async ({ page, context }) => {
     // define filtering criteria
     const filterBy = {
       lineage: ["BA.1.15"],
     };
+
+    //create an intercept to stub response with mock data once we get response with status 200
+    await context.route(api, async (route) => {
+      const response = await context.request.get(api);
+      //check we get response 200, but we could also abort the call (route.abort() : route.continue();)
+      expect(response.ok()).toBeTruthy();
+      //retain original response but replace body part with stubbed data we created
+      route.fulfill({
+        response,
+        body: JSON.stringify(mockData),
+      });
+    });
+    // make the actual, wait until all responses have been received
+    await page.goto(url, { waitUntil: "networkidle" });
+
+    //wait until data is displayed
+    await waitForDataToBeDisplayed(page);
+
     // filter samples
     await applyFilter(page, filterBy);
+    await page.screenshot({ path: "samplesPage.png", fullPage: true });
 
-    // verify only samples with selected lineages displayed
+    // verify only complete samples are listed
     const sampleLineages = page.locator(".ez2j8c413");
+    expect(await sampleLineages.count()).toBe(2); //we earlier prepared 2 samples with complete status
     for (let i = 0; i < (await sampleLineages.count()); i++) {
-      const val = await sampleLineages.nth(i).textContent();
-      expect(filterBy.lineage).toContain(val);
+      expect(sampleLineages.nth(i)).toHaveText(filterBy.lineage);
     }
   });
 
@@ -357,69 +376,69 @@ test.describe("Sample filtering tests", () => {
 function prepareTestData() {
   let mockResponseData = [];
   const totalSamplePerScenario = 2;
-  let defaults = getDefaults();
+  //let defaults = getDefaults();
   // data for testing status = failed
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
     let defaults = getDefaults();
     defaults.czb_failed_genome_recovery = true;
-    mockResponseData.push(getSampleResponseData());
+    mockResponseData.push(getSampleResponseData(defaults));
   }
 
   // data for testing lineage
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
-    defaults = getDefaults();
+    let defaults = getDefaults();
     defaults.lineage = "BA.1.15";
-    mockResponseData.push(getSampleResponseData());
+    mockResponseData.push(getSampleResponseData(defaults));
   }
 
   // data for samples collected within last 7 days
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
-    defaults = getDefaults();
-    defaults.collection_date = CommonUtil.getADateInThePast(0, 7);
-    mockResponseData.push(getSampleResponseData());
+    let defaults = getDefaults();
+    defaults.collection_date = getADateInThePast(0, 7);
+    mockResponseData.push(getSampleResponseData(defaults));
   }
 
   // data for samples collected within last 30 days; we already have 2 within 7 days
-  defaults = getDefaults();
-  defaults.collection_date = CommonUtil.getADateInThePast(8, 30);
-  mockResponseData.push(getSampleResponseData());
+  let defaults = getDefaults();
+  defaults.collection_date = getADateInThePast(8, 30);
+  mockResponseData.push(getSampleResponseData(defaults));
 
   // data for samples collected within last 3 months; we already have 3 within 30 days
   defaults = getDefaults();
-  defaults.collection_date = CommonUtil.getADateInThePast(31, 90);
-  mockResponseData.push(getSampleResponseData());
+  defaults.collection_date = getADateInThePast(31, 90);
+  mockResponseData.push(getSampleResponseData(defaults));
 
   // data for samples collected within last 6 months; we already have 4 within 3 months
   defaults = getDefaults();
-  defaults.collection_date = CommonUtil.getADateInThePast(91, 120);
-  mockResponseData.push(getSampleResponseData());
+  defaults.collection_date = getADateInThePast(91, 120);
+  mockResponseData.push(getSampleResponseData(defaults));
 
   // data for samples collected within last 1 year; we already have 5 within 6 months
   defaults = getDefaults();
-  defaults.collection_date = CommonUtil.getADateInThePast(121, 360);
-  mockResponseData.push(getSampleResponseData());
+  defaults.collection_date = getADateInThePast(121, 360);
+  mockResponseData.push(getSampleResponseData(defaults));
 
   // data for samples uploaded today
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
-    defaults = getDefaults();
-    defaults.upload_date = CommonUtil.getADateInThePast(0, 0);
-    mockResponseData.push(getSampleResponseData());
+    let defaults = getDefaults();
+    defaults.upload_date = getADateInThePast(0, 0);
+    mockResponseData.push(getSampleResponseData(defaults));
   }
   // data for samples uploaded yesterday, we have 2 uploaded today
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
-    defaults = getDefaults();
-    defaults.upload_date = CommonUtil.getADateInThePast(1, 1);
-    mockResponseData.push(getSampleResponseData());
+    let defaults = getDefaults();
+    defaults.upload_date = getADateInThePast(1, 1);
+    mockResponseData.push(getSampleResponseData(defaults));
   }
   // data for samples uploaded with last 7 days; we already have 4 uploaded today and yesterday
   defaults = getDefaults();
-  defaults.upload_date = CommonUtil.getADateInThePast(2, 7);
-  mockResponseData.push(getSampleResponseData());
+  defaults.upload_date = getADateInThePast(2, 7);
+  mockResponseData.push(getSampleResponseData(defaults));
   return mockResponseData;
 }
 /**
@@ -442,7 +461,10 @@ function getDefaults(): Partial<SampleResponseDefaults> {
 
 async function waitForDataToBeDisplayed(page: Page) {
   //accept cookie t&c
-  await page.locator('text="Accept"').first().click();
+  //await page.locator('text="Accept"').first().click();
+  await page
+    .locator('[aria-label="Help us improve CZ GEN EPI"] >> text=Accept')
+    .click();
 
   //wait until data is displayed
   await page.waitForSelector('[data-test-id="table-row"]');

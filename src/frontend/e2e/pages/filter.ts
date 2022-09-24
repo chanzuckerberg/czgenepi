@@ -70,19 +70,22 @@ export async function applyFilter(
       .filter({ hasText: filterData.collectionDatePeriod })
       .click();
   }
-  // select lineage
+  // select lineage(s)
   if (filterData.lineage !== undefined) {
-    await page.locator("button[label='Lineage']").click();
+    await page.locator('button:has-text("Lineage")').click();
+    await page
+      .locator('text=Search for a location​ >> [placeholder="Search"]')
+      .click();
     for (const singleLineage of filterData.lineage) {
-      await page.locator("div[role='tooltip'] input").fill(singleLineage);
       await page
-        .locator("ul[role='listbox']  .primary-text > div", {
-          hasText: singleLineage,
-        })
-        .first()
+        .locator('text=Search for a location​ >> [placeholder="Search"]')
+        .fill(singleLineage);
+      await page
+        .locator(`div[role="menuitem"] >> text=${singleLineage}`)
         .click();
     }
-    await page.keyboard.press("Escape"); //dismiss form
+    //dismiss form
+    await page.keyboard.press("Escape");
   }
 }
 
