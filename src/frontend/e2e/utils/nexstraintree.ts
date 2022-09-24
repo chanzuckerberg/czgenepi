@@ -1,6 +1,6 @@
 const faker = require("@faker-js/faker");
 import { sample } from "lodash";
-import { GeneralUtil } from "./general";
+import { GeneralUtil } from "./common";
 
 const lineages = ["A", "BA.1.1", "BA.1.15"];
 

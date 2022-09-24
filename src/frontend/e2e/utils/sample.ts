@@ -1,5 +1,5 @@
 import { sample } from "lodash";
-import { GeneralUtil } from "./general";
+import { CommonUtil } from "./common";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -8,6 +8,7 @@ const defaultSequence =
   "ATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTCATTAAAGCCCCCAAGTC";
 const locationId = 166768; //todo: will be good to get this from API and then choose randomly
 const lineages = ["A", "BA.1.1", "BA.1.15"]; //todo: will be good to get this from API and then choose randomly
+const trueOrFalse = [true, false];
 
 export class SampleUtil {
   /**
@@ -19,37 +20,42 @@ export class SampleUtil {
    */
   public static getSampleUploadData(
     defaults?: SampleUploadData,
-    maxCollectionDateAge = 10
+    minCollectionDays = 0,
+    maxCollectionDays = 10
   ): SampleUploadData {
-    const collectionDate = GeneralUtil.getValueOrDefault(
+    const collectionDate = CommonUtil.getValueOrDefault(
       defaults?.sample?.collection_date,
-      GeneralUtil.getADateInThePast(maxCollectionDateAge)
+      CommonUtil.getADateInThePast(minCollectionDays)
     );
     return {
       pathogen_genome: {
         sequence: defaultSequence,
-        sequencing_date: GeneralUtil.getValueOrDefault(
+        sequencing_date: CommonUtil.getValueOrDefault(
           defaults?.pathogen_genome?.sequencing_date,
-          GeneralUtil.getADateInThePast(maxCollectionDateAge, collectionDate)
+          CommonUtil.getADateInThePast(
+            minCollectionDays,
+            maxCollectionDays,
+            collectionDate
+          )
         ) as string,
       },
       sample: {
         collection_date: collectionDate as string,
-        location_id: GeneralUtil.getValueOrDefault(
+        location_id: CommonUtil.getValueOrDefault(
           defaults?.sample?.location_id,
           locationId
         ) as number,
-        private: GeneralUtil.getValueOrDefault(
+        private: CommonUtil.getValueOrDefault(
           defaults?.sample?.private,
-          false
+          sample(trueOrFalse)
         ) as boolean,
-        private_identifier: GeneralUtil.getValueOrDefault(
+        private_identifier: CommonUtil.getValueOrDefault(
           defaults?.sample?.private_identifier,
-          GeneralUtil.generatePrivateSampleId()
+          CommonUtil.generatePrivateSampleId()
         ) as string,
-        public_identifier: GeneralUtil.getValueOrDefault(
+        public_identifier: CommonUtil.getValueOrDefault(
           defaults?.sample?.public_identifier,
-          GeneralUtil.generatePublicSampleId()
+          CommonUtil.generatePublicSampleId()
         ) as string,
       },
     };
@@ -58,53 +64,60 @@ export class SampleUtil {
   /**
    * method creates synthetic data for stubbing get Sample api response
    * @param defaults - user supplied sample data to be included
-   * @param maxCollectionDateAge  - specifies earliest day of the sample.
-   * e.g. 5 means sample collection date will be no earlier than 5 days
+   * @param maxDays  - specifies earliest day of the sample, defaults 10
+   * @param minDays  - specifies lates day of the sample default 0 (today).
    * @returns GetSampleResponseData
    */
   public static getSampleResponseData(
-    defaults?: GetSampleResponseData,
-    maxCollectionDateAge = 10
-  ): GetSampleResponseData {
+    defaults?: Partial<SampleResponseDefaults>,
+    minDays = 0,
+    maxDays = 10
+  ): SampleResponseData {
     return {
-      collection_date: GeneralUtil.getADateInThePast(maxCollectionDateAge),
+      collection_date: CommonUtil.getADateInThePast(minDays, maxDays),
       collection_location: {
         country: "USA",
         division: "California",
-        id: GeneralUtil.getRandomNumber(),
+        id: CommonUtil.getValueOrDefault(
+          defaults?.collection_location,
+          locationId
+        ) as number,
         location: "Corodano",
         region: "California",
       },
-      czb_failed_genome_recovery: true,
+      czb_failed_genome_recovery: CommonUtil.getValueOrDefault(
+        defaults?.czb_failed_genome_recovery,
+        sample(trueOrFalse)
+      ) as boolean,
       gisaid: {
         gisaid_id: "",
         status: "Not Found",
       },
-      id: GeneralUtil.getValueOrDefault(
+      id: CommonUtil.getValueOrDefault(
         defaults?.id,
-        GeneralUtil.getRandomNumber()
+        CommonUtil.getRandomNumber()
       ) as number,
       lineage: {
         confidence: "",
-        last_updated: GeneralUtil.getADateInThePast(),
+        last_updated: CommonUtil.getADateInThePast(),
         lineage: sample(lineages) as string,
         qc_status: "pass",
         scorpio_call: "Omicron (BA.1-like)",
         scorpio_support: 0.93,
         version: "PUSHER-v1.13",
       },
-      private: GeneralUtil.getValueOrDefault(
-        defaults?.private,
-        true
-      ) as boolean,
-      private_identifier: GeneralUtil.generatePrivateSampleId(),
-      public_identifier: GeneralUtil.generatePublicSampleId(),
-      sequencing_date: GeneralUtil.getADateInThePast(),
+      private: CommonUtil.getValueOrDefault(defaults?.private, true) as boolean,
+      private_identifier: CommonUtil.generatePrivateSampleId(),
+      public_identifier: CommonUtil.generatePublicSampleId(),
+      sequencing_date: CommonUtil.getADateInThePast(),
       submitting_group: {
         id: 74,
         name: "QA Automation",
       },
-      upload_date: GeneralUtil.getADateInThePast(),
+      upload_date: CommonUtil.getValueOrDefault(
+        defaults?.upload_date,
+        CommonUtil.getADateInThePast()
+      ) as string,
       uploaded_by: {
         id: 108,
         name: "Playwright",
@@ -127,11 +140,11 @@ export interface SampleUploadData {
   };
 }
 
-export interface GetSampleResponseData {
+export interface SampleResponseData {
   id: number;
   collection_date: string;
   collection_location: {
-    id: number;
+    id?: number;
     region: string;
     country: string;
     division: string;
@@ -139,7 +152,7 @@ export interface GetSampleResponseData {
   };
   czb_failed_genome_recovery: boolean;
   gisaid: {
-    gisaid_id: string;
+    gisaid_id: any;
     status: string;
   };
   lineage: {
@@ -164,4 +177,16 @@ export interface GetSampleResponseData {
     id: number;
     name: string;
   };
+}
+
+export interface SampleResponseDefaults {
+  collection_date?: string;
+  collection_location?: number;
+  czb_failed_genome_recovery?: boolean;
+  gisaid_id?: any;
+  gisaid_status?: string;
+  id?: number;
+  lineage?: string;
+  private?: boolean;
+  upload_date?: string;
 }

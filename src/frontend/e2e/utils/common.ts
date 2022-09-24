@@ -1,4 +1,4 @@
-export class GeneralUtil {
+export class CommonUtil {
   public static getValueOrDefault = function <T>(value: T, defaultValue: T): T {
     return value !== undefined ? value : defaultValue;
   };
@@ -10,7 +10,7 @@ export class GeneralUtil {
   public static generatePublicSampleId(country?: string): string {
     const prefix = "hCoV-19";
     const _country = country !== undefined ? country : "USA";
-    const _number = GeneralUtil.getRandomNumber();
+    const _number = CommonUtil.getRandomNumber();
     const year = new Date().getFullYear();
 
     return `${prefix}/${_country}/QA-${_number}/${year}`;
@@ -33,13 +33,14 @@ export class GeneralUtil {
   @param {number} howRecent: how recent the date should be, defaults to 10, meaning the date can be 1 - 10 days in the past
   @param {string} refDate: reference date to use, especially useful for sequencing date that needs to be older that collection date
   */
-  public static getADateInThePast(earliest = 10, refDate?: string): string {
-    // if current date if no refence date
+  public static getADateInThePast(min = 0, max = 10, refDate?: string): string {
+    // dfeault to current date as a refence date
     const fromDate = refDate !== undefined ? new Date(refDate) : new Date();
     let d = fromDate;
+    const delta = max - min;
     do {
       d = fromDate;
-      const randomNumber = Math.floor(Math.random() * earliest);
+      const randomNumber = Math.floor(Math.random() * delta);
       d.setDate(d.getDate() - randomNumber);
     } while (d.getTime() < fromDate.getTime());
     return d.toISOString().substring(0, 10);
