@@ -1,10 +1,6 @@
 import { expect, test, Page } from "@playwright/test";
-import {
-  SampleResponseData,
-  SampleResponseDefaults,
-  SampleUtil,
-} from "../utils/sample";
-import { FilterSample } from "../pages/filter";
+import { getSampleResponseData, SampleResponseDefaults } from "../utils/sample";
+import { applyFilter, convertDaysToDate } from "../pages/filter";
 import path from "path";
 import * as dotenv from "dotenv";
 import { getByTestID } from "../utils/selectors";
@@ -29,16 +25,16 @@ const datesDatesFromGridLocator =
   "//div[@data-test-id='table-row']/descendant::div[13]";
 
 test.describe("Sample filtering tests", () => {
-  const url = `${process.env.BASEURL}/data/samples/`;
+  let url = "";
   const api = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2/samples/`;
 
   const mockData = {
     samples: prepareTestData(),
   };
-  console.log(JSON.stringify(mockData));
+  //console.log(JSON.stringify(mockData));
   test.beforeEach(async ({ page }, workerInfo) => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
-    const url = `${baseUrl}/data/samples`;
+    url = `${baseUrl}/data/samples`;
     await page.goto(url);
   });
 
@@ -51,7 +47,7 @@ test.describe("Sample filtering tests", () => {
       status: "complete",
     };
     // filter samples
-    await FilterSample.applyFilter(page, filterBy);
+    await applyFilter(page, filterBy);
 
     //create an intercept to stub response with mock data once we get response with status 200
     await context.route(api, async (route) => {
@@ -87,7 +83,7 @@ test.describe("Sample filtering tests", () => {
       status: "complete",
     };
     // filter samples
-    await FilterSample.applyFilter(page, filterBy);
+    await applyFilter(page, filterBy);
 
     // verify only complete samples are listed
     const sampleStatuses = page.locator("div[status='success'] > span");
@@ -102,7 +98,7 @@ test.describe("Sample filtering tests", () => {
       lineage: ["BA.1.15"],
     };
     // filter samples
-    await FilterSample.applyFilter(page, filterBy);
+    await applyFilter(page, filterBy);
 
     // verify only samples with selected lineages displayed
     const sampleLineages = page.locator(".ez2j8c413");
@@ -117,7 +113,7 @@ test.describe("Sample filtering tests", () => {
       collectionDateFrom: collectionDateFrom, //changes are required
     };
     // filter samples
-    await FilterSample.applyFilter(page, filterBy);
+    await applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterCollectionDate = new Date(filterBy.collectionDateFrom);
@@ -138,7 +134,7 @@ test.describe("Sample filtering tests", () => {
       collectionDateTo: collectionDateTo, //change as required
     };
     // filter samples
-    await FilterSample.applyFilter(page, filterBy);
+    await applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterCollectionDate = new Date(filterBy.collectionDateTo);
@@ -160,7 +156,7 @@ test.describe("Sample filtering tests", () => {
       collectionDateTo: collectionDateTo,
     };
     // filter samples
-    await FilterSample.applyFilter(page, filterBy);
+    await applyFilter(page, filterBy);
 
     // convert to date objects for comparison
     const filterCollectionDateFrom = new Date(filterBy.collectionDateFrom);
@@ -188,10 +184,10 @@ test.describe("Sample filtering tests", () => {
     for (const period of periods) {
       const periodValue = uploadDatePeriods[period];
       // filter by collection date period
-      await FilterSample.applyFilter(page, { collectionDatePeriod: period });
+      await applyFilter(page, { collectionDatePeriod: period });
 
       //convert period to date object
-      const filterCollectionDate = FilterSample.convertDaysToDate(periodValue);
+      const filterCollectionDate = convertDaysToDate(periodValue);
 
       //verify only samples meeting criteria are listed
       const sampleCol = await page.locator(getByTestID(row));
@@ -211,7 +207,7 @@ test.describe("Sample filtering tests", () => {
       uploadDateFrom: collectionDateFrom, //change as required
     };
     // filter samples by upload date from
-    await FilterSample.applyFilter(page, filterBy);
+    await applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterUploadDate = new Date(filterBy.uploadDateFrom);
@@ -231,7 +227,7 @@ test.describe("Sample filtering tests", () => {
       uploadDateTo: collectionDateTo, //changes are required
     };
     // filter samples
-    await FilterSample.applyFilter(page, filterBy);
+    await applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterUploadDate = new Date(filterBy.uploadDateTo);
@@ -253,7 +249,7 @@ test.describe("Sample filtering tests", () => {
       uploadDateTo: collectionDateTo,
     };
     // filter samples
-    await FilterSample.applyFilter(page, filterBy);
+    await applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
     const filterUploadDateFrom = new Date(filterBy.uploadDateFrom);
@@ -279,12 +275,10 @@ test.describe("Sample filtering tests", () => {
     for (const period of periods) {
       // filter
       const periodValue = uploadDatePeriods[period];
-      await FilterSample.applyFilter(page, { collectionDatePeriod: period });
+      await applyFilter(page, { collectionDatePeriod: period });
 
       //convert period to date object
-      const filterUploadDate = await FilterSample.convertDaysToDate(
-        periodValue
-      );
+      const filterUploadDate = await convertDaysToDate(periodValue);
 
       //verify sample listing
       const UploadDates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
@@ -309,7 +303,7 @@ test.describe("Sample filtering tests", () => {
       uploadDateTo: collectionDateTo,
     };
     // filter
-    await FilterSample.applyFilter(page, filterBy);
+    await applyFilter(page, filterBy);
 
     //verify sample listing
     const samples = await page.locator(getByTestID("table-row"));
@@ -369,7 +363,7 @@ function prepareTestData() {
     // get default values and set the statue to failed
     let defaults = getDefaults();
     defaults.czb_failed_genome_recovery = true;
-    mockResponseData.push(SampleUtil.getSampleResponseData());
+    mockResponseData.push(getSampleResponseData());
   }
 
   // data for testing lineage
@@ -377,7 +371,7 @@ function prepareTestData() {
     // get default values and set the statue to failed
     defaults = getDefaults();
     defaults.lineage = "BA.1.15";
-    mockResponseData.push(SampleUtil.getSampleResponseData());
+    mockResponseData.push(getSampleResponseData());
   }
 
   // data for samples collected within last 7 days
@@ -385,47 +379,47 @@ function prepareTestData() {
     // get default values and set the statue to failed
     defaults = getDefaults();
     defaults.collection_date = CommonUtil.getADateInThePast(0, 7);
-    mockResponseData.push(SampleUtil.getSampleResponseData());
+    mockResponseData.push(getSampleResponseData());
   }
 
   // data for samples collected within last 30 days; we already have 2 within 7 days
   defaults = getDefaults();
   defaults.collection_date = CommonUtil.getADateInThePast(8, 30);
-  mockResponseData.push(SampleUtil.getSampleResponseData());
+  mockResponseData.push(getSampleResponseData());
 
   // data for samples collected within last 3 months; we already have 3 within 30 days
   defaults = getDefaults();
   defaults.collection_date = CommonUtil.getADateInThePast(31, 90);
-  mockResponseData.push(SampleUtil.getSampleResponseData());
+  mockResponseData.push(getSampleResponseData());
 
   // data for samples collected within last 6 months; we already have 4 within 3 months
   defaults = getDefaults();
   defaults.collection_date = CommonUtil.getADateInThePast(91, 120);
-  mockResponseData.push(SampleUtil.getSampleResponseData());
+  mockResponseData.push(getSampleResponseData());
 
   // data for samples collected within last 1 year; we already have 5 within 6 months
   defaults = getDefaults();
   defaults.collection_date = CommonUtil.getADateInThePast(121, 360);
-  mockResponseData.push(SampleUtil.getSampleResponseData());
+  mockResponseData.push(getSampleResponseData());
 
   // data for samples uploaded today
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
     defaults = getDefaults();
     defaults.upload_date = CommonUtil.getADateInThePast(0, 0);
-    mockResponseData.push(SampleUtil.getSampleResponseData());
+    mockResponseData.push(getSampleResponseData());
   }
   // data for samples uploaded yesterday, we have 2 uploaded today
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
     defaults = getDefaults();
     defaults.upload_date = CommonUtil.getADateInThePast(1, 1);
-    mockResponseData.push(SampleUtil.getSampleResponseData());
+    mockResponseData.push(getSampleResponseData());
   }
   // data for samples uploaded with last 7 days; we already have 4 uploaded today and yesterday
   defaults = getDefaults();
   defaults.upload_date = CommonUtil.getADateInThePast(2, 7);
-  mockResponseData.push(SampleUtil.getSampleResponseData());
+  mockResponseData.push(getSampleResponseData());
   return mockResponseData;
 }
 /**
