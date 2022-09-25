@@ -347,7 +347,7 @@ const DataSubview: FunctionComponent<Props> = ({
                 placeholder="Search"
                 onChange={onSearchChange}
                 value={searchQuery}
-                data-test-id="search"
+                data-test-id="search-samples"
               />
             </SearchInput>
             <div>

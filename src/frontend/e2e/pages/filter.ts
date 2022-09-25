@@ -4,13 +4,6 @@ export async function applyFilter(
   page: Page,
   filterData: Partial<FilterData>
 ): Promise<void> {
-  // wait for sample page is ready to be handled
-  await page.waitForFunction(() => {
-    const samples = document.querySelector(
-      "a[href$='/data/samples'] > div > div:nth-child(2)"
-    )?.textContent;
-    return parseInt(samples!) > 0;
-  });
   if (
     filterData.uploadDateFrom !== undefined ||
     filterData.uploadDateTo !== undefined
@@ -36,8 +29,9 @@ export async function applyFilter(
   if (filterData.uploadDatePeriod !== undefined) {
     await page.locator("button[label='Upload Date']").click();
     await page
-      .locator("div:not([style*='hidden'])[class*='MuiPaper-elevation'] li")
+      .locator("li")
       .filter({ hasText: filterData.uploadDatePeriod })
+      .first()
       .click();
   }
   // fill in collection date(s)
@@ -61,6 +55,9 @@ export async function applyFilter(
         "//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']"
       )
       .click();
+
+    //dismiss form
+    await page.keyboard.press("Escape");
   }
   // select collection date period
   if (filterData.collectionDatePeriod !== undefined) {
@@ -84,6 +81,13 @@ export async function applyFilter(
         .locator(`div[role="menuitem"] >> text=${singleLineage}`)
         .click();
     }
+    //dismiss form
+    await page.keyboard.press("Escape");
+  }
+  // select status
+  if (filterData.status !== undefined) {
+    await page.locator('button:has-text("Genome Recovery")').click();
+    await page.locator(`text="${filterData.status}"`).click();
     //dismiss form
     await page.keyboard.press("Escape");
   }

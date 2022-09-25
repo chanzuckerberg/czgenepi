@@ -1,4 +1,4 @@
-import { expect, test, Page } from "@playwright/test";
+import { expect, test, Page, BrowserContext } from "@playwright/test";
 import { getSampleResponseData, SampleResponseDefaults } from "../utils/sample";
 import { applyFilter, convertDaysToDate } from "../pages/filter";
 import path from "path";
@@ -11,6 +11,11 @@ dotenv.config({
 });
 
 const uploadDatePeriods: { [key: string]: number } = {
+  //"Today": 0, //bug raised: SC-216585
+  Yesterday: 1,
+  "Last 7 Days": 7,
+};
+const collectionDatePeriods: { [key: string]: number } = {
   "Last 3 Months": 90,
   "Last 30 Days": 30,
   "Last 6 Months": 180,
@@ -18,106 +23,73 @@ const uploadDatePeriods: { [key: string]: number } = {
   "Last Year": 365,
 };
 
-const collectionDateFrom = "2022-07-01";
-const collectionDateTo = "2022-09-01";
-const row = "row-collectionDate";
-const datesDatesFromGridLocator =
-  "//div[@data-test-id='table-row']/descendant::div[13]";
+const fromDate = getADateInThePast(0, 5);
+const toDate = getADateInThePast(0, 1);
+const collectionDateSelector = "row-collectionDate";
+const uploadDateSelector =
+  "//div[@data-test-id='table-row']/descendant::div[13]"; //todo: add data-test-id
 
+const api = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2/samples/`;
+let url = "";
+const mockData = {
+  samples: prepareTestData(),
+};
 test.describe("Sample filtering tests", () => {
-  let url = "";
-  const api = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2/samples/`;
-
-  const mockData = {
-    samples: prepareTestData(),
-  };
-  //console.log(JSON.stringify(mockData));
-  test.beforeEach(async ({ page }, workerInfo) => {
+  test.beforeEach(async ({ page, context }, workerInfo) => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
     url = `${baseUrl}/data/samples`;
     await page.goto(url);
+    //accept cookie t&c
+    await page
+      .locator('[aria-label="Help us improve CZ GEN EPI"] >> text=Accept')
+      .click();
+
+    //intercept request and stub response
+    await interceptRequestAndStubResponse(page, context);
   });
 
-  test("Should filter samples by 'Complete' status", async ({
-    page,
-    context,
-  }) => {
-    // define filtering criteria
-    const filterBy = {
-      status: "complete",
+  test.only("Should filter samples by status", async ({ page }) => {
+    // filter for complete status
+    let filterBy = {
+      status: "Complete",
     };
     // filter samples
     await applyFilter(page, filterBy);
 
-    //create an intercept to stub response with mock data once we get response with status 200
-    await context.route(api, async (route) => {
-      const response = await context.request.get(api);
-      //check we get response 200, but we could also abort the call (route.abort() : route.continue();)
-      expect(response.ok()).toBeTruthy();
-      //retain original response but replace body part with stubbed data we created
-      route.fulfill({
-        response,
-        body: JSON.stringify(mockData),
-      });
-    });
-    // make the actual, wait until all responses have been received
-    await page.goto(url, { waitUntil: "networkidle" });
-
-    //wait until data is displayed
-    await waitForDataToBeDisplayed(page);
+    await page.screenshot({ path: `screenshotStatus.png`, fullPage: true });
 
     // verify only complete samples are listed
-    const sampleStatuses = page.locator('[data-test-id="sample-status"]');
-    expect(await sampleStatuses.count()).toBe(2); //we earlier prepared 2 samples with complete status
+    const samplesWithCompleteStatus = 11;
+    let sampleStatuses = page.locator(getByTestID("sample-status"));
+    expect(await sampleStatuses.count()).toBe(samplesWithCompleteStatus);
     for (let i = 0; i < (await sampleStatuses.count()); i++) {
       expect(sampleStatuses.nth(i)).toHaveText(filterBy.status);
     }
 
-    // for debugging only
-    await page.screenshot({ path: "screenshot.png", fullPage: true });
-  });
-
-  test("Should filter samples by status", async ({ page }) => {
-    // define filtering criteria
-    const filterBy = {
-      status: "complete",
+    // filter for complete status
+    filterBy = {
+      status: "Failed",
     };
     // filter samples
     await applyFilter(page, filterBy);
 
-    // verify only complete samples are listed
-    const sampleStatuses = page.locator("div[status='success'] > span");
+    // verify only failed samples are listed
+    const samplesWithFailedStatus = 2;
+    sampleStatuses = page.locator(getByTestID("sample-status"));
+    expect(await sampleStatuses.count()).toBe(samplesWithFailedStatus);
     for (let i = 0; i < (await sampleStatuses.count()); i++) {
       expect(sampleStatuses.nth(i)).toHaveText(filterBy.status);
     }
   });
 
-  test.only("Should filter samples by lineage", async ({ page, context }) => {
+  test("Should filter samples by lineage", async ({ page }) => {
     // define filtering criteria
     const filterBy = {
       lineage: ["BA.1.15"],
     };
 
-    //create an intercept to stub response with mock data once we get response with status 200
-    await context.route(api, async (route) => {
-      const response = await context.request.get(api);
-      //check we get response 200, but we could also abort the call (route.abort() : route.continue();)
-      expect(response.ok()).toBeTruthy();
-      //retain original response but replace body part with stubbed data we created
-      route.fulfill({
-        response,
-        body: JSON.stringify(mockData),
-      });
-    });
-    // make the actual, wait until all responses have been received
-    await page.goto(url, { waitUntil: "networkidle" });
-
-    //wait until data is displayed
-    await waitForDataToBeDisplayed(page);
-
     // filter samples
     await applyFilter(page, filterBy);
-    await page.screenshot({ path: "samplesPage.png", fullPage: true });
 
     // verify only complete samples are listed
     const sampleLineages = page.locator(".ez2j8c413");
@@ -129,15 +101,18 @@ test.describe("Sample filtering tests", () => {
 
   test("Should filter by collection date from", async ({ page }) => {
     const filterBy = {
-      collectionDateFrom: collectionDateFrom, //changes are required
+      collectionDateFrom: fromDate,
     };
+
     // filter samples
     await applyFilter(page, filterBy);
 
+    await page.screenshot({ path: "samplesPage.png", fullPage: true });
     // verify only samples meeting date criteria are listed
     const filterCollectionDate = new Date(filterBy.collectionDateFrom);
-
-    const sampleCollectionDates = await page.locator(getByTestID(row));
+    const sampleCollectionDates = page.locator(
+      getByTestID(collectionDateSelector)
+    );
     for (let i = 0; i < (await sampleCollectionDates.count()); i++) {
       const actuallCollectionDate = new Date(
         (await sampleCollectionDates.nth(i).textContent()) as string
@@ -150,7 +125,7 @@ test.describe("Sample filtering tests", () => {
 
   test("Should filter by collection date to", async ({ page }) => {
     const filterBy = {
-      collectionDateTo: collectionDateTo, //change as required
+      collectionDateTo: toDate,
     };
     // filter samples
     await applyFilter(page, filterBy);
@@ -158,7 +133,7 @@ test.describe("Sample filtering tests", () => {
     // verify only samples meeting date criteria are listed
     const filterCollectionDate = new Date(filterBy.collectionDateTo);
 
-    const sampDates = await page.locator(getByTestID(row));
+    const sampDates = await page.locator(getByTestID(collectionDateSelector));
     for (let i = 0; i < (await sampDates.count()); i++) {
       const actuallCollectionDate = new Date(
         (await sampDates.nth(i).textContent()) as string
@@ -171,8 +146,8 @@ test.describe("Sample filtering tests", () => {
 
   test("Should filter by collection date from and to", async ({ page }) => {
     const filterBy = {
-      collectionDateFrom: collectionDateFrom, //change as required
-      collectionDateTo: collectionDateTo,
+      collectionDateFrom: fromDate,
+      collectionDateTo: toDate,
     };
     // filter samples
     await applyFilter(page, filterBy);
@@ -182,7 +157,7 @@ test.describe("Sample filtering tests", () => {
     const filterCollectionDateTo = new Date(filterBy.collectionDateTo);
 
     // verify only samples meeting date criteria are listed
-    const collections = await page.locator(getByTestID(row));
+    const collections = await page.locator(getByTestID(collectionDateSelector));
     for (let i = 0; i < (await collections.count()); i++) {
       const actuallCollectionDate = new Date(
         (await collections.nth(i).textContent()) as string
@@ -199,7 +174,7 @@ test.describe("Sample filtering tests", () => {
   test("Should filter by collection date periods", async ({ page }) => {
     //test all date options
 
-    const periods = Object.keys(uploadDatePeriods);
+    const periods = Object.keys(collectionDatePeriods);
     for (const period of periods) {
       const periodValue = uploadDatePeriods[period];
       // filter by collection date period
@@ -209,7 +184,7 @@ test.describe("Sample filtering tests", () => {
       const filterCollectionDate = convertDaysToDate(periodValue);
 
       //verify only samples meeting criteria are listed
-      const sampleCol = await page.locator(getByTestID(row));
+      const sampleCol = page.locator(getByTestID(collectionDateSelector));
       for (let i = 0; i < (await sampleCol.count()); i++) {
         const actuallCollectionDate = new Date(
           (await sampleCol.nth(i).textContent()) as string
@@ -223,7 +198,7 @@ test.describe("Sample filtering tests", () => {
 
   test("Should filter by upload date from", async ({ page }) => {
     const filterBy = {
-      uploadDateFrom: collectionDateFrom, //change as required
+      uploadDateFrom: fromDate,
     };
     // filter samples by upload date from
     await applyFilter(page, filterBy);
@@ -231,7 +206,7 @@ test.describe("Sample filtering tests", () => {
     // verify only samples meeting date criteria are listed
     const filterUploadDate = new Date(filterBy.uploadDateFrom);
 
-    const dates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
+    const dates = page.locator(uploadDateSelector);
     for (let i = 0; i < (await dates.count()); i++) {
       const actuallUploadDate = new Date(
         (await dates.nth(i).textContent()) as string
@@ -243,7 +218,7 @@ test.describe("Sample filtering tests", () => {
 
   test("Should filter by upload date to", async ({ page }) => {
     const filterBy = {
-      uploadDateTo: collectionDateTo, //changes are required
+      uploadDateTo: toDate,
     };
     // filter samples
     await applyFilter(page, filterBy);
@@ -251,7 +226,7 @@ test.describe("Sample filtering tests", () => {
     // verify only samples meeting date criteria are listed
     const filterUploadDate = new Date(filterBy.uploadDateTo);
 
-    const sampleUploadDates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
+    const sampleUploadDates = page.locator(uploadDateSelector);
 
     for (let i = 0; i < (await sampleUploadDates.count()); i++) {
       const actuallUploadDate = new Date(
@@ -264,25 +239,23 @@ test.describe("Sample filtering tests", () => {
 
   test("Should filter by from and to upload dates", async ({ page }) => {
     const filterBy = {
-      uploadDateFrom: "2022-07-01", //change as required
-      uploadDateTo: collectionDateTo,
+      uploadDateFrom: fromDate,
+      uploadDateTo: toDate,
     };
     // filter samples
     await applyFilter(page, filterBy);
 
     // verify only samples meeting date criteria are listed
-    const filterUploadDateFrom = new Date(filterBy.uploadDateFrom);
-    const filterUploadDateTo = new Date(filterBy.uploadDateTo);
+    const filterFromDate = new Date(filterBy.uploadDateFrom);
+    const filterToDate = new Date(filterBy.uploadDateTo);
 
-    const samUploadDates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
-    for (let i = 0; i < (await samUploadDates.count()); i++) {
+    const sampleUploadDates = page.locator(uploadDateSelector);
+    for (let i = 0; i < (await sampleUploadDates.count()); i++) {
       const actuallUploadDate = new Date(
-        (await samUploadDates.nth(i).textContent()) as string
+        (await sampleUploadDates.nth(i).textContent()) as string
       );
-      const dateFromResult =
-        actuallUploadDate >= filterUploadDateFrom ? true : false;
-      const dateToResult =
-        actuallUploadDate <= filterUploadDateTo ? true : false;
+      const dateFromResult = actuallUploadDate >= filterFromDate ? true : false;
+      const dateToResult = actuallUploadDate <= filterToDate ? true : false;
       expect(dateFromResult).toBeTruthy();
       expect(dateToResult).toBeTruthy();
     }
@@ -294,18 +267,18 @@ test.describe("Sample filtering tests", () => {
     for (const period of periods) {
       // filter
       const periodValue = uploadDatePeriods[period];
-      await applyFilter(page, { collectionDatePeriod: period });
+      await applyFilter(page, { uploadDatePeriod: period });
 
       //convert period to date object
-      const filterUploadDate = await convertDaysToDate(periodValue);
+      const filterUploadDate = convertDaysToDate(periodValue);
 
       //verify sample listing
-      const UploadDates = await page.locator(datesDatesFromGridLocator); //todo we need dev help to inject test ids in sample data table
-      for (let i = 0; i < (await UploadDates.count()); i++) {
-        const actuallUploadDate = new Date(
-          (await UploadDates.nth(i).textContent()) as string
+      const sampleUploadDates = page.locator(uploadDateSelector);
+      for (let i = 0; i < (await sampleUploadDates.count()); i++) {
+        const actualUploadDate = new Date(
+          (await sampleUploadDates.nth(i).textContent()) as string
         );
-        const result = actuallUploadDate >= filterUploadDate ? true : false;
+        const result = actualUploadDate >= filterUploadDate ? true : false;
         expect(result).toBeTruthy();
       }
     }
@@ -314,12 +287,12 @@ test.describe("Sample filtering tests", () => {
   test("Should filter by multiple fields", async ({ page }) => {
     //todo: change filter values
     const filterBy = {
-      collectionDateFrom: collectionDateTo,
-      collectionDateTo: collectionDateTo,
+      collectionDateFrom: fromDate,
+      collectionDateTo: toDate,
       lineage: ["BA.1.15"],
       status: "Complete",
-      uploadDateFrom: collectionDateTo,
-      uploadDateTo: collectionDateTo,
+      uploadDateFrom: fromDate,
+      uploadDateTo: toDate,
     };
     // filter
     await applyFilter(page, filterBy);
@@ -329,7 +302,7 @@ test.describe("Sample filtering tests", () => {
     for (let i = 0; i < (await samples.count()); i++) {
       //verify upload date is within from-to range
       const uploadDateText = (await page
-        .locator(datesDatesFromGridLocator)
+        .locator(uploadDateSelector)
         .nth(i)
         .textContent()) as string; //todo we need dev help to inject test ids in sample data table
       const actuallUploadDate = new Date(uploadDateText);
@@ -343,7 +316,7 @@ test.describe("Sample filtering tests", () => {
       expect(dateToResult).toBeTruthy();
       //very collection date is within from-to range
       const collectionDateText = (await page
-        .locator(getByTestID(row))
+        .locator(getByTestID(collectionDateSelector))
         .nth(i)
         .textContent()) as string;
       const actualCollectionDate = new Date(collectionDateText);
@@ -442,9 +415,10 @@ function prepareTestData() {
   return mockResponseData;
 }
 /**
- * Default values to be used for generating a samples;
- * This helps us know exactly which records meets our filtering criteria
- * Please note collection and sequening dates are set deliberately set to over a year and specifically overwritten for given scenario
+ * Default values to be used for generating a sample response data;
+ * This helps us know exactly which records meet our filtering criteria
+ * Please note that collection and sequencing dates are set deliberately set to over a year
+ * and should be specifically overwritten for given scenarios
  */
 function getDefaults(): Partial<SampleResponseDefaults> {
   return {
@@ -459,18 +433,34 @@ function getDefaults(): Partial<SampleResponseDefaults> {
   };
 }
 
-async function waitForDataToBeDisplayed(page: Page) {
-  //accept cookie t&c
-  //await page.locator('text="Accept"').first().click();
-  await page
-    .locator('[aria-label="Help us improve CZ GEN EPI"] >> text=Accept')
-    .click();
+async function interceptRequestAndStubResponse(
+  page: Page,
+  context: BrowserContext
+) {
+  //create an intercept to stub response with mock data once we get response with status 200
+  await context.route(
+    api,
+    async (route: {
+      fulfill: (arg0: { response: any; body: string }) => void;
+    }) => {
+      const response = await context.request.get(api);
+      //check we get response 200, but we could also abort the call (route.abort() : route.continue();)
+      expect(response.ok()).toBeTruthy();
+      //retain original response but replace body part with stubbed data we created
+      route.fulfill({
+        response,
+        body: JSON.stringify(mockData),
+      });
+    }
+  );
+  // make the actual call, wait until all responses have been received
+  await page.goto(url, { waitUntil: "networkidle" });
 
   //wait until data is displayed
-  await page.waitForSelector('[data-test-id="table-row"]');
+  await page.waitForSelector(getByTestID("table-row"));
 
   // assert table is populated with at least one record
-  expect(
-    await page.locator('[data-test-id="table-row"]').count()
-  ).toBeGreaterThan(0);
+  expect(await page.locator(getByTestID("table-row")).count()).toBeGreaterThan(
+    0
+  );
 }
