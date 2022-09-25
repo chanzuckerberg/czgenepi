@@ -19,11 +19,12 @@ export async function applyFilter(
         .locator("input[name='uploadDateEnd']")
         .fill(filterData.uploadDateTo);
     }
-    await page
-      .locator(
-        "//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']"
-      )
-      .click();
+    // await page
+    //   .locator(
+    //     "//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']"
+    //   )
+    //   .click();
+    await page.locator('text=​to​Apply >> [data-testid="button"]').click();
   }
   // select upload date period
   if (filterData.uploadDatePeriod !== undefined) {
@@ -50,11 +51,7 @@ export async function applyFilter(
         .locator("input[name='collectionDateEnd']")
         .fill(filterData.collectionDateTo);
     }
-    await page
-      .locator(
-        "//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']"
-      )
-      .click();
+    await page.locator('text=​to​Apply >> [data-testid="button"]').click();
 
     //dismiss form
     await page.keyboard.press("Escape");
@@ -63,8 +60,8 @@ export async function applyFilter(
   if (filterData.collectionDatePeriod !== undefined) {
     await page.locator("button[label='Collection Date']").click();
     await page
-      .locator("div:not([style*='hidden'])[class*='MuiPaper-elevation'] li")
-      .filter({ hasText: filterData.collectionDatePeriod })
+      .locator(`text=${filterData.collectionDatePeriod}`)
+      .nth(1)
       .click();
   }
   // select lineage(s)

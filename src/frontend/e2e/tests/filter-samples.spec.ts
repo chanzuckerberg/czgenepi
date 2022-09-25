@@ -56,14 +56,14 @@ test.describe("Sample filtering tests", () => {
     // filter samples
     await applyFilter(page, filterBy);
 
-    await page.screenshot({ path: `screenshotStatus.png`, fullPage: true });
-
     // verify only complete samples are listed
     const samplesWithCompleteStatus = 11;
     let sampleStatuses = page.locator(getByTestID("sample-status"));
     expect(await sampleStatuses.count()).toBe(samplesWithCompleteStatus);
     for (let i = 0; i < (await sampleStatuses.count()); i++) {
-      expect(sampleStatuses.nth(i)).toHaveText(filterBy.status);
+      expect(sampleStatuses.nth(i)).toHaveText(
+        filterBy.status.toLocaleLowerCase()
+      );
     }
 
     // filter for complete status
@@ -78,11 +78,13 @@ test.describe("Sample filtering tests", () => {
     sampleStatuses = page.locator(getByTestID("sample-status"));
     expect(await sampleStatuses.count()).toBe(samplesWithFailedStatus);
     for (let i = 0; i < (await sampleStatuses.count()); i++) {
-      expect(sampleStatuses.nth(i)).toHaveText(filterBy.status);
+      expect(sampleStatuses.nth(i)).toHaveText(
+        filterBy.status.toLocaleLowerCase()
+      );
     }
   });
 
-  test("Should filter samples by lineage", async ({ page }) => {
+  test.only("Should filter samples by lineage", async ({ page }) => {
     // define filtering criteria
     const filterBy = {
       lineage: ["BA.1.15"],
@@ -99,7 +101,7 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter by collection date from", async ({ page }) => {
+  test.only("Should filter by collection date from", async ({ page }) => {
     const filterBy = {
       collectionDateFrom: fromDate,
     };
@@ -107,7 +109,6 @@ test.describe("Sample filtering tests", () => {
     // filter samples
     await applyFilter(page, filterBy);
 
-    await page.screenshot({ path: "samplesPage.png", fullPage: true });
     // verify only samples meeting date criteria are listed
     const filterCollectionDate = new Date(filterBy.collectionDateFrom);
     const sampleCollectionDates = page.locator(
@@ -123,7 +124,7 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter by collection date to", async ({ page }) => {
+  test.only("Should filter by collection date to", async ({ page }) => {
     const filterBy = {
       collectionDateTo: toDate,
     };
@@ -144,7 +145,9 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter by collection date from and to", async ({ page }) => {
+  test.only("Should filter by collection date from and to", async ({
+    page,
+  }) => {
     const filterBy = {
       collectionDateFrom: fromDate,
       collectionDateTo: toDate,
@@ -171,7 +174,7 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter by collection date periods", async ({ page }) => {
+  test.only("Should filter by collection date periods", async ({ page }) => {
     //test all date options
 
     const periods = Object.keys(collectionDatePeriods);
@@ -196,7 +199,7 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter by upload date from", async ({ page }) => {
+  test.only("Should filter by upload date from", async ({ page }) => {
     const filterBy = {
       uploadDateFrom: fromDate,
     };
@@ -216,7 +219,7 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter by upload date to", async ({ page }) => {
+  test.only("Should filter by upload date to", async ({ page }) => {
     const filterBy = {
       uploadDateTo: toDate,
     };
@@ -237,7 +240,7 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter by from and to upload dates", async ({ page }) => {
+  test.only("Should filter by from and to upload dates", async ({ page }) => {
     const filterBy = {
       uploadDateFrom: fromDate,
       uploadDateTo: toDate,
@@ -261,7 +264,7 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter by upload date periods", async ({ page }) => {
+  test.only("Should filter by upload date periods", async ({ page }) => {
     //test all date options
     const periods = Object.keys(uploadDatePeriods);
     for (const period of periods) {
@@ -284,7 +287,7 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter by multiple fields", async ({ page }) => {
+  test.only("Should filter by multiple fields", async ({ page }) => {
     //todo: change filter values
     const filterBy = {
       collectionDateFrom: fromDate,
