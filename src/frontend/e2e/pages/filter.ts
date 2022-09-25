@@ -1,5 +1,9 @@
 import { Page } from "@playwright/test";
 
+const applyCollectionDateSelector =
+  "​to​ApplyLast 7 DaysLast 30 DaysLast 3 MonthsLast 6 MonthsLast Year";
+const applyUploadDateSelector = "to​ApplyTodayYesterdayLast 7 Days";
+
 export async function applyFilter(
   page: Page,
   filterData: Partial<FilterData>
@@ -19,12 +23,9 @@ export async function applyFilter(
         .locator("input[name='uploadDateEnd']")
         .fill(filterData.uploadDateTo);
     }
-    // await page
-    //   .locator(
-    //     "//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']"
-    //   )
-    //   .click();
-    await page.locator('text=​to​Apply >> [data-testid="button"]').click();
+    await page
+      .locator(`text=${applyUploadDateSelector} >> [data-testid="button"]`)
+      .click();
   }
   // select upload date period
   if (filterData.uploadDatePeriod !== undefined) {
@@ -40,6 +41,8 @@ export async function applyFilter(
     filterData.collectionDateFrom !== undefined ||
     filterData.collectionDateTo !== undefined
   ) {
+    console.log(filterData.collectionDateFrom);
+    console.log(filterData.collectionDateTo);
     await page.locator("button[label='Collection Date']").click();
     if (filterData.collectionDateFrom !== undefined) {
       page
@@ -51,7 +54,9 @@ export async function applyFilter(
         .locator("input[name='collectionDateEnd']")
         .fill(filterData.collectionDateTo);
     }
-    await page.locator('text=​to​Apply >> [data-testid="button"]').click();
+    await page
+      .locator(`text=${applyCollectionDateSelector} >> [data-testid="button"]`)
+      .click();
 
     //dismiss form
     await page.keyboard.press("Escape");
@@ -60,8 +65,8 @@ export async function applyFilter(
   if (filterData.collectionDatePeriod !== undefined) {
     await page.locator("button[label='Collection Date']").click();
     await page
-      .locator(`text=${filterData.collectionDatePeriod}`)
-      .nth(1)
+      .locator("div:not([style*='hidden'])[class*='MuiPaper-elevation'] li")
+      .filter({ hasText: filterData.collectionDatePeriod })
       .click();
   }
   // select lineage(s)
@@ -90,6 +95,15 @@ export async function applyFilter(
   }
 }
 
+//clears filters set earlier
+export async function clearFilters(
+  page: Page,
+  filters: Array<string>
+): Promise<void> {
+  for (const filter of filters) {
+    await page.locator(`div[role="button"]:has-text("${filter}")`).click();
+  }
+}
 //convert days into date object based on current date
 export function convertDaysToDate(value: number): Date {
   const today = new Date();

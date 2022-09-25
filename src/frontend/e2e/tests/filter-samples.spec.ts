@@ -1,6 +1,6 @@
 import { expect, test, Page, BrowserContext } from "@playwright/test";
 import { getSampleResponseData, SampleResponseDefaults } from "../utils/sample";
-import { applyFilter, convertDaysToDate } from "../pages/filter";
+import { applyFilter, clearFilters, convertDaysToDate } from "../pages/filter";
 import path from "path";
 import * as dotenv from "dotenv";
 import { getByTestID } from "../utils/selectors";
@@ -92,7 +92,7 @@ test.describe("Sample filtering tests", () => {
 
     // filter samples
     await applyFilter(page, filterBy);
-
+    await page.screenshot({ path: "screenshot.png" });
     // verify only complete samples are listed
     const sampleLineages = page.locator(".ez2j8c413");
     expect(await sampleLineages.count()).toBe(2); //we earlier prepared 2 samples with complete status
@@ -155,20 +155,22 @@ test.describe("Sample filtering tests", () => {
     // filter samples
     await applyFilter(page, filterBy);
 
+    //await page.screenshot({ path: 'screenshot.png' });
+
     // convert to date objects for comparison
     const filterCollectionDateFrom = new Date(filterBy.collectionDateFrom);
     const filterCollectionDateTo = new Date(filterBy.collectionDateTo);
 
     // verify only samples meeting date criteria are listed
-    const collections = await page.locator(getByTestID(collectionDateSelector));
+    const collections = page.locator(getByTestID(collectionDateSelector));
     for (let i = 0; i < (await collections.count()); i++) {
-      const actuallCollectionDate = new Date(
+      const actualCollectionDate = new Date(
         (await collections.nth(i).textContent()) as string
       );
       const dateFromResult =
-        actuallCollectionDate >= filterCollectionDateFrom ? true : false;
+        actualCollectionDate >= filterCollectionDateFrom ? true : false;
       const dateToResult =
-        actuallCollectionDate <= filterCollectionDateTo ? true : false;
+        actualCollectionDate <= filterCollectionDateTo ? true : false;
       expect(dateFromResult).toBeFalsy();
       expect(dateToResult).toBeTruthy();
     }
@@ -352,10 +354,9 @@ test.describe("Sample filtering tests", () => {
 function prepareTestData() {
   let mockResponseData = [];
   const totalSamplePerScenario = 2;
-  //let defaults = getDefaults();
   // data for testing status = failed
   for (let i = 1; i <= totalSamplePerScenario; i++) {
-    // get default values and set the statue to failed
+    // get default values and set the status to failed
     let defaults = getDefaults();
     defaults.czb_failed_genome_recovery = true;
     mockResponseData.push(getSampleResponseData(defaults));
@@ -392,7 +393,7 @@ function prepareTestData() {
   defaults.collection_date = getADateInThePast(91, 120);
   mockResponseData.push(getSampleResponseData(defaults));
 
-  // data for samples collected within last 1 year; we already have 5 within 6 months
+  // data for samples collected within last year; we already have 5 within 6 months
   defaults = getDefaults();
   defaults.collection_date = getADateInThePast(121, 360);
   mockResponseData.push(getSampleResponseData(defaults));
@@ -408,10 +409,10 @@ function prepareTestData() {
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
     let defaults = getDefaults();
-    defaults.upload_date = getADateInThePast(1, 1);
+    defaults.upload_date = getADateInThePast(0, 1);
     mockResponseData.push(getSampleResponseData(defaults));
   }
-  // data for samples uploaded with last 7 days; we already have 4 uploaded today and yesterday
+  // data for samples uploaded within last 7 days; we already have 4 uploaded today and yesterday
   defaults = getDefaults();
   defaults.upload_date = getADateInThePast(2, 7);
   mockResponseData.push(getSampleResponseData(defaults));
