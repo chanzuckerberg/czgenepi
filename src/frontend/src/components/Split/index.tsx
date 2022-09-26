@@ -36,7 +36,7 @@ import ENV from "src/common/constants/ENV";
 import { useUserInfo } from "src/common/queries/auth";
 import { useSelector } from "src/common/redux/hooks";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
-import { createPathogenFlagsForLocal } from "./pathogenFlagMap";
+import { createPathogenFlagsForLocal } from "./pathogenFeatureSplits";
 import { SPLIT_SIMPLE_FLAG, USER_FEATURE_FLAGS } from "./types";
 
 // Keyword to tell Split client it's running in local-only mode.
