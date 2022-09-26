@@ -163,8 +163,9 @@ jobs:
           echo "Init complete - testing web service"
           # docker-compose exec -T frontend wget -T 10 --tries 20 localhost:8000/
           echo "Webserver up, running tests!"
+          export NOW=$(date +'%Y-%m-%dT%H:%M:%S')
           docker-compose logs -f frontend &
-          export S3_PREFIX=${{ secrets.CI_SCREENSHOT_PREFIX }}/${{ github.run_id }}/
+          export S3_PREFIX=${{ secrets.CI_SCREENSHOT_PREFIX }}/${{ github.run_id }}-${NOW}/
           make frontend-e2e-ci
   py-test:
     runs-on: ubuntu-20.04
