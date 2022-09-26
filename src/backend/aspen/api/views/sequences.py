@@ -18,8 +18,8 @@ from aspen.api.schemas.sequences import (
     SequenceRequest,
 )
 from aspen.api.settings import APISettings
-from aspen.api.utils import get_public_repository_prefix
 from aspen.api.utils.fasta_streamer import FastaStreamer
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.database.models import Pathogen
 
 router = APIRouter()
@@ -46,9 +46,13 @@ async def prepare_sequences_download(
     fasta_filename = get_fasta_filename(request.public_repository_name, ac.group.name)  # type: ignore
 
     # get the sample id prefix for given public_repository
-    prefix = await get_public_repository_prefix(
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
         pathogen, request.public_repository_name, db
     )
+    prefix = None
+    if pathogen_repo_config:
+        prefix = pathogen_repo_config.prefix
+
     prefix_should_exist = (
         pathogen is not None and request.public_repository_name is not None
     )
