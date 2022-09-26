@@ -1,10 +1,14 @@
 import { Page } from "@playwright/test";
+const applyCollectionDateSelector =
+  "​to​ApplyLast 7 DaysLast 30 DaysLast 3 MonthsLast 6 MonthsLast Year";
+const applyUploadDateSelector = "to​ApplyTodayYesterdayLast 7 Days";
 export abstract class FilterSample {
   public static async applyFilter(
     page: Page,
     filterData: Partial<FilterData>
   ): Promise<void> {
     // wait for sample page is ready to be handled
+    // this wait is deleted in another PR. Pls disregard
     await page.waitForFunction(() => {
       const samples = document.querySelector(
         "a[href$='/data/samples'] > div > div:nth-child(2)"
@@ -27,18 +31,13 @@ export abstract class FilterSample {
           .fill(filterData.uploadDateTo);
       }
       await page
-        .locator(
-          "//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']"
-        )
+        .locator(`text=${applyUploadDateSelector} >> [data-testid="button"]`)
         .click();
     }
     // select upload date period
     if (filterData.uploadDatePeriod !== undefined) {
       await page.locator("button[label='Upload Date']").click();
-      await page
-        .locator("div:not([style*='hidden'])[class*='MuiPaper-elevation'] li")
-        .filter({ hasText: filterData.uploadDatePeriod })
-        .click();
+      await page.locator(`text=${filterData.uploadDatePeriod}`).nth(0).click();
     }
     // fill in collection date(s)
     if (
@@ -47,7 +46,7 @@ export abstract class FilterSample {
     ) {
       await page.locator("button[label='Collection Date']").click();
       if (filterData.collectionDateFrom !== undefined) {
-        page
+        await page
           .locator("input[name='collectionDateStart']")
           .fill(filterData.collectionDateFrom);
       }
@@ -58,31 +57,44 @@ export abstract class FilterSample {
       }
       await page
         .locator(
-          "//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']"
+          `text=${applyCollectionDateSelector} >> [data-testid="button"]`
         )
         .click();
+
+      //dismiss form
+      await page.keyboard.press("Escape");
     }
     // select collection date period
     if (filterData.collectionDatePeriod !== undefined) {
       await page.locator("button[label='Collection Date']").click();
       await page
-        .locator("div:not([style*='hidden'])[class*='MuiPaper-elevation'] li")
-        .filter({ hasText: filterData.collectionDatePeriod })
+        .locator(`text=${filterData.collectionDatePeriod}`)
+        .nth(1)
         .click();
     }
-    // select lineage
+    // select lineage(s)
     if (filterData.lineage !== undefined) {
-      await page.locator("button[label='Lineage']").click();
+      await page.locator('button:has-text("Lineage")').click();
+      await page
+        .locator('text=Search for a location​ >> [placeholder="Search"]')
+        .click();
       for (const singleLineage of filterData.lineage) {
-        await page.locator("div[role='tooltip'] input").fill(singleLineage);
         await page
-          .locator("ul[role='listbox']  .primary-text > div", {
-            hasText: singleLineage,
-          })
-          .first()
+          .locator('text=Search for a location​ >> [placeholder="Search"]')
+          .fill(singleLineage);
+        await page
+          .locator(`div[role="menuitem"] >> text=${singleLineage}`)
           .click();
       }
-      await page.keyboard.press("Escape"); //dismiss form
+      //dismiss form
+      await page.keyboard.press("Escape");
+    }
+    // select status
+    if (filterData.status !== undefined) {
+      await page.locator('button:has-text("Genome Recovery")').click();
+      await page.locator(`text="${filterData.status}"`).click();
+      //dismiss form
+      await page.keyboard.press("Escape");
     }
   }
 
