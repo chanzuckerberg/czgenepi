@@ -31,7 +31,7 @@ const toDateInt = dateToInteger(toDate);
 
 const collectionDateSelector = "row-collectionDate";
 const uploadDateSelector =
-  "//div[@data-test-id='table-row']/descendant::div[13]"; //todo: add data-test-id
+  "//div[@data-test-id='table-row']/descendant::div[13]";
 
 const api = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2/samples/`;
 let url = "";
@@ -47,9 +47,9 @@ test.describe("Sample filtering tests", () => {
     const tAndCSelector =
       '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
     const tAndC = page.locator(tAndCSelector);
-    // if (await tAndC.isVisible) {
-    //   await page.locator(tAndCSelector).click();
-    // }
+    if (await tAndC.isVisible) {
+      await page.locator(tAndCSelector).click();
+    }
 
     //intercept request and stub response
     await interceptRequestAndStubResponse(page, context);
