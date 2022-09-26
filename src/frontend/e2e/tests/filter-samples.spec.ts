@@ -318,12 +318,12 @@ test.describe("Sample filtering tests", () => {
  * want to update test data every day.
  */
 function prepareTestData() {
-  let mockResponseData = [];
+  const mockResponseData = [];
   const totalSamplePerScenario = 2;
   // data for testing status = failed
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the status to failed
-    let defaults = getDefaults();
+    const defaults = getDefaults();
     defaults.czb_failed_genome_recovery = true;
     mockResponseData.push(getSampleResponseData(defaults));
   }
@@ -331,7 +331,7 @@ function prepareTestData() {
   // data for testing lineage
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
-    let defaults = getDefaults();
+    const defaults = getDefaults();
     defaults.lineage = "BA.1.15";
     mockResponseData.push(getSampleResponseData(defaults));
   }
@@ -339,7 +339,7 @@ function prepareTestData() {
   // data for samples collected within last 7 days
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
-    let defaults = getDefaults();
+    const defaults = getDefaults();
     defaults.collection_date = getADateInThePast(0, 7);
     mockResponseData.push(getSampleResponseData(defaults));
   }
@@ -374,7 +374,7 @@ function prepareTestData() {
   // data for samples uploaded yesterday, we have 2 uploaded today
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
-    let defaults = getDefaults();
+    const defaults = getDefaults();
     defaults.upload_date = getADateInThePast(0, 1);
     mockResponseData.push(getSampleResponseData(defaults));
   }
