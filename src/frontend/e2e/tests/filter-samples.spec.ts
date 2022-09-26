@@ -23,6 +23,7 @@ const collectionDatePeriods: { [key: string]: number } = {
   "Last Year": 365,
 };
 
+const sampleStatusId = "sample-status";
 const fromDate = getADateInThePast(0, 5);
 const toDate = getADateInThePast(0, 1);
 const fromDateInt = dateToInteger(fromDate);
@@ -42,10 +43,12 @@ test.describe("Sample filtering tests", () => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
     url = `${baseUrl}/data/samples`;
     await page.goto(url);
-    //accept cookie t&c
-    await page
-      .locator('[aria-label="Help us improve CZ GEN EPI"] >> text=Accept')
-      .click();
+    //accept cookie t&c (if prompted and not in CI)
+    const tAndCSelector =
+      '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
+    if (!process.env.CI) {
+      await page.locator(tAndCSelector).click();
+    }
 
     //intercept request and stub response
     await interceptRequestAndStubResponse(page, context);
@@ -61,7 +64,7 @@ test.describe("Sample filtering tests", () => {
 
     // verify only complete samples are listed
     const samplesWithCompleteStatus = 11;
-    let sampleStatuses = page.locator(getByTestID("sample-status"));
+    let sampleStatuses = page.locator(getByTestID(sampleStatusId));
     expect(await sampleStatuses.count()).toBe(samplesWithCompleteStatus);
     for (let i = 0; i < (await sampleStatuses.count()); i++) {
       expect(sampleStatuses.nth(i)).toHaveText(
@@ -78,7 +81,7 @@ test.describe("Sample filtering tests", () => {
 
     // verify only failed samples are listed
     const samplesWithFailedStatus = 2;
-    sampleStatuses = page.locator(getByTestID("sample-status"));
+    sampleStatuses = page.locator(getByTestID(sampleStatusId));
     expect(await sampleStatuses.count()).toBe(samplesWithFailedStatus);
     for (let i = 0; i < (await sampleStatuses.count()); i++) {
       expect(sampleStatuses.nth(i)).toHaveText(
@@ -305,9 +308,9 @@ test.describe("Sample filtering tests", () => {
       const val = page.locator(".ez2j8c413").nth(i).textContent();
       expect(filterBy.lineage).toContain(val);
       //verify status
-      await expect(
-        page.locator(getByTestID("sample-status")).nth(i)
-      ).toHaveText(filterBy.status);
+      await expect(page.locator(getByTestID(sampleStatusId)).nth(i)).toHaveText(
+        filterBy.status
+      );
     }
   });
 });
@@ -367,7 +370,7 @@ function prepareTestData() {
   // data for samples uploaded today
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
-    let defaults = getDefaults();
+    const defaults = getDefaults();
     defaults.upload_date = getADateInThePast(0, 0);
     mockResponseData.push(getSampleResponseData(defaults));
   }
