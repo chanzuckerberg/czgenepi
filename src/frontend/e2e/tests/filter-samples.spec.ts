@@ -46,7 +46,8 @@ test.describe("Sample filtering tests", () => {
     //accept cookie t&c (if prompted and not in CI)
     const tAndCSelector =
       '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
-    if (!process.env.CI) {
+    const tAndC = page.locator(tAndCSelector);
+    if (await tAndC.isVisible) {
       await page.locator(tAndCSelector).click();
     }
 
