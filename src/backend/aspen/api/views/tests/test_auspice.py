@@ -8,11 +8,13 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.api.views.tests.data.location_data import TEST_COUNTRY_DATA
 from aspen.api.views.tests.data.phylo_tree_data import TEST_TREE
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
+from aspen.util.split import SplitClient
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -21,12 +23,14 @@ pytestmark = pytest.mark.asyncio
 async def test_valid_auspice_link_generation(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
     auth_headers = {"user_id": user.auth0_user_id}
     request_body = {"tree_id": phylo_tree.entity_id}
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/auspice/generate",
         json=request_body,
@@ -47,9 +51,14 @@ async def test_valid_auspice_link_access(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    split_client.get_pathogen_treatment.return_value = "GISAID"
+    user, group, samples, phylo_run, phylo_tree, pathogen = await make_shared_test_data(
         async_session
+    )
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, "GISAID", async_session
     )
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     try:
@@ -82,22 +91,28 @@ async def test_valid_auspice_link_access(
 
     assert "meta" in res_json.keys()
     assert "tree" in res_json.keys()
-    assert res_json["tree"]["name"] == "hCoV-19/ROOT"
+    assert res_json["tree"]["name"] == f"{pathogen_repo_config.prefix}/ROOT"
     assert res_json["tree"]["branch_attrs"]["labels"]["clade"] == "42"
     test_children = res_json["tree"]["children"]
     for index in range(1, 2):
         child = test_children[index - 1]
         assert child["name"] == f"private_identifier_{index}"
-        assert child["GISAID_ID"] == f"hCoV-19/public_identifier_{index}"
+        assert (
+            child["GISAID_ID"]
+            == f"{pathogen_repo_config.prefix}/public_identifier_{index}"
+        )
 
 
 async def test_unauth_user_auspice_link_generation(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    split_client.get_pathogen_treatment.return_value = "GISAID"
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
+    split_client.get_pathogen_treatment.return_value = "GISAID"
     group_that_did_not_make_tree = group_factory(name="i_want_to_see_trees")
     user_that_did_not_make_tree = await userrole_factory(
         async_session,
@@ -124,8 +139,10 @@ async def test_tampered_magic_link(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    split_client.get_pathogen_treatment.return_value = "GISAID"
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
 
@@ -171,8 +188,10 @@ async def test_country_color_labeling(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    split_client.get_pathogen_treatment.return_value = "GISAID"
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
 
@@ -262,8 +281,10 @@ async def test_division_color_labeling(
     async_session: AsyncSession,
     http_client: AsyncClient,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    split_client.get_pathogen_treatment.return_value = "GISAID"
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
 
@@ -352,8 +373,10 @@ async def test_location_color_labeling(
     http_client: AsyncClient,
     api,
     mock_s3_resource: boto3.resource,
+    split_client: SplitClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    split_client.get_pathogen_treatment.return_value = "GISAID"
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
 
