@@ -1,5 +1,5 @@
 /**
- * Everything surrounding the use of Split.io / feature flags lives here.
+ * Everything surrounding the use of Split.io / feature flags lives in this directory.
  *
  * For a detailed guide on working with feature flags in Split, see the wiki:
  *   "GenEpi -- Feature Flags (Split.io) -- HowTo"
@@ -17,7 +17,7 @@
  * are built around that assumption: if you need to work with a complex flag,
  * that's totally fine, but you'll need to write some custom handling.
  *
- * To use a new flag
+ * To use a new flag for `user` traffic type,
  *   1) Create the flag in Split, add it to the `USER_FEATURE_FLAGS` enum.
  *      * If it's a simple flag of just "on"/"off", local dev defaults to on
  *   2) To pull the flag in a component in app, do the following
@@ -137,6 +137,5 @@ const SplitInitializer = ({ children }: Props): JSX.Element | null => {
 
   return <SplitFactory config={splitConfig}>{children}</SplitFactory>;
 };
-
 
 export default SplitInitializer;
