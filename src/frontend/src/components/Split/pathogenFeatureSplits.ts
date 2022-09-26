@@ -10,12 +10,14 @@ import { SplitFactory } from "@splitsoftware/splitio";
  * the config is requested from Split's servers.
  */
 
-type PathogenFlagMap = Record<
+type PathogenToSplitValueMap = Record<Required<Pathogen>, SPLIT_SIMPLE_FLAG>;
+
+type PathogenTrafficFlagConfig = Record<
   Required<PATHOGEN_FEATURE_FLAGS>,
-  Record<Required<Pathogen>, SPLIT_SIMPLE_FLAG>
+  PathogenToSplitValueMap
 >;
 
-const pathogenFlagMap: PathogenFlagMap = {
+const pathogenTrafficFlagConfig: PathogenTrafficFlagConfig = {
   [PATHOGEN_FEATURE_FLAGS.galago_linkout]: {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
   },
@@ -30,18 +32,21 @@ const pathogenFlagMap: PathogenFlagMap = {
   },
 };
 
+
+type CurrentPathogenFlagMapping = Record<PATHOGEN_FEATURE_FLAGS, SPLIT_SIMPLE_FLAG>;
+
 /**
  * Creates a `features` object for when Split is running in "localhost" mode.
  *
  * This maps flags with traffic type `pathogen` to the appropriate setting as given in the config.
  * This does not draw from the actual split configuration online -- this is for local use only.
  */
-export const createPathogenFlagsForLocal = (pathogen: Pathogen): Record<PATHOGEN_FEATURE_FLAGS, SPLIT_SIMPLE_FLAG> => {
-  const localFeatures: Record<PATHOGEN_FEATURE_FLAGS, SPLIT_SIMPLE_FLAG> = {};
+export const createPathogenFlagsForLocal = (pathogen: Pathogen): CurrentPathogenFlagMapping => {
+  const localFeatures = {} as CurrentPathogenFlagMapping;
 
-  forEach(pathogenFlagMap, (value, key) => {
+  forEach(pathogenTrafficFlagConfig, (value, key) => {
     const flag = value?.[pathogen];
-    localFeatures[key] = flag ?? SPLIT_SIMPLE_FLAG.ON;
+    localFeatures[key as PATHOGEN_FEATURE_FLAGS] = flag ?? SPLIT_SIMPLE_FLAG.ON;
   });
 
   return localFeatures;
