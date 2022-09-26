@@ -30,22 +30,16 @@ export async function applyFilter(
   // select upload date period
   if (filterData.uploadDatePeriod !== undefined) {
     await page.locator("button[label='Upload Date']").click();
-    await page
-      .locator("li")
-      .filter({ hasText: filterData.uploadDatePeriod })
-      .first()
-      .click();
+    await page.locator(`text=${filterData.uploadDatePeriod}`).nth(0).click();
   }
   // fill in collection date(s)
   if (
     filterData.collectionDateFrom !== undefined ||
     filterData.collectionDateTo !== undefined
   ) {
-    console.log(filterData.collectionDateFrom);
-    console.log(filterData.collectionDateTo);
     await page.locator("button[label='Collection Date']").click();
     if (filterData.collectionDateFrom !== undefined) {
-      page
+      await page
         .locator("input[name='collectionDateStart']")
         .fill(filterData.collectionDateFrom);
     }
@@ -65,8 +59,8 @@ export async function applyFilter(
   if (filterData.collectionDatePeriod !== undefined) {
     await page.locator("button[label='Collection Date']").click();
     await page
-      .locator("div:not([style*='hidden'])[class*='MuiPaper-elevation'] li")
-      .filter({ hasText: filterData.collectionDatePeriod })
+      .locator(`text=${filterData.collectionDatePeriod}`)
+      .nth(1)
       .click();
   }
   // select lineage(s)
@@ -103,19 +97,6 @@ export async function clearFilters(
   for (const filter of filters) {
     await page.locator(`div[role="button"]:has-text("${filter}")`).click();
   }
-}
-//convert days into date object based on current date
-export function convertDaysToDate(value: number): Date {
-  const today = new Date();
-  const filterDate = new Date(today);
-  if (value <= 30) {
-    filterDate.setDate(filterDate.getDay() - value);
-  } else if (value > 30 && value <= 180) {
-    filterDate.setMonth(filterDate.getMonth() - value);
-  } else {
-    filterDate.setFullYear(filterDate.getFullYear() - value);
-  }
-  return filterDate;
 }
 
 export interface FilterData {

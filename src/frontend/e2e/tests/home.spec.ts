@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { getByTestID } from "../utils/selectors";
 import path from "path";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
-dotenv.config({path: path.resolve(`.env.${process.env.NODE_ENV}`),});
+dotenv.config({ path: path.resolve(`.env.${process.env.NODE_ENV}`) });
 
 const footer: Record<string, string> = {
   Github: "https://github.com/chanzuckerberg/czgenepi/",
@@ -14,7 +14,7 @@ const footer: Record<string, string> = {
 };
 
 test.describe("Home page tests", () => {
-  test.only("Should verify home page", async ({ page }, workerInfo) => {
+  test("Should verify home page", async ({ page }, workerInfo) => {
     const { baseURL } = workerInfo.config.projects[0].use;
     await page.goto(`${baseURL}` as string);
     await expect(page.locator(getByTestID("navbar-landing"))).toBeVisible();
