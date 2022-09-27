@@ -1,7 +1,6 @@
 import { forEach } from "lodash";
 import { Pathogen } from "src/common/redux/types";
 import { PATHOGEN_FEATURE_FLAGS, SPLIT_SIMPLE_FLAG } from "./types";
-import { SplitFactory } from "@splitsoftware/splitio";
 
 /**
  * This file contains the configuration for any feature that demonstrates different behavior
@@ -51,5 +50,3 @@ export const createPathogenFlagsForLocal = (pathogen: Pathogen): CurrentPathogen
 
   return localFeatures;
 };
-
-export const PathogenSplitClient = SplitFactory;
