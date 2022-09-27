@@ -47,7 +47,7 @@ test.describe("Sample filtering tests", () => {
     const tAndCSelector =
       '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
     const tAndC = page.locator(tAndCSelector);
-    if (await tAndC.isVisible) {
+    if (await tAndC.isVisible()) {
       await page.locator(tAndCSelector).click();
     }
 

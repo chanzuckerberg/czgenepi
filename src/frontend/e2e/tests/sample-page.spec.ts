@@ -17,7 +17,8 @@ const tableHeaders = [
   "GISAID",
 ];
 const api = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2/samples/`;
-
+const tAndCSelector =
+  '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
 const mockData = JSON.parse(
   fs.readFileSync("e2e/fixtures/sampleList.json") as unknown as string
 );
@@ -26,6 +27,11 @@ test.describe("Samples page tests", () => {
     const { baseURL } = workerInfo.config.projects[0].use;
     const url = `${baseURL}` as string;
     await page.goto(`${url}/data/samples`);
+    //accept cookie t&c (if prompted and not in CI)
+    const tAndC = page.locator(tAndCSelector);
+    if (await tAndC.isVisible()) {
+      await page.locator(tAndCSelector).click();
+    }
   });
 
   test("Should verify sample list headers", async ({ page }) => {
@@ -59,9 +65,10 @@ test.describe("Samples page tests", () => {
     await page.goto(url, { waitUntil: "networkidle" });
 
     //accept cookie t&c
-    await page
-      .locator('[aria-label="Help us improve CZ GEN EPI"] >> text=Accept')
-      .click();
+    const tAndC = page.locator(tAndCSelector);
+    if (await tAndC.isVisible()) {
+      await page.locator(tAndCSelector).click();
+    }
 
     //wait until data is displayed
     await page.waitForSelector(getByTestID("table-row"));
