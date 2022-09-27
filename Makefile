@@ -261,6 +261,7 @@ frontend-e2e-ci: .env.ecr ## Run e2e tests with s3 screenshot wrapper.
 	test_container=$$(docker ps -a | grep -i frontend_run | cut -d ' ' -f 1 | head -n 1); \
 	docker cp $${test_container}:/tmp/screenshots .; \
 	docker rm $${test_container}; \
+	ls screenshots
 	echo copying screenshots to ${S3_PREFIX}
 	aws s3 cp --recursive ./screenshots ${S3_PREFIX}; \
 	exit $$exit_status
