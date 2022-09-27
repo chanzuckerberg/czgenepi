@@ -1,7 +1,7 @@
 import { chromium, FullConfig } from "@playwright/test";
 import path from "path";
 import dotenv from "dotenv";
-import { login } from "e2e/utils/login";
+import { login } from "../utils/login";
 
 dotenv.config({ path: path.resolve(`.env.${process.env.NODE_ENV}`) });
 
