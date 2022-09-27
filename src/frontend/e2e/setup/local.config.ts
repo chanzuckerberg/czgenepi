@@ -26,7 +26,7 @@ const config: PlaywrightTestConfig = {
   timeout: 30000,
   use: {
     actionTimeout: 0,
-    baseURL: "https://staging.czgenepi.org",
+    baseURL: "http://frontend.genepinet.localdev:8000",
     headless: true,
     ignoreHTTPSErrors: true,
     screenshot: "only-on-failure",

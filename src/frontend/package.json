@@ -10,7 +10,7 @@
     "dev": "node --max_old_space_size=8192 node_modules/.bin/next dev",
     "local-dev": "API_URL=http://backend.genepinet.localdev:3000 npm run dev --  -p 8000",
     "jest": "jest --config jest/config.js",
-    "e2e": "mkdir -p /tmp/screenshots; DEBUG=pw:api NODE_ENV=local npx playwright test --output /tmp/screenshots -c ./e2e/setup/local.config.ts",
+    "e2e": "mkdir -p /tmp/screenshots; DEBUG=pw:api NODE_ENV=development npx playwright test --output /tmp/screenshots -c ./e2e/setup/local.config.ts",
     "e2e-staging": "mkdir -p /tmp/screenshots; DEBUG=pw:api npx playwright test --output /tmp/screenshots -c ./e2e/setup/staging.config.ts",
     "e2e-staging-from-local": "AWS_PROFILE=genepi-dev FRONTEND_URL=https://staging.genepi.czi.technology DEPLOYMENT_STAGE=staging make e2e",
     "type-check": "tsc --noEmit",
