@@ -12,6 +12,11 @@ export class UploadSample {
     await UploadSample.selectSampleFiles(page, uploadData.dataFile);
     // complete form
     for (let i = 0; i < uploadData.samples.length; i++) {
+      // fill private ID input
+      await page
+        .locator('input[name="privateId"]')
+        .nth(i)
+        .type(uploadData.samples[i].publicId);
       // fill public ID input
       await page
         .locator('input[name="publicId"]')
@@ -21,19 +26,28 @@ export class UploadSample {
       await page
         .locator('input[name="collectionDate"]')
         .nth(i)
-        .type(uploadData.samples[i].collectionDate);
+        .fill(uploadData.samples[i].collectionDate);
+
       // fill search for location input
-      await page.locator('button[label="Search For Location"]').nth(i).click();
+      await page.locator('span:has-text("Search For Location")').nth(0).click();
+      await page
+        .locator('[placeholder="Search"]')
+        .fill(uploadData.samples[i].collectionLocation);
+      await page
+        .locator(`text="${uploadData.samples[i].collectionLocation}"`)
+        .nth(0)
+        .click();
+
       // fill sequencing date input
       await page
         .locator('input[name="sequencingDate"]')
         .nth(i)
-        .type(uploadData.samples[i].sequencingDate);
+        .fill(uploadData.samples[i].sequencingDate);
+
       // toggle keep private switch
       await page.locator('input[name="keepPrivate"]').nth(i).click();
     }
     //continue button
-    await page.locator('a:has-text("Continue")').scrollIntoViewIfNeeded();
     await page.locator('a:has-text("Continue")').click();
   }
 

@@ -28,8 +28,16 @@ test.describe("Upload sample tests", () => {
         samples: UploadSample.createSampleData(),
       };
       await UploadSample.uploadSampleFiles(page, uploadData);
-      //await expect(page.locator("//button[not(contains(@class,'Mui-disabled')) and text()='Continue']")).toBeVisible()
-      await expect(page.locator('a:has-text("Continue")')).toBeVisible();
+
+      //accept terms and conditions
+      await page.locator('input[type="checkbox"]').nth(0).click();
+      await page.locator('input[type="checkbox"]').nth(1).click();
+
+      await page.locator("text=Start Upload").click();
+
+      // show confirmation and finish process
+      await expect(page.locator("text=Upload Complete!")).toBeVisible();
+      await page.locator("text=Go to Samples").click();
     });
   });
 
