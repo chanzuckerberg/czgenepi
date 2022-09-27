@@ -161,7 +161,7 @@ jobs:
           chmod a+rwx src/frontend/build # TODO temp hack - need a better plan for the build dir.
           make local-init
           echo "Init complete - testing web service"
-          # docker-compose exec -T frontend wget -T 10 --tries 20 localhost:8000/
+          docker-compose exec -T frontend wget -T 10 --tries 20 localhost:8000/
           echo "Webserver up, running tests!"
           export NOW=$(date +'%Y-%m-%dT%H:%M:%S')
           docker-compose logs -f frontend &
