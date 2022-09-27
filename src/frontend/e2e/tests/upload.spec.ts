@@ -13,7 +13,7 @@ test.describe("Upload sample tests", () => {
     const tAndCSelector =
       '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
     const tAndC = page.locator(tAndCSelector);
-    if (await tAndC.isVisible) {
+    if (await tAndC.isVisible()) {
       await page.locator(tAndCSelector).click();
     }
     //click upload button
@@ -21,7 +21,7 @@ test.describe("Upload sample tests", () => {
   });
 
   fileExtensions.forEach((extenstion) => {
-    test.only(`Should upload ${extenstion.toUpperCase()} sample file`, async ({
+    test(`Should upload ${extenstion.toUpperCase()} sample file`, async ({
       page,
     }) => {
       const samples = [];
@@ -49,7 +49,7 @@ test.describe("Upload sample tests", () => {
     });
   });
 
-  test.only(`Should validate collection dates`, async ({ page }) => {
+  test(`Should validate collection dates`, async ({ page }) => {
     const samples = [];
     //overwrite collection dates with invalid values
     for (let i = 0; i < 3; i++) {
@@ -65,7 +65,7 @@ test.describe("Upload sample tests", () => {
     expect(await page.locator(`text=${dateErrorMessage}`).count()).toBe(3);
   });
 
-  test.only(`Should validate sequencing dates`, async ({ page }) => {
+  test(`Should validate sequencing dates`, async ({ page }) => {
     const samples = [];
     //overwrite collection dates with invalid values
     for (let i = 0; i < 3; i++) {
