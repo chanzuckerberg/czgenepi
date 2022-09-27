@@ -149,13 +149,18 @@ export default function Metadata({
               disabled={!isValid}
               sdsType="primary"
               sdsStyle="rounded"
+              data-test-id="upload-step-two-continue-btn"
             >
               Continue
             </ContinueButton>
           </NextStepWrapper>
           <NextLink href={ROUTES.UPLOAD_STEP1} passHref>
             <Link href="passHref">
-              <Button sdsType="secondary" sdsStyle="rounded">
+              <Button
+                sdsType="secondary"
+                sdsStyle="rounded"
+                data-test-id="upload-step-two-back-btn"
+              >
                 Back
               </Button>
             </Link>
@@ -174,7 +179,11 @@ function NextStepWrapper({
   isValid: boolean;
 }): JSX.Element {
   return isValid ? (
-    <NextLink href={ROUTES.UPLOAD_STEP3} passHref>
+    <NextLink
+      href={ROUTES.UPLOAD_STEP3}
+      passHref
+      data-test-id="upload-step-counter"
+    >
       <Link href="passHref">{children}</Link>
     </NextLink>
   ) : (

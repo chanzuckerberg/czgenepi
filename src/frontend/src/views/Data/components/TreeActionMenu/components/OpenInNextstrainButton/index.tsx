@@ -33,6 +33,7 @@ const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
             : "View in Nextstrain"
         }
         placement="top"
+        data-test-id="view-in-nextstrain"
       >
         <span>
           <ButtonIcon
