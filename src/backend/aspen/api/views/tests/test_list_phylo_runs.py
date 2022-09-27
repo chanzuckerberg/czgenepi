@@ -2,6 +2,7 @@ import random
 from typing import Collection, Sequence, Tuple
 
 import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import (
     Group,
@@ -16,6 +17,9 @@ from aspen.database.models import (
 )
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import random_pathogen_factory
+from aspen.test_infra.models.pathogen_repo_config import (
+    setup_gisaid_and_genbank_repo_configs,
+)
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -85,7 +89,12 @@ def make_runs_with_no_trees(group: Group, pathogen: Pathogen) -> Collection[Phyl
 
 
 def make_all_test_data(
-    group: Group, user: User, location: Location, n_samples: int, n_trees: int
+    async_session: AsyncSession,
+    group: Group,
+    user: User,
+    location: Location,
+    n_samples: int,
+    n_trees: int,
 ) -> Tuple[
     Pathogen,
     Collection[Sample],
@@ -94,12 +103,15 @@ def make_all_test_data(
     Collection[PhyloRun],
 ]:
     pathogen: Pathogen = random_pathogen_factory()
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+
     samples: Collection[Sample] = make_sample_data(
         group, user, location, n_samples, pathogen
     )
     uploaded_pathogen_genomes: Collection[
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
+
     trees: Sequence[PhyloTree] = make_trees(group, pathogen, samples, n_trees)
     treeless_runs: Collection[PhyloRun] = make_runs_with_no_trees(group, pathogen)
     return pathogen, samples, uploaded_pathogen_genomes, trees, treeless_runs
@@ -140,7 +152,7 @@ async def test_phylo_tree_view(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen, _, _, trees, _ = make_all_test_data(
-        group, user, location, n_samples, n_trees
+        async_session, group, user, location, n_samples, n_trees
     )
 
     async_session.add(group)
@@ -161,7 +173,7 @@ async def test_in_progress_and_failed_trees(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen, _, _, trees, treeless_runs = make_all_test_data(
-        group, user, location, n_samples, n_trees
+        async_session, group, user, location, n_samples, n_trees
     )
 
     async_session.add(group)
@@ -218,7 +230,7 @@ async def test_phylo_trees_can_see(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen, _, _, trees, _ = make_all_test_data(
-        owner_group, user, location, n_samples, n_trees
+        async_session, owner_group, user, location, n_samples, n_trees
     )
 
     role_objs = await grouprole_factory(async_session, owner_group, viewer_group)
@@ -241,7 +253,7 @@ async def test_phylo_trees_no_can_see(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen, _, _, trees, _ = make_all_test_data(
-        owner_group, user, location, n_samples, n_trees
+        async_session, owner_group, user, location, n_samples, n_trees
     )
 
     async_session.add_all((owner_group, viewer_group))

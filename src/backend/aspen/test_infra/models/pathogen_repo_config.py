@@ -1,15 +1,22 @@
 from aspen.database.models import Pathogen, PathogenRepoConfig, PublicRepository
-from aspen.test_infra.models.pathogen import pathogen_factory
+from aspen.database.models.usergroup import generate_random_id
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 
 
-def setup_gisaid_and_genbank_repo_configs(async_session) -> Pathogen:
+def setup_gisaid_and_genbank_repo_configs(
+    async_session,
+    pathogen=None,
+    gisaid_prefix=generate_random_id(5),
+    genbank_prefix=generate_random_id(5),
+) -> Pathogen:
+
     repo_info = {
-        "GISAID": {"prefix": "hCoV-19"},
-        "GenBank": {"prefix": "SARS-CoV-2/human"},
+        "GISAID": {"prefix": gisaid_prefix},
+        "GenBank": {"prefix": genbank_prefix},
     }
-
-    pathogen = pathogen_factory("SC2", "SARS-CoV-2")
-    async_session.add(pathogen)
+    if pathogen is None:
+        pathogen = random_pathogen_factory()
+        async_session.add(pathogen)
     for name, config in repo_info.items():
         public_repository = PublicRepository(name=name)
         async_session.add(public_repository)

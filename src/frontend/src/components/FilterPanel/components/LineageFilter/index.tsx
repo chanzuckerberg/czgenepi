@@ -63,6 +63,7 @@ const LineageFilter = (props: Props): JSX.Element => {
       multiple
       search
       InputDropdownProps={PROPS_FOR_INPUT_DROPDOWN}
+      data-test-id="sample-filter-lineage"
     />
   );
 };

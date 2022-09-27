@@ -14,6 +14,7 @@ from sqlalchemy.sql.expression import and_, or_
 from aspen.api.authz import AuthZSession
 from aspen.api.error import http_exceptions as ex
 from aspen.database.models import Group, Location, Pathogen, PhyloRun, PhyloTree, Sample
+from aspen.database.models.pathogens import PathogenRepoConfig
 
 # 16 colors
 NEXTSTRAIN_COLOR_SCALE = [
@@ -47,6 +48,7 @@ CATEGORY_NAMES = {
 
 
 def _rename_nodes_on_tree(
+    prefix: str,
     node: dict,
     name_map: Mapping[str, str],
     save_key: Optional[str] = None,
@@ -54,7 +56,6 @@ def _rename_nodes_on_tree(
     """Given a tree, a mapping of identifiers to their replacements, rename the nodes on
     the tree.  If `save_key` is provided, then the original identifier is saved using
     that as the key."""
-    gisaid_prefix = "hCoV-19/"
 
     # The mixed situations we're dealing with here:
     #  - The public identifiers in our database *sometimes* have gisaid prefixes on them
@@ -67,14 +68,14 @@ def _rename_nodes_on_tree(
 
     # Strip the gisaid prefix from our tree identifier if it's present
     tree_identifier = node["name"]
-    if tree_identifier.lower().startswith(gisaid_prefix.lower()):
-        tree_identifier = tree_identifier[len(gisaid_prefix) :]
+    if tree_identifier.lower().startswith(prefix.lower()):
+        tree_identifier = tree_identifier[len(f"{prefix}/") :]
 
     renamed_value = name_map.get(tree_identifier, None)
 
     # Make sure we have the gisaid prefix on this node when we output it.
     node["name"] = (
-        f"{gisaid_prefix}{tree_identifier}"
+        f"{prefix}/{tree_identifier}"
         if not tree_identifier.startswith("NODE_")
         else tree_identifier
     )
@@ -85,7 +86,7 @@ def _rename_nodes_on_tree(
             node[save_key] = node["name"]
         node["name"] = renamed_value
     for child in node.get("children", []):
-        _rename_nodes_on_tree(child, name_map, save_key)
+        _rename_nodes_on_tree(prefix, child, name_map, save_key)
     return node
 
 
@@ -276,6 +277,7 @@ async def process_phylo_tree(
     az: AuthZSession,
     phylo_tree_id: int,
     pathogen: Pathogen,
+    pathogen_repo_config: PathogenRepoConfig,
     id_style: Optional[str] = None,
 ) -> dict:
     (
@@ -304,10 +306,13 @@ async def process_phylo_tree(
         s3.Bucket(phylo_tree.s3_bucket).Object(phylo_tree.s3_key).get()["Body"].read()
     )
     json_data = json.loads(data)
-
+    name = pathogen_repo_config.public_repository.name
+    save_key = "{}_ID".format(name.upper())
     if id_style == "public":
         json_data = await _set_colors(db, json_data, phylo_run)
-        json_data["tree"] = _rename_nodes_on_tree(json_data["tree"], {}, "GISAID_ID")
+        json_data["tree"] = _rename_nodes_on_tree(
+            pathogen_repo_config.prefix, json_data["tree"], {}, save_key
+        )
         return json_data
 
     # Load all the public:private sample mappings this user/group has access to.
@@ -323,14 +328,14 @@ async def process_phylo_tree(
         .all()
     )
     for sample in translatable_samples:
-        public_id = sample.public_identifier.replace("hCoV-19/", "")
+        public_id = sample.public_identifier.replace(
+            f"{pathogen_repo_config.prefix}/", ""
+        )
         identifier_map[public_id] = sample.private_identifier
-
     # we pass in the root node of the tree to the recursive naming function.
     json_data["tree"] = _rename_nodes_on_tree(
-        json_data["tree"], identifier_map, "GISAID_ID"
+        pathogen_repo_config.prefix, json_data["tree"], identifier_map, save_key
     )
-
     # set country labeling/colors
     json_data = await _set_colors(db, json_data, phylo_run)
     return json_data

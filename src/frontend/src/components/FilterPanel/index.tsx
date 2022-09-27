@@ -214,16 +214,22 @@ const FilterPanel: FC<Props> = ({
 
   return (
     <StyledFilterPanel isOpen={isOpen}>
-      <UploadDateFilter updateUploadDateFilter={updateUploadDateFilter} />
+      <UploadDateFilter
+        updateUploadDateFilter={updateUploadDateFilter}
+        data-test-id="sample-filter-upload-date"
+      />
       <CollectionDateFilter
         updateCollectionDateFilter={updateCollectionDateFilter}
+        data-test-id="sample-filter-collection-date"
       />
       <LineageFilter
         options={lineages}
         updateLineageFilter={updateLineageFilter}
+        data-test-id="sample-filter-lineage"
       />
       <GenomeRecoveryFilter
         updateGenomeRecoveryFilter={updateGenomeRecoveryFilter}
+        data-test-id="sample-filter-status"
       />
     </StyledFilterPanel>
   );
