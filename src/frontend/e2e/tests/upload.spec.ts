@@ -1,9 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { UploadSample } from "../pages/upload";
+import { uploadSampleFiles } from "../pages/upload";
+import { createSampleUploadData } from "../utils/sample";
 
 test.describe("Upload sample tests", () => {
   const dateErrorMessage = "Update format to YYYY-MM-DD";
-  const fileExtensions = [".txt"];
+  const fileExtensions = [".txt", ".fa", ".fasta"];
   test.beforeEach(async ({ page }, workerInfo) => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
     const url = `${baseUrl}/data/samples`;
@@ -23,11 +24,18 @@ test.describe("Upload sample tests", () => {
     test.only(`Should upload ${extenstion.toUpperCase()} sample file`, async ({
       page,
     }) => {
+      const samples = [];
+      for (let i = 0; i < 3; i++) {
+        samples.push(createSampleUploadData());
+      }
       const uploadData = {
         dataFile: extenstion,
-        samples: UploadSample.createSampleData(),
+        samples: samples,
       };
-      await UploadSample.uploadSampleFiles(page, uploadData);
+      await uploadSampleFiles(page, uploadData);
+
+      //continue button
+      await page.locator('a:has-text("Continue")').click();
 
       //accept terms and conditions
       await page.locator('input[type="checkbox"]').nth(0).click();
@@ -41,41 +49,36 @@ test.describe("Upload sample tests", () => {
     });
   });
 
-  test(`Should validate collection dates`, async ({ page }) => {
-    const samples = UploadSample.createSampleData();
+  test.only(`Should validate collection dates`, async ({ page }) => {
+    const samples = [];
     //overwrite collection dates with invalid values
-    for (let i = 0; i < samples.length; i++) {
-      samples[i].collectionDate = " ";
+    for (let i = 0; i < 3; i++) {
+      const sample = createSampleUploadData();
+      sample.collection_date = " ";
+      samples.push(sample);
     }
     const uploadData = {
       dataFile: ".txt",
       samples: samples,
     };
-    await UploadSample.uploadSampleFiles(page, uploadData);
-    const errors = page.locator('input[name="collectionDate"]');
-    //   "//input[@name='collectionDate']/../../p"
-    // );
-    for (let i = 0; i < samples.length; i++) {
-      await expect(await errors.nth(i).textContent()).toBe(dateErrorMessage);
-    }
+    await uploadSampleFiles(page, uploadData);
+    expect(await page.locator(`text=${dateErrorMessage}`).count()).toBe(3);
   });
 
-  test(`Should validate sequencing dates`, async ({ page }) => {
-    const samples = UploadSample.createSampleData();
-    //overwrite equencing dates with invalid values
-    for (let i = 0; i < samples.length; i++) {
-      samples[i].sequencingDate = " ";
+  test.only(`Should validate sequencing dates`, async ({ page }) => {
+    const samples = [];
+    //overwrite collection dates with invalid values
+    for (let i = 0; i < 3; i++) {
+      const sample = createSampleUploadData();
+      sample.sequencing_date = " ";
+      samples.push(sample);
     }
+
     const uploadData = {
       dataFile: ".txt",
       samples: samples,
     };
-    await UploadSample.uploadSampleFiles(page, uploadData);
-    const errors = page.locator('input[name="sequencingDate]');
-    //   "//input[@name='sequencingDate']/../following-sibling::p"
-    // );
-    for (let i = 0; i < samples.length; i++) {
-      expect(await errors.nth(i).textContent()).toBe(dateErrorMessage);
-    }
+    await uploadSampleFiles(page, uploadData);
+    expect(await page.locator(`text=${dateErrorMessage}`).count()).toBe(3);
   });
 });
