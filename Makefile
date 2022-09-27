@@ -253,6 +253,16 @@ backend-%: .env.ecr  ## Run make commands in a NEW backend container. See src/ba
 frontend-%: .env.ecr ## Run make commands in the frontend container (src/frontend/Makefile)
 	$(docker_compose) run -e CI=true --no-deps --rm frontend make $(subst frontend-,,$@)
 
+# this needs to be here so we can access docker and aws (which are not installed in the frontend container)
+.PHONY: frontend-e2e-ci
+frontend-e2e-ci: .env.ecr ## Run e2e tests with s3 screenshot wrapper.
+	$(docker_compose) run -e CI=true --no-deps frontend make e2e; \
+	exit_status=$$?; \
+	test_container=$$(docker ps -a | grep -i frontend_run | cut -d ' ' -f 1 | head -n 1); \
+	docker cp $${test_container}:/tmp/screenshots .; \
+	docker rm $${test_container}; \
+	aws s3 cp --recursive ./screenshots $${S3_PREFIX}; \
+	exit $$exit_status
 
 ### WDL ###################################################
 .PHONY: wdl-lint
