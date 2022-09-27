@@ -1,9 +1,9 @@
 import { expect, Page, test } from "@playwright/test";
 import { getByTestID, getByText } from "../utils/selectors";
 import path from "path";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
-dotenv.config({path: path.resolve(`.env.${process.env.NODE_ENV}`),});
+dotenv.config({ path: path.resolve(`.env.${process.env.NODE_ENV}`) });
 
 const TAB_COUNT = 2;
 
@@ -24,7 +24,11 @@ test.describe("Samples page tests", () => {
     const url = `${baseURL}` as string;
     await page.goto(`${url}/data/samples`);
   });
-  test("Should verify sample listing", async ({ page }: { page: Page }) => {
+  test.skip("Should verify sample listing", async ({
+    page,
+  }: {
+    page: Page;
+  }) => {
     tableHeaders.forEach((header) => {
       expect(page.locator(getByText(header)).first()).not.toBeEmpty();
     });
@@ -33,8 +37,8 @@ test.describe("Samples page tests", () => {
     );
   });
 
-  test("Should verify sample data", async ({ page }: { page: Page }) => {
-    await page.goto(process.env.BASEURL+"data/samples" as string);
+  test.skip("Should verify sample data", async ({ page }: { page: Page }) => {
+    await page.goto((process.env.BASEURL + "data/samples") as string);
 
     //wait until data is displayed
     await page.waitForSelector('[data-test-id="table-row"]');
