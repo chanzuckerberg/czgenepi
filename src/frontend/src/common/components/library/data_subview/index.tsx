@@ -252,7 +252,12 @@ const DataSubview: FunctionComponent<Props> = ({
     if (viewName === VIEWNAME.SAMPLES && tableData !== undefined) {
       sampleActions = (
         <DownloadWrapper>
-          <StyledChip isRounded label={checkedSampleIds.length} status="info" />
+          <StyledChip
+            isRounded
+            label={checkedSampleIds.length}
+            status="info"
+            data-test-id="selected-sample-count"
+          />
           <StyledDiv>Selected </StyledDiv>
           <Divider />
           <TreeSelectionMenu
@@ -274,6 +279,7 @@ const DataSubview: FunctionComponent<Props> = ({
             isSampleEditDisabled={isSampleEditDisabled}
             onDeleteSelected={() => setDeleteSampleConfirmationOpen(true)}
             onEditSelected={() => setEditSampleConfirmationOpen(true)}
+            data-test-id="sample-page-more-action-btn"
           />
         </DownloadWrapper>
       );

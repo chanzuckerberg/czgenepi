@@ -6,6 +6,9 @@ from aspen.api.utils.gisaid import (  # noqa: F401
     get_matching_gisaid_ids_by_epi_isl,
 )
 from aspen.api.utils.lineage import expand_lineage_wildcards  # noqa: F401
+from aspen.api.utils.pathogens import (  # noqa: F401
+    get_pathogen_repo_config_for_pathogen,
+)
 from aspen.api.utils.phylo import (  # noqa: F401
     extract_accessions,
     process_phylo_tree,
@@ -18,7 +21,6 @@ from aspen.api.utils.sample import (  # noqa: F401
     collect_submission_information,
     determine_gisaid_status,
     format_sample_lineage,
-    get_public_repository_prefix,
     sample_info_to_genbank_rows,
     sample_info_to_gisaid_rows,
     samples_by_identifiers,

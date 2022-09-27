@@ -60,10 +60,18 @@ export default function Table({ samples }: Props): JSX.Element {
           <TableBody component="div">
             {Object.entries(samples).map(([key, value]) => (
               <TableRow key={key} component="div">
-                <StyledTableCell scope="row" component="div">
+                <StyledTableCell
+                  scope="row"
+                  component="div"
+                  data-test-id="sample-id"
+                >
                   {key}
                 </StyledTableCell>
-                <StyledTableCell align="left" component="div">
+                <StyledTableCell
+                  align="left"
+                  component="div"
+                  data-test-id="file-name"
+                >
                   {value.filename}
                 </StyledTableCell>
               </TableRow>

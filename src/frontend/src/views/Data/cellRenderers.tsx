@@ -48,7 +48,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     const location = value.location ?? value.division;
     return (
       <RowContent>
-        <Cell data-test-id={`row-collectionLocation`}>{location}</Cell>
+        <Cell data-test-id="row-collectionLocation">{location}</Cell>
       </RowContent>
     );
   },
@@ -57,7 +57,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
     return (
       <RowContent>
-        <GISAIDCell>
+        <GISAIDCell data-test-id="row-gisaid-id">
           {status}
           {gisaid_id && <Subtext>{gisaid_id}</Subtext>}
         </GISAIDCell>
@@ -71,7 +71,9 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
     const Content = (
       <Component>
-        <Cell>{value.lineage || "Not Yet Processed"}</Cell>
+        <Cell data-test-id="row-lineage">
+          {value.lineage || "Not Yet Processed"}
+        </Cell>
       </Component>
     );
 
@@ -80,6 +82,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
         followCursor
         title={<LineageTooltip lineage={value as Lineage} />}
         width="wide"
+        data-test-id="lineage-tooltip"
       >
         {Content}
       </Tooltip>
@@ -115,22 +118,34 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
         <Cell>
           <SampleIconWrapper>
             {isPrivate ? (
-              <Icon sdsIcon="flaskPrivate" sdsSize="xl" sdsType="static" />
+              <Icon
+                sdsIcon="flaskPrivate"
+                sdsSize="xl"
+                sdsType="static"
+                data-test-id="row-is-private"
+              />
             ) : (
-              <Icon sdsIcon="flaskPublic" sdsSize="xl" sdsType="static" />
+              <Icon
+                sdsIcon="flaskPublic"
+                sdsSize="xl"
+                sdsType="static"
+                data-test-id="row-is-public"
+              />
             )}
           </SampleIconWrapper>
           <PrivateIdValueWrapper>
             <CenteredFlexContainer>
-              <span>{value}</span>
+              <span data-test-id="row-private-id">{value}</span>
               <StyledChip
-                data-test-id="sample-status"
+                data-test-id="row-sample-status"
                 size="small"
                 label={label.label}
                 status={label.status}
               />
             </CenteredFlexContainer>
-            <StyledUploaderName>{displayName}</StyledUploaderName>
+            <StyledUploaderName data-test-id="row-user-name">
+              {displayName}
+            </StyledUploaderName>
           </PrivateIdValueWrapper>
         </Cell>
       </RowContent>
@@ -138,7 +153,11 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   },
 
   uploadDate: ({ value }): JSX.Element => {
-    return <RowContent>{datetimeWithTzToLocalDate(value)}</RowContent>;
+    return (
+      <RowContent data-test-id={`row-upload-date`}>
+        {datetimeWithTzToLocalDate(value)}
+      </RowContent>
+    );
   },
 };
 

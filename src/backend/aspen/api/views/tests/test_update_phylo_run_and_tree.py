@@ -6,8 +6,12 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.database.models import Group, PhyloRun, PhyloTree, Sample, User
+from aspen.database.models.pathogens import Pathogen
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import random_pathogen_factory
+from aspen.test_infra.models.pathogen_repo_config import (
+    setup_gisaid_and_genbank_repo_configs,
+)
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
@@ -18,7 +22,7 @@ pytestmark = pytest.mark.asyncio
 
 async def make_shared_test_data(
     async_session: AsyncSession, no_trees: bool = False, system_admin=False
-) -> Tuple[User, Group, List[Sample], PhyloRun, Union[PhyloTree, None]]:
+) -> Tuple[User, Group, List[Sample], PhyloRun, Union[PhyloTree, None], Pathogen]:
     location = location_factory(
         "North America",
         "USA",
@@ -29,7 +33,9 @@ async def make_shared_test_data(
     )
     group = group_factory(default_tree_location=location)
     user = await userrole_factory(async_session, group, system_admin=system_admin)
+
     pathogen = random_pathogen_factory()
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
     samples = [
         sample_factory(
             group,
@@ -41,6 +47,7 @@ async def make_shared_test_data(
         )
         for i in range(1, 3)
     ]
+
     phylo_run = phylorun_factory(group, pathogen=pathogen)
     phylo_tree = None
     if not no_trees:
@@ -54,14 +61,14 @@ async def make_shared_test_data(
 
     await async_session.commit()
 
-    return user, group, samples, phylo_run, phylo_tree
+    return user, group, samples, phylo_run, phylo_tree, pathogen
 
 
 async def test_update_phylo_tree(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
-    user, group, samples, phylo_run, phylo_tree = await make_shared_test_data(
+    user, group, samples, phylo_run, phylo_tree, _ = await make_shared_test_data(
         async_session
     )
     auth_headers = {"user_id": user.auth0_user_id}
@@ -92,7 +99,7 @@ async def test_update_phylo_run_no_trees(
     async_session: AsyncSession,
     http_client: AsyncClient,
 ):
-    user, group, samples, phylo_run, _ = await make_shared_test_data(
+    user, group, samples, phylo_run, _, _ = await make_shared_test_data(
         async_session, no_trees=True
     )
     auth_headers = {"user_id": user.auth0_user_id}
@@ -124,6 +131,7 @@ async def test_update_phylo_tree_wrong_group(
         samples,
         phylo_run,
         phylo_tree,
+        _,
     ) = await make_shared_test_data(async_session)
     group_that_did_not_make_tree = group_factory(name="i_want_to_see_trees")
     user_that_did_not_make_tree = await userrole_factory(
