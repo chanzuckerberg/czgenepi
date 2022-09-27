@@ -71,7 +71,7 @@ test.describe("Samples page tests", () => {
     }
 
     //wait until data is displayed
-    await page.waitForSelector(getByTestID("table-row"));
+    //await page.waitForSelector(getByTestID("table-row"));
 
     const sampleRows = page.locator(getByTestID("table-row"));
     expect(await sampleRows.count()).toBe(1);

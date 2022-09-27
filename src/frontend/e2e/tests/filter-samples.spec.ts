@@ -431,7 +431,7 @@ async function interceptRequestAndStubResponse(
   await page.goto(url, { waitUntil: "networkidle" });
 
   //wait until data is displayed
-  await page.waitForSelector(getByTestID("table-row"));
+  //await page.waitForSelector(getByTestID("table-row"));
 
   // assert table is populated with at least one record
   expect(await page.locator(getByTestID("table-row")).count()).toBeGreaterThan(
