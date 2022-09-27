@@ -11,8 +11,10 @@ from aspen.api.utils import (
     GenBankSubmissionFormTSVStreamer,
     GisaidSubmissionFormCSVStreamer,
 )
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.database.models import Sample, UploadedPathogenGenome
 from aspen.test_infra.models.location import location_factory
+from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
     setup_gisaid_and_genbank_repo_configs,
 )
@@ -36,7 +38,10 @@ async def test_submission_template_download_gisaid(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = setup_gisaid_and_genbank_repo_configs(async_session)
+    pathogen = random_pathogen_factory()
+    pathogen = setup_gisaid_and_genbank_repo_configs(
+        async_session, pathogen, "hCoV-19", "SARS-CoV-2/human"
+    )
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
@@ -119,7 +124,11 @@ async def test_submission_template_download_genbank(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = setup_gisaid_and_genbank_repo_configs(async_session)
+    pathogen = random_pathogen_factory()
+    setup_gisaid_and_genbank_repo_configs(
+        async_session, pathogen, "hCoV-19", "SARS-CoV-2/human"
+    )
+
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
@@ -198,7 +207,11 @@ async def test_submission_template_prefix_stripping(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = setup_gisaid_and_genbank_repo_configs(async_session)
+    pathogen = random_pathogen_factory()
+    pathogen = setup_gisaid_and_genbank_repo_configs(
+        async_session, pathogen, "hCoV-19", "SARS-CoV-2/human"
+    )
+
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
@@ -236,7 +249,7 @@ async def test_submission_template_prefix_stripping(
         "public_repository_name": "GISAID",
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/submission_template",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/submission_template",
         headers=auth_headers,
         json=request_data,
     )
@@ -282,7 +295,13 @@ async def test_submission_template_incomplete_location(
     group = group_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory("North America", "USA", "California")
-    pathogen = setup_gisaid_and_genbank_repo_configs(async_session)
+
+    pathogen = random_pathogen_factory()
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
+        pathogen, "GISAID", async_session
+    )
+
     pangolin_output = {
         "scorpio_call": "B.1.167",
         "scorpio_support": "0.775",
@@ -299,8 +318,8 @@ async def test_submission_template_incomplete_location(
                 location,
                 private=True,
                 pathogen=pathogen,
-                private_identifier=f"hCoV-19/private{i}",
-                public_identifier=f"hCoV-19/public{i}",
+                private_identifier=f"{pathogen_repo_config.prefix}/private{i}",
+                public_identifier=f"{pathogen_repo_config.prefix}/public{i}",
             )
         )
         uploaded_pathogen_genomes.append(
@@ -320,10 +339,11 @@ async def test_submission_template_incomplete_location(
         "public_repository_name": "GISAID",
     }
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/samples/submission_template",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/submission_template",
         headers=auth_headers,
         json=request_data,
     )
+
     expected_filename = f"{today.strftime('%Y%m%d')}_GISAID_metadata.csv"
     assert res.status_code == 200
     assert res.headers["Content-Type"] == "text/csv"
