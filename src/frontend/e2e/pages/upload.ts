@@ -5,69 +5,39 @@ import { UploadData } from "../utils/schemas/uploadData";
 import * as path from "path";
 
 export class UploadSample {
-  public static async uploadSequencingFiles(
+  public static async uploadSampleFiles(
     page: Page,
     uploadData: UploadData
   ): Promise<any> {
-    //click upload button
-    await page.locator("a[href$='/upload/step1']").click();
-    await UploadSample.getSampleDataFile(page, uploadData.dataFile);
+    await UploadSample.selectSampleFiles(page, uploadData.dataFile);
     // complete form
     for (let i = 0; i < uploadData.samples.length; i++) {
       // fill public ID input
-      // TODO modify selector
       await page
-        .locator(
-          `//div[contains(@class,'MuiTableBody-root')]/div[@role='row'][${
-            i + 1
-          }]/descendant::input[@name='publicId']`
-        )
+        .locator('input[name="publicId"]')
+        .nth(i)
         .type(uploadData.samples[i].publicId);
       // fill collection date input
-      // TODO modify selector
       await page
-        .locator(
-          `//div[contains(@class,'MuiTableBody-root')]/div[@role='row'][${
-            i + 1
-          }]/descendant::input[@name='collectionDate']`
-        )
+        .locator('input[name="collectionDate"]')
+        .nth(i)
         .type(uploadData.samples[i].collectionDate);
-      // fill search for location input from emergent widget
-      // TODO modify selector
-      await page
-        .locator(
-          `//div[contains(@class,'MuiTableBody-root')]/div[@role='row'][${
-            i + 1
-          }]/descendant::button[@label='Search For Location']`
-        )
-        .click();
-      await page
-        .locator("//div[@role='tooltip']/descendant::input")
-        .type(uploadData.samples[i].collectionLocation, { delay: 150 });
-      await page.keyboard.press("ArrowDown");
-      await page.keyboard.press("Enter");
+      // fill search for location input
+      await page.locator('button[label="Search For Location"]').nth(i).click();
       // fill sequencing date input
-      // TODO modify selector
       await page
-        .locator(
-          `//div[contains(@class,'MuiTableBody-root')]/div[@role='row'][${
-            i + 1
-          }]/descendant::input[@name='sequencingDate']`
-        )
+        .locator('input[name="sequencingDate"]')
+        .nth(i)
         .type(uploadData.samples[i].sequencingDate);
       // toggle keep private switch
-      // TODO modify selector
-      await page
-        .locator(
-          `//div[contains(@class,'MuiTableBody-root')]/div[@role='row'][${
-            i + 1
-          }]/descendant::input[@name='keepPrivate']`
-        )
-        .click();
+      await page.locator('input[name="keepPrivate"]').nth(i).click();
     }
+    //continue button
+    await page.locator('a:has-text("Continue")').scrollIntoViewIfNeeded();
+    await page.locator('a:has-text("Continue")').click();
   }
 
-  public static async getSampleDataFile(
+  public static async selectSampleFiles(
     page: Page,
     fileName: string
   ): Promise<void> {
@@ -77,34 +47,36 @@ export class UploadSample {
     );
     await page.waitForTimeout(3000);
     // click continue button
-    await page.locator("a[href$='/upload/step2']").click();
-    await page.waitForSelector("form div[role='table'] > .MuiTableBody-root");
+    await page.locator('a:has-text("Continue")').click();
   }
 
-  public static getSampleData(): Array<SampleData> {
+  public static createSampleData(): Array<SampleData> {
     return [
       {
-        collectionDate: faker.datatype.string(8),
+        collectionDate: faker.date.recent(10).toISOString().substring(0, 10),
         collectionLocation: "Africa/Angola/Luanda/Calemba",
         isPrivate: true,
-        privateId: faker.datatype.string(8),
-        publicId: faker.datatype.string(8),
+        privateId:
+          "privateId-" + faker.datatype.number({ min: 1000, max: 9999 }),
+        publicId: "publicId-" + faker.datatype.number({ min: 1000, max: 9999 }),
         sequencingDate: faker.date.recent(10).toISOString().substring(0, 10),
       },
       {
-        collectionDate: faker.datatype.string(8),
+        collectionDate: faker.date.recent(10).toISOString().substring(0, 10),
         collectionLocation: "Europe/Russia/Kaluga/Tarusa",
         isPrivate: true,
-        privateId: faker.datatype.string(8),
-        publicId: faker.datatype.string(8),
+        privateId:
+          "privateId-" + faker.datatype.number({ min: 1000, max: 9999 }),
+        publicId: "publicId-" + faker.datatype.number({ min: 1000, max: 9999 }),
         sequencingDate: faker.date.recent(10).toISOString().substring(0, 10),
       },
       {
-        collectionDate: faker.datatype.string(8),
+        collectionDate: faker.date.recent(10).toISOString().substring(0, 10),
         collectionLocation: "Asia/China",
         isPrivate: true,
-        privateId: faker.datatype.string(8),
-        publicId: faker.datatype.string(8),
+        privateId:
+          "privateId-" + faker.datatype.number({ min: 1000, max: 9999 }),
+        publicId: "publicId-" + faker.datatype.number({ min: 1000, max: 9999 }),
         sequencingDate: faker.date.recent(10).toISOString().substring(0, 10),
       },
     ];
