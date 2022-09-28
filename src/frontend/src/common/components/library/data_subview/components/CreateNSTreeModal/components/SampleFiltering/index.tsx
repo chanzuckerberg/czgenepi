@@ -1,5 +1,6 @@
 import { FilterOptionsState, PopperProps } from "@mui/material";
 import { createFilterOptions } from "@mui/material/Autocomplete";
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { DefaultMenuSelectOption, Icon } from "czifui";
 import { isEqual } from "lodash";
 import { noop } from "src/common/constants/empty";
@@ -7,7 +8,9 @@ import {
   MENU_OPTIONS_COLLECTION_DATE,
   MENU_OPTION_ALL_TIME,
 } from "src/components/DateFilterMenu/constants";
+import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { StyledTooltip } from "../../style";
+import { SampleFilteringTooltip } from "../SampleFilteringTooltip";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import {
   StyledContainer,
@@ -186,6 +189,12 @@ export function SampleFiltering({
   setStartDate,
   setEndDate,
 }: Props): JSX.Element {
+  const flag = useTreatments([FEATURE_FLAGS.tree_location_filter]);
+  const isTreeLocationFilterFlagOn = isFlagOn(
+    flag,
+    FEATURE_FLAGS.tree_location_filter
+  );
+
   const lineageDropdownOptions = generateLineageDropdownOptions(
     selectedLineages,
     availableLineages
@@ -296,18 +305,21 @@ export function SampleFiltering({
     <StyledContainer>
       <StyledExplainerTitle>
         Limit samples from my jurisdiction to:
-        <StyledTooltip
-          arrow
-          leaveDelay={1000}
-          title={SAMPLE_FILTERING_TOOLTIP_TEXT}
-          placement="top"
-        >
-          <StyledInfoIconWrapper>
-            <Icon sdsIcon="infoCircle" sdsSize="xs" sdsType="static" />
-          </StyledInfoIconWrapper>
-        </StyledTooltip>
+        {isTreeLocationFilterFlagOn ? (
+          <SampleFilteringTooltip />
+        ) : (
+          <StyledTooltip
+            arrow
+            leaveDelay={1000}
+            title={SAMPLE_FILTERING_TOOLTIP_TEXT}
+            placement="top"
+          >
+            <StyledInfoIconWrapper>
+              <Icon sdsIcon="infoCircle" sdsSize="xs" sdsType="static" />
+            </StyledInfoIconWrapper>
+          </StyledTooltip>
+        )}
       </StyledExplainerTitle>
-
       <StyledFiltersSection>
         <StyledFilterGroup>
           <StyledFilterGroupName>Lineage</StyledFilterGroupName>

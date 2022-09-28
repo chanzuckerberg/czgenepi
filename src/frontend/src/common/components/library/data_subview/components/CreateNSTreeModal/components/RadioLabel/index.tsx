@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { SampleFiltering } from "../SampleFiltering";
+import { TargetedFiltering } from "../TargetedFiltering";
 import { pathogenStrings, tempLocationFilterCopyUpdates } from "./strings";
 import {
   Label,
@@ -145,24 +146,27 @@ export const RadioLabelTargeted = ({
       </Label>
       <SmallText>{targetedDescription}</SmallText>
       {selected && (
-        <List>
-          <StyledListItem>
-            <StyledListItemIcon>
-              <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
-            </StyledListItemIcon>
-            <ListItemText>
-              <SmallText>{targetedBestFor}</SmallText>
-            </ListItemText>
-          </StyledListItem>
-          <StyledListItem>
-            <StyledListItemIcon>
-              <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
-            </StyledListItemIcon>
-            <ListItemText>
-              <SmallText>{targetedGoodFor}</SmallText>
-            </ListItemText>
-          </StyledListItem>
-        </List>
+        <>
+          <List>
+            <StyledListItem>
+              <StyledListItemIcon>
+                <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>{targetedBestFor}</SmallText>
+              </ListItemText>
+            </StyledListItem>
+            <StyledListItem>
+              <StyledListItemIcon>
+                <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>{targetedGoodFor}</SmallText>
+              </ListItemText>
+            </StyledListItem>
+          </List>
+          {isTreeLocationFilterFlagOn && <TargetedFiltering />}
+        </>
       )}
     </div>
   );
