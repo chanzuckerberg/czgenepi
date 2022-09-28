@@ -19,6 +19,7 @@ class TemplateArgsRequest(BaseRequest):
     filter_start_date: Optional[datetime.date]
     filter_end_date: Optional[datetime.date]
     filter_pango_lineages: Optional[List[constr(regex=r"^[0-9A-Za-z. *\/]+$")]]  # type: ignore # noqa
+    location_id: Optional[int]  # if not specified, will use group default
 
 
 class PhyloRunRequest(BaseRequest):
