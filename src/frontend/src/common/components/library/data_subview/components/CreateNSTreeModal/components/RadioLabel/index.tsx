@@ -4,7 +4,7 @@ import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon, List } from "czifui";
 import { useSelector } from "react-redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
-import { isFlagOn } from "src/components/Split";
+import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { SampleFiltering } from "../SampleFiltering";
 import { TargetedFiltering } from "../TargetedFiltering";
@@ -46,7 +46,7 @@ export const RadioLabelOverview = ({
   const pathogen = useSelector(selectCurrentPathogen);
 
   const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isFlagOn(
+  const isTreeLocationFilterFlagOn = isUserFlagOn(
     flag,
     USER_FEATURE_FLAGS.tree_location_filter
   );
@@ -121,7 +121,7 @@ export const RadioLabelTargeted = ({
   const pathogen = useSelector(selectCurrentPathogen);
 
   const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isFlagOn(
+  const isTreeLocationFilterFlagOn = isUserFlagOn(
     flag,
     USER_FEATURE_FLAGS.tree_location_filter
   );
@@ -186,7 +186,7 @@ export const RadioLabelNonContextualized = ({
   const pathogen = useSelector(selectCurrentPathogen);
 
   const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isFlagOn(
+  const isTreeLocationFilterFlagOn = isUserFlagOn(
     flag,
     USER_FEATURE_FLAGS.tree_location_filter
   );

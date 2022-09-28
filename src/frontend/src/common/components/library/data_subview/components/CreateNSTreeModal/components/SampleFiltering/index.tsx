@@ -10,7 +10,7 @@ import {
   MENU_OPTIONS_COLLECTION_DATE,
   MENU_OPTION_ALL_TIME,
 } from "src/components/DateFilterMenu/constants";
-import { isFlagOn } from "src/components/Split";
+import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { SplitPathogenWrapper } from "src/components/Split/SplitPathogenWrapper";
 import { PATHOGEN_FEATURE_FLAGS } from "src/components/Split/types";
@@ -196,7 +196,7 @@ export function SampleFiltering({
 }: Props): JSX.Element {
   const pathogen = useSelector(selectCurrentPathogen);
   const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isFlagOn(
+  const isTreeLocationFilterFlagOn = isUserFlagOn(
     flag,
     USER_FEATURE_FLAGS.tree_location_filter
   );

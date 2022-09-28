@@ -1,7 +1,7 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { Tooltip } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import { isFlagOn } from "src/components/Split";
+import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 
 export const TreeTypeTooltip = ({ children, value }: Props): JSX.Element => {
   const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isFlagOn(
+  const isTreeLocationFilterFlagOn = isUserFlagOn(
     flag,
     USER_FEATURE_FLAGS.tree_location_filter
   );
