@@ -1,5 +1,6 @@
 import RadioGroup from "@mui/material/RadioGroup";
-import { Icon } from "czifui";
+import { useTreatments } from "@splitsoftware/splitio-react";
+import { Icon, Link } from "czifui";
 import { uniq } from "lodash";
 import Image from "next/image";
 import { SyntheticEvent, useEffect, useState } from "react";
@@ -22,6 +23,7 @@ import {
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
+import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { Header } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
@@ -51,6 +53,7 @@ import {
   Title,
   TreeNameInfoWrapper,
   TreeTypeSection,
+  TreeTypeSubtext,
 } from "./style";
 
 interface Props {
@@ -81,6 +84,12 @@ export const CreateNSTreeModal = ({
   const [selectedLineages, setSelectedLineages] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
+
+  const flag = useTreatments([FEATURE_FLAGS.tree_location_filter]);
+  const isTreeLocationFilterFlagOn = isFlagOn(
+    flag,
+    FEATURE_FLAGS.tree_location_filter
+  );
 
   const dispatch = useDispatch();
 
@@ -121,11 +130,13 @@ export const CreateNSTreeModal = ({
 
   const mutation = useCreateTree({
     componentOnError: () => {
-      dispatch(addNotification({
-        intent: "error",
-        componentKey: NotificationComponents.CREATE_NS_TREE_FAILURE,
-        shouldShowCloseButton: true,
-      }));
+      dispatch(
+        addNotification({
+          intent: "error",
+          componentKey: NotificationComponents.CREATE_NS_TREE_FAILURE,
+          shouldShowCloseButton: true,
+        })
+      );
       handleClose();
     },
     componentOnSuccess: (respData: RawTreeCreationWithId) => {
@@ -139,11 +150,13 @@ export const CreateNSTreeModal = ({
         }
       );
 
-      dispatch(addNotification({
-        autoDismiss: 12000,
-        intent: "info",
-        componentKey: NotificationComponents.CREATE_NS_TREE_SUCCESS,
-      }));
+      dispatch(
+        addNotification({
+          autoDismiss: 12000,
+          intent: "info",
+          componentKey: NotificationComponents.CREATE_NS_TREE_SUCCESS,
+        })
+      );
 
       handleClose();
     },
@@ -240,6 +253,19 @@ export const CreateNSTreeModal = ({
                 </StyledInfoIconWrapper>
               </StyledTooltip>
             </TreeNameInfoWrapper>
+            {isTreeLocationFilterFlagOn && (
+              <TreeTypeSubtext>
+                Samples already selected on the sample table or included by ID
+                in the bottom section will always be force-included on your
+                tree.{" "}
+                <Link
+                  href="https://help.czgenepi.org/hc/en-us/articles/6712563575956-Build-on-demand-trees#generating"
+                  target="_blank"
+                >
+                  Learn More.
+                </Link>
+              </TreeTypeSubtext>
+            )}
             <RadioGroup
               value={treeType}
               onChange={(e) => setTreeType(e.target.value as TreeType)}

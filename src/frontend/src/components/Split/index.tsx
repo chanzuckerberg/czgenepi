@@ -47,6 +47,7 @@ export enum FEATURE_FLAGS {
   // my_flag_name = "my_flag_name", (<-- format example)
   galago_integration = "galago_integration",
   prep_files = "prep_files",
+  tree_location_filter = "tree_location_filter",
 }
 
 // Keyword to tell Split client it's running in local-only mode.
