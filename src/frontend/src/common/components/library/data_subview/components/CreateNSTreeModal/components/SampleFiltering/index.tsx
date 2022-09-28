@@ -304,7 +304,9 @@ export function SampleFiltering({
   return (
     <StyledContainer>
       <StyledExplainerTitle>
-        Limit samples from my jurisdiction to:
+        {isTreeLocationFilterFlagOn
+          ? "Define samples of interest by:"
+          : "Limit samples from my jurisdiction to:"}
         {isTreeLocationFilterFlagOn ? (
           <SampleFilteringTooltip />
         ) : (
