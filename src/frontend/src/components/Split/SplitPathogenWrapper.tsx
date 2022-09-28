@@ -37,8 +37,10 @@ const SplitPathogenWrapper = ({ children, feature, pathogen }: Props): JSX.Eleme
       <SplitTreatments names={[feature]}>
         {({ isReady, treatments }) => {
           if (isReady) {
-            console.log(treatments); // eslint-disable-line
-            return <div>{children}</div>;
+            console.log("treatments", treatments); // eslint-disable-line
+            const treatment = treatments[feature]?.treatment;
+            console.log("treatment", treatment); // eslint-disable-line
+            return treatment === SPLIT_SIMPLE_FLAG.ON ? (<div>{children}</div>) : null;
           }
 
           // wait until treatments are loaded to show anything
