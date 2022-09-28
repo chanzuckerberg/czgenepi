@@ -152,8 +152,6 @@ jobs:
           install_globally: "true"
       - name: Playwright tests
         run: |
-          ls -l
-          pwd
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build backend image
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
@@ -163,6 +161,8 @@ jobs:
           chmod a+rwx src/frontend/build # TODO temp hack - need a better plan for the build dir.
           make local-init
           echo "Init complete - testing web service"
+          ls -l
+          pwd
           docker-compose exec -T frontend wget -T 10 --tries 20 -v ${PWD}:/src/frontend -v /frontend/node_modules frontend.genepinet.localdev:8000
           echo "Webserver up, running tests!"
           docker-compose logs -f frontend &

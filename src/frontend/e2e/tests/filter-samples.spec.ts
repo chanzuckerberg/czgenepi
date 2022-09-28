@@ -5,6 +5,7 @@ import path from "path";
 import * as dotenv from "dotenv";
 import { getByTestID } from "../utils/selectors";
 import { getADateInThePast } from "../utils/common";
+import { BasePage } from "../pages/basePage";
 
 dotenv.config({
   path: path.resolve(__dirname, "../../", `.env.${process.env.NODE_ENV}`),
@@ -43,34 +44,28 @@ test.describe("Sample filtering tests", () => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
     url = `${baseUrl}/data/samples`;
     await page.goto(url);
-    //accept cookie t&c (if prompted and not in CI)
+    //accept cookie t&c (if prompted)
     const tAndCSelector =
       '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
-    const tAndC = page.locator(tAndCSelector);
-    if (await tAndC.isVisible()) {
-      await page.locator(tAndCSelector).click();
-    }
+    await page.locator(tAndCSelector).click();
 
     //intercept request and stub response
     await interceptRequestAndStubResponse(page, context);
   });
 
   test("Should filter samples by status", async ({ page }) => {
+    const base = new BasePage(page);
     // filter for complete status
     let filterBy = {
       status: "Complete",
     };
     // filter samples
-    await applyFilter(page, filterBy);
+    await applyFilter(base, filterBy);
 
     // verify only complete samples are listed
-    const samplesWithCompleteStatus = 11;
-    let sampleStatuses = page.locator(getByTestID(sampleStatusId));
-    expect(await sampleStatuses.count()).toBe(samplesWithCompleteStatus);
+    let sampleStatuses = await base.findByTestId(sampleStatusId);
     for (let i = 0; i < (await sampleStatuses.count()); i++) {
-      expect(sampleStatuses.nth(i)).toHaveText(
-        filterBy.status.toLocaleLowerCase()
-      );
+      expect(sampleStatuses.nth(i)).toHaveText(filterBy.status.toLowerCase());
     }
 
     // filter for complete status
@@ -78,48 +73,43 @@ test.describe("Sample filtering tests", () => {
       status: "Failed",
     };
     // filter samples
-    await applyFilter(page, filterBy);
+    await applyFilter(base, filterBy);
 
     // verify only failed samples are listed
-    const samplesWithFailedStatus = 2;
-    sampleStatuses = page.locator(getByTestID(sampleStatusId));
-    expect(await sampleStatuses.count()).toBe(samplesWithFailedStatus);
+    sampleStatuses = sampleStatuses = await base.findByTestId(sampleStatusId);
     for (let i = 0; i < (await sampleStatuses.count()); i++) {
-      expect(sampleStatuses.nth(i)).toHaveText(
-        filterBy.status.toLocaleLowerCase()
-      );
+      expect(sampleStatuses.nth(i)).toHaveText(filterBy.status.toLowerCase());
     }
   });
 
   test("Should filter samples by lineage", async ({ page }) => {
+    const base = new BasePage(page);
     // define filtering criteria
     const filterBy = {
       lineage: ["BA.1.15"],
     };
 
     // filter samples
-    await applyFilter(page, filterBy);
-    await page.screenshot({ path: "screenshot.png" });
+    await applyFilter(base, filterBy);
+
     // verify only complete samples are listed
-    const sampleLineages = page.locator(".ez2j8c413");
-    expect(await sampleLineages.count()).toBe(2); //we earlier prepared 2 samples with complete status
+    const sampleLineages = await base.findElement(".ez2j8c413");
     for (let i = 0; i < (await sampleLineages.count()); i++) {
       expect(sampleLineages.nth(i)).toHaveText(filterBy.lineage);
     }
   });
 
   test("Should filter by collection date from", async ({ page }) => {
+    const base = new BasePage(page);
     const filterBy = {
       collectionDateFrom: fromDate,
     };
 
     // filter samples
-    await applyFilter(page, filterBy);
+    await applyFilter(base, filterBy);
 
     // verify only samples meeting date criteria are listed
-    const rowCollectionDates = page.locator(
-      getByTestID(collectionDateSelector)
-    );
+    const rowCollectionDates = await base.findByTestId(collectionDateSelector);
     for (let i = 0; i < (await rowCollectionDates.count()); i++) {
       const collectionDate = await dateToInteger(
         (await rowCollectionDates.nth(i).textContent()) as string
@@ -129,16 +119,15 @@ test.describe("Sample filtering tests", () => {
   });
 
   test("Should filter by collection date to", async ({ page }) => {
+    const base = new BasePage(page);
     const filterBy = {
       collectionDateTo: toDate,
     };
     // filter samples
-    await applyFilter(page, filterBy);
+    await applyFilter(base, filterBy);
 
     // verify only samples meeting date criteria are listed
-    const rowCollectionDates = page.locator(
-      getByTestID(collectionDateSelector)
-    );
+    const rowCollectionDates = await base.findByTestId(collectionDateSelector);
     for (let i = 0; i < (await rowCollectionDates.count()); i++) {
       const collectionDate = await dateToInteger(
         (await rowCollectionDates.nth(i).textContent()) as string
@@ -148,17 +137,16 @@ test.describe("Sample filtering tests", () => {
   });
 
   test("Should filter by collection date from and to", async ({ page }) => {
+    const base = new BasePage(page);
     const filterBy = {
       collectionDateFrom: fromDate,
       collectionDateTo: toDate,
     };
     // filter samples
-    await applyFilter(page, filterBy);
+    await applyFilter(base, filterBy);
 
     // verify only samples meeting date criteria are listed
-    const rowCollectionDates = page.locator(
-      getByTestID(collectionDateSelector)
-    );
+    const rowCollectionDates = await base.findByTestId(collectionDateSelector);
     for (let i = 0; i < (await rowCollectionDates.count()); i++) {
       const collectionDate = await dateToInteger(
         (await rowCollectionDates.nth(i).textContent()) as string
@@ -171,19 +159,19 @@ test.describe("Sample filtering tests", () => {
 
   //todo: defect sc-216597
   test.skip("Should filter by collection date periods", async ({ page }) => {
+    const base = new BasePage(page);
     //test all date options
-
     const periods = Object.keys(collectionDatePeriods);
     for (const period of periods) {
       // filter by collection date period
-      await applyFilter(page, { collectionDatePeriod: period });
+      await applyFilter(base, { collectionDatePeriod: period });
 
       //convert period to date int
       const filterDate = dateOptionToNumber(period);
 
       //verify only samples meeting criteria are listed
-      const rowCollectionDates = page.locator(
-        getByTestID(collectionDateSelector)
+      const rowCollectionDates = await base.findByTestId(
+        collectionDateSelector
       );
       for (let i = 0; i < (await rowCollectionDates.count()); i++) {
         const collectionDate = await dateToInteger(
@@ -195,14 +183,15 @@ test.describe("Sample filtering tests", () => {
   });
 
   test("Should filter by upload date from", async ({ page }) => {
+    const base = new BasePage(page);
     const filterBy = {
       uploadDateFrom: fromDate,
     };
     // filter samples by upload date from
-    await applyFilter(page, filterBy);
+    await applyFilter(base, filterBy);
 
     // verify only samples meeting date criteria are listed
-    const rowUploadDates = page.locator(uploadDateSelector);
+    const rowUploadDates = await base.findElement(uploadDateSelector);
     for (let i = 0; i < (await rowUploadDates.count()); i++) {
       const uploadDate = await dateToInteger(
         (await rowUploadDates.nth(i).textContent()) as string
@@ -212,14 +201,15 @@ test.describe("Sample filtering tests", () => {
   });
 
   test("Should filter by upload date to", async ({ page }) => {
+    const base = new BasePage(page);
     const filterBy = {
       uploadDateTo: toDate,
     };
     // filter samples
-    await applyFilter(page, filterBy);
+    await applyFilter(base, filterBy);
 
     // verify only samples meeting date criteria are listed
-    const rowUploadDates = page.locator(uploadDateSelector);
+    const rowUploadDates = await base.findElement(uploadDateSelector);
 
     for (let i = 0; i < (await rowUploadDates.count()); i++) {
       const uploadDate = await dateToInteger(
@@ -230,15 +220,16 @@ test.describe("Sample filtering tests", () => {
   });
 
   test("Should filter by from and to upload dates", async ({ page }) => {
+    const base = new BasePage(page);
     const filterBy = {
       uploadDateFrom: fromDate,
       uploadDateTo: toDate,
     };
     // filter samples
-    await applyFilter(page, filterBy);
+    await applyFilter(base, filterBy);
 
     // verify only samples meeting date criteria are listed
-    const rowUploadDates = page.locator(getByTestID(uploadDateSelector));
+    const rowUploadDates = await base.findByTestId(uploadDateSelector);
     for (let i = 0; i < (await rowUploadDates.count()); i++) {
       const uploadDate = await dateToInteger(
         (await rowUploadDates.nth(i).textContent()) as string
@@ -250,17 +241,18 @@ test.describe("Sample filtering tests", () => {
   });
 
   test("Should filter by upload date periods", async ({ page }) => {
+    const base = new BasePage(page);
     //test all date options
     const periods = Object.keys(uploadDatePeriods);
     for (const period of periods) {
       // filter
-      await applyFilter(page, { uploadDatePeriod: period });
+      await applyFilter(base, { uploadDatePeriod: period });
 
       //convert period to date object
       const filterDate = dateOptionToNumber(period);
 
       //verify sample listing
-      const rowUploadDates = page.locator(uploadDateSelector);
+      const rowUploadDates = await base.findElement(uploadDateSelector);
       for (let i = 0; i < (await rowUploadDates.count()); i++) {
         const uploadDate = await dateToInteger(
           (await rowUploadDates.nth(i).textContent()) as string
@@ -271,7 +263,7 @@ test.describe("Sample filtering tests", () => {
   });
 
   test("Should filter by multiple fields", async ({ page }) => {
-    //todo: change filter values
+    const base = new BasePage(page);
     const filterBy = {
       collectionDateFrom: fromDate,
       collectionDateTo: toDate,
@@ -281,14 +273,16 @@ test.describe("Sample filtering tests", () => {
       uploadDateTo: toDate,
     };
     // filter
-    await applyFilter(page, filterBy);
+    await applyFilter(base, filterBy);
 
     //verify sample listing
-    const sampleRows = await page.locator(getByTestID("table-row"));
+    const sampleRows = await base.findByTestId("table-row");
     for (let i = 0; i < (await sampleRows.count()); i++) {
       //verify upload date is within from-to range
       const uploadDate = await dateToInteger(
-        (await page.locator(uploadDateSelector).nth(i).textContent()) as string
+        (await (await base.findElement(uploadDateSelector))
+          .nth(i)
+          .textContent()) as string
       );
 
       expect(uploadDate).toBeGreaterThanOrEqual(await fromDateInt);
@@ -296,8 +290,7 @@ test.describe("Sample filtering tests", () => {
 
       //very collection date is within from-to range
       const collectionDate = await dateToInteger(
-        (await page
-          .locator(collectionDateSelector)
+        (await (await base.findElement(collectionDateSelector))
           .nth(i)
           .textContent()) as string
       );
@@ -306,10 +299,12 @@ test.describe("Sample filtering tests", () => {
       expect(collectionDate).toBeLessThanOrEqual(await toDateInt);
 
       //verify lineage
-      const val = page.locator(".ez2j8c413").nth(i).textContent();
+      const val = await (await base.findElement(".ez2j8c413"))
+        .nth(i)
+        .textContent();
       expect(filterBy.lineage).toContain(val);
       //verify status
-      await expect(page.locator(getByTestID(sampleStatusId)).nth(i)).toHaveText(
+      await expect((await base.findByTestId(sampleStatusId)).nth(i)).toHaveText(
         filterBy.status
       );
     }
@@ -429,9 +424,6 @@ async function interceptRequestAndStubResponse(
   );
   // make the actual call, wait until all responses have been received
   await page.goto(url, { waitUntil: "networkidle" });
-
-  //wait until data is displayed
-  //await page.waitForSelector(getByTestID("table-row"));
 
   // assert table is populated with at least one record
   expect(await page.locator(getByTestID("table-row")).count()).toBeGreaterThan(
