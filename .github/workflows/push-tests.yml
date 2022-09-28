@@ -163,7 +163,7 @@ jobs:
           echo "Init complete - testing web service"
           ls -l
           pwd
-          docker-compose exec -T frontend wget -T 10 --tries 20 -v ${PWD}:/src/frontend -v /frontend/node_modules frontend.genepinet.localdev:8000
+          docker-compose exec -T frontend wget -T 10 --tries 20 -p 8000:8000 frontend.genepinet.localdev
           echo "Webserver up, running tests!"
           docker-compose logs -f frontend &
           export S3_PREFIX=${{ secrets.CI_SCREENSHOT_PREFIX }}/${{ github.run_id }}/
