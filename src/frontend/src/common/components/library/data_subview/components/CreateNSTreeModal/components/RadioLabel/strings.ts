@@ -39,3 +39,23 @@ export const pathogenStrings: PathogenStringsType<RadioLabelStrings> = {
       "Good for identifying samples most closely related to the selected samples among all samples in GISAID and your CZ GEN EPI samples.",
   },
 };
+
+/* TODO: (ehoops)
+ * This object contains copy updates that are behind the
+ * tree_location_filter feature flag.  When the feature flag is removed,
+ * these should be moved into the pathogenStrings object above.
+ */
+export const tempLocationFilterCopyUpdates: Partial<RadioLabelStrings> = {
+  nonContextualizedDescription:
+    "Builds tree with only samples of interest (defined by location, date, and lineage).",
+  nonContextualizedGoodFor:
+    "Good for seeing viral diversity in the public repository that may not be captured by your own sampling effort.",
+  nonContextualizedNotRecommended:
+    "Not recommended for epidemiological interpretation due to lack of visibility into viral diversity outside of the selections below and omission of closely-related samples.",
+  overviewBestFor:
+    "Best for generating a summary tree of samples of interest, in the context of genetically similar GISAID samples.",
+  overviewGoodFor2:
+    "Good for specifying sample location, collection date, or lineages instead of the defaults used for your CZ GEN EPI weekly build.",
+  targetedDescription:
+    "Builds tree with selected samples (from the sample table or the ID box below) and closely-related samples, at a ratio of roughly 1:2.",
+};
