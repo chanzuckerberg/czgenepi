@@ -22,7 +22,7 @@
  *      * If it's a simple flag of just "on"/"off", local dev defaults to on
  *   2) To pull the flag in a component in app, do the following
  *        import { useTreatments } from "@splitsoftware/splitio-react";
- *        import { USER_FEATURE_FLAGS } from <<This file right here>>;
+ *        import { USER_FEATURE_FLAGS } from <<file in this dir>>;
  *        const flag = useTreatments([USER_FEATURE_FLAGS.my_flag_name]);
  *   3) If the flag is just a simple "on"/"off" type flag, helper to get bool
  *        << ... in addition what's in (2) above ... >>>
