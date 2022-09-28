@@ -37,7 +37,7 @@ const SplitPathogenWrapper = ({ children, feature, pathogen }: Props): JSX.Eleme
       <SplitTreatments names={[feature]}>
         {({ isReady, treatments }) => {
           if (isReady) {
-            const treatment = treatments[feature]?.treatment;
+            const { treatment } = treatments[feature];
             return treatment === SPLIT_SIMPLE_FLAG.ON ? (<div>{children}</div>) : null;
           }
 

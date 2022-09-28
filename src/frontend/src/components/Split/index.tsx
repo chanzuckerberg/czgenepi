@@ -26,8 +26,8 @@
  *        const flag = useTreatments([USER_FEATURE_FLAGS.my_flag_name]);
  *   3) If the flag is just a simple "on"/"off" type flag, helper to get bool
  *        << ... in addition what's in (2) above ... >>>
- *        import { isFlagOn } from <<This file right here>>;
- *        const isMyFlagOn = isFlagOn(flag, USER_FEATURE_FLAGS.my_flag_name);
+ *        import { isUserFlagOn } from <<This file right here>>;
+ *        const isMyFlagOn = isUserFlagOn(flag, USER_FEATURE_FLAGS.my_flag_name);
  */
 import { SplitFactory } from "@splitsoftware/splitio-react";
 import { TreatmentsWithConfig } from "@splitsoftware/splitio/types/splitio";
@@ -56,7 +56,7 @@ const createUserFlagsForLocal = () => {
 };
 
 /**
- * Helper to check if a given Split feature flag is "on" (enabled; true).
+ * Helper to check if a given User-based Split feature flag is "on" (enabled; true).
  *
  * Note that this function will NOT work on any flag this is using a more
  * complicated set of values than just "on" for enabled. For example, if
@@ -67,8 +67,7 @@ const createUserFlagsForLocal = () => {
  * of all the flags in the array. However, we generally only use a single
  * feature flag at once, so this helper only examines one flag at a time.
  */
-// TODO (mlila):figure out if this works with traffictype=pathogen
-export function isFlagOn(
+export function isUserFlagOn(
   splitTreatments: TreatmentsWithConfig,
   featureFlagName: string
 ): boolean {
@@ -110,6 +109,7 @@ const SplitInitializer = ({ children }: Props): JSX.Element | null => {
         trafficType: "user",
       },
     };
+
     if (isLocalSplitEnv) {
       const mockedFeatureFlags = createUserFlagsForLocal();
       splitConf.features = mockedFeatureFlags;
