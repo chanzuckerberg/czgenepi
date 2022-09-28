@@ -9,7 +9,7 @@ export type ComplexActionType<T, U> = (payload: T) => {
 export type ActionType<T> = ComplexActionType<T, T>;
 
 export enum Pathogen {
-  COVID = "covid",
+  COVID = "SC2",
 }
 
 // export action type for use in reducers and middleware

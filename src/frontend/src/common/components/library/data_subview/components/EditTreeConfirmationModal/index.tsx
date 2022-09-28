@@ -31,29 +31,30 @@ export const EditTreeConfirmationModal = ({
     if (name) {
       setNewTreeName(name);
     }
-  }, [
-    phyloRun,
-    setNewTreeName,
-  ]);
+  }, [phyloRun, setNewTreeName]);
 
   const editTreeMutation = useEditTree({
     componentOnSuccess: () => {
-      dispatch(addNotification({
-        autoDismiss: true,
-        dismissDirection: "left",
-        intent: "info",
-        shouldShowCloseButton: true,
-        text: "Tree name was successfully updated.",
-      }));
+      dispatch(
+        addNotification({
+          autoDismiss: true,
+          dismissDirection: "left",
+          intent: "info",
+          shouldShowCloseButton: true,
+          text: "Tree name was successfully updated.",
+        })
+      );
     },
     componentOnError: () => {
-      dispatch(addNotification({
-        autoDismiss: true,
-        dismissDirection: "left",
-        intent: "error",
-        shouldShowCloseButton: true,
-        text: "Something went wrong and we were unable to update your tree name. Please try again later.",
-      }));
+      dispatch(
+        addNotification({
+          autoDismiss: true,
+          dismissDirection: "left",
+          intent: "error",
+          shouldShowCloseButton: true,
+          text: "Something went wrong and we were unable to update your tree name. Please try again later.",
+        })
+      );
     },
   });
 
@@ -95,13 +96,19 @@ export const EditTreeConfirmationModal = ({
       sdsStyle="rounded"
       disabled={!hasValidName}
       onClick={onEdit}
+      data-test-id="update-tree-name-btn"
     >
       Update
     </Button>
   );
 
   const closeIcon = (
-    <StyledIconButton onClick={onClose} sdsType="tertiary" sdsSize="small">
+    <StyledIconButton
+      onClick={onClose}
+      sdsType="tertiary"
+      sdsSize="small"
+      data-test-id="tree-name-close-btn"
+    >
       <Icon sdsIcon="xMark" sdsSize="s" sdsType="iconButton" />
     </StyledIconButton>
   );

@@ -1,8 +1,16 @@
 module.exports = {
   plugins: ["@emotion", transformImports()],
-  presets: [
-    "next/babel"
-  ],
+  presets: ["next/babel"],
+  env: {
+    production: {
+      plugins: [
+        "babel-plugin-jsx-remove-data-test-id",
+        {
+          attributes: ["data-test-id", "data-testid"],
+        },
+      ],
+    },
+  },
 };
 
 function transformImports() {

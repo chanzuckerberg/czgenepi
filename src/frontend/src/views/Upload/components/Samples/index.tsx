@@ -120,7 +120,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
             </span>,
           ]}
         />
-        <ContentWrapper>
+        <ContentWrapper data-test-id="upload-select-sample-files-btn">
           <StyledFilePicker
             text={"Select Sample Files"}
             multiple
@@ -134,6 +134,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
               intent="error"
               title="Some of your files or samples could not be imported."
               collapseContent={<AlertTable parseErrors={parseErrors} />}
+              data-test-id="upload-import-error"
             />
           )}
           {samples && (

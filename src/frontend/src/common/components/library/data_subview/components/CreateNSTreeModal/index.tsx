@@ -207,15 +207,20 @@ export const CreateNSTreeModal = ({
         fullWidth={true}
         maxWidth={"sm"}
         onClose={handleClose}
+        data-test-id="create-tree-dialog"
       >
         <StyledDialogTitle>
-          <StyledCloseIconButton aria-label="close modal" onClick={handleClose}>
+          <StyledCloseIconButton
+            aria-label="close modal"
+            onClick={handleClose}
+            data-test-id="close-create-tree-dialog"
+          >
             <StyledCloseIconWrapper>
               <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
             </StyledCloseIconWrapper>
           </StyledCloseIconButton>
           <Header>Create New Phylogenetic Tree</Header>
-          <Title>
+          <Title data-test-id="title-with-sample-total">
             {allSamplesRequestedTableAndInput.length}{" "}
             {pluralize("Sample", allValidSamplesForTreeCreation.length)} Total
           </Title>
@@ -234,6 +239,7 @@ export const CreateNSTreeModal = ({
             setTreeName={setTreeName}
             treeName={treeName}
             instructionHeader="Tree Name: "
+            data-test-id="tree-name"
           />
           <TreeTypeSection>
             <TreeNameInfoWrapper>
@@ -243,6 +249,7 @@ export const CreateNSTreeModal = ({
                 leaveDelay={1000}
                 title={TREE_TYPE_TOOLTIP_TEXT}
                 placement="top"
+                data-test-id="tree-type-tooltip"
               >
                 <StyledInfoIconWrapper>
                   <Icon

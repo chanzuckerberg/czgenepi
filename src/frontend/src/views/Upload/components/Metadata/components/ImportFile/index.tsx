@@ -180,6 +180,7 @@ export default function ImportFile({
           SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId
         }
         metadataUploadType={MetadataUploadTypeOption.Upload}
+        data-test-id="upload-simport-file-warning"
       />
     </Wrapper>
   );

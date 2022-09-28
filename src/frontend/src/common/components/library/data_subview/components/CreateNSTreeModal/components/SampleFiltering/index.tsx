@@ -335,6 +335,7 @@ export function SampleFiltering({
             DropdownMenuProps={lineageDropdownMenuProps}
             InputDropdownProps={InputDropdownProps}
             PopperComponent={BottomPlacementDropdownPopper}
+            data-test-id="lineage-dropdown"
           />
         </StyledFilterGroup>
         <StyledFilterGroup>
@@ -351,6 +352,7 @@ export function SampleFiltering({
             endDate={endDate}
             setStartDate={setStartDate}
             setEndDate={setEndDate}
+            data-test-id="collection-date"
           />
         </StyledFilterGroup>
       </StyledFiltersSection>
