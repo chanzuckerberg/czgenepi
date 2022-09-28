@@ -71,7 +71,7 @@ test.describe("Samples page tests", () => {
 
     // verify status
     // todo: not finding this selector
-    const status = sample.czb_failed_genome_recovery ? "failed" : "complete";
+    //const status = sample.czb_failed_genome_recovery ? "failed" : "complete";
     //expect(page.locator(getByTestID("sample-status"))).toHaveText(status);
 
     // verify public ID

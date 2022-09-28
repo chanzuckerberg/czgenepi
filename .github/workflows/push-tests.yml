@@ -161,9 +161,7 @@ jobs:
           chmod a+rwx src/frontend/build # TODO temp hack - need a better plan for the build dir.
           make local-init
           echo "Init complete - testing web service"
-          ls -l
-          pwd
-          docker-compose exec -T frontend wget -T 10 --tries 20 -p 8000:8000 frontend.genepinet.localdev
+          docker-compose exec -T frontend wget -T 10 --tries 20 frontend.genepinet.localdev:8000
           echo "Webserver up, running tests!"
           docker-compose logs -f frontend &
           export S3_PREFIX=${{ secrets.CI_SCREENSHOT_PREFIX }}/${{ github.run_id }}/
