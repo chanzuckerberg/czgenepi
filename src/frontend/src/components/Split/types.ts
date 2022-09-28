@@ -27,8 +27,8 @@ export enum USER_FEATURE_FLAGS {
  * One enum per traffic type (currently, we have `user` and `pathogen` types)
  */
 export enum PATHOGEN_FEATURE_FLAGS {
-  galago_linkout = "galago_linkout",
-  lineage_filter_enabled = "lineage_filter_enabled",
-  public_repository = "public_repository",
-  usher_linkout = "usher_linkout",
+  galago_linkout = "PATHOGEN_galago_linkout",
+  lineage_filter_enabled = "PATHOGEN_lineage_filter_enabled",
+  public_repository = "PATHOGEN_public_repository",
+  usher_linkout = "PATHOGEN_usher_linkout",
 }

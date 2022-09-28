@@ -4,12 +4,16 @@ import { useTreatments } from "@splitsoftware/splitio-react";
 import { DefaultMenuSelectOption, Icon } from "czifui";
 import { isEqual } from "lodash";
 import { noop } from "src/common/constants/empty";
+import { useSelector } from "src/common/redux/hooks";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import {
   MENU_OPTIONS_COLLECTION_DATE,
   MENU_OPTION_ALL_TIME,
 } from "src/components/DateFilterMenu/constants";
 import { isFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
+import { SplitPathogenWrapper } from "src/components/Split/SplitPathogenWrapper";
+import { PATHOGEN_FEATURE_FLAGS } from "src/components/Split/types";
 import { StyledTooltip } from "../../style";
 import { SampleFilteringTooltip } from "../SampleFilteringTooltip";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
@@ -190,6 +194,7 @@ export function SampleFiltering({
   setStartDate,
   setEndDate,
 }: Props): JSX.Element {
+  const pathogen = useSelector(selectCurrentPathogen);
   const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
   const isTreeLocationFilterFlagOn = isFlagOn(
     flag,
@@ -324,21 +329,26 @@ export function SampleFiltering({
         )}
       </StyledExplainerTitle>
       <StyledFiltersSection>
-        <StyledFilterGroup>
-          <StyledFilterGroupName>Lineage</StyledFilterGroupName>
-          <StyledDropdown
-            label={lineageDropdownLabel}
-            onChange={handleLineageDropdownChange}
-            options={lineageDropdownOptions}
-            value={lineageDropdownValue}
-            multiple
-            search
-            DropdownMenuProps={lineageDropdownMenuProps}
-            InputDropdownProps={InputDropdownProps}
-            PopperComponent={BottomPlacementDropdownPopper}
-            data-test-id="lineage-dropdown"
-          />
-        </StyledFilterGroup>
+        <SplitPathogenWrapper
+          pathogen={pathogen}
+          feature={PATHOGEN_FEATURE_FLAGS.lineage_filter_enabled}
+        >
+          <StyledFilterGroup>
+            <StyledFilterGroupName>Lineage</StyledFilterGroupName>
+            <StyledDropdown
+              label={lineageDropdownLabel}
+              onChange={handleLineageDropdownChange}
+              options={lineageDropdownOptions}
+              value={lineageDropdownValue}
+              multiple
+              search
+              DropdownMenuProps={lineageDropdownMenuProps}
+              InputDropdownProps={InputDropdownProps}
+              PopperComponent={BottomPlacementDropdownPopper}
+              data-test-id="lineage-dropdown"
+            />
+          </StyledFilterGroup>
+        </SplitPathogenWrapper>
         <StyledFilterGroup>
           <StyledFilterGroupName>Collection Date</StyledFilterGroupName>
           <CollectionDateFilter
