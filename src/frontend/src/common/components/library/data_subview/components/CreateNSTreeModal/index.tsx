@@ -23,7 +23,8 @@ import {
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
-import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
+import { isFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { Header } from "../DownloadModal/style";
 import { FailedSampleAlert } from "../FailedSampleAlert";
@@ -85,10 +86,10 @@ export const CreateNSTreeModal = ({
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
 
-  const flag = useTreatments([FEATURE_FLAGS.tree_location_filter]);
+  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
   const isTreeLocationFilterFlagOn = isFlagOn(
     flag,
-    FEATURE_FLAGS.tree_location_filter
+    USER_FEATURE_FLAGS.tree_location_filter
   );
 
   const dispatch = useDispatch();

@@ -4,7 +4,8 @@ import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon, List } from "czifui";
 import { useSelector } from "react-redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
-import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
+import { isFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { SampleFiltering } from "../SampleFiltering";
 import { TargetedFiltering } from "../TargetedFiltering";
 import { pathogenStrings, tempLocationFilterCopyUpdates } from "./strings";
@@ -44,10 +45,10 @@ export const RadioLabelOverview = ({
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
-  const flag = useTreatments([FEATURE_FLAGS.tree_location_filter]);
+  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
   const isTreeLocationFilterFlagOn = isFlagOn(
     flag,
-    FEATURE_FLAGS.tree_location_filter
+    USER_FEATURE_FLAGS.tree_location_filter
   );
 
   // While the feature flag is in use, merge the updated strings with the originals.
@@ -119,10 +120,10 @@ export const RadioLabelTargeted = ({
 }: BaseTreeChoiceProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
-  const flag = useTreatments([FEATURE_FLAGS.tree_location_filter]);
+  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
   const isTreeLocationFilterFlagOn = isFlagOn(
     flag,
-    FEATURE_FLAGS.tree_location_filter
+    USER_FEATURE_FLAGS.tree_location_filter
   );
 
   // While the feature flag is in use, merge the updated strings with the originals.
@@ -184,10 +185,10 @@ export const RadioLabelNonContextualized = ({
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
-  const flag = useTreatments([FEATURE_FLAGS.tree_location_filter]);
+  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
   const isTreeLocationFilterFlagOn = isFlagOn(
     flag,
-    FEATURE_FLAGS.tree_location_filter
+    USER_FEATURE_FLAGS.tree_location_filter
   );
 
   // While the feature flag is in use, merge the updated strings with the originals.

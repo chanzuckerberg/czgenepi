@@ -8,7 +8,8 @@ import {
   MENU_OPTIONS_COLLECTION_DATE,
   MENU_OPTION_ALL_TIME,
 } from "src/components/DateFilterMenu/constants";
-import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
+import { isFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { StyledTooltip } from "../../style";
 import { SampleFilteringTooltip } from "../SampleFilteringTooltip";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
@@ -189,10 +190,10 @@ export function SampleFiltering({
   setStartDate,
   setEndDate,
 }: Props): JSX.Element {
-  const flag = useTreatments([FEATURE_FLAGS.tree_location_filter]);
+  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
   const isTreeLocationFilterFlagOn = isFlagOn(
     flag,
-    FEATURE_FLAGS.tree_location_filter
+    USER_FEATURE_FLAGS.tree_location_filter
   );
 
   const lineageDropdownOptions = generateLineageDropdownOptions(
