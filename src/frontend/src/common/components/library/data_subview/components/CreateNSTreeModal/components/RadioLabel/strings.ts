@@ -54,6 +54,8 @@ export const tempLocationFilterCopyUpdates: Partial<RadioLabelStrings> = {
     "Not recommended for epidemiological interpretation due to lack of visibility into viral diversity outside of the selections below and omission of closely-related samples.",
   overviewBestFor:
     "Best for generating a summary tree of samples of interest, in the context of genetically similar GISAID samples.",
+  overviewDescription:
+    "Builds tree focused around samples of interest (defined by location, date, and lineage) and closely-related samples, at a ratio of roughly 2:1.",
   overviewGoodFor2:
     "Good for specifying sample location, collection date, or lineages instead of the defaults used for your CZ GEN EPI weekly build.",
   targetedDescription:
