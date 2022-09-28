@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { UploadSample } from "../pages/upload";
+import { getSampleData, uploadSequencingFiles } from "../pages/upload";
 
 test.describe("Upload sample tests", () => {
   const dateErrorMessage = "Update format to YYYY-MM-DD";
@@ -16,15 +16,19 @@ test.describe("Upload sample tests", () => {
     }) => {
       const uploadData = {
         dataFile: extenstion,
-        samples: UploadSample.getSampleData(),
+        samples: getSampleData(),
       };
-      await UploadSample.uploadSequencingFiles(page, uploadData);
-      await expect(page.locator("//button[not(contains(@class,'Mui-disabled')) and text()='Continue']")).toBeVisible()
+      await uploadSequencingFiles(page, uploadData);
+      await expect(
+        page.locator(
+          "//button[not(contains(@class,'Mui-disabled')) and text()='Continue']"
+        )
+      ).toBeVisible();
     });
   });
 
   test(`Should validate collection dates`, async ({ page }) => {
-    const samples = UploadSample.getSampleData();
+    const samples = getSampleData();
     //overwrite collection dates with invalid values
     for (let i = 0; i < samples.length; i++) {
       samples[i].collectionDate = " ";
@@ -33,17 +37,15 @@ test.describe("Upload sample tests", () => {
       dataFile: ".txt",
       samples: samples,
     };
-    await UploadSample.uploadSequencingFiles(page, uploadData);
-    const errors = page.locator(
-      "//input[@name='collectionDate']/../../p"
-    );
+    await uploadSequencingFiles(page, uploadData);
+    const errors = page.locator("//input[@name='collectionDate']/../../p");
     for (let i = 0; i < samples.length; i++) {
       await expect(await errors.nth(i).textContent()).toBe(dateErrorMessage);
     }
   });
 
   test(`Should validate sequencing dates`, async ({ page }) => {
-    const samples = UploadSample.getSampleData();
+    const samples = getSampleData();
     //overwrite equencing dates with invalid values
     for (let i = 0; i < samples.length; i++) {
       samples[i].sequencingDate = " ";
@@ -52,13 +54,12 @@ test.describe("Upload sample tests", () => {
       dataFile: ".txt",
       samples: samples,
     };
-    await UploadSample.uploadSequencingFiles(page, uploadData);
+    await uploadSequencingFiles(page, uploadData);
     const errors = page.locator(
       "//input[@name='sequencingDate']/../following-sibling::p"
     );
     for (let i = 0; i < samples.length; i++) {
-     await expect(await errors.nth(i).textContent()).toBe(dateErrorMessage);
+      await expect(await errors.nth(i).textContent()).toBe(dateErrorMessage);
     }
   });
-
 });
