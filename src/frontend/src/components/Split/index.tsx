@@ -1,5 +1,5 @@
 /**
- * Everything surrounding the use of Split.io / feature flags lives here.
+ * Everything surrounding the use of Split.io / feature flags lives in this directory.
  *
  * For a detailed guide on working with feature flags in Split, see the wiki:
  *   "GenEpi -- Feature Flags (Split.io) -- HowTo"
@@ -17,42 +17,30 @@
  * are built around that assumption: if you need to work with a complex flag,
  * that's totally fine, but you'll need to write some custom handling.
  *
- * To use a new flag
- *   1) Create the flag in Split, add it to the `FEATURE_FLAGS` enum.
+ * To use a new flag for `user` traffic type,
+ *   1) Create the flag in Split, add it to the `USER_FEATURE_FLAGS` enum.
  *      * If it's a simple flag of just "on"/"off", local dev defaults to on
  *   2) To pull the flag in a component in app, do the following
  *        import { useTreatments } from "@splitsoftware/splitio-react";
- *        import { FEATURE_FLAGS } from <<This file right here>>;
- *        const flag = useTreatments([FEATURE_FLAGS.my_flag_name]);
+ *        import { USER_FEATURE_FLAGS } from <<file in this dir>>;
+ *        const flag = useTreatments([USER_FEATURE_FLAGS.my_flag_name]);
  *   3) If the flag is just a simple "on"/"off" type flag, helper to get bool
  *        << ... in addition what's in (2) above ... >>>
  *        import { isFlagOn } from <<This file right here>>;
- *        const isMyFlagOn = isFlagOn(flag, FEATURE_FLAGS.my_flag_name);
+ *        const isMyFlagOn = isFlagOn(flag, USER_FEATURE_FLAGS.my_flag_name);
  */
 import { SplitFactory } from "@splitsoftware/splitio-react";
 import { TreatmentsWithConfig } from "@splitsoftware/splitio/types/splitio";
 import { useEffect, useState } from "react";
 import ENV from "src/common/constants/ENV";
 import { useUserInfo } from "src/common/queries/auth";
-
-/**
- * Canonical listing of all Split feature flags FE needs to know about.
- *
- * If you modify the feature flags while doing dev work, you will need to
- * /reload/ your browser. Do not just depend on the soft [Fast Refresh]
- * functionality of our dev server because the feature flags are injected
- * into the Split config, and that is only rebuilt with a real refresh.
- */
-export enum FEATURE_FLAGS {
-  // my_flag_name = "my_flag_name", (<-- format example)
-  galago_integration = "galago_integration",
-  prep_files = "prep_files",
-}
+import { useSelector } from "src/common/redux/hooks";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { createPathogenFlagsForLocal } from "./pathogenFeatureSplits";
+import { SPLIT_SIMPLE_FLAG, USER_FEATURE_FLAGS } from "./types";
 
 // Keyword to tell Split client it's running in local-only mode.
 const SPLIT_LOCALHOST_ONLY_MODE = "localhost";
-// Team convention for value of an enabled flag that is just a simple on/off.
-const SPLIT_SIMPLE_FLAG_ON_VALUE = "on";
 
 /**
  * Creates a `features` object for when Split is running in "localhost" mode.
@@ -61,11 +49,13 @@ const SPLIT_SIMPLE_FLAG_ON_VALUE = "on";
  * with only an on/off case and that they should all be marked as "on".
  * If a more complex flag is required you should add it separately.
  */
-function createSimpleFlagsForLocal(splitNames: Array<FEATURE_FLAGS>) {
-  const localFeatures: Partial<Record<FEATURE_FLAGS, string>> = {};
+function createSimpleFlagsForLocal(splitNames: Array<USER_FEATURE_FLAGS>) {
+  const localFeatures: Partial<Record<USER_FEATURE_FLAGS, SPLIT_SIMPLE_FLAG>> = {};
+
   splitNames.forEach((splitName) => {
-    localFeatures[splitName] = SPLIT_SIMPLE_FLAG_ON_VALUE;
+    localFeatures[splitName] = SPLIT_SIMPLE_FLAG.ON;
   });
+
   return localFeatures;
 }
 
@@ -86,7 +76,7 @@ export function isFlagOn(
   featureFlagName: string
 ): boolean {
   const flagValue = splitTreatments[featureFlagName]?.treatment;
-  return flagValue === SPLIT_SIMPLE_FLAG_ON_VALUE;
+  return flagValue === SPLIT_SIMPLE_FLAG.ON;
 }
 
 interface Props {
@@ -106,6 +96,7 @@ interface Props {
  * functionality of our dev server because the config won't be rebuilt.
  */
 const SplitInitializer = ({ children }: Props): JSX.Element | null => {
+  const pathogen = useSelector(selectCurrentPathogen);
   const { data: userInfo, isLoading: isLoadingUserInfo } = useUserInfo();
   const [splitConfig, setSplitConfig] =
     useState<SplitIO.IBrowserSettings | null>(null);
@@ -120,6 +111,7 @@ const SplitInitializer = ({ children }: Props): JSX.Element | null => {
       core: {
         authorizationKey: ENV.SPLIT_FRONTEND_KEY,
         key: userInfo?.splitId || "anonymous",
+        trafficType: "user",
       },
     };
     if (splitConf.core.authorizationKey === SPLIT_LOCALHOST_ONLY_MODE) {
@@ -127,13 +119,16 @@ const SplitInitializer = ({ children }: Props): JSX.Element | null => {
       // To ease dev experience, we mock flags, setting them all to "on"
       // NOTE: Below just sets /all/ current flags to treatment of "on".
       // If you need some off or a more complicated flag, modify the below.
-      const flagsToSetOn = Object.values(FEATURE_FLAGS);
-      const mockedFeatureFlags = createSimpleFlagsForLocal(flagsToSetOn);
-      splitConf.features = mockedFeatureFlags;
+      const simpleFlagsToSetOn = Object.values(USER_FEATURE_FLAGS);
+      const mockedSimpleFeatureFlags = createSimpleFlagsForLocal(simpleFlagsToSetOn);
+      const mockedComplexFeatureFlags = createPathogenFlagsForLocal(pathogen);
+
+      const allLocalFlags = { ...mockedSimpleFeatureFlags, ...mockedComplexFeatureFlags }
+      splitConf.features = allLocalFlags;
     }
 
     setSplitConfig(splitConf);
-  }, [isLoadingUserInfo, userInfo]);
+  }, [isLoadingUserInfo, userInfo, pathogen]);
 
   if (!splitConfig) {
     // If we haven't fetched a userinfo response yet, don't enable split.
