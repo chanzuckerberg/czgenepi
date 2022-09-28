@@ -3,10 +3,14 @@ import { createFilterOptions } from "@mui/material/Autocomplete";
 import { DefaultMenuSelectOption, Icon } from "czifui";
 import { isEqual } from "lodash";
 import { noop } from "src/common/constants/empty";
+import { useSelector } from "src/common/redux/hooks";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import {
   MENU_OPTIONS_COLLECTION_DATE,
   MENU_OPTION_ALL_TIME,
 } from "src/components/DateFilterMenu/constants";
+import { SplitPathogenWrapper } from "src/components/Split/SplitPathogenWrapper";
+import { PATHOGEN_FEATURE_FLAGS } from "src/components/Split/types";
 import { StyledTooltip } from "../../style";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import {
@@ -186,6 +190,7 @@ export function SampleFiltering({
   setStartDate,
   setEndDate,
 }: Props): JSX.Element {
+  const pathogen = useSelector(selectCurrentPathogen);
   const lineageDropdownOptions = generateLineageDropdownOptions(
     selectedLineages,
     availableLineages
@@ -309,21 +314,23 @@ export function SampleFiltering({
       </StyledExplainerTitle>
 
       <StyledFiltersSection>
-        <StyledFilterGroup>
-          <StyledFilterGroupName>Lineage</StyledFilterGroupName>
-          <StyledDropdown
-            label={lineageDropdownLabel}
-            onChange={handleLineageDropdownChange}
-            options={lineageDropdownOptions}
-            value={lineageDropdownValue}
-            multiple
-            search
-            DropdownMenuProps={lineageDropdownMenuProps}
-            InputDropdownProps={InputDropdownProps}
-            PopperComponent={BottomPlacementDropdownPopper}
-            data-test-id="lineage-dropdown"
-          />
-        </StyledFilterGroup>
+        <SplitPathogenWrapper pathogen={pathogen} feature={PATHOGEN_FEATURE_FLAGS.lineage_filter_enabled}>
+          <StyledFilterGroup>
+            <StyledFilterGroupName>Lineage</StyledFilterGroupName>
+            <StyledDropdown
+              label={lineageDropdownLabel}
+              onChange={handleLineageDropdownChange}
+              options={lineageDropdownOptions}
+              value={lineageDropdownValue}
+              multiple
+              search
+              DropdownMenuProps={lineageDropdownMenuProps}
+              InputDropdownProps={InputDropdownProps}
+              PopperComponent={BottomPlacementDropdownPopper}
+              data-test-id="lineage-dropdown"
+            />
+          </StyledFilterGroup>
+        </SplitPathogenWrapper>
         <StyledFilterGroup>
           <StyledFilterGroupName>Collection Date</StyledFilterGroupName>
           <CollectionDateFilter
