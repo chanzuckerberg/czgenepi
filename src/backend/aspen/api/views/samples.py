@@ -36,12 +36,12 @@ from aspen.api.utils import (
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
-    get_public_repository_prefix,
     GisaidSubmissionFormCSVStreamer,
     sample_info_to_genbank_rows,
     sample_info_to_gisaid_rows,
     samples_by_identifiers,
 )
+from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.database.models import (
     Group,
     Location,
@@ -389,13 +389,14 @@ async def fill_submission_template(
     user_visible_samples = user_visible_samples_res.scalars().all()
 
     # get the sample id prefix for given public_repository
-    prefix = await get_public_repository_prefix(
+    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
         pathogen, request.public_repository_name, db
     )
+
     prefix_should_exist = (
         pathogen is not None and request.public_repository_name is not None
     )
-    if prefix is None and prefix_should_exist:
+    if pathogen_repo_config.prefix is None and prefix_should_exist:
         raise ex.ServerException(
             "no prefix found for given pathogen_slug and public_repository combination"
         )
@@ -415,14 +416,18 @@ async def fill_submission_template(
     ]
     if request.public_repository_name.lower() == "gisaid":
         metadata_rows = sample_info_to_gisaid_rows(
-            submission_information, prefix, datetime.date.today().strftime("%Y%m%d")
+            submission_information,
+            pathogen_repo_config.prefix,
+            datetime.date.today().strftime("%Y%m%d"),
         )
         metadata_rows.sort(key=lambda row: row.get("covv_virus_name"))  # type: ignore
         filename = get_submission_template_filename("GISAID")
         filename = filename.replace(".tsv", ".csv")
         tsv_streamer = GisaidSubmissionFormCSVStreamer
     elif request.public_repository_name.lower() == "genbank":
-        metadata_rows = sample_info_to_genbank_rows(submission_information, prefix)
+        metadata_rows = sample_info_to_genbank_rows(
+            submission_information, pathogen_repo_config.prefix
+        )
         metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))  # type: ignore
         filename = get_submission_template_filename("GenBank")
         tsv_streamer = GenBankSubmissionFormTSVStreamer

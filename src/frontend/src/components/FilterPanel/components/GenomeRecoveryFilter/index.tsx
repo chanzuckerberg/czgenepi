@@ -47,6 +47,7 @@ const GenomeRecoveryFilter = ({
       options={GENOME_RECOVERY_OPTIONS}
       onChange={onChange as CallbackTypeWorkaround}
       InputDropdownProps={PROPS_FOR_INPUT_DROPDOWN}
+      data-test-id="sample-filter-status"
     />
   );
 };

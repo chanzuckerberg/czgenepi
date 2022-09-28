@@ -1,0 +1,74 @@
+FROM rust:1.63-buster AS rust
+RUN apt update && apt install -y jq
+RUN cd /tmp && git clone https://github.com/chanzuckerberg/oso.git --single-branch --branch czge-oso25
+RUN cd /tmp/oso && cargo build
+
+FROM python:3.9.1-slim AS osobuild
+ENV OSO_ENV=CI
+COPY --from=rust /tmp/oso /tmp/oso
+RUN apt update && apt install -y build-essential
+WORKDIR /tmp/oso
+RUN mkdir -p languages/python/oso/native
+RUN cp polar-c-api/polar.h languages/python/oso/native/polar.h
+RUN cp target/debug/libpolar.a languages/python/oso/native/libpolar.a
+RUN cd /tmp/oso/languages/python/sqlalchemy-oso && make build && python3 -m pip wheel . --wheel-dir=/tmp/wheels
+RUN cd /tmp/oso/languages/python/oso && make build && python3 -m pip wheel . --wheel-dir=/tmp/wheels
+
+FROM python:3.9.1-slim AS build
+ENV FLASK_APP=aspen.main
+RUN apt-get update && apt-get install -y vim build-essential libdigest-sha-perl wget unzip libdigest-sha-perl
+ENV POETRY_VERSION=1.1.15
+RUN python3 -m pip install poetry==$POETRY_VERSION
+COPY pyproject.toml poetry.lock environment.yaml ./
+COPY third-party ./third-party
+COPY --from=osobuild /tmp/wheels ./wheels
+RUN ls -la /wheels
+RUN shasum -a 256 /wheels/*
+RUN poetry config virtualenvs.create false && \
+    poetry install
+
+# Separate base image so that we can use it to update the Pipfile.lock and requirements.txt file
+FROM python:3.9.1-slim AS base
+ENV FLASK_APP=aspen.main
+EXPOSE 3000
+
+# Utility
+RUN apt-get update && apt-get install -y vim procps wget make jq nano
+
+# Orchestration. Supervisor is heavyweight but afaik nothing else supports sane child reaping and signal forwarding.
+RUN pip install --no-cache-dir supervisor
+
+# Proxy/Router: Set up nginx
+RUN apt install -y nginx
+
+# FASTAPI: Install poetry
+RUN apt install -y libdigest-sha-perl
+ENV POETRY_VERSION=1.1.15
+RUN python3 -m pip install poetry==$POETRY_VERSION
+WORKDIR /usr/src/app
+
+COPY pyproject.toml poetry.lock environment.yaml ./
+# build deps needs to exist before configuring poetry
+COPY third-party ./third-party
+COPY --from=osobuild /tmp/wheels ./wheels
+RUN poetry config virtualenvs.create false
+# Copy poetry deps from the build image
+COPY --from=build /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+COPY --from=build \
+     /usr/local/bin/gunicorn \
+     /usr/local/bin/aws \
+     /usr/local/bin/alembic \
+     /usr/local/bin/autoflake \
+     /usr/local/bin/flake8 \
+     /usr/local/bin/black \
+     /usr/local/bin/isort \
+     /usr/local/bin/mypy \
+     /usr/local/bin/pytest \
+     /usr/local/bin/
+
+ENV PYTHONPATH=.
+
+COPY . .
+# By default, Poetry installs deps, dev deps, and the project package (aspen)
+RUN cd aspen && poetry install
+CMD ["/usr/local/bin/supervisord", "-c", "/usr/src/app/etc/supervisord.conf"]

@@ -249,6 +249,7 @@ export default function ImportFile({
           SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.privateId
         }
         metadataUploadType={MetadataUploadTypeOption.Edit}
+        data-test-id="upload-import-file-warning"
       />
     </>
   );

@@ -72,8 +72,9 @@ const TreeSelectionMenu = ({
         keepMounted
         open={Boolean(anchorEl)}
         onClose={handleClose}
+        data-test-id="run-nextstrain-phylo-analysis-icon"
       >
-        <MenuItem onClick={handleClickNS}>
+        <MenuItem onClick={handleClickNS} data-test-id="nextstrain-phylo-tree">
           Nextstrain Phylogenetic Tree
         </MenuItem>
         <Tooltip
