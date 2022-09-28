@@ -45,7 +45,8 @@ import { SPLIT_SIMPLE_FLAG, USER_FEATURE_FLAGS } from "./types";
  * If a more complex flag is required you should add it separately.
  */
 const createUserFlagsForLocal = () => {
-  const simpleFlags: Partial<Record<USER_FEATURE_FLAGS, SPLIT_SIMPLE_FLAG>> = {};
+  const simpleFlags: Partial<Record<USER_FEATURE_FLAGS, SPLIT_SIMPLE_FLAG>> =
+    {};
 
   const features = Object.values(USER_FEATURE_FLAGS);
   features.forEach((feature) => {
