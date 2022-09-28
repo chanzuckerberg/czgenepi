@@ -34,30 +34,26 @@ import { TreatmentsWithConfig } from "@splitsoftware/splitio/types/splitio";
 import { useEffect, useState } from "react";
 import ENV from "src/common/constants/ENV";
 import { useUserInfo } from "src/common/queries/auth";
-import { useSelector } from "src/common/redux/hooks";
-import { selectCurrentPathogen } from "src/common/redux/selectors";
-import { createPathogenFlagsForLocal } from "./pathogenFeatureSplits";
+import { isLocalSplitEnv } from "./util";
 import { SPLIT_SIMPLE_FLAG, USER_FEATURE_FLAGS } from "./types";
-
-// Keyword to tell Split client it's running in local-only mode.
-const SPLIT_LOCALHOST_ONLY_MODE = "localhost";
 
 /**
  * Creates a `features` object for when Split is running in "localhost" mode.
  *
- * Assumes that all the feature flags in `splitNames` are just simple flags
+ * Assumes that all the user-based feature flags are just simple flags
  * with only an on/off case and that they should all be marked as "on".
  * If a more complex flag is required you should add it separately.
  */
-function createSimpleFlagsForLocal(splitNames: Array<USER_FEATURE_FLAGS>) {
-  const localFeatures: Partial<Record<USER_FEATURE_FLAGS, SPLIT_SIMPLE_FLAG>> = {};
+const createUserFlagsForLocal = () => {
+  const simpleFlags: Partial<Record<USER_FEATURE_FLAGS, SPLIT_SIMPLE_FLAG>> = {};
 
-  splitNames.forEach((splitName) => {
-    localFeatures[splitName] = SPLIT_SIMPLE_FLAG.ON;
+  const features = Object.values(USER_FEATURE_FLAGS);
+  features.forEach((feature) => {
+    simpleFlags[feature] = SPLIT_SIMPLE_FLAG.ON;
   });
 
-  return localFeatures;
-}
+  return simpleFlags;
+};
 
 /**
  * Helper to check if a given Split feature flag is "on" (enabled; true).
@@ -71,6 +67,7 @@ function createSimpleFlagsForLocal(splitNames: Array<USER_FEATURE_FLAGS>) {
  * of all the flags in the array. However, we generally only use a single
  * feature flag at once, so this helper only examines one flag at a time.
  */
+// TODO (mlila):figure out if this works with traffictype=pathogen
 export function isFlagOn(
   splitTreatments: TreatmentsWithConfig,
   featureFlagName: string
@@ -96,7 +93,6 @@ interface Props {
  * functionality of our dev server because the config won't be rebuilt.
  */
 const SplitInitializer = ({ children }: Props): JSX.Element | null => {
-  const pathogen = useSelector(selectCurrentPathogen);
   const { data: userInfo, isLoading: isLoadingUserInfo } = useUserInfo();
   const [splitConfig, setSplitConfig] =
     useState<SplitIO.IBrowserSettings | null>(null);
@@ -114,21 +110,13 @@ const SplitInitializer = ({ children }: Props): JSX.Element | null => {
         trafficType: "user",
       },
     };
-    if (splitConf.core.authorizationKey === SPLIT_LOCALHOST_ONLY_MODE) {
-      // Split is only running locally, not talking to its servers.
-      // To ease dev experience, we mock flags, setting them all to "on"
-      // NOTE: Below just sets /all/ current flags to treatment of "on".
-      // If you need some off or a more complicated flag, modify the below.
-      const simpleFlagsToSetOn = Object.values(USER_FEATURE_FLAGS);
-      const mockedSimpleFeatureFlags = createSimpleFlagsForLocal(simpleFlagsToSetOn);
-      const mockedComplexFeatureFlags = createPathogenFlagsForLocal(pathogen);
-
-      const allLocalFlags = { ...mockedSimpleFeatureFlags, ...mockedComplexFeatureFlags }
-      splitConf.features = allLocalFlags;
+    if (isLocalSplitEnv) {
+      const mockedFeatureFlags = createUserFlagsForLocal();
+      splitConf.features = mockedFeatureFlags;
     }
 
     setSplitConfig(splitConf);
-  }, [isLoadingUserInfo, userInfo, pathogen]);
+  }, [isLoadingUserInfo, userInfo]);
 
   if (!splitConfig) {
     // If we haven't fetched a userinfo response yet, don't enable split.
