@@ -152,6 +152,8 @@ jobs:
           install_globally: "true"
       - name: Playwright tests
         run: |
+          ls -l
+          pwd
           echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build backend image
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
