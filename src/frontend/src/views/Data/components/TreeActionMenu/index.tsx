@@ -1,5 +1,5 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
-import { isFlagOn } from "src/components/Split";
+import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { MoreActionsMenu } from "./components/MoreActionsMenu";
 import { OpenInGalagoButton } from "./components/OpenInGalagoButton";
@@ -38,7 +38,7 @@ const TreeActionMenu = ({
   userInfo,
 }: Props): JSX.Element => {
   const flag = useTreatments([USER_FEATURE_FLAGS.galago_integration]);
-  const isGalagoIntegrationFlagOn = isFlagOn(
+  const isGalagoIntegrationFlagOn = isUserFlagOn(
     flag,
     USER_FEATURE_FLAGS.galago_integration
   );

@@ -1,13 +1,21 @@
 import { FilterOptionsState, PopperProps } from "@mui/material";
 import { createFilterOptions } from "@mui/material/Autocomplete";
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { DefaultMenuSelectOption, Icon } from "czifui";
 import { isEqual } from "lodash";
 import { noop } from "src/common/constants/empty";
+import { useSelector } from "src/common/redux/hooks";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import {
   MENU_OPTIONS_COLLECTION_DATE,
   MENU_OPTION_ALL_TIME,
 } from "src/components/DateFilterMenu/constants";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
+import { SplitPathogenWrapper } from "src/components/Split/SplitPathogenWrapper";
+import { PATHOGEN_FEATURE_FLAGS } from "src/components/Split/types";
 import { StyledTooltip } from "../../style";
+import { SampleFilteringTooltip } from "../SampleFilteringTooltip";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import {
   StyledContainer,
@@ -186,6 +194,13 @@ export function SampleFiltering({
   setStartDate,
   setEndDate,
 }: Props): JSX.Element {
+  const pathogen = useSelector(selectCurrentPathogen);
+  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
+  const isTreeLocationFilterFlagOn = isUserFlagOn(
+    flag,
+    USER_FEATURE_FLAGS.tree_location_filter
+  );
+
   const lineageDropdownOptions = generateLineageDropdownOptions(
     selectedLineages,
     availableLineages
@@ -295,35 +310,45 @@ export function SampleFiltering({
   return (
     <StyledContainer>
       <StyledExplainerTitle>
-        Limit samples from my jurisdiction to:
-        <StyledTooltip
-          arrow
-          leaveDelay={1000}
-          title={SAMPLE_FILTERING_TOOLTIP_TEXT}
-          placement="top"
-        >
-          <StyledInfoIconWrapper>
-            <Icon sdsIcon="infoCircle" sdsSize="xs" sdsType="static" />
-          </StyledInfoIconWrapper>
-        </StyledTooltip>
+        {isTreeLocationFilterFlagOn
+          ? "Define samples of interest by:"
+          : "Limit samples from my jurisdiction to:"}
+        {isTreeLocationFilterFlagOn ? (
+          <SampleFilteringTooltip />
+        ) : (
+          <StyledTooltip
+            arrow
+            leaveDelay={1000}
+            title={SAMPLE_FILTERING_TOOLTIP_TEXT}
+            placement="top"
+          >
+            <StyledInfoIconWrapper>
+              <Icon sdsIcon="infoCircle" sdsSize="xs" sdsType="static" />
+            </StyledInfoIconWrapper>
+          </StyledTooltip>
+        )}
       </StyledExplainerTitle>
-
       <StyledFiltersSection>
-        <StyledFilterGroup>
-          <StyledFilterGroupName>Lineage</StyledFilterGroupName>
-          <StyledDropdown
-            label={lineageDropdownLabel}
-            onChange={handleLineageDropdownChange}
-            options={lineageDropdownOptions}
-            value={lineageDropdownValue}
-            multiple
-            search
-            DropdownMenuProps={lineageDropdownMenuProps}
-            InputDropdownProps={InputDropdownProps}
-            PopperComponent={BottomPlacementDropdownPopper}
-            data-test-id="lineage-dropdown"
-          />
-        </StyledFilterGroup>
+        <SplitPathogenWrapper
+          pathogen={pathogen}
+          feature={PATHOGEN_FEATURE_FLAGS.lineage_filter_enabled}
+        >
+          <StyledFilterGroup>
+            <StyledFilterGroupName>Lineage</StyledFilterGroupName>
+            <StyledDropdown
+              label={lineageDropdownLabel}
+              onChange={handleLineageDropdownChange}
+              options={lineageDropdownOptions}
+              value={lineageDropdownValue}
+              multiple
+              search
+              DropdownMenuProps={lineageDropdownMenuProps}
+              InputDropdownProps={InputDropdownProps}
+              PopperComponent={BottomPlacementDropdownPopper}
+              data-test-id="lineage-dropdown"
+            />
+          </StyledFilterGroup>
+        </SplitPathogenWrapper>
         <StyledFilterGroup>
           <StyledFilterGroupName>Collection Date</StyledFilterGroupName>
           <CollectionDateFilter

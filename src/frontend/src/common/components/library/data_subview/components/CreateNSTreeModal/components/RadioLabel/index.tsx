@@ -1,10 +1,14 @@
 // eslint-disable @typescript-eslint/explicit-member-accessibility
 import ListItemText from "@mui/material/ListItemText";
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon, List } from "czifui";
 import { useSelector } from "react-redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { SampleFiltering } from "../SampleFiltering";
-import { pathogenStrings } from "./strings";
+import { TargetedFiltering } from "../TargetedFiltering";
+import { pathogenStrings, tempLocationFilterCopyUpdates } from "./strings";
 import {
   Label,
   LabelMain,
@@ -40,12 +44,27 @@ export const RadioLabelOverview = ({
   setEndDate,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
+
+  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
+  const isTreeLocationFilterFlagOn = isUserFlagOn(
+    flag,
+    USER_FEATURE_FLAGS.tree_location_filter
+  );
+
+  // While the feature flag is in use, merge the updated strings with the originals.
+  // When we remove the feature flag, remove this variable
+  const tempPathogenStringsWithCopyUpdates =
+    isTreeLocationFilterFlagOn && pathogen
+      ? { ...pathogenStrings[pathogen], ...tempLocationFilterCopyUpdates }
+      : pathogenStrings[pathogen];
+
   const {
     overviewDescription = "",
     overviewBestFor = "",
     overviewGoodFor1 = "",
     overviewGoodFor2 = "",
-  } = pathogen ? pathogenStrings[pathogen] : {};
+    // When we remove the feature flag, change this line back to use pathogenStrings[pathogen]
+  } = pathogen ? tempPathogenStringsWithCopyUpdates : {};
 
   return (
     <div>
@@ -100,11 +119,26 @@ export const RadioLabelTargeted = ({
   selected,
 }: BaseTreeChoiceProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
+
+  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
+  const isTreeLocationFilterFlagOn = isUserFlagOn(
+    flag,
+    USER_FEATURE_FLAGS.tree_location_filter
+  );
+
+  // While the feature flag is in use, merge the updated strings with the originals.
+  // When we remove the feature flag, remove this variable
+  const tempPathogenStringsWithCopyUpdates =
+    isTreeLocationFilterFlagOn && pathogen
+      ? { ...pathogenStrings[pathogen], ...tempLocationFilterCopyUpdates }
+      : pathogenStrings[pathogen];
+
   const {
     targetedDescription = "",
     targetedBestFor = "",
     targetedGoodFor = "",
-  } = pathogen ? pathogenStrings[pathogen] : {};
+    // When we remove the feature flag, change this line back to use pathogenStrings[pathogen]
+  } = pathogen ? tempPathogenStringsWithCopyUpdates : {};
 
   return (
     <div>
@@ -113,24 +147,27 @@ export const RadioLabelTargeted = ({
       </Label>
       <SmallText>{targetedDescription}</SmallText>
       {selected && (
-        <List>
-          <StyledListItem>
-            <StyledListItemIcon>
-              <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
-            </StyledListItemIcon>
-            <ListItemText>
-              <SmallText>{targetedBestFor}</SmallText>
-            </ListItemText>
-          </StyledListItem>
-          <StyledListItem>
-            <StyledListItemIcon>
-              <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
-            </StyledListItemIcon>
-            <ListItemText>
-              <SmallText>{targetedGoodFor}</SmallText>
-            </ListItemText>
-          </StyledListItem>
-        </List>
+        <>
+          <List>
+            <StyledListItem>
+              <StyledListItemIcon>
+                <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>{targetedBestFor}</SmallText>
+              </ListItemText>
+            </StyledListItem>
+            <StyledListItem>
+              <StyledListItemIcon>
+                <Icon sdsIcon="check" sdsSize="xs" sdsType="static" />
+              </StyledListItemIcon>
+              <ListItemText>
+                <SmallText>{targetedGoodFor}</SmallText>
+              </ListItemText>
+            </StyledListItem>
+          </List>
+          {isTreeLocationFilterFlagOn && <TargetedFiltering />}
+        </>
       )}
     </div>
   );
@@ -147,12 +184,28 @@ export const RadioLabelNonContextualized = ({
   setEndDate,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
+
+  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
+  const isTreeLocationFilterFlagOn = isUserFlagOn(
+    flag,
+    USER_FEATURE_FLAGS.tree_location_filter
+  );
+
+  // While the feature flag is in use, merge the updated strings with the originals.
+  // When we remove the feature flag, remove this variable
+  const tempPathogenStringsWithCopyUpdates =
+    isTreeLocationFilterFlagOn && pathogen
+      ? { ...pathogenStrings[pathogen], ...tempLocationFilterCopyUpdates }
+      : pathogenStrings[pathogen];
+
   const {
     nonContextualizedDescription = "",
     nonContextualizedBestFor = "",
     nonContextualizedGoodFor = "",
     nonContextualizedNotRecommended = "",
-  } = pathogen ? pathogenStrings[pathogen] : {};
+    // When we remove the feature flag, change this line back to use pathogenStrings[pathogen]
+  } = pathogen ? tempPathogenStringsWithCopyUpdates : {};
+
   return (
     <div>
       <Label>
