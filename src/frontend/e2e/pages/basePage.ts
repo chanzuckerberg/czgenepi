@@ -137,6 +137,11 @@ export class BasePage {
   async findByPlaceHolder(placeholder: string) {
     return this.page.locator(`[placeholder="${placeholder}"]`);
   }
+
+  async waitForSelector(selector: string) {
+    return this.page.waitForSelector(selector, { timeout: 25000 });
+  }
+
   /**
    * Convenience method for this.page.keyboard.type.  Note that this requires
    * an already focused input to type into.  Normally via click or focus.

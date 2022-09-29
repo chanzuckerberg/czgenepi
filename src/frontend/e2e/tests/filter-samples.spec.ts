@@ -45,9 +45,9 @@ test.describe("Sample filtering tests", () => {
     url = `${baseUrl}/data/samples`;
     await page.goto(url);
     //accept cookie t&c (if prompted)
-    const tAndCSelector =
+    const acceptCookieSelector =
       '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
-    await page.locator(tAndCSelector).click();
+    await page.locator(acceptCookieSelector).click();
 
     //intercept request and stub response
     await interceptRequestAndStubResponse(page, context);

@@ -36,7 +36,7 @@ test.describe("Samples page tests", () => {
     });
   });
 
-  test("Should verify sample data", async ({ page, context }) => {
+  test.only("Should verify sample data", async ({ page, context }) => {
     await displaySamplePage(page);
 
     // get the first record so
@@ -59,37 +59,39 @@ test.describe("Samples page tests", () => {
         });
       }
     );
+
     // make the actual call, wait until all responses have been received
     await page.goto(url, { waitUntil: "networkidle" });
 
-    //wait until data is displayed
-    await page.waitForSelector(getByTestID("table-row"));
+    // assert table is populated with at least one record
+    expect(await page.locator(getByTestID("table-row")).count()).toBe(1);
 
-    const sampleRows = page.locator(getByTestID("table-row"));
-    expect(await sampleRows.count()).toBe(1);
+    const base = new BasePage(page);
+
+    const sampleRows = base.findByTestId("table-row");
+    expect(await (await sampleRows).count()).toBe(1);
 
     // verify status
-    // todo: this test currently fails to find element, deferring for now
     //const status = sample.czb_failed_genome_recovery ? "failed" : "complete";
-    //expect(page.locator(getByTestID("sample-status"))).toHaveText(status);
+    //expect(await base.findByTestId("sample-status")).toHaveText(status);
 
     // verify public ID
-    expect(page.locator(getByTestID("row-publicId"))).toHaveText(
+    expect(await base.findByTestId("row-publicId")).toHaveText(
       sample.public_identifier
     );
 
     // verify collection date
-    expect(page.locator(getByTestID("row-collectionDate"))).toHaveText(
+    expect(await base.findByTestId("row-collectionDate")).toHaveText(
       sample.collection_date
     );
 
     // verify collection date
-    expect(page.locator(getByTestID("row-collectionDate"))).toHaveText(
+    expect(await base.findByTestId("row-collectionDate")).toHaveText(
       sample.collection_date
     );
 
     // verify collection location
-    expect(page.locator(getByTestID("row-collectionLocation"))).toHaveText(
+    expect(await base.findByTestId("row-collectionLocation")).toHaveText(
       sample.collection_location.location
     );
 

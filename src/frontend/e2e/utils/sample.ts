@@ -79,32 +79,29 @@ export function getSampleResponseData(
     collection_location: {
       country: "USA",
       division: "California",
-      id: getValueOrDefault(
-        defaults?.collection_location,
-        locationId
-      ) as number,
+      id: getValueOrDefault(defaults?.collection_location, locationId),
       location: "Corodano",
       region: "California",
     },
     czb_failed_genome_recovery: getValueOrDefault(
       defaults?.czb_failed_genome_recovery,
       sample(trueOrFalse)
-    ) as boolean,
+    ),
     gisaid: {
       gisaid_id: "",
       status: "Not Found",
     },
-    id: getValueOrDefault(defaults?.id, getRandomNumber()) as number,
+    id: getValueOrDefault(defaults?.id, getRandomNumber()),
     lineage: {
       confidence: "",
       last_updated: getADateInThePast(),
-      lineage: getValueOrDefault(defaults?.lineage, sample(lineages)) as string,
+      lineage: getValueOrDefault(defaults?.lineage, sample(lineages)),
       qc_status: "pass",
       scorpio_call: "Omicron (BA.1-like)",
       scorpio_support: 0.93,
       version: "PUSHER-v1.13",
     },
-    private: getValueOrDefault(defaults?.private, true) as boolean,
+    private: getValueOrDefault(defaults?.private, true),
     private_identifier: generatePrivateSampleId(),
     public_identifier: generatePublicSampleId(),
     sequencing_date: getADateInThePast(),
@@ -112,10 +109,7 @@ export function getSampleResponseData(
       id: 74,
       name: "QA Automation",
     },
-    upload_date: getValueOrDefault(
-      defaults?.upload_date,
-      getADateInThePast()
-    ) as string,
+    upload_date: getValueOrDefault(defaults?.upload_date, getADateInThePast()),
     uploaded_by: {
       id: 108,
       name: "Playwright",
@@ -138,30 +132,30 @@ export interface SampleUploadData {
 }
 
 export interface SampleResponseData {
-  id: number;
-  collection_date: string;
+  id: number | undefined;
+  collection_date: string | undefined;
   collection_location: {
-    id: number;
+    id: number | undefined;
     region: string;
     country: string;
     division: string;
     location: string;
   };
-  czb_failed_genome_recovery: boolean;
+  czb_failed_genome_recovery: boolean | undefined;
   gisaid: {
     gisaid_id: any;
     status: string;
   };
   lineage: {
     last_updated: string;
-    lineage: string;
+    lineage: string | undefined;
     confidence: string;
     version: string;
     scorpio_call: string;
     scorpio_support: number;
     qc_status: string;
   };
-  private: boolean;
+  private: boolean | undefined;
   private_identifier: string;
   public_identifier: string;
   sequencing_date: string;
@@ -169,7 +163,7 @@ export interface SampleResponseData {
     id: number;
     name: string;
   };
-  upload_date: string;
+  upload_date: string | undefined;
   uploaded_by: {
     id: number;
     name: string;
