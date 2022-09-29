@@ -89,7 +89,7 @@ const setCurrentWorkspacePath = async (router: NextRouter) => {
 
   // don't redirect if user already viewing correct workspace
   if (router.asPath !== newPath) {
-    router.push(newPath);
+    router.replace(newPath);
   }
 };
 
