@@ -141,7 +141,7 @@ export interface SampleResponseData {
   id: number;
   collection_date: string;
   collection_location: {
-    id?: number;
+    id: number;
     region: string;
     country: string;
     division: string;
@@ -180,7 +180,7 @@ export interface SampleResponseDefaults {
   collection_date?: string;
   collection_location?: number;
   czb_failed_genome_recovery?: boolean;
-  gisaid_id?: any;
+  gisaid_id?: string | null;
   gisaid_status?: string;
   id?: number;
   lineage?: string;

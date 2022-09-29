@@ -15,10 +15,6 @@ async function globalSetup(config: FullConfig): Promise<void> {
 
   const page = await browser.newPage();
   await page.goto(baseURL as string);
-  // await page.locator(getByTestID("navbar-sign-in-link")).click();
-  // await page.locator(getByID("username")).first().fill(username);
-  // await page.locator(getByID("password")).first().fill(password);
-  // await page.locator('button[type=submit] >> "Continue"').first().click();
   await login(page, username, password);
   await page.context().storageState({ path: storageState as string });
   await browser.close();

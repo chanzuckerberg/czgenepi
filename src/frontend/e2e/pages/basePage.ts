@@ -134,6 +134,9 @@ export class BasePage {
     return this.page.locator(`css = ${className}`);
   }
 
+  async findByPlaceHolder(placeholder: string) {
+    return this.page.locator(`[placeholder="${placeholder}"]`);
+  }
   /**
    * Convenience method for this.page.keyboard.type.  Note that this requires
    * an already focused input to type into.  Normally via click or focus.

@@ -18,8 +18,6 @@ const tableHeaders = [
   "GISAID",
 ];
 const api = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2/samples/`;
-const tAndCSelector =
-  '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
 const mockData = JSON.parse(
   fs.readFileSync("e2e/fixtures/sampleList.json") as unknown as string
 );
@@ -41,7 +39,8 @@ test.describe("Samples page tests", () => {
   test("Should verify sample data", async ({ page, context }) => {
     await displaySamplePage(page);
 
-    // get the first record so we can validate UI renders recieved from backend correctly
+    // get the first record so
+    //for validating attributes rendered on UI
     const sample = mockData.samples[0];
 
     //create an intercept to stub response with mock data once we get response with status 200
@@ -70,7 +69,7 @@ test.describe("Samples page tests", () => {
     expect(await sampleRows.count()).toBe(1);
 
     // verify status
-    // todo: not finding this selector
+    // todo: this test currently fails to find element, deferring for now
     //const status = sample.czb_failed_genome_recovery ? "failed" : "complete";
     //expect(page.locator(getByTestID("sample-status"))).toHaveText(status);
 
@@ -97,8 +96,16 @@ test.describe("Samples page tests", () => {
     //todo: add remainining fields when test-id are added
   });
 });
+
+/**
+ * Help function that navigates to sample page
+ * and accepts  site cookies
+ * @param page
+ */
 async function displaySamplePage(page: Page): Promise<void> {
+  const acceptCookieSelector =
+    '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
   await page.goto(url);
   //accept cookie t&c (if prompted)
-  await page.locator(tAndCSelector).click();
+  await page.locator(acceptCookieSelector).click();
 }
