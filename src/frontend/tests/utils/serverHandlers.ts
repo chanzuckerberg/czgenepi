@@ -5,7 +5,7 @@
 import { rest } from "msw";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
-import { userInfo } from "e2e/fixtures/userInfo";
+import { userInfo } from "./userInfo";
 
 export const handlers = [
   rest.get(ENV.API_URL + API.USERDATA, (req, res, context) => {
