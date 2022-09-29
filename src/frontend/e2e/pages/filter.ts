@@ -74,7 +74,6 @@ export async function applyFilter(
   }
   // select lineage(s)
   if (filterData.lineage !== undefined) {
-    //const searchLocator = 'Search for a location​ >> [placeholder="Search"]';
     await base.clickElement('button:has-text("Lineage")');
     for (const singleLineage of filterData.lineage) {
       await (await base.findByPlaceHolder("Search")).nth(1).fill(singleLineage);
