@@ -23,6 +23,13 @@ export const LocationFilter = ({
   selectedLocation,
   setSelectedLocation,
 }: LocationFilterType): JSX.Element => {
+  const locationOptions = namedLocations.map((location) => {
+    return {
+      ...location,
+      key: location.id,
+    };
+  });
+
   const filterLocations = (
     options: NamedGisaidLocation[],
     state: AutocompleteState
@@ -71,7 +78,7 @@ export const LocationFilter = ({
         label={selectedLocation?.name || "Search for location"}
         value={selectedLocation}
         onChange={handleLocationDropdownChange}
-        options={namedLocations}
+        options={locationOptions}
         search
         DropdownMenuProps={{
           filterOptions: filterLocations,
