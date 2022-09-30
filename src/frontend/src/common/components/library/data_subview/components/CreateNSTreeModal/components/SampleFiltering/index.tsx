@@ -1,10 +1,5 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon } from "czifui";
-import { noop } from "src/common/constants/empty";
-import {
-  MENU_OPTIONS_COLLECTION_DATE,
-  MENU_OPTION_ALL_TIME,
-} from "src/components/DateFilterMenu/constants";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { StyledTooltip } from "../../style";
@@ -22,8 +17,6 @@ import {
 import {
   StyledContainer,
   StyledExplainerTitle,
-  StyledFilterGroup,
-  StyledFilterGroupName,
   StyledFiltersSection,
   StyledInfoIconWrapper,
   StyledNewTabLink,
@@ -100,23 +93,12 @@ export function SampleFiltering({
           selectedLineages={selectedLineages}
           setSelectedLineages={setSelectedLineages}
         />
-        <StyledFilterGroup>
-          <StyledFilterGroupName>Collection Date</StyledFilterGroupName>
-          <CollectionDateFilter
-            fieldKeyEnd="collectionDateEnd"
-            fieldKeyStart="collectionDateStart"
-            updateDateFilter={noop}
-            menuOptions={[
-              ...MENU_OPTIONS_COLLECTION_DATE,
-              MENU_OPTION_ALL_TIME,
-            ]}
-            startDate={startDate}
-            endDate={endDate}
-            setStartDate={setStartDate}
-            setEndDate={setEndDate}
-            data-test-id="collection-date"
-          />
-        </StyledFilterGroup>
+        <CollectionDateFilter
+          startDate={startDate}
+          endDate={endDate}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
+        />
         {isTreeLocationFilterFlagOn && (
           <LocationFilter
             availableLocations={availableLocations}
