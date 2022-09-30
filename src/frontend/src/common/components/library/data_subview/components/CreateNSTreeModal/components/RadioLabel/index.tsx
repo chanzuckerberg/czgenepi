@@ -124,9 +124,16 @@ export const RadioLabelOverview = ({
   );
 };
 
+interface RadioLabelTargetedProps
+  extends BaseTreeChoiceProps,
+    LocationFilterType {}
+
 export const RadioLabelTargeted = ({
   selected,
-}: BaseTreeChoiceProps): JSX.Element => {
+  namedLocations,
+  selectedLocation,
+  setSelectedLocation,
+}: RadioLabelTargetedProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
   const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
@@ -175,7 +182,13 @@ export const RadioLabelTargeted = ({
               </ListItemText>
             </StyledListItem>
           </List>
-          {isTreeLocationFilterFlagOn && <TargetedFiltering />}
+          {isTreeLocationFilterFlagOn && (
+            <TargetedFiltering
+              namedLocations={namedLocations}
+              selectedLocation={selectedLocation}
+              setSelectedLocation={setSelectedLocation}
+            />
+          )}
         </>
       )}
     </div>

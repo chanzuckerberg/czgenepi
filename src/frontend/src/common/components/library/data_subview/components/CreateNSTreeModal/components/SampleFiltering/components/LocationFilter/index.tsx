@@ -13,22 +13,35 @@ export type LocationFilterType = {
   setSelectedLocation: (location: NamedGisaidLocation | null) => void;
 };
 
+interface LocationFilterStyleProps {
+  fullWidth?: boolean;
+  showTitle?: boolean;
+}
+
+interface LocationFilterProps
+  extends LocationFilterType,
+    LocationFilterStyleProps {}
+
 interface AutocompleteState {
   getOptionLabel: (option: NamedGisaidLocation) => string;
   inputValue: string;
 }
 
 export const LocationFilter = ({
+  fullWidth = false,
+  showTitle = true,
   namedLocations,
   selectedLocation,
   setSelectedLocation,
-}: LocationFilterType): JSX.Element => {
-  const locationOptions = namedLocations.map((location) => {
-    return {
-      ...location,
-      key: location.id,
-    };
-  });
+}: LocationFilterProps): JSX.Element => {
+  const locationOptions = namedLocations
+    ? namedLocations.map((location) => {
+        return {
+          ...location,
+          key: location.id,
+        };
+      })
+    : [];
 
   const filterLocations = (
     options: NamedGisaidLocation[],
@@ -72,9 +85,10 @@ export const LocationFilter = ({
   };
 
   return (
-    <StyledFilterGroup>
-      <StyledFilterGroupName>Location</StyledFilterGroupName>
+    <StyledFilterGroup fullWidth={fullWidth}>
+      {showTitle && <StyledFilterGroupName>Location</StyledFilterGroupName>}
       <StyledDropdown
+        fullWidth={fullWidth}
         label={selectedLocation?.name || "Search for location"}
         value={selectedLocation}
         onChange={handleLocationDropdownChange}

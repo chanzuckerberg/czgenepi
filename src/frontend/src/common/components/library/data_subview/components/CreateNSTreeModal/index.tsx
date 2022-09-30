@@ -324,6 +324,9 @@ export const CreateNSTreeModal = ({
                 label={
                   <RadioLabelTargeted
                     selected={treeType === TreeTypes.Targeted}
+                    namedLocations={namedLocations}
+                    selectedLocation={selectedLocation}
+                    setSelectedLocation={setSelectedLocation}
                   />
                 }
               />
