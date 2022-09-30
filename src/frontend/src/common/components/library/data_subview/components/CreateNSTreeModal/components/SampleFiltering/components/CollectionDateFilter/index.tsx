@@ -3,15 +3,21 @@ import { getDateRangeLabel } from "src/common/utils/dateUtils";
 import { MENU_OPTION_ALL_TIME } from "src/components/DateFilterMenu/constants";
 import { StyledDateFilterMenu, StyledInputDropdown } from "./style";
 
-interface Props {
+export type StartDateFilterType = {
+  startDate: FormattedDateType;
+  setStartDate: (d: FormattedDateType) => void;
+};
+
+export type EndDateFilterType = {
+  endDate: FormattedDateType;
+  setEndDate: (d: FormattedDateType) => void;
+};
+
+interface Props extends StartDateFilterType, EndDateFilterType {
   fieldKeyEnd: string;
   fieldKeyStart: string;
   menuOptions: DateMenuOption[];
   updateDateFilter: UpdateDateFilterType;
-  startDate: FormattedDateType;
-  endDate: FormattedDateType;
-  setStartDate(d: FormattedDateType): void;
-  setEndDate(d: FormattedDateType): void;
 }
 
 const CollectionDateFilter = ({
