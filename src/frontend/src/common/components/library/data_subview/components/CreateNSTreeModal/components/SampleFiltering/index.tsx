@@ -51,7 +51,7 @@ const SAMPLE_FILTERING_TOOLTIP_TEXT = (
  */
 export function SampleFiltering({
   availableLineages,
-  availableLocations,
+  namedLocations,
   selectedLineages,
   selectedLocation,
   setSelectedLineages,
@@ -101,7 +101,7 @@ export function SampleFiltering({
         />
         {isTreeLocationFilterFlagOn && (
           <LocationFilter
-            availableLocations={availableLocations}
+            namedLocations={namedLocations}
             selectedLocation={selectedLocation}
             setSelectedLocation={setSelectedLocation}
           />

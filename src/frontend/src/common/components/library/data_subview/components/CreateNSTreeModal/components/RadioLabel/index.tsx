@@ -7,6 +7,12 @@ import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { SampleFiltering } from "../SampleFiltering";
+import {
+  EndDateFilterType,
+  StartDateFilterType,
+} from "../SampleFiltering/components/CollectionDateFilter";
+import { LineageFilterType } from "../SampleFiltering/components/LineageFilter";
+import { LocationFilterType } from "../SampleFiltering/components/LocationFilter";
 import { TargetedFiltering } from "../TargetedFiltering";
 import { pathogenStrings, tempLocationFilterCopyUpdates } from "./strings";
 import {
@@ -23,23 +29,17 @@ interface BaseTreeChoiceProps {
   selected: boolean;
 }
 
-interface TreeChoiceWithFilteringProps extends BaseTreeChoiceProps {
-  availableLineages: string[];
-  availableLocations: NamedGisaidLocation[];
-  selectedLineages: string[];
-  selectedLocation: NamedGisaidLocation;
-  setSelectedLineages: (lineages: string[]) => void;
-  setSelectedLocation: (location: NamedGisaidLocation) => void;
-  startDate: FormattedDateType;
-  endDate: FormattedDateType;
-  setStartDate(d: FormattedDateType): void;
-  setEndDate(d: FormattedDateType): void;
-}
+interface TreeChoiceWithFilteringProps
+  extends BaseTreeChoiceProps,
+    StartDateFilterType,
+    EndDateFilterType,
+    LineageFilterType,
+    LocationFilterType {}
 
 export const RadioLabelOverview = ({
   selected,
   availableLineages,
-  availableLocations,
+  namedLocations,
   selectedLineages,
   selectedLocation,
   setSelectedLineages,
@@ -108,7 +108,7 @@ export const RadioLabelOverview = ({
           </StyledList>
           <SampleFiltering
             availableLineages={availableLineages}
-            availableLocations={availableLocations}
+            namedLocations={namedLocations}
             selectedLineages={selectedLineages}
             selectedLocation={selectedLocation}
             setSelectedLineages={setSelectedLineages}
@@ -187,6 +187,9 @@ export const RadioLabelNonContextualized = ({
   availableLineages,
   selectedLineages,
   setSelectedLineages,
+  namedLocations,
+  selectedLocation,
+  setSelectedLocation,
   startDate,
   endDate,
   setStartDate,
@@ -253,6 +256,9 @@ export const RadioLabelNonContextualized = ({
             availableLineages={availableLineages}
             selectedLineages={selectedLineages}
             setSelectedLineages={setSelectedLineages}
+            namedLocations={namedLocations}
+            selectedLocation={selectedLocation}
+            setSelectedLocation={setSelectedLocation}
             startDate={startDate}
             endDate={endDate}
             setStartDate={setStartDate}

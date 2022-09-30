@@ -54,6 +54,7 @@ export const StyledFilterGroupName = styled.p`
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
+      margin-top: ${spaces?.m}px;
       margin-bottom: ${spaces?.xxs}px;
     `;
   }}
@@ -76,7 +77,7 @@ export const StyledNewTabLink = styled(NewTabLink)`
   }}
 `;
 
-const DROPDOWN_WIDTH = "209px";
+export const DROPDOWN_WIDTH = "204px";
 
 export const StyledDropdown = styled(Dropdown)`
   width: ${DROPDOWN_WIDTH};
