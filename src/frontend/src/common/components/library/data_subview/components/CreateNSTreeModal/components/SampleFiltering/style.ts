@@ -30,6 +30,7 @@ export const StyledExplainerTitle = styled.div`
 export const StyledFiltersSection = styled.div`
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `

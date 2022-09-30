@@ -25,8 +25,11 @@ interface BaseTreeChoiceProps {
 
 interface TreeChoiceWithFilteringProps extends BaseTreeChoiceProps {
   availableLineages: string[];
+  availableLocations: NamedGisaidLocation[];
   selectedLineages: string[];
+  selectedLocation: NamedGisaidLocation;
   setSelectedLineages: (lineages: string[]) => void;
+  setSelectedLocation: (location: NamedGisaidLocation) => void;
   startDate: FormattedDateType;
   endDate: FormattedDateType;
   setStartDate(d: FormattedDateType): void;
@@ -36,8 +39,11 @@ interface TreeChoiceWithFilteringProps extends BaseTreeChoiceProps {
 export const RadioLabelOverview = ({
   selected,
   availableLineages,
+  availableLocations,
   selectedLineages,
+  selectedLocation,
   setSelectedLineages,
+  setSelectedLocation,
   startDate,
   endDate,
   setStartDate,
@@ -102,8 +108,11 @@ export const RadioLabelOverview = ({
           </StyledList>
           <SampleFiltering
             availableLineages={availableLineages}
+            availableLocations={availableLocations}
             selectedLineages={selectedLineages}
+            selectedLocation={selectedLocation}
             setSelectedLineages={setSelectedLineages}
+            setSelectedLocation={setSelectedLocation}
             startDate={startDate}
             endDate={endDate}
             setStartDate={setStartDate}

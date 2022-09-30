@@ -11,9 +11,11 @@ import {
   MENU_OPTION_ALL_TIME,
 } from "src/components/DateFilterMenu/constants";
 import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { SplitPathogenWrapper } from "src/components/Split/SplitPathogenWrapper";
-import { PATHOGEN_FEATURE_FLAGS } from "src/components/Split/types";
+import {
+  PATHOGEN_FEATURE_FLAGS,
+  USER_FEATURE_FLAGS,
+} from "src/components/Split/types";
 import { StyledTooltip } from "../../style";
 import { SampleFilteringTooltip } from "../SampleFilteringTooltip";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
@@ -31,8 +33,11 @@ import {
 
 interface Props {
   availableLineages: string[];
+  availableLocations: NamedGisaidLocation[];
   selectedLineages: string[];
+  selectedLocation: NamedGisaidLocation;
   setSelectedLineages: (lineages: string[]) => void;
+  setSelectedLocation: (location: NamedGisaidLocation) => void;
   startDate: FormattedDateType;
   endDate: FormattedDateType;
   setStartDate(d: FormattedDateType): void;
@@ -187,8 +192,11 @@ const BottomPlacementDropdownPopper = (props: PopperProps) => {
  */
 export function SampleFiltering({
   availableLineages,
+  availableLocations,
   selectedLineages,
+  selectedLocation,
   setSelectedLineages,
+  setSelectedLocation,
   startDate,
   endDate,
   setStartDate,
@@ -366,6 +374,25 @@ export function SampleFiltering({
             data-test-id="collection-date"
           />
         </StyledFilterGroup>
+        {isTreeLocationFilterFlagOn && (
+          <StyledFilterGroup>
+            <StyledFilterGroupName>Location</StyledFilterGroupName>
+            <CollectionDateFilter
+              fieldKeyEnd="collectionDateEnd"
+              fieldKeyStart="collectionDateStart"
+              updateDateFilter={noop}
+              menuOptions={[
+                ...MENU_OPTIONS_COLLECTION_DATE,
+                MENU_OPTION_ALL_TIME,
+              ]}
+              startDate={startDate}
+              endDate={endDate}
+              setStartDate={setStartDate}
+              setEndDate={setEndDate}
+              data-test-id="collection-date"
+            />
+          </StyledFilterGroup>
+        )}
       </StyledFiltersSection>
     </StyledContainer>
   );
