@@ -7,13 +7,14 @@ import {
   fontBodyXxxs,
   fontHeaderM,
   getColors,
+  getPalette,
   getSpaces,
   Tooltip,
 } from "czifui";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import NextstrainLogoImg from "src/common/images/nextstrain-inline.svg";
-import { transparentScrollbars } from "src/common/styles/basicStyle";
+import { P, transparentScrollbars } from "src/common/styles/basicStyle";
 import { iconFillGrayHoverPrimary } from "src/common/styles/iconStyle";
 import Dialog from "src/components/Dialog";
 
@@ -145,6 +146,17 @@ export const TreeTypeSection = styled.div`
     const spaces = getSpaces(props);
     return `
       margin-top: ${spaces?.s}px;
+    `;
+  }}
+`;
+
+export const TreeTypeSubtext = styled(P)`
+  ${(props: CommonThemeProps) => {
+    const palette = getPalette(props);
+    const spaces = getSpaces(props);
+    return `
+      color: ${palette?.common?.black};
+      margin: 0 0 ${spaces?.s}px;
     `;
   }}
 `;
