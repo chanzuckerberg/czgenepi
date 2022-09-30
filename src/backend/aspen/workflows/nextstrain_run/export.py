@@ -2,7 +2,7 @@ import csv
 import io
 import json
 import re
-from typing import Any, Iterable, List, Mapping, MutableMapping, Optional, Set
+from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional, Set
 
 import click
 from sqlalchemy.orm import aliased, joinedload, with_polymorphic
@@ -13,6 +13,7 @@ from aspen.database.connection import (
     init_db,
     session_scope,
     SqlAlchemyInterface,
+    Session,
 )
 from aspen.database.models import (
     Accession,
@@ -20,6 +21,7 @@ from aspen.database.models import (
     AlignedGisaidDump,
     Entity,
     Group,
+    Location,
     PathogenGenome,
     PhyloRun,
     Sample,
@@ -173,11 +175,15 @@ def export_run_config(
             "num_sequences": num_sequences,
             "num_included_samples": num_included_samples,
         }
+
+        # Some template args need to be resolved before ready to use.
+        resolved_template_args = resolve_template_args(session, phylo_run.template_args, group)
+
         builder: TemplateBuilder = TemplateBuilder(
             phylo_run.tree_type,
             phylo_run.pathogen,
             group,
-            phylo_run.template_args,
+            resolved_template_args,
             **context,
         )
         builder.write_file(builds_file_fh)
@@ -226,6 +232,32 @@ def get_phylo_run(session, phylo_run_id):
         .one()
     )
     return phylo_run
+
+
+def resolve_template_args(session: Session, template_args: Dict[str, Any], group: Group) -> Dict[str, Any]:
+    """Takes raw template_args and interprets them so ready for downstream use.
+
+    Some of the raw args from upstream (eg, `location_id`) need to resolved
+    into something usable downstream. There's no definite line between args
+    that can stay "raw" and those that need to be interpreted. Generally, it's
+    if it needs (A) to involve database usage or (B) to make a clearer version
+    of the arg for eventual display to user (eg, in the trees table).
+    """
+    # We do not pass thru any template_args that get special interpretation
+    NON_PASSTHRU_ARGS = ["location_id"]
+
+    # Handle location. If custom set, use that, otherwise use group's default.
+    resolved_location = group.default_tree_location
+    custom_location_id = template_args.get("location_id")
+    if custom_location_id:
+        resolved_location = session.query(Location).filter(
+            Location.id == custom_location_id).one()
+
+    # Avoid mutating original template_args; resolved args handled special.
+    resolved_template_args = {key: template_args[key] for key in template_args
+        if key not in NON_PASSTHRU_ARGS}
+    resolved_template_args["location"] = resolved_location
+    return resolved_template_args
 
 
 def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
