@@ -162,6 +162,7 @@ jobs:
           make local-init
           echo "Init complete - testing web service"
           docker-compose exec -T frontend wget -qO- -T 10 --timeout 20 --tries 60 frontend.genepinet.localdev:8000/
+          docker-compose exec -T oidc wget -qO- -T 10 --timeout 20 --tries 60 oidc.genepinet.localdev:8443/
           echo "Webserver up, running tests!"
           docker-compose logs -f frontend &
           export S3_PREFIX=${{ secrets.CI_SCREENSHOT_PREFIX }}/${{ github.run_id }}/
