@@ -1,5 +1,8 @@
 import { BasePage } from "../pages/basePage";
 
+// until we have reliable data-test-id, we will use
+// these to select date options
+// NOTE: They llok weired but this how PL sees these options
 const applyCollectionDateSelector =
   "​to​ApplyLast 7 DaysLast 30 DaysLast 3 MonthsLast 6 MonthsLast Year";
 const applyUploadDateSelector = "to​ApplyTodayYesterdayLast 7 Days";
@@ -69,7 +72,7 @@ export async function applyFilter(
   if (filterData.collectionDatePeriod !== undefined) {
     await base.clickByTypeAndLabel("button", "Collection Date");
     await (await base.findByText(`${filterData.collectionDatePeriod}`))
-      .nth(1)
+      .nth(0)
       .click();
   }
   // select lineage(s)
