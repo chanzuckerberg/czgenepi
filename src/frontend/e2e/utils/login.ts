@@ -33,7 +33,8 @@ export async function login(
   await Promise.all([
     page.waitForNavigation(),
     await page.goto(`${process.env.BASEURL}`),
-    await page.locator(getByTestID("navbar-sign-in-link")).click(),
+    await page.locator("text=Sign in").nth(0).click(),
+    //await page.locator(getByTestID("navbar-sign-in-link")).click(),
     await page.locator(getByID(usernameInputSelector)).fill(username),
     await page.locator(getByID(passwordInputSelector)).fill(password),
     page.locator(`button[type=submit] >> "${buttonText}"`).click(),
