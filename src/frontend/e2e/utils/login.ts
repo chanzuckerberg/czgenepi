@@ -36,6 +36,7 @@ export async function login(
     await page
       .locator(getByTestID("navbar-sign-in-link"))
       .click({ force: true }),
+    console.log(page.url),
     await page.locator(getByID(usernameInputSelector)).fill(username),
     await page.locator(getByID(passwordInputSelector)).fill(password),
     page.locator(`button[type=submit] >> "${buttonText}"`).click(),
