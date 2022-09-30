@@ -11,9 +11,9 @@ from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
     init_db,
+    Session,
     session_scope,
     SqlAlchemyInterface,
-    Session,
 )
 from aspen.database.models import (
     Accession,
@@ -177,7 +177,9 @@ def export_run_config(
         }
 
         # Some template args need to be resolved before ready to use.
-        resolved_template_args = resolve_template_args(session, phylo_run.template_args, group)
+        resolved_template_args = resolve_template_args(
+            session, phylo_run.template_args, group
+        )
 
         builder: TemplateBuilder = TemplateBuilder(
             phylo_run.tree_type,
@@ -234,7 +236,9 @@ def get_phylo_run(session, phylo_run_id):
     return phylo_run
 
 
-def resolve_template_args(session: Session, template_args: Dict[str, Any], group: Group) -> Dict[str, Any]:
+def resolve_template_args(
+    session: Session, template_args: Dict[str, Any], group: Group
+) -> Dict[str, Any]:
     """Takes raw template_args and interprets them so ready for downstream use.
 
     Some of the raw args from upstream (eg, `location_id`) need to resolved
@@ -250,12 +254,14 @@ def resolve_template_args(session: Session, template_args: Dict[str, Any], group
     resolved_location = group.default_tree_location
     custom_location_id = template_args.get("location_id")
     if custom_location_id:
-        resolved_location = session.query(Location).filter(
-            Location.id == custom_location_id).one()
+        resolved_location = (
+            session.query(Location).filter(Location.id == custom_location_id).one()
+        )
 
     # Avoid mutating original template_args; resolved args handled special.
-    resolved_template_args = {key: template_args[key] for key in template_args
-        if key not in NON_PASSTHRU_ARGS}
+    resolved_template_args = {
+        key: template_args[key] for key in template_args if key not in NON_PASSTHRU_ARGS
+    }
     resolved_template_args["location"] = resolved_location
     return resolved_template_args
 
