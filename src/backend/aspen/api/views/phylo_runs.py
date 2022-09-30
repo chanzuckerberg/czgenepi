@@ -30,6 +30,7 @@ from aspen.api.utils import (
 from aspen.database.models import (
     AlignedGisaidDump,
     Group,
+    Location,
     Pathogen,
     PathogenGenome,
     PhyloRun,
@@ -131,7 +132,13 @@ async def kick_off_phylo_run(
                 value = value.strftime("%Y-%m-%d")
             if key == "filter_pango_lineages":
                 value = await expand_lineage_wildcards(db, value)
+            if key == "location_id":
+                # Verify it's a real location before starting workflow with it
+                location = await Location.get_by_id(db, value)
+                if location is None:
+                    raise ex.BadRequestException(f"location_id {value} not found")
             template_args[key] = value
+
     workflow: PhyloRun = PhyloRun(
         start_datetime=start_datetime,
         workflow_status=WorkflowStatusType.STARTED,
