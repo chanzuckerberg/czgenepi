@@ -9,8 +9,16 @@ import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { StyledTooltip } from "../../style";
 import { SampleFilteringTooltip } from "../SampleFilteringTooltip";
-import { CollectionDateFilter } from "./components/CollectionDateFilter";
-import { LineageFilter } from "./components/LineageFilter";
+import {
+  CollectionDateFilter,
+  EndDateFilterType,
+  StartDateFilterType,
+} from "./components/CollectionDateFilter";
+import { LineageFilter, LineageFilterType } from "./components/LineageFilter";
+import {
+  LocationFilter,
+  LocationFilterType,
+} from "./components/LocationFilter";
 import {
   StyledContainer,
   StyledExplainerTitle,
@@ -21,18 +29,11 @@ import {
   StyledNewTabLink,
 } from "./style";
 
-interface Props {
-  availableLineages: string[];
-  availableLocations: NamedGisaidLocation[];
-  selectedLineages: string[];
-  selectedLocation: NamedGisaidLocation;
-  setSelectedLineages: (lineages: string[]) => void;
-  setSelectedLocation: (location: NamedGisaidLocation) => void;
-  startDate: FormattedDateType;
-  endDate: FormattedDateType;
-  setStartDate(d: FormattedDateType): void;
-  setEndDate(d: FormattedDateType): void;
-}
+interface Props
+  extends StartDateFilterType,
+    EndDateFilterType,
+    LineageFilterType,
+    LocationFilterType {}
 
 const SAMPLE_FILTERING_TOOLTIP_TEXT = (
   <div>
@@ -117,10 +118,11 @@ export function SampleFiltering({
           />
         </StyledFilterGroup>
         {isTreeLocationFilterFlagOn && (
-          <StyledFilterGroup>
-            <StyledFilterGroupName>Location</StyledFilterGroupName>
-            <div>TODO - Locatin Filter</div>
-          </StyledFilterGroup>
+          <LocationFilter
+            availableLocations={availableLocations}
+            selectedLocation={selectedLocation}
+            setSelectedLocation={setSelectedLocation}
+          />
         )}
       </StyledFiltersSection>
     </StyledContainer>
