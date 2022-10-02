@@ -21,7 +21,6 @@ const api = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2
 const mockData = JSON.parse(
   fs.readFileSync("e2e/fixtures/sampleList.json") as unknown as string
 );
-let url: string;
 
 test.describe("Samples page tests", () => {
   test("Should verify sample list headers", async ({ page }, workerInfo) => {
