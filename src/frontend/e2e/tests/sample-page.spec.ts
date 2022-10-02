@@ -60,7 +60,9 @@ test.describe("Samples page tests", () => {
     await acceptSiteCookieTerms(page);
 
     //wait for UI to render; give it ample time in local/ci
-    await page.waitForSelector(`[data-test-id="row-publicId"]`);
+    await page.waitForSelector(`[data-test-id="row-publicId"]`, {
+      timeout: 300000,
+    });
 
     const base = new BasePage(page);
 

@@ -23,7 +23,7 @@ const config: PlaywrightTestConfig = {
   ],
   reporter: process.env.CI ? "github" : "list",
   testDir: "../tests",
-  timeout: 120000,
+  timeout: 90000,
   use: {
     actionTimeout: 0,
     baseURL: "http://frontend.genepinet.localdev:8000",

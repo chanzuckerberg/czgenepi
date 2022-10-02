@@ -18,12 +18,14 @@ test.describe("Home page tests", () => {
   test.use({ storageState: undefined });
 
   // fails in CI; to be fixed in a separate PR
-  test.skip("Should verify home page", async ({ page }, workerInfo) => {
+  test("Should verify home page", async ({ page }, workerInfo) => {
     const { baseURL } = workerInfo.config.projects[0].use;
     await page.goto(`${baseURL}` as string);
 
     //wait until page content id displayed; in local this takes long time
-    await page.waitForSelector(`text=No-code phylogenetic analysis`);
+    await page.waitForSelector(`text=No-code phylogenetic analysis`, {
+      timeout: 300000,
+    });
 
     // verify navigation menu
     await expect(page.locator(getByTestID("navbar-landing"))).toBeVisible();

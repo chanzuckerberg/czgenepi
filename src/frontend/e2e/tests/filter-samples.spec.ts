@@ -185,7 +185,7 @@ test.describe("Sample filtering tests", () => {
   });
 
   // fails in CI, there is also a defect. will skip until sorted
-  test.skip("Should filter by upload date from", async ({ page }) => {
+  test("Should filter by upload date from", async ({ page }) => {
     const base = new BasePage(page);
     const filterBy = {
       uploadDateFrom: fromDate,
@@ -223,7 +223,7 @@ test.describe("Sample filtering tests", () => {
   });
 
   // fails in CI, there is also a defect. will skip until sorted
-  test.skip("Should filter by from and to upload dates", async ({ page }) => {
+  test("Should filter by from and to upload dates", async ({ page }) => {
     const base = new BasePage(page);
     const filterBy = {
       uploadDateFrom: fromDate,
@@ -425,7 +425,9 @@ async function interceptRequestAndStubResponse(
   await page.goto(url, { waitUntil: "networkidle" });
 
   //wait for UI to render
-  await page.waitForSelector(`[data-test-id="row-publicId"]`);
+  await page.waitForSelector(`[data-test-id="row-publicId"]`, {
+    timeout: 300000,
+  });
 
   // assert table is populated with at least one record
   expect(await page.locator(getByTestID("table-row")).count()).toBeGreaterThan(
