@@ -36,7 +36,10 @@ test.describe("Samples page tests", () => {
     });
   });
 
-  test("Should verify sample data", async ({ page, context }, workerInfo) => {
+  test.only("Should verify sample data", async ({
+    page,
+    context,
+  }, workerInfo) => {
     const { baseURL } = workerInfo.config.projects[0].use;
     const url = `${baseURL}/data/samples/groupId/${process.env.GROUPID}/pathogen/SC2`;
 
@@ -60,8 +63,8 @@ test.describe("Samples page tests", () => {
 
     await acceptSiteCookieTerms(page);
 
-    // UI takes time to load, wait until first record is displayed
-    await await page.waitForSelector(`text=${sample.public_identifier}`);
+    //wait for UI to render
+    await page.waitForSelector(`[data-test-id="row-publicId"]`);
 
     // assert table is populated with at least one record
     expect(await page.locator(getByTestID("table-row")).count()).toBe(1);

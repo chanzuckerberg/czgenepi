@@ -9,11 +9,6 @@ export class BasePage {
 
   async goto(url: string, option?: any) {
     this.page.goto(url, option);
-    if (option !== undefined) {
-      this.page.goto(url, option);
-    } else {
-      this.page.goto(url);
-    }
   }
   /**
    * Convenience method to press the enter key
