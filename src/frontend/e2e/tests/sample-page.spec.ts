@@ -22,13 +22,11 @@ const mockData = JSON.parse(
   fs.readFileSync("e2e/fixtures/sampleList.json") as unknown as string
 );
 let url: string;
-test.describe("Samples page tests", () => {
-  test.beforeAll(async ({}, workerInfo) => {
-    const { baseURL } = workerInfo.config.projects[0].use;
-    url = `${baseURL}/data/samples/groupId/${process.env.GROUPID}/pathogen/SC2`;
-  });
 
-  test("Should verify sample list headers", async ({ page }) => {
+test.describe("Samples page tests", () => {
+  test("Should verify sample list headers", async ({ page }, workerInfo) => {
+    const { baseURL } = workerInfo.config.projects[0].use;
+    const url = `${baseURL}/data/samples/groupId/${process.env.GROUPID}/pathogen/SC2`;
     // make the actual call, wait until all responses have been received
     await page.goto(url, { waitUntil: "networkidle" });
     await acceptSiteCookieTerms(page);
@@ -39,7 +37,10 @@ test.describe("Samples page tests", () => {
     });
   });
 
-  test("Should verify sample data", async ({ page, context }) => {
+  test("Should verify sample data", async ({ page, context }, workerInfo) => {
+    const { baseURL } = workerInfo.config.projects[0].use;
+    const url = `${baseURL}/data/samples/groupId/${process.env.GROUPID}/pathogen/SC2`;
+
     // get the first record so for validating attributes rendered on UI
     const sample = mockData.samples[0];
 

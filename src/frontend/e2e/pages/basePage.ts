@@ -8,11 +8,7 @@ export class BasePage {
   constructor(public readonly page: Page) {}
 
   async goto(url: string, option?: any) {
-    if (option !== undefined) {
-      this.page.goto(url, option);
-    } else {
-      this.page.goto(url);
-    }
+    this.page.goto(url, option);
   }
   /**
    * Convenience method to press the enter key

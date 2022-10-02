@@ -2,7 +2,7 @@ import { BasePage } from "../pages/basePage";
 
 // until we have reliable data-test-id, we will use
 // these to select date options
-// NOTE: They llok weired but this how PL sees these options
+// NOTE: They look weired but this is how PL sees these options
 const applyCollectionDateSelector =
   "​to​ApplyLast 7 DaysLast 30 DaysLast 3 MonthsLast 6 MonthsLast Year";
 const applyUploadDateSelector = "to​ApplyTodayYesterdayLast 7 Days";
@@ -11,10 +11,7 @@ export async function applyFilter(
   base: BasePage,
   filterData: Partial<FilterData>
 ): Promise<void> {
-  if (
-    filterData.uploadDateFrom !== undefined ||
-    filterData.uploadDateTo !== undefined
-  ) {
+  if (filterData.uploadDateFrom || filterData.uploadDateTo) {
     await base.clickByTypeAndLabel("button", "Upload Date");
     if (filterData.uploadDateFrom !== undefined) {
       await base.fillByTypeAndName(
@@ -23,7 +20,7 @@ export async function applyFilter(
         filterData.uploadDateFrom
       );
     }
-    if (filterData.uploadDateTo !== undefined) {
+    if (filterData.uploadDateTo) {
       await base.fillByTypeAndName(
         "input",
         "uploadDateEnd",
@@ -35,17 +32,14 @@ export async function applyFilter(
     );
   }
   // select upload date period
-  if (filterData.uploadDatePeriod !== undefined) {
+  if (filterData.uploadDatePeriod) {
     await base.clickByTypeAndLabel("button", "Upload Date");
     await (await base.findByText(`${filterData.uploadDatePeriod}`))
       .nth(0)
       .click();
   }
   // fill in collection date(s)
-  if (
-    filterData.collectionDateFrom !== undefined ||
-    filterData.collectionDateTo !== undefined
-  ) {
+  if (filterData.collectionDateFrom || filterData.collectionDateTo) {
     await (await base.findByTypeAndLabel("button", "Collection Date")).click();
     if (filterData.collectionDateFrom !== undefined) {
       await base.fillByTypeAndName(
@@ -54,7 +48,7 @@ export async function applyFilter(
         filterData.collectionDateFrom
       );
     }
-    if (filterData.collectionDateTo !== undefined) {
+    if (filterData.collectionDateTo) {
       await base.fillByTypeAndName(
         "input",
         "collectionDateEnd",
@@ -69,14 +63,14 @@ export async function applyFilter(
     await base.pressEsc();
   }
   // select collection date period
-  if (filterData.collectionDatePeriod !== undefined) {
+  if (filterData.collectionDatePeriod) {
     await base.clickByTypeAndLabel("button", "Collection Date");
     await (await base.findByText(`${filterData.collectionDatePeriod}`))
       .nth(0)
       .click();
   }
   // select lineage(s)
-  if (filterData.lineage !== undefined) {
+  if (filterData.lineage) {
     await base.clickElement('button:has-text("Lineage")');
     for (const singleLineage of filterData.lineage) {
       await (await base.findByPlaceHolder("Search")).nth(1).fill(singleLineage);
@@ -86,7 +80,7 @@ export async function applyFilter(
     await base.pressEsc();
   }
   // select status
-  if (filterData.status !== undefined) {
+  if (filterData.status) {
     await base.clickElement('button:has-text("Genome Recovery")');
     await base.clickElement(`ul[role="listbox"] >> text=${filterData.status}`);
     //dismiss form

@@ -54,6 +54,7 @@ test.describe("Sample filtering tests", () => {
     await interceptRequestAndStubResponse(page, context);
   });
 
+  // This test currently fails and needs fixing; it is not clear why the element is not found
   test.skip("Should filter samples by status", async ({ page }) => {
     const base = new BasePage(page);
     // filter for complete status
@@ -83,7 +84,7 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test.only("Should filter samples by lineage", async ({ page }) => {
+  test("Should filter samples by lineage", async ({ page }) => {
     const base = new BasePage(page);
     // define filtering criteria
     const filterBy = {
