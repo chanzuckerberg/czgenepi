@@ -42,18 +42,19 @@ const mockData = {
 test.describe("Sample filtering tests", () => {
   test.beforeEach(async ({ page, context }, workerInfo) => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
-    url = `${baseUrl}/data/samples`;
+    url = `${baseUrl}/data/samples/groupId/${process.env.GROUPID}/pathogen/SC2`;
     await page.goto(url);
     //accept cookie t&c (if prompted)
     const acceptCookieSelector =
       '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
-    await page.locator(acceptCookieSelector).click();
-
+    if (await page.isVisible(acceptCookieSelector)) {
+      await page.locator(acceptCookieSelector).click();
+    }
     //intercept request and stub response
     await interceptRequestAndStubResponse(page, context);
   });
 
-  test("Should filter samples by status", async ({ page }) => {
+  test.skip("Should filter samples by status", async ({ page }) => {
     const base = new BasePage(page);
     // filter for complete status
     let filterBy = {
@@ -82,7 +83,7 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter samples by lineage", async ({ page }) => {
+  test.only("Should filter samples by lineage", async ({ page }) => {
     const base = new BasePage(page);
     // define filtering criteria
     const filterBy = {
@@ -407,23 +408,21 @@ async function interceptRequestAndStubResponse(
   context: BrowserContext
 ) {
   //create an intercept to stub response with mock data once we get response with status 200
-  await context.route(
-    api,
-    async (route: {
-      fulfill: (arg0: { response: any; body: string }) => void;
-    }) => {
-      const response = await context.request.get(api);
-      //check we get response 200, but we could also abort the call (route.abort() : route.continue();)
-      expect(response.ok()).toBeTruthy();
-      //retain original response but replace body part with stubbed data we created
-      route.fulfill({
-        response,
-        body: JSON.stringify(mockData),
-      });
-    }
-  );
+  await context.route(api, async (route) => {
+    const response = await context.request.get(api);
+    //check we get response 200, but we could also abort the call (route.abort() : route.continue();)
+    expect(response.ok()).toBeTruthy();
+    //retain original response but replace body part with stubbed data we created
+    route.fulfill({
+      response,
+      body: JSON.stringify(mockData),
+    });
+  });
   // make the actual call, wait until all responses have been received
   await page.goto(url, { waitUntil: "networkidle" });
+
+  //wait for UI to render
+  await page.waitForSelector(`[data-test-id="row-publicId"]`);
 
   // assert table is populated with at least one record
   expect(await page.locator(getByTestID("table-row")).count()).toBeGreaterThan(

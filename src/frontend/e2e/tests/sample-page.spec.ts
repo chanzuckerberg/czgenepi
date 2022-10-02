@@ -25,10 +25,10 @@ let url: string;
 test.describe("Samples page tests", () => {
   test.beforeAll(async ({}, workerInfo) => {
     const { baseURL } = workerInfo.config.projects[0].use;
-    url = `${baseURL}/data/samples/groupId/74/pathogen/SC2`;
+    url = `${baseURL}/data/samples/groupId/${process.env.GROUPID}/pathogen/SC2`;
   });
 
-  test.only("Should verify sample list headers", async ({ page }) => {
+  test("Should verify sample list headers", async ({ page }) => {
     // make the actual call, wait until all responses have been received
     await page.goto(url, { waitUntil: "networkidle" });
     await acceptSiteCookieTerms(page);
@@ -39,27 +39,21 @@ test.describe("Samples page tests", () => {
     });
   });
 
-  test.only("Should verify sample data", async ({ page, context }) => {
-    // get the first record so
-    //for validating attributes rendered on UI
+  test("Should verify sample data", async ({ page, context }) => {
+    // get the first record so for validating attributes rendered on UI
     const sample = mockData.samples[0];
 
     //create an intercept to stub response with mock data once we get response with status 200
-    await context.route(
-      api,
-      async (route: {
-        fulfill: (arg0: { response: any; body: any }) => void;
-      }) => {
-        const response = await context.request.get(api);
-        //check we get response 200, but we could also abort the call (route.abort() : route.continue();)
-        expect(response.ok()).toBeTruthy();
-        //retain original response but replace body part with stubbed data we created
-        route.fulfill({
-          response,
-          body: JSON.stringify(mockData),
-        });
-      }
-    );
+    await context.route(api, async (route) => {
+      const response = await context.request.get(api);
+      //check we get response 200, but we could also abort the call (route.abort() : route.continue();)
+      expect(response.ok()).toBeTruthy();
+      //retain original response but replace body part with stubbed data we created
+      route.fulfill({
+        response,
+        body: JSON.stringify(mockData),
+      });
+    });
 
     // make the actual call, wait until all responses have been received
     await page.goto(url, { waitUntil: "networkidle" });
@@ -67,9 +61,7 @@ test.describe("Samples page tests", () => {
     await acceptSiteCookieTerms(page);
 
     // UI takes time to load, wait until first record is displayed
-    await page.waitForSelector(`text=${sample.public_identifier}`, {
-      timeout: 300000,
-    });
+    await await page.waitForSelector(`text=${sample.public_identifier}`);
 
     // assert table is populated with at least one record
     expect(await page.locator(getByTestID("table-row")).count()).toBe(1);
