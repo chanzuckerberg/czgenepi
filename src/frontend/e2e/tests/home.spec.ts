@@ -22,9 +22,7 @@ test.describe("Home page tests", () => {
     await page.goto(`${baseURL}` as string);
 
     //wait until page content id displayed; in local this takes long time
-    await page.waitForSelector(`text=No-code phylogenetic analysis`, {
-      timeout: 300000,
-    });
+    await page.waitForSelector(`text=No-code phylogenetic analysis`);
 
     // verify navigation menu
     await expect(page.locator(getByTestID("navbar-landing"))).toBeVisible();

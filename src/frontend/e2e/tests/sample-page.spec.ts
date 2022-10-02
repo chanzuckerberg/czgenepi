@@ -60,14 +60,9 @@ test.describe("Samples page tests", () => {
     await acceptSiteCookieTerms(page);
 
     //wait for UI to render; give it ample time in local/ci
-    await page.waitForSelector(`[data-test-id="row-publicId"]`, {
-      timeout: 300000,
-    });
+    await page.waitForSelector(`[data-test-id="row-publicId"]`);
 
     const base = new BasePage(page);
-
-    const sampleRows = base.findByTestId("table-row");
-    expect(await (await sampleRows).count()).toBe(1);
 
     /**
      * This test currently failing and not sure status is coming null
