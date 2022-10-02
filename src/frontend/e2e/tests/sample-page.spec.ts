@@ -36,10 +36,7 @@ test.describe("Samples page tests", () => {
     });
   });
 
-  test.only("Should verify sample data", async ({
-    page,
-    context,
-  }, workerInfo) => {
+  test("Should verify sample data", async ({ page, context }, workerInfo) => {
     const { baseURL } = workerInfo.config.projects[0].use;
     const url = `${baseURL}/data/samples/groupId/${process.env.GROUPID}/pathogen/SC2`;
 
