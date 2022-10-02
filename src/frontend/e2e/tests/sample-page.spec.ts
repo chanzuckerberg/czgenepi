@@ -3,7 +3,6 @@ import path from "path";
 import dotenv from "dotenv";
 import fs from "fs";
 import { BasePage } from "../pages/basePage";
-import { getByTestID } from "../utils/selectors";
 
 dotenv.config({ path: path.resolve(`.env.${process.env.NODE_ENV}`) });
 
@@ -60,17 +59,20 @@ test.describe("Samples page tests", () => {
 
     await acceptSiteCookieTerms(page);
 
-    //wait for UI to render
-    await page.waitForSelector(`[data-test-id="row-publicId"]`);
-
-    // assert table is populated with at least one record
-    expect(await page.locator(getByTestID("table-row")).count()).toBe(1);
+    //wait for UI to render; give it ample time in local/ci
+    await page.waitForSelector(`[data-test-id="row-publicId"]`, {
+      timeout: 300000,
+    });
 
     const base = new BasePage(page);
 
     const sampleRows = base.findByTestId("table-row");
     expect(await (await sampleRows).count()).toBe(1);
 
+    /**
+     * This test currently failing and not sure status is coming null
+     * commenting out until I investigate this in detail
+     */
     // verify status
     //const status = sample.czb_failed_genome_recovery ? "failed" : "complete";
     //expect(await base.findByTestId("sample-status")).toHaveText(status);

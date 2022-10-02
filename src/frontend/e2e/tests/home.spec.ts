@@ -14,16 +14,28 @@ const footer: Record<string, string> = {
 };
 
 test.describe("Home page tests", () => {
-  //don't use global login otherwise you won't see home page but samples page
+  //reset storagestate; otherwise you won't see home page but samples page
   test.use({ storageState: undefined });
+
   test("Should verify home page", async ({ page }, workerInfo) => {
     const { baseURL } = workerInfo.config.projects[0].use;
     await page.goto(`${baseURL}` as string);
+
+    //wait until page content id displayed; in local this takes long time
+    await page.waitForSelector(`text=No-code phylogenetic analysis`, {
+      timeout: 300000,
+    });
+
+    // verify navigation menu
     await expect(page.locator(getByTestID("navbar-landing"))).toBeVisible();
     await expect(
       page.locator(getByTestID("navbar-sign-in-link"))
     ).toBeVisible();
+
+    // verify logo
     await expect(page.locator(getByTestID("logo"))).toBeVisible();
+
+    // verify footer links
     Object.keys(footer).forEach(async (key) => {
       await expect(
         await page.locator(`a:has-text("${key}")`).first()
