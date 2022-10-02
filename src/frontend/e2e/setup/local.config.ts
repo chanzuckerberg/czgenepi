@@ -4,12 +4,12 @@ import dotenv from "dotenv";
 import path from "path";
 
 dotenv.config({
-  path: path.resolve(__dirname, "../../", ".env.local"),
+  path: path.resolve(__dirname, "../../", ".env.development"),
 });
 
 const config: PlaywrightTestConfig = {
   expect: {
-    timeout: 30000,
+    timeout: 300000,
   },
   globalSetup: "./global-setup",
   outputDir: "../report",
@@ -30,7 +30,7 @@ const config: PlaywrightTestConfig = {
     headless: true,
     ignoreHTTPSErrors: true,
     screenshot: "only-on-failure",
-    storageState: "/tmp/state.json",
+    storageState: "e2e/storage/state.json",
     trace: "on-first-retry",
   },
 };

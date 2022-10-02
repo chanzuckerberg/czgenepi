@@ -25,11 +25,14 @@ let url: string;
 test.describe("Samples page tests", () => {
   test.beforeAll(async ({}, workerInfo) => {
     const { baseURL } = workerInfo.config.projects[0].use;
-    url = `${baseURL}/data/samples`;
+    url = `${baseURL}/data/samples/groupId/74/pathogen/SC2`;
   });
 
-  test("Should verify sample list headers", async ({ page }) => {
-    await displaySamplePage(page);
+  test.only("Should verify sample list headers", async ({ page }) => {
+    // make the actual call, wait until all responses have been received
+    await page.goto(url, { waitUntil: "networkidle" });
+    await acceptSiteCookieTerms(page);
+    await page.waitForSelector(`text=Phylogenetic Trees`, { timeout: 300000 });
     const base = new BasePage(page);
     tableHeaders.forEach(async (header) => {
       expect((await base.findByText(header)).first()).not.toBeEmpty();
@@ -37,8 +40,6 @@ test.describe("Samples page tests", () => {
   });
 
   test.only("Should verify sample data", async ({ page, context }) => {
-    await displaySamplePage(page);
-
     // get the first record so
     //for validating attributes rendered on UI
     const sample = mockData.samples[0];
@@ -47,7 +48,7 @@ test.describe("Samples page tests", () => {
     await context.route(
       api,
       async (route: {
-        fulfill: (arg0: { response: any; body: string }) => void;
+        fulfill: (arg0: { response: any; body: any }) => void;
       }) => {
         const response = await context.request.get(api);
         //check we get response 200, but we could also abort the call (route.abort() : route.continue();)
@@ -62,6 +63,13 @@ test.describe("Samples page tests", () => {
 
     // make the actual call, wait until all responses have been received
     await page.goto(url, { waitUntil: "networkidle" });
+
+    await acceptSiteCookieTerms(page);
+
+    // UI takes time to load, wait until first record is displayed
+    await page.waitForSelector(`text=${sample.public_identifier}`, {
+      timeout: 300000,
+    });
 
     // assert table is populated with at least one record
     expect(await page.locator(getByTestID("table-row")).count()).toBe(1);
@@ -104,10 +112,12 @@ test.describe("Samples page tests", () => {
  * and accepts  site cookies
  * @param page
  */
-async function displaySamplePage(page: Page): Promise<void> {
+async function acceptSiteCookieTerms(page: Page): Promise<void> {
   const acceptCookieSelector =
     '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
-  await page.goto(url);
-  //accept cookie t&c (if prompted)
-  await page.locator(acceptCookieSelector).click();
+  //accept cookie terms and conditions (if displayed)
+  if (await page.isVisible(acceptCookieSelector)) {
+    await page.locator(acceptCookieSelector).click();
+  }
+  await page.waitForSelector("text=Phylogenetic Trees", { timeout: 300000 });
 }
