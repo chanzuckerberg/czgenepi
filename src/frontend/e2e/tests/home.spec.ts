@@ -14,6 +14,8 @@ const footer: Record<string, string> = {
 };
 
 test.describe("Home page tests", () => {
+  //don't use global login otherwise you won't see home page but samples page
+  test.use({ storageState: undefined });
   test("Should verify home page", async ({ page }, workerInfo) => {
     const { baseURL } = workerInfo.config.projects[0].use;
     await page.goto(`${baseURL}` as string);
