@@ -14,7 +14,7 @@ const footer: Record<string, string> = {
 };
 
 test.describe("Home page tests", () => {
-  test.only("Should verify home page", async ({ page }) => {
+  test("Should verify home page", async ({ page }) => {
     await page.goto(`${process.env.BASEURL}`);
 
     // lets logout so we get to visit home page
