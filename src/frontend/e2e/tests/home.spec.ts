@@ -14,17 +14,14 @@ const footer: Record<string, string> = {
 };
 
 test.describe("Home page tests", () => {
-  test("Should verify home page", async ({ page }) => {
-    const base = new BasePage(page);
-    await base.goto(`${process.env.BASEURL}`);
+  test.only("Should verify home page", async ({ page }) => {
+    await page.goto(`${process.env.BASEURL}`);
 
     // lets logout so we get to visit home page
-    await base.clickByTestId("nav-user-menu");
+    await page.locator('[data-test-id="nav-user-menu"]').click();
+    await page.locator('text="Logout"').click();
 
-    //create element handle to prevent Logout link becoming detached
-    const logoutElement = await base.queryElement("text=Logout");
-    await logoutElement.click();
-
+    const base = new BasePage(page);
     //now go to home page
     await base.goto(`${process.env.BASEURL}`);
 
