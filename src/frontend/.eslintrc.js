@@ -47,7 +47,6 @@ module.exports = {
     "sort-keys": "off",
     "prettier/prettier": 0,
     "@typescript-eslint/no-var-requires": 0,
-    "no-empty-pattern": 0, //there is a need in Playwright to pass empty { }
   },
   settings: {
     react: {

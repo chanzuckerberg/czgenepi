@@ -55,7 +55,7 @@ export class BasePage {
    * Convenience method to click by data-test-id
    * @param value test ids added specifically for testing
    */
-  async clickByTesId(value: string) {
+  async clickByTestId(value: string) {
     await this.page.click(`[data-test-id="${value}"]`);
   }
 
@@ -141,6 +141,9 @@ export class BasePage {
     return this.page.waitForSelector(selector, { timeout: 300000 });
   }
 
+  async queryElement(selector: string) {
+    return this.page.$(selector);
+  }
   /**
    * Convenience method for this.page.keyboard.type.  Note that this requires
    * an already focused input to type into.  Normally via click or focus.

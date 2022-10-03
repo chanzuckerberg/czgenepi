@@ -19,8 +19,11 @@ test.describe("Home page tests", () => {
     await base.goto(`${process.env.BASEURL}`);
 
     // lets logout so we get to visit home page
-    await base.clickByTesId("nav-user-menu");
-    await base.clickByText("Logout");
+    await base.clickByTestId("nav-user-menu");
+
+    //create element handle to prevent Logout link becoming detached
+    const logoutElement = await base.queryElement("text=Logout");
+    await logoutElement.click();
 
     //now go to home page
     await base.goto(`${process.env.BASEURL}`);
