@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
-import { getByTestID } from "../utils/selectors";
 import path from "path";
 import dotenv from "dotenv";
+import { BasePage } from "../pages/basePage";
 
 dotenv.config({ path: path.resolve(`.env.${process.env.NODE_ENV}`) });
 
@@ -14,32 +14,31 @@ const footer: Record<string, string> = {
 };
 
 test.describe("Home page tests", () => {
-  //reset storagestate; otherwise you won't see home page but samples page
-  test.use({ storageState: undefined });
+  test("Should verify home page", async ({ page }) => {
+    const base = new BasePage(page);
+    await base.goto(`${process.env.BASEURL}`);
 
-  // fails in CI; to be fixed in a separate PR
-  test("Should verify home page", async ({ page }, workerInfo) => {
-    const { baseURL } = workerInfo.config.projects[0].use;
-    await page.goto(`${baseURL}` as string);
+    // lets logout so we get to visit home page
+    await base.clickByTesId("nav-user-menu");
+    await base.clickByText("Logout");
 
-    //wait until page content id displayed; in local this takes long time
-    await page.waitForSelector(`text=No-code phylogenetic analysis`, {
-      timeout: 300000,
-    });
+    //now go to home page
+    await base.goto(`${process.env.BASEURL}`);
+
+    await base.waitForSelector("text=No-code phylogenetic analysis");
 
     // verify navigation menu
-    await expect(page.locator(getByTestID("navbar-landing"))).toBeVisible();
-    await expect(
-      page.locator(getByTestID("navbar-sign-in-link"))
-    ).toBeVisible();
+    await expect(await base.findByTestId("navbar-landing")).toBeVisible();
+
+    await expect(await base.findByTestId("navbar-sign-in-link")).toBeVisible();
 
     // verify logo
-    await expect(page.locator(getByTestID("logo"))).toBeVisible();
+    await expect(await base.findByTestId("logo")).toBeVisible();
 
     // verify footer links
     Object.keys(footer).forEach(async (key) => {
       await expect(
-        await page.locator(`a:has-text("${key}")`).first()
+        await (await base.findLinkByText(key)).nth(0)
       ).toHaveAttribute("href", footer[key]);
     });
   });

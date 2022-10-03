@@ -244,7 +244,8 @@ test.describe("Sample filtering tests", () => {
     }
   });
 
-  test("Should filter by upload date periods", async ({ page }) => {
+  //defect: https://app.shortcut.com/genepi/story/216585/cannot-filter-samples-uploaded-by-today-period
+  test.skip("Should filter by upload date periods", async ({ page }) => {
     const base = new BasePage(page);
     //test all date options
     const periods = Object.keys(uploadDatePeriods);

@@ -119,6 +119,9 @@ export class BasePage {
   async findByText(text: string) {
     return this.page.locator(`text="${text}"`);
   }
+  async findLinkByText(text: string) {
+    return this.page.locator(`a:has-text("${text}")`);
+  }
   async findById(id: string) {
     return this.page.locator(`[id="${id}"]`);
   }
@@ -135,7 +138,7 @@ export class BasePage {
   }
 
   async waitForSelector(selector: string) {
-    return this.page.waitForSelector(selector, { timeout: 25000 });
+    return this.page.waitForSelector(selector, { timeout: 300000 });
   }
 
   /**
