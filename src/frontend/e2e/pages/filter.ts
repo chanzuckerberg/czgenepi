@@ -1,103 +1,90 @@
-import { Page } from "@playwright/test";
-export abstract class FilterSample {
-  public static async applyFilter(
-    page: Page,
-    filterData: Partial<FilterData>
-  ): Promise<void> {
-    // wait for sample page is ready to be handled
-    await page.waitForFunction(() => {
-      const samples = document.querySelector(
-        "a[href$='/data/samples'] > div > div:nth-child(2)"
-      )?.textContent;
-      return parseInt(samples!) > 0;
-    });
-    if (
-      filterData.uploadDateFrom !== undefined ||
-      filterData.uploadDateTo !== undefined
-    ) {
-      await page.locator("button[label='Upload Date']").click();
-      if (filterData.uploadDateFrom !== undefined) {
-        await page
-          .locator("input[name='uploadDateStart']")
-          .fill(filterData.uploadDateFrom);
-      }
-      if (filterData.uploadDateTo !== undefined) {
-        await page
-          .locator("input[name='uploadDateEnd']")
-          .fill(filterData.uploadDateTo);
-      }
-      await page
-        .locator(
-          "//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']"
-        )
-        .click();
-    }
-    // select upload date period
-    if (filterData.uploadDatePeriod !== undefined) {
-      await page.locator("button[label='Upload Date']").click();
-      await page
-        .locator("div:not([style*='hidden'])[class*='MuiPaper-elevation'] li")
-        .filter({ hasText: filterData.uploadDatePeriod })
-        .click();
-    }
-    // fill in collection date(s)
-    if (
-      filterData.collectionDateFrom !== undefined ||
-      filterData.collectionDateTo !== undefined
-    ) {
-      await page.locator("button[label='Collection Date']").click();
-      if (filterData.collectionDateFrom !== undefined) {
-        page
-          .locator("input[name='collectionDateStart']")
-          .fill(filterData.collectionDateFrom);
-      }
-      if (filterData.collectionDateTo !== undefined) {
-        await page
-          .locator("input[name='collectionDateEnd']")
-          .fill(filterData.collectionDateTo);
-      }
-      await page
-        .locator(
-          "//div[not(contains(@style,'visibility: hidden')) and contains(@class,'MuiPaper-root')]/descendant::button[text()='Apply']"
-        )
-        .click();
-    }
-    // select collection date period
-    if (filterData.collectionDatePeriod !== undefined) {
-      await page.locator("button[label='Collection Date']").click();
-      await page
-        .locator("div:not([style*='hidden'])[class*='MuiPaper-elevation'] li")
-        .filter({ hasText: filterData.collectionDatePeriod })
-        .click();
-    }
-    // select lineage
-    if (filterData.lineage !== undefined) {
-      await page.locator("button[label='Lineage']").click();
-      for (const singleLineage of filterData.lineage) {
-        await page.locator("div[role='tooltip'] input").fill(singleLineage);
-        await page
-          .locator("ul[role='listbox']  .primary-text > div", {
-            hasText: singleLineage,
-          })
-          .first()
-          .click();
-      }
-      await page.keyboard.press("Escape"); //dismiss form
-    }
-  }
+import { BasePage } from "../pages/basePage";
 
-  //convert days into date object based on current date
-  public static convertDaysToDate(value: number): Date {
-    const today = new Date();
-    const filterDate = new Date(today);
-    if (value <= 30) {
-      filterDate.setDate(filterDate.getDay() - value);
-    } else if (value > 30 && value <= 180) {
-      filterDate.setMonth(filterDate.getMonth() - value);
-    } else {
-      filterDate.setFullYear(filterDate.getFullYear() - value);
+// until we have reliable data-test-id, we will use
+// these to select date options
+// NOTE: They look weired but this is how PL sees these options
+const applyCollectionDateSelector =
+  "​to​ApplyLast 7 DaysLast 30 DaysLast 3 MonthsLast 6 MonthsLast Year";
+const applyUploadDateSelector = "to​ApplyTodayYesterdayLast 7 Days";
+
+export async function applyFilter(
+  base: BasePage,
+  filterData: Partial<FilterData>
+): Promise<void> {
+  if (filterData.uploadDateFrom || filterData.uploadDateTo) {
+    await base.clickByTypeAndLabel("button", "Upload Date");
+    if (filterData.uploadDateFrom !== undefined) {
+      await base.fillByTypeAndName(
+        "input",
+        "uploadDateStart",
+        filterData.uploadDateFrom
+      );
     }
-    return filterDate;
+    if (filterData.uploadDateTo) {
+      await base.fillByTypeAndName(
+        "input",
+        "uploadDateEnd",
+        filterData.uploadDateTo
+      );
+    }
+    await base.clickByText(
+      `${applyUploadDateSelector} >> [data-testid="button"]`
+    );
+  }
+  // select upload date period
+  if (filterData.uploadDatePeriod) {
+    await base.clickByTypeAndLabel("button", "Upload Date");
+    await (await base.findByText(`${filterData.uploadDatePeriod}`))
+      .nth(0)
+      .click();
+  }
+  // fill in collection date(s)
+  if (filterData.collectionDateFrom || filterData.collectionDateTo) {
+    await (await base.findByTypeAndLabel("button", "Collection Date")).click();
+    if (filterData.collectionDateFrom !== undefined) {
+      await base.fillByTypeAndName(
+        "input",
+        "collectionDateStart",
+        filterData.collectionDateFrom
+      );
+    }
+    if (filterData.collectionDateTo) {
+      await base.fillByTypeAndName(
+        "input",
+        "collectionDateEnd",
+        filterData.collectionDateTo
+      );
+    }
+    await base.clickByText(
+      `${applyCollectionDateSelector} >> [data-testid="button"]`
+    );
+
+    //dismiss form
+    await base.pressEsc();
+  }
+  // select collection date period
+  if (filterData.collectionDatePeriod) {
+    await base.clickByTypeAndLabel("button", "Collection Date");
+    await (await base.findByText(`${filterData.collectionDatePeriod}`))
+      .nth(0)
+      .click();
+  }
+  // select lineage(s)
+  if (filterData.lineage) {
+    await base.clickElement('button:has-text("Lineage")');
+    for (const singleLineage of filterData.lineage) {
+      await (await base.findByPlaceHolder("Search")).nth(1).fill(singleLineage);
+      await base.clickElement(`div[role="menuitem"] >> text=${singleLineage}`);
+    }
+    //dismiss form
+    await base.pressEsc();
+  }
+  // select status
+  if (filterData.status) {
+    await base.clickElement('button:has-text("Genome Recovery")');
+    await base.clickElement(`ul[role="listbox"] >> text=${filterData.status}`);
+    //dismiss form
+    await base.pressEsc();
   }
 }
 

@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
-import { getByTestID } from "../utils/selectors";
 import path from "path";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
+import { BasePage } from "../pages/basePage";
 
-dotenv.config({path: path.resolve(`.env.${process.env.NODE_ENV}`),});
+dotenv.config({ path: path.resolve(`.env.${process.env.NODE_ENV}`) });
 
 const footer: Record<string, string> = {
   Github: "https://github.com/chanzuckerberg/czgenepi/",
@@ -14,17 +14,27 @@ const footer: Record<string, string> = {
 };
 
 test.describe("Home page tests", () => {
-  test.only("Should verify home page", async ({ page }, workerInfo) => {
-    const { baseURL } = workerInfo.config.projects[0].use;
-    await page.goto(`${baseURL}` as string);
-    await expect(page.locator(getByTestID("navbar-landing"))).toBeVisible();
-    await expect(
-      page.locator(getByTestID("navbar-sign-in-link"))
-    ).toBeVisible();
-    await expect(page.locator(getByTestID("logo"))).toBeVisible();
+  // overwrite global login with empty storage so we can visit home page
+  test.use({ storageState: "e2e/storage/emptyStorageState.json" });
+  test("Should verify home page", async ({ page }) => {
+    const base = new BasePage(page);
+    //now go to home page
+    await base.goto(`${process.env.BASEURL}`);
+
+    await base.waitForSelector("text=No-code phylogenetic analysis");
+
+    // verify navigation menu
+    await expect(await base.findByTestId("navbar-landing")).toBeVisible();
+
+    await expect(await base.findByTestId("navbar-sign-in-link")).toBeVisible();
+
+    // verify logo
+    await expect(await base.findByTestId("logo")).toBeVisible();
+
+    // verify footer links
     Object.keys(footer).forEach(async (key) => {
       await expect(
-        await page.locator(`a:has-text("${key}")`).first()
+        await (await base.findLinkByText(key)).nth(0)
       ).toHaveAttribute("href", footer[key]);
     });
   });

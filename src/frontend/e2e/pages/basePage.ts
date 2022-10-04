@@ -4,9 +4,16 @@ import { Page } from "@playwright/test";
  * Base class with convenience wrappers for interactions
  * with page elements
  */
-export abstract class BasePage {
+export class BasePage {
   constructor(public readonly page: Page) {}
 
+  async goto(url: string, option?: any) {
+    if (option) {
+      this.page.goto(url, option);
+    } else {
+      this.page.goto(url);
+    }
+  }
   /**
    * Convenience method to press the enter key
    */
@@ -26,6 +33,10 @@ export abstract class BasePage {
    */
   async pressTab() {
     this.page.keyboard.press("Tab");
+  }
+
+  async clickElement(selector: string) {
+    await this.page.click(selector);
   }
 
   /**
@@ -48,7 +59,7 @@ export abstract class BasePage {
    * Convenience method to click by data-test-id
    * @param value test ids added specifically for testing
    */
-  async clickByTesId(value: string) {
+  async clickByTestId(value: string) {
     await this.page.click(`[data-test-id="${value}"]`);
   }
 
@@ -58,6 +69,14 @@ export abstract class BasePage {
    */
   async clickByName(value: string) {
     await this.page.click(`[name="${value}"]`);
+  }
+
+  async clickByTypeName(type: string, name: string) {
+    await this.page.click(`${type}[name="${name}"]`);
+  }
+
+  async clickByTypeAndLabel(type: string, label: string) {
+    await this.page.click(`${type}[label="${label}"]`);
   }
 
   async fillByPlaceHolder(placeholder: string, value: string) {
@@ -71,13 +90,30 @@ export abstract class BasePage {
   async fillByName(name: string, value: string) {
     await this.page.fill(`[name="${name}"]`, value);
   }
-
+  async fillByTypeAndName(type: string, name: string, value: string) {
+    await this.page.fill(`${type}[name="${name}"]`, value);
+  }
+  async fillByTypeAndLabel(type: string, name: string, value: string) {
+    await this.page.fill(`${type}[label="${name}"]`, value);
+  }
   async fillTestId(testId: string, value: string) {
     await this.page.fill(`[data-test-id="${testId}"]`, value);
   }
+  async fillByText(text: string, value: string) {
+    await this.page.fill(`text=${text}`, value);
+  }
 
-  async findByLabel(label: string, value: string) {
-    await this.page.fill(`[label="${label}"]`, value);
+  async findElement(selector: string) {
+    return this.page.locator(`${selector}`);
+  }
+  async findByLabel(label: string) {
+    return this.page.locator(`[label="${label}"]`);
+  }
+  async findByTypeAndLabel(type: string, label: string) {
+    return this.page.locator(`${type}[label="${label}"]`);
+  }
+  async findByTypeAndName(type: string, name: string) {
+    return this.page.locator(`${type}[label="${name}"]`);
   }
 
   async findByName(name: string) {
@@ -86,6 +122,9 @@ export abstract class BasePage {
 
   async findByText(text: string) {
     return this.page.locator(`text="${text}"`);
+  }
+  async findLinkByText(text: string) {
+    return this.page.locator(`a:has-text("${text}")`);
   }
   async findById(id: string) {
     return this.page.locator(`[id="${id}"]`);
@@ -98,6 +137,17 @@ export abstract class BasePage {
     return this.page.locator(`css = ${className}`);
   }
 
+  async findByPlaceHolder(placeholder: string) {
+    return this.page.locator(`[placeholder="${placeholder}"]`);
+  }
+
+  async waitForSelector(selector: string) {
+    return this.page.waitForSelector(selector, { timeout: 300000 });
+  }
+
+  async queryElement(selector: string) {
+    return this.page.$(selector);
+  }
   /**
    * Convenience method for this.page.keyboard.type.  Note that this requires
    * an already focused input to type into.  Normally via click or focus.
