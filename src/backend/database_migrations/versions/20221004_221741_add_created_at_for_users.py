@@ -20,9 +20,20 @@ def upgrade():
         sa.Column(
             "created_at",
             sa.DateTime(),
-            server_default=sa.text("now()"),
+            # We do NOT set a `server_default` on creation, because
+            # we want preexisting records to come in as NULL.
+            # server_default=sa.text("now()"),
             nullable=True,
         ),
+        schema="aspen",
+    )
+
+    # Now that column is added and prior records have a NULL created_at
+    # we come back and change the default so new records will be set correctly.
+    op.alter_column(
+        "users",
+        "created_at",
+        server_default=sa.text("now()"),
         schema="aspen",
     )
 
