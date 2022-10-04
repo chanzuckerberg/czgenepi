@@ -19,7 +19,7 @@ test.describe("Home page tests", () => {
 
     // lets logout so we get to visit home page
     await page.locator('[data-test-id="nav-user-menu"]').click();
-    await page.locator('text="Logout"').click();
+    await page.locator("text=Logout").click();
 
     const base = new BasePage(page);
     //now go to home page
