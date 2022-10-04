@@ -11,7 +11,7 @@ test.describe("Upload sample tests", () => {
   });
 
   fileExtensions.forEach((extenstion) => {
-    test(`Should upload ${extenstion.toUpperCase()} sample file`, async ({
+    test.skip(`Should upload ${extenstion.toUpperCase()} sample file`, async ({
       page,
     }) => {
       const uploadData = {
@@ -19,11 +19,15 @@ test.describe("Upload sample tests", () => {
         samples: UploadSample.getSampleData(),
       };
       await UploadSample.uploadSequencingFiles(page, uploadData);
-      await expect(page.locator("//button[not(contains(@class,'Mui-disabled')) and text()='Continue']")).toBeVisible()
+      await expect(
+        page.locator(
+          "//button[not(contains(@class,'Mui-disabled')) and text()='Continue']"
+        )
+      ).toBeVisible();
     });
   });
 
-  test(`Should validate collection dates`, async ({ page }) => {
+  test.skip(`Should validate collection dates`, async ({ page }) => {
     const samples = UploadSample.getSampleData();
     //overwrite collection dates with invalid values
     for (let i = 0; i < samples.length; i++) {
@@ -34,15 +38,13 @@ test.describe("Upload sample tests", () => {
       samples: samples,
     };
     await UploadSample.uploadSequencingFiles(page, uploadData);
-    const errors = page.locator(
-      "//input[@name='collectionDate']/../../p"
-    );
+    const errors = page.locator("//input[@name='collectionDate']/../../p");
     for (let i = 0; i < samples.length; i++) {
       await expect(await errors.nth(i).textContent()).toBe(dateErrorMessage);
     }
   });
 
-  test(`Should validate sequencing dates`, async ({ page }) => {
+  test.skip(`Should validate sequencing dates`, async ({ page }) => {
     const samples = UploadSample.getSampleData();
     //overwrite equencing dates with invalid values
     for (let i = 0; i < samples.length; i++) {
@@ -57,8 +59,7 @@ test.describe("Upload sample tests", () => {
       "//input[@name='sequencingDate']/../following-sibling::p"
     );
     for (let i = 0; i < samples.length; i++) {
-     await expect(await errors.nth(i).textContent()).toBe(dateErrorMessage);
+      await expect(await errors.nth(i).textContent()).toBe(dateErrorMessage);
     }
   });
-
 });
