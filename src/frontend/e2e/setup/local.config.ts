@@ -9,7 +9,7 @@ dotenv.config({
 
 const config: PlaywrightTestConfig = {
   expect: {
-    timeout: 300000,
+    timeout: 120000,
   },
   globalSetup: "./global-setup",
   outputDir: "../report",

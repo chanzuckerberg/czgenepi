@@ -14,14 +14,9 @@ const footer: Record<string, string> = {
 };
 
 test.describe("Home page tests", () => {
+  // overwrite global login with empty storage so we can visit home page
+  test.use({ storageState: "e2e/storage/emptyStorageState.json" });
   test("Should verify home page", async ({ page }) => {
-    await page.goto(`${process.env.BASEURL}`);
-
-    // lets logout so we get to visit home page
-    await page.locator('[data-test-id="nav-user-menu"]').click();
-    await page.waitForSelector("text=Logout", { timeout: 300000 });
-    await page.locator("text=Logout").click();
-
     const base = new BasePage(page);
     //now go to home page
     await base.goto(`${process.env.BASEURL}`);
