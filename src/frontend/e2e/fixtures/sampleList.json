@@ -1,0 +1,42 @@
+{
+  "samples": [
+    {
+      "collection_date": "2022-09-22",
+      "collection_location": {
+        "country": "USA",
+        "division": "California",
+        "id": 2605082,
+        "location": "Corodano",
+        "region": "California"
+      },
+      "czb_failed_genome_recovery": true,
+      "gisaid": {
+        "gisaid_id": "",
+        "status": "Not Found"
+      },
+      "id": 12687,
+      "lineage": {
+        "confidence": "",
+        "last_updated": "2022-09-18",
+        "lineage": "QA.1.15",
+        "qc_status": "pass",
+        "scorpio_call": "Omicron (BA.1-like)",
+        "scorpio_support": 0.93,
+        "version": "PUSHER-v1.13"
+      },
+      "private": false,
+      "private_identifier": "wIWr2LBlkteC7rQvFcvdE",
+      "public_identifier": "hCoV-19/USA/QA-65613/2022",
+      "sequencing_date": "2022-09-24",
+      "submitting_group": {
+        "id": 74,
+        "name": "QA Automation"
+      },
+      "upload_date": "2021-05-05",
+      "uploaded_by": {
+        "id": 108,
+        "name": "Playwright"
+      }
+    }
+  ]
+}

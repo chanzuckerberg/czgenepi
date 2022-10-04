@@ -7,3 +7,6 @@ export const SAMPLE_PAGE = {
   SAMPLE_STATUS: "div[data-test-id='sample-status']",
   UPLOAD_BTN: "a[href='/upload/step1']",
 };
+export const ENVIRONMENT = {
+  DEV: "development",
+};

@@ -4,12 +4,12 @@ import dotenv from "dotenv";
 import path from "path";
 
 dotenv.config({
-  path: path.resolve(__dirname, "../../", ".env.local.ts"),
+  path: path.resolve(__dirname, "../../", ".env.development"),
 });
 
 const config: PlaywrightTestConfig = {
   expect: {
-    timeout: 30000,
+    timeout: 120000,
   },
   globalSetup: "./global-setup",
   outputDir: "../report",
@@ -23,16 +23,15 @@ const config: PlaywrightTestConfig = {
   ],
   reporter: process.env.CI ? "github" : "list",
   testDir: "../tests",
-  timeout: 30000,
+  timeout: 120000,
   use: {
     actionTimeout: 0,
-    baseURL: "https://staging.czgenepi.org",
+    baseURL: "http://frontend.genepinet.localdev:8000",
     headless: true,
     ignoreHTTPSErrors: true,
     screenshot: "only-on-failure",
-    storageState: "/tmp/state.json",
+    storageState: "e2e/storage/state.json",
     trace: "on-first-retry",
-    viewport: { width: 1280, height: 720 },
   },
 };
 export default config;

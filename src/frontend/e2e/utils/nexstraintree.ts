@@ -1,6 +1,6 @@
 const faker = require("@faker-js/faker");
 import { sample } from "lodash";
-import { GeneralUtil } from "./general";
+import { getADateInThePast, getValueOrDefault } from "./common";
 
 const lineages = ["A", "BA.1.1", "BA.1.15"];
 
@@ -11,21 +11,18 @@ export class NextstrainUtil {
     const treeTypes = ["OVERVIEW", "TARGETED"];
 
     return {
-      name: GeneralUtil.getValueOrDefault(
-        defaults?.name,
-        faker.name.fullName()
-      ) as string,
+      name: getValueOrDefault(defaults?.name, faker.name.fullName()) as string,
       samples: defaults?.samples !== undefined ? defaults?.samples : [],
-      tree_type: GeneralUtil.getValueOrDefault(
+      tree_type: getValueOrDefault(
         defaults?.tree_type,
         sample(treeTypes)
       ) as string,
       template_args: {
-        filter_start_date: GeneralUtil.getValueOrDefault(
+        filter_start_date: getValueOrDefault(
           defaults?.template_args?.filter_start_date,
-          GeneralUtil.getADateInThePast()
+          getADateInThePast()
         ) as string,
-        filter_pango_lineages: GeneralUtil.getValueOrDefault(
+        filter_pango_lineages: getValueOrDefault(
           defaults?.template_args?.filter_pango_lineages,
           lineages
         ) as Array<string>,
