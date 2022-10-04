@@ -9,7 +9,7 @@ const locations = [
 ];
 test.describe("Upload sample tests", () => {
   const dateErrorMessage = "Update format to YYYY-MM-DD";
-  const fileExtensions = [".txt", ".fasta", ".fast"]; //todo: add zip and gzip
+  const fileExtensions = [".txt", ".fa", ".fasta"]; //todo: add zip and gzip
   test.beforeEach(async ({ page }, workerInfo) => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
     const url = `${baseUrl}/data/samples`;
