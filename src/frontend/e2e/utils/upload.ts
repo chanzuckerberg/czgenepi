@@ -1,5 +1,11 @@
 import { Page } from "@playwright/test";
 import * as path from "path";
+import dotenv from "dotenv";
+import { ENVIRONMENT } from "./constants";
+
+dotenv.config({
+  path: path.resolve(__dirname, "../../", `.env.${process.env.NODE_ENV}`),
+});
 
 export async function uploadSampleFiles(
   page: Page,
@@ -25,12 +31,16 @@ export async function uploadSampleFiles(
       .fill(uploadData.samples[i].collection_date);
 
     // fill search for location input
+    // location dropdown loads very slow in local first time, so we will put a delay
     await page.locator('span:has-text("Search For Location")').nth(0).click();
+    if (i === 0 && process.env.NODE_ENV === ENVIRONMENT.DEV) {
+      await page.waitForTimeout(10000);
+    }
     await page
       .locator('[placeholder="Search"]')
-      .fill(uploadData.samples[i].location);
-    await page.keyboard.press("ArrowDown");
-    await page.keyboard.press("Enter");
+      .type(uploadData.samples[i].location, { delay: 100 });
+    await page.keyboard.press("ArrowDown", { delay: 100 });
+    await page.keyboard.press("Enter", { delay: 100 });
 
     // fill sequencing date input
     await page

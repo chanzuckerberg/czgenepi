@@ -27,18 +27,19 @@ export function generatePrivateSampleId(): string {
 }
 
 /*
-Sample collection and sequencing dates need to be in the past. 
-This helper method generates a date in the past it does not need to be hard coded. 
-@param {number} howRecent: how recent the date should be, defaults to 10, meaning the date can be 1 - 10 days in the past
-@param {string} refDate: reference date to use, especially useful for sequencing date that needs to be older that collection date
-*/
-export function getADateInThePast(earliest = 10, refDate?: string): string {
-  // if current date if no refence date
+  Sample collection and sequencing dates need to be in the past. 
+  This helper method generates a date in the past it does not need to be hard coded. 
+  @param {number} howRecent: how recent the date should be, defaults to 10, meaning the date can be 1 - 10 days in the past
+  @param {string} refDate: reference date to use, especially useful for sequencing date that needs to be older that collection date
+  */
+export function getADateInThePast(min = 0, max = 10, refDate?: string): string {
+  // dfeault to current date as a refence date
   const fromDate = refDate !== undefined ? new Date(refDate) : new Date();
   let d = fromDate;
+  const delta = max - min;
   do {
     d = fromDate;
-    const randomNumber = Math.floor(Math.random() * earliest);
+    const randomNumber = Math.floor(Math.random() * delta);
     d.setDate(d.getDate() - randomNumber);
   } while (d.getTime() < fromDate.getTime());
   return d.toISOString().substring(0, 10);

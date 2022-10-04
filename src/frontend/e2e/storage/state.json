@@ -1,0 +1,55 @@
+{
+  "cookies": [
+    {
+      "name": ".AspNetCore.Antiforgery.-7dc1-bnz3I",
+      "value": "CfDJ8JaC8C_2RhdGp5H5oFpLPyTU4TAmx9E8Lgm4uqjzmxocdKbiWBAW-eKNF5CS5nMgD3LoivG3L1BNDCff4BZxCkFutVrvDYqXXFZC6iCxACGnHyNmowhfREf6jJ1_e11pwNYBHdoKja_m5fNLKTbzvGA",
+      "domain": "oidc.genepinet.localdev",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Strict"
+    },
+    {
+      "name": "idsrv.session",
+      "value": "2F4CBC765D47ADAE21C4B0AB2F669E05",
+      "domain": "oidc.genepinet.localdev",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "idsrv",
+      "value": "CfDJ8JaC8C_2RhdGp5H5oFpLPySmT_qf8dw4Snm95dcRdl7olOP8BVyWBk3v5baViyyf3apCddmwrM56_XSk3NbXsGQ7WZwnrRVjtJCldnBekOJ1Go0UxsYT0wCMURqFDSJ-dnB_xxnRj92ubK9gSBKM98Wiw2_4250jas54m-sNptHTDl2NzLyDnq0-CjWL9vx8B0ArMBOqWqHiSz_0Pl-99u8bY0TXm9O3_X8yivxNaMRSzuJaRln3rUVG2PYw5NVMlJYru7wEZHwog9SHA_TXwjFUi-hJJuMnH-SYxqtqaBrKBPOMFu9IRyE60Hdnn_Rb2N9WMbuWdkJEwJl4gt34Z6ZQQr1u7jtV87akUSKPK8jjlbmjMwOUy9j1-PAdhQKtMQQ7aSER6qaXHmS9YygasAfYZjzqV-GOZfd7JNyHBguusmOsNogawHuW3OJSmBND5AlSB8EzEOChQRcJBLEKUUwjx8tHZbrYt4Ztw9Ocsnc6v2r31MV0J7PPRm-FvBBJSh52GQwsJ0llVQPsPjL-ej4aWpA9ltsbQPNzRJfzeiktMOkSLfv24IlxY3j9eAkHMxpr7TFoqFMrcZEtb8WXw-jpk-h_l-EG9dTUzT9Ku5R5",
+      "domain": "oidc.genepinet.localdev",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "session",
+      "value": ".eJxtkFtPwyAYhv-K-a67Qw9jrle2OyRq541bFmNMQ4GtKAVC6Y7Zf5c2M9HES948z8sLF_g82Fzjk1CYQnwBXBmI30EfKHx4gG1e4rqEGPZ-Rt5WyzkNEj-Q2Tkjx3SfgEMa54FQBIseEZxJ2-O0y22ZW14xiH2EInQ_GYXIA1ZhLpwgVaHo6YGUWJ4b8sVMwcyuT1TlVHbUN2kS-uHYA47tr5Y2oPrnUsfzunan0lodDwaKU9LfMck0l8z2O4ayvcMkbsfAK67uVm6EMm1WbP82SyVJR2XMrIePG7J9jsIXW4vN8snxNW9fGyyiaTodo9EsGiezZB740ygdJmmwQGgyH45asCkcuK6Z8eHqgTZqywVrf_i_GY3j8q76Zly_AftBfOI.YzklgQ.JlDg5vJ6t7T-BGDT6njZ7dFDSdI",
+      "domain": "backend.genepinet.localdev",
+      "path": "/",
+      "expires": 1665899137.682088,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://frontend.genepinet.localdev:8000",
+      "localStorage": [
+        {
+          "name": "ally-supports-cache",
+          "value": "{\"userAgent\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36\",\"version\":\"1.4.1\",\"focusAreaImgTabindex\":false,\"focusAreaTabindex\":false,\"focusAreaWithoutHref\":false,\"focusAudioWithoutControls\":false,\"focusBrokenImageMap\":true,\"focusChildrenOfFocusableFlexbox\":false,\"focusFieldsetDisabled\":false,\"focusFieldset\":false,\"focusFlexboxContainer\":false,\"focusFormDisabled\":true,\"focusImgIsmap\":false,\"focusImgUsemapTabindex\":true,\"focusInHiddenIframe\":true,\"focusInvalidTabindex\":false,\"focusLabelTabindex\":true,\"focusObjectSvg\":false,\"focusObjectSvgHidden\":false,\"focusRedirectImgUsemap\":false,\"focusRedirectLegend\":\"\",\"focusScrollBody\":false,\"focusScrollContainerWithoutOverflow\":false,\"focusScrollContainer\":false,\"focusSummary\":true,\"focusSvgFocusableAttribute\":false,\"focusSvgTabindexAttribute\":true,\"focusSvgNegativeTabindexAttribute\":true,\"focusSvgUseTabindex\":true,\"focusSvgForeignobjectTabindex\":true,\"focusSvg\":false,\"focusTabindexTrailingCharacters\":true,\"focusTable\":false,\"focusVideoWithoutControls\":false,\"cssShadowPiercingDeepCombinator\":\"\",\"focusInZeroDimensionObject\":true,\"focusObjectSwf\":true,\"focusSvgInIframe\":false,\"tabsequenceAreaAtImgPosition\":false,\"time\":\"2022-10-02T05:45:29.413Z\"}"
+        }
+      ]
+    }
+  ]
+}

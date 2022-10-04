@@ -4,7 +4,8 @@ import { useState } from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
-import { FEATURE_FLAGS, isFlagOn } from "src/components/Split";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { StyledNavButton, StyledNavIconWrapper } from "./style";
 
 interface UserMenuProps {
@@ -30,8 +31,8 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
     handleClose();
   };
 
-  const flag = useTreatments([FEATURE_FLAGS.prep_files]);
-  const isPrepFilesFlagOn = isFlagOn(flag, FEATURE_FLAGS.prep_files);
+  const flag = useTreatments([USER_FEATURE_FLAGS.prep_files]);
+  const isPrepFilesFlagOn = isUserFlagOn(flag, USER_FEATURE_FLAGS.prep_files);
 
   return (
     <>

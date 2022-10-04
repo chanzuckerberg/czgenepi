@@ -14,8 +14,8 @@ const lineages = ["A", "BA.1.1", "BA.1.15"]; //todo: will be good to get this fr
 
 //add more locations as required
 const locations = [
-  "Africa/Angola/Luanda/Calemba",
-  "Europe/Russia/Kaluga/Tarusa",
+  "Africa/Angola/Luanda",
+  "Europe/Russia/Kaluga",
   "Asia/China",
 ];
 /**
@@ -39,19 +39,13 @@ export function createSampleUploadData(
   );
   return {
     collection_date: collectionDate,
-    location: getValueOrDefault(
-      defaults?.location,
-      sample(locations)
-    ) as string,
-    private: getValueOrDefault(defaults?.private, false) as boolean,
+    location: getValueOrDefault(defaults?.location, sample(locations)),
+    private: getValueOrDefault(defaults?.private, false),
     private_id: getValueOrDefault(
       defaults?.private_id,
       generatePrivateSampleId()
-    ) as string,
-    public_id: getValueOrDefault(
-      defaults?.public_id,
-      generatePublicSampleId()
-    ) as string,
+    ),
+    public_id: getValueOrDefault(defaults?.public_id, generatePublicSampleId()),
     sequencing_date: sequencingDate,
   };
 }
@@ -64,9 +58,9 @@ export function createSampleUploadData(
  * @returns GetSampleResponseData
  */
 export function getSampleResponseData(
-  defaults?: GetSampleResponseData,
+  defaults?: SampleResponseDefaults,
   maxCollectionDateAge = 10
-): GetSampleResponseData {
+): SampleResponseData {
   return {
     collection_date: getADateInThePast(maxCollectionDateAge),
     collection_location: {
@@ -99,7 +93,7 @@ export function getSampleResponseData(
       id: 74,
       name: "QA Automation",
     },
-    upload_date: getADateInThePast(),
+    upload_date: getValueOrDefault(defaults?.upload_date, getADateInThePast()),
     uploaded_by: {
       id: 108,
       name: "Playwright",
@@ -108,39 +102,39 @@ export function getSampleResponseData(
 }
 
 export interface SampleUploadData {
-  collection_date: any;
-  location: any;
-  private: boolean;
-  private_id: any;
-  public_id: any;
-  sequencing_date: any;
+  collection_date?: any;
+  location?: any;
+  private?: boolean | undefined;
+  private_id?: any;
+  public_id?: any;
+  sequencing_date?: any;
 }
 
-export interface GetSampleResponseData {
-  id: number;
-  collection_date: string;
+export interface SampleResponseData {
+  id: number | undefined;
+  collection_date: string | undefined;
   collection_location: {
-    id: number;
+    id?: number;
     region: string;
     country: string;
     division: string;
     location: string;
   };
-  czb_failed_genome_recovery: boolean;
+  czb_failed_genome_recovery?: boolean;
   gisaid: {
-    gisaid_id: string;
+    gisaid_id: any;
     status: string;
   };
   lineage: {
     last_updated: string;
-    lineage: string;
+    lineage?: string;
     confidence: string;
     version: string;
     scorpio_call: string;
     scorpio_support: number;
     qc_status: string;
   };
-  private: boolean;
+  private?: boolean;
   private_identifier: string;
   public_identifier: string;
   sequencing_date: string;
@@ -148,9 +142,21 @@ export interface GetSampleResponseData {
     id: number;
     name: string;
   };
-  upload_date: string;
+  upload_date?: string;
   uploaded_by: {
     id: number;
     name: string;
   };
+}
+
+export interface SampleResponseDefaults {
+  collection_date?: string;
+  collection_location?: number;
+  czb_failed_genome_recovery?: boolean;
+  gisaid_id?: string | null;
+  gisaid_status?: string;
+  id?: number;
+  lineage?: string;
+  private?: boolean;
+  upload_date?: string;
 }
