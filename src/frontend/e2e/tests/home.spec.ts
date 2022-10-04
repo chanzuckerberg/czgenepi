@@ -19,7 +19,7 @@ test.describe("Home page tests", () => {
 
     // lets logout so we get to visit home page
     await page.locator('[data-test-id="nav-user-menu"]').click();
-    await page.waitForSelector("text=Logout", { timeout: 30000 });
+    await page.waitForSelector("text=Logout", { timeout: 300000 });
     await page.locator("text=Logout").click();
 
     const base = new BasePage(page);
