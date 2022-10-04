@@ -101,6 +101,14 @@ export const CreateNSTreeModal = ({
       groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
     );
 
+  // If the group call isn't back when this is loaded, we need to update when the
+  // call returns
+  useEffect(() => {
+    setSelectedLocation(
+      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
+    );
+  }, [groupInfo?.location]);
+
   // Filter based on date ranges
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
@@ -126,6 +134,9 @@ export const CreateNSTreeModal = ({
     setStartDate(undefined);
     setEndDate(undefined);
     setSelectedLineages([]);
+    setSelectedLocation(
+      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
+    );
   };
 
   const handleClose = function () {
@@ -213,6 +224,7 @@ export const CreateNSTreeModal = ({
         startDate,
         endDate,
         lineages: selectedLineages,
+        location: selectedLocation || undefined,
       },
     });
   };
