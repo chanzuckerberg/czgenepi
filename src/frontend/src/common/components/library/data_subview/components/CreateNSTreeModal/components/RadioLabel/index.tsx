@@ -1,11 +1,12 @@
 // eslint-disable @typescript-eslint/explicit-member-accessibility
 import ListItemText from "@mui/material/ListItemText";
 import { useTreatments } from "@splitsoftware/splitio-react";
-import { Icon, List } from "czifui";
+import { Button, Icon, List } from "czifui";
 import { useSelector } from "react-redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
+import { ResetFiltersType } from "../..";
 import { SampleFiltering } from "../SampleFiltering";
 import {
   EndDateFilterType,
@@ -34,7 +35,8 @@ interface TreeChoiceWithFilteringProps
     StartDateFilterType,
     EndDateFilterType,
     LineageFilterType,
-    LocationFilterType {}
+    LocationFilterType,
+    ResetFiltersType {}
 
 export const RadioLabelOverview = ({
   selected,
@@ -48,6 +50,8 @@ export const RadioLabelOverview = ({
   endDate,
   setStartDate,
   setEndDate,
+  isFilterEnabled,
+  resetFilters,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
@@ -77,6 +81,9 @@ export const RadioLabelOverview = ({
       <Label>
         <LabelMain>Overview </LabelMain>
       </Label>
+      <Button onClick={resetFilters} sdsStyle="text">
+        Reset all
+      </Button>
       <SmallText>{overviewDescription}</SmallText>
       {selected && (
         <>
