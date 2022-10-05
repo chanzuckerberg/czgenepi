@@ -89,6 +89,11 @@ export const CreateNSTreeModal = ({
     []
   );
 
+  const handleChangeTreeType = (e: React.ChangeEvent<HTMLInputElement>) => {
+    resetFilters();
+    setTreeType(e.target.value as TreeType);
+  };
+
   // --- FILTERS ---
   // Keep track of whether any filters have changed, use to show reset button
   const [isFilterEnabled, setIsFilterEnabled] = useState<boolean>(false);
@@ -340,10 +345,7 @@ export const CreateNSTreeModal = ({
                 </Link>
               </TreeTypeSubtext>
             )}
-            <RadioGroup
-              value={treeType}
-              onChange={(e) => setTreeType(e.target.value as TreeType)}
-            >
+            <RadioGroup value={treeType} onChange={handleChangeTreeType}>
               <StyledFormControlLabel
                 value={TreeTypes.Overview}
                 checked={treeType === TreeTypes.Overview}
