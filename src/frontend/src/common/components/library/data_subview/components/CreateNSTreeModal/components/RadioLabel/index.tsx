@@ -133,13 +133,16 @@ export const RadioLabelOverview = ({
 
 interface RadioLabelTargetedProps
   extends BaseTreeChoiceProps,
-    LocationFilterType {}
+    LocationFilterType,
+    ResetFiltersType {}
 
 export const RadioLabelTargeted = ({
   selected,
   namedLocations,
   selectedLocation,
   setSelectedLocation,
+  isFilterEnabled,
+  resetFilters,
 }: RadioLabelTargetedProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
@@ -194,6 +197,8 @@ export const RadioLabelTargeted = ({
               namedLocations={namedLocations}
               selectedLocation={selectedLocation}
               setSelectedLocation={setSelectedLocation}
+              isFilterEnabled={isFilterEnabled}
+              resetFilters={resetFilters}
             />
           )}
         </>

@@ -378,6 +378,8 @@ export const CreateNSTreeModal = ({
                     namedLocations={namedLocations}
                     selectedLocation={selectedLocation}
                     setSelectedLocation={handleSetSelectedLocation}
+                    isFilterEnabled={isFilterEnabled}
+                    resetFilters={resetFilters}
                   />
                 }
               />
