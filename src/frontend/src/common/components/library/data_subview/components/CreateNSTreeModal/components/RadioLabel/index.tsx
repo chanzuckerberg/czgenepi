@@ -81,9 +81,7 @@ export const RadioLabelOverview = ({
       <Label>
         <LabelMain>Overview </LabelMain>
       </Label>
-      <Button onClick={resetFilters} sdsStyle="text">
-        Reset all
-      </Button>
+
       <SmallText>{overviewDescription}</SmallText>
       {selected && (
         <>
@@ -124,6 +122,8 @@ export const RadioLabelOverview = ({
             endDate={endDate}
             setStartDate={setStartDate}
             setEndDate={setEndDate}
+            isFilterEnabled={isFilterEnabled}
+            resetFilters={resetFilters}
           />
         </>
       )}
@@ -214,6 +214,8 @@ export const RadioLabelNonContextualized = ({
   endDate,
   setStartDate,
   setEndDate,
+  isFilterEnabled,
+  resetFilters,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
@@ -283,6 +285,8 @@ export const RadioLabelNonContextualized = ({
             endDate={endDate}
             setStartDate={setStartDate}
             setEndDate={setEndDate}
+            isFilterEnabled={isFilterEnabled}
+            resetFilters={resetFilters}
           />
         </>
       )}

@@ -91,7 +91,7 @@ export const CreateNSTreeModal = ({
 
   // --- FILTERS ---
   // Keep track of whether any filters have changed, use to show reset button
-  const [isFilterEnabled, setIsFilterEnabled] = useState(false);
+  const [isFilterEnabled, setIsFilterEnabled] = useState<boolean>(false);
 
   // Certain tree types can filter based on lineages
   const { data: lineagesData } = useLineages();
@@ -361,6 +361,7 @@ export const CreateNSTreeModal = ({
                     endDate={endDate}
                     setStartDate={handleSetStartDate}
                     setEndDate={handleSetEndDate}
+                    isFilterEnabled={isFilterEnabled}
                     resetFilters={resetFilters}
                   />
                 }
@@ -395,6 +396,8 @@ export const CreateNSTreeModal = ({
                     endDate={endDate}
                     setStartDate={handleSetStartDate}
                     setEndDate={handleSetEndDate}
+                    isFilterEnabled={isFilterEnabled}
+                    resetFilters={resetFilters}
                   />
                 }
               />
