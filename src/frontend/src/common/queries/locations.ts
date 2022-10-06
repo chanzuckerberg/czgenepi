@@ -34,18 +34,21 @@ interface NamedLocationsResponse {
   namedLocations: NamedGisaidLocation[];
 }
 
+export const foldInLocationName = (
+  location: GisaidLocation
+): NamedGisaidLocation => {
+  return {
+    ...location,
+    name: stringifyGisaidLocation(location),
+  };
+};
+
 const foldInNamesToLocations = (
   data: LocationsResponse
 ): NamedLocationsResponse => {
   const { locations } = data;
-  const foldInName = (location: GisaidLocation): NamedGisaidLocation => {
-    return {
-      ...location,
-      name: stringifyGisaidLocation(location),
-    };
-  };
   return {
-    namedLocations: locations.map(foldInName),
+    namedLocations: locations.map(foldInLocationName),
   };
 };
 
