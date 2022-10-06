@@ -1,7 +1,7 @@
 // eslint-disable @typescript-eslint/explicit-member-accessibility
 import ListItemText from "@mui/material/ListItemText";
 import { useTreatments } from "@splitsoftware/splitio-react";
-import { Button, Icon, List } from "czifui";
+import { Icon, List } from "czifui";
 import { useSelector } from "react-redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { isUserFlagOn } from "src/components/Split";
