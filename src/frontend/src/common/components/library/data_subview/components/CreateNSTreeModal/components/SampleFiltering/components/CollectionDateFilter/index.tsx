@@ -1,26 +1,30 @@
 import { useState } from "react";
+import { noop } from "src/common/constants/empty";
 import { getDateRangeLabel } from "src/common/utils/dateUtils";
-import { MENU_OPTION_ALL_TIME } from "src/components/DateFilterMenu/constants";
+import {
+  MENU_OPTIONS_COLLECTION_DATE,
+  MENU_OPTION_ALL_TIME,
+} from "src/components/DateFilterMenu/constants";
+import { StyledFilterGroup, StyledFilterGroupName } from "../../style";
 import { StyledDateFilterMenu, StyledInputDropdown } from "./style";
 
-interface Props {
-  fieldKeyEnd: string;
-  fieldKeyStart: string;
-  menuOptions: DateMenuOption[];
-  updateDateFilter: UpdateDateFilterType;
+export type StartDateFilterType = {
   startDate: FormattedDateType;
+  setStartDate: (d: FormattedDateType) => void;
+};
+
+export type EndDateFilterType = {
   endDate: FormattedDateType;
-  setStartDate(d: FormattedDateType): void;
-  setEndDate(d: FormattedDateType): void;
-}
+  setEndDate: (d: FormattedDateType) => void;
+};
+
+interface Props extends StartDateFilterType, EndDateFilterType {}
 
 const CollectionDateFilter = ({
-  updateDateFilter,
   startDate,
   endDate,
   setStartDate,
   setEndDate,
-  ...props
 }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>();
   // What menu option is chosen. If none chosen, `null`.
@@ -42,7 +46,8 @@ const CollectionDateFilter = ({
   });
 
   return (
-    <>
+    <StyledFilterGroup>
+      <StyledFilterGroupName>Collection Date</StyledFilterGroupName>
       <StyledInputDropdown
         sdsStyle="square"
         sdsType="singleSelect"
@@ -51,16 +56,19 @@ const CollectionDateFilter = ({
         onClick={handleClick}
       />
       <StyledDateFilterMenu
-        {...props}
         anchorEl={anchorEl}
+        data-test-id="collection-date"
+        fieldKeyEnd="collectionDateEnd"
+        fieldKeyStart="collectionDateStart"
+        menuOptions={[...MENU_OPTIONS_COLLECTION_DATE, MENU_OPTION_ALL_TIME]}
         onClose={handleClose}
         onStartDateChange={setStartDate}
         onEndDateChange={setEndDate}
         selectedDateMenuOption={selectedDateMenuOption}
         setSelectedDateMenuOption={setSelectedDateMenuOption}
-        updateDateFilter={updateDateFilter}
+        updateDateFilter={noop}
       />
-    </>
+    </StyledFilterGroup>
   );
 };
 

@@ -30,6 +30,7 @@ export const StyledExplainerTitle = styled.div`
 export const StyledFiltersSection = styled.div`
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
@@ -38,11 +39,18 @@ export const StyledFiltersSection = styled.div`
   }}
 `;
 
+interface StyledFilterGroupProps extends CommonThemeProps {
+  fullWidth?: boolean;
+}
 export const StyledFilterGroup = styled.div`
-  ${(props: CommonThemeProps) => {
+  ${(props: StyledFilterGroupProps) => {
     const spaces = getSpaces(props);
+    const leftMargin = props.fullWidth ? "0" : `${spaces?.xl}px`;
+    const topMargin = props.fullWidth ? `${spaces?.m}px` : "0";
+
     return `
-      margin-left: ${spaces?.xl}px;
+      margin-left: ${leftMargin};
+      margin-top: ${topMargin};
     `;
   }}
 `;
@@ -53,6 +61,7 @@ export const StyledFilterGroupName = styled.p`
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
+      margin-top: ${spaces?.m}px;
       margin-bottom: ${spaces?.xxs}px;
     `;
   }}
@@ -75,15 +84,19 @@ export const StyledNewTabLink = styled(NewTabLink)`
   }}
 `;
 
-const DROPDOWN_WIDTH = "209px";
+export const DROPDOWN_WIDTH = "204px";
 
+interface StyledDropdownProps extends CommonThemeProps {
+  fullWidth?: boolean;
+}
 export const StyledDropdown = styled(Dropdown)`
-  width: ${DROPDOWN_WIDTH};
+  ${(props: StyledDropdownProps) => {
+    const width = props.fullWidth ? "100%" : DROPDOWN_WIDTH;
 
-  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const palette = getPalette(props);
     return `
+      width: ${width};
       border-color: ${colors?.gray[500]};
       path {
         fill: ${colors?.gray[500]};
