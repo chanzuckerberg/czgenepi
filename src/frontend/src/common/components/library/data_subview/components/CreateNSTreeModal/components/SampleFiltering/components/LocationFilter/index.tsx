@@ -27,6 +27,9 @@ interface AutocompleteState {
   inputValue: string;
 }
 
+// Note: much of the logic here is very similar to the
+// LocationField component used in file upload/edit
+// We should revisit and refactor if this comes up again.
 export const LocationFilter = ({
   fullWidth = false,
   showTitle = true,
