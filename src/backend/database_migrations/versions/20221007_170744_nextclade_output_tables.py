@@ -115,16 +115,12 @@ def downgrade():
     op.enum_delete("entity_types", ["ALIGNED_PATHOGEN_GENOME"], schema="aspen")
     op.add_column(
         "users",
-        sa.Column(
-            "group_admin", sa.BOOLEAN(), autoincrement=False, nullable=True
-        ),
+        sa.Column("group_admin", sa.BOOLEAN(), autoincrement=False, nullable=True),
         schema="aspen",
     )
     op.add_column(
         "users",
-        sa.Column(
-            "group_id", sa.INTEGER(), autoincrement=False, nullable=True
-        ),
+        sa.Column("group_id", sa.INTEGER(), autoincrement=False, nullable=True),
         schema="aspen",
     )
     op.create_foreign_key(
@@ -138,9 +134,7 @@ def downgrade():
     )
     op.add_column(
         "sample_qc_metrics",
-        sa.Column(
-            "qc_type", sa.VARCHAR(), autoincrement=False, nullable=False
-        ),
+        sa.Column("qc_type", sa.VARCHAR(), autoincrement=False, nullable=False),
         schema="aspen",
     )
     op.create_foreign_key(
@@ -161,9 +155,7 @@ def downgrade():
     op.drop_column("pathogens", "nextclade_dataset_name", schema="aspen")
     op.create_table(
         "qc_types",
-        sa.Column(
-            "item_id", sa.VARCHAR(), autoincrement=False, nullable=False
-        ),
+        sa.Column("item_id", sa.VARCHAR(), autoincrement=False, nullable=False),
         sa.PrimaryKeyConstraint("item_id", name="pk_qc_types"),
         schema="aspen",
     )
@@ -172,9 +164,7 @@ def downgrade():
         sa.Column(
             "id",
             sa.INTEGER(),
-            server_default=sa.text(
-                "nextval('aspen.can_see_id_seq'::regclass)"
-            ),
+            server_default=sa.text("nextval('aspen.can_see_id_seq'::regclass)"),
             autoincrement=True,
             nullable=False,
         ),
@@ -184,12 +174,8 @@ def downgrade():
             autoincrement=False,
             nullable=False,
         ),
-        sa.Column(
-            "owner_group_id", sa.INTEGER(), autoincrement=False, nullable=False
-        ),
-        sa.Column(
-            "data_type", sa.VARCHAR(), autoincrement=False, nullable=False
-        ),
+        sa.Column("owner_group_id", sa.INTEGER(), autoincrement=False, nullable=False),
+        sa.Column("data_type", sa.VARCHAR(), autoincrement=False, nullable=False),
         sa.ForeignKeyConstraint(
             ["data_type"],
             ["aspen.data_types.item_id"],
@@ -210,9 +196,7 @@ def downgrade():
     )
     op.create_table(
         "data_types",
-        sa.Column(
-            "item_id", sa.VARCHAR(), autoincrement=False, nullable=False
-        ),
+        sa.Column("item_id", sa.VARCHAR(), autoincrement=False, nullable=False),
         sa.PrimaryKeyConstraint("item_id", name="pk_data_types"),
         schema="aspen",
     )
