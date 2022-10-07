@@ -133,9 +133,9 @@ export const CreateNSTreeModal = ({
     USER_FEATURE_FLAGS.tree_location_filter
   );
 
-  const handleFilterChange = (setFilter: () => void): void => {
+  const handleFilterChange = (onChangeFilter: () => void): void => {
     setIsFilterEnabled(true);
-    setFilter();
+    onChangeFilter();
   };
 
   // Creating functions here rather than inline to avoid creating them

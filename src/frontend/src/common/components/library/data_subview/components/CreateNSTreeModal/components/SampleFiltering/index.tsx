@@ -74,13 +74,26 @@ export function SampleFiltering({
   return (
     <StyledContainer>
       <StyledTitleContainer>
-        <StyledExplainerTitle>
-          {isTreeLocationFilterFlagOn
-            ? "Define samples of interest by:"
-            : "Limit samples from my jurisdiction to:"}
-          {isTreeLocationFilterFlagOn ? (
-            <SampleFilteringTooltip />
-          ) : (
+        {isTreeLocationFilterFlagOn ? (
+          <>
+            <StyledExplainerTitle>
+              Define samples of interest by:
+              <SampleFilteringTooltip />
+            </StyledExplainerTitle>
+            {isFilterEnabled && (
+              <Button
+                onClick={resetFilters}
+                sdsType="primary"
+                sdsStyle="minimal"
+                isAllCap
+              >
+                Reset all
+              </Button>
+            )}
+          </>
+        ) : (
+          <StyledExplainerTitle>
+            Limit samples from my jurisdiction to:
             <StyledTooltip
               arrow
               leaveDelay={1000}
@@ -91,17 +104,7 @@ export function SampleFiltering({
                 <Icon sdsIcon="infoCircle" sdsSize="xs" sdsType="static" />
               </StyledInfoIconWrapper>
             </StyledTooltip>
-          )}
-        </StyledExplainerTitle>
-        {isTreeLocationFilterFlagOn && isFilterEnabled && (
-          <Button
-            onClick={resetFilters}
-            sdsType="primary"
-            sdsStyle="minimal"
-            isAllCap
-          >
-            Reset all
-          </Button>
+          </StyledExplainerTitle>
         )}
       </StyledTitleContainer>
       <StyledFiltersSection>
