@@ -128,6 +128,8 @@ export type AnalyticsTreeCreationNextstrain = {
   phylo_run_workflow_id: number;
   // Type of tree being created
   tree_type: string;
+  // Location of samples used for tree creation
+  location_id?: number;
 };
 
 /** EVENT_TYPES.TREE_ACTIONS_CLICK_GALAGO */

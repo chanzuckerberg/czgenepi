@@ -218,6 +218,7 @@ export const CreateNSTreeModal = ({
           // Safe to assert treeType is not undefined here, can't create tree
           // otherwise, it's just that checking happens in a child component.
           tree_type: treeType!,
+          location_id: selectedLocation?.id,
         }
       );
 
