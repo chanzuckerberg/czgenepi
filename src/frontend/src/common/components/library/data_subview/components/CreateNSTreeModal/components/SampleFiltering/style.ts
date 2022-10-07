@@ -108,6 +108,13 @@ export const StyledDropdown = styled(Dropdown)`
     const colors = getColors(props);
     const palette = getPalette(props);
     return `
+      ${
+        props.fullWidth &&
+        `
+        text-overflow: ellipsis;
+        max-width: 470px;
+        `
+      }
       width: ${width};
       border-color: ${colors?.gray[500]};
       path {
