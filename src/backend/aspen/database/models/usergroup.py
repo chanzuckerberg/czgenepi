@@ -7,7 +7,9 @@ from sqlalchemy import (
     Boolean,
     Column,
     Date,
+    DateTime,
     ForeignKey,
+    func,
     Index,
     Integer,
     String,
@@ -90,6 +92,9 @@ class User(idbase, DictMixin):  # type: ignore
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     auth0_user_id = Column(String, unique=True, nullable=False)
+    # Users did not originally have `created_at` in DB. Users created prior
+    # to Oct 2022 will have a NULL value.
+    created_at = Column(DateTime, nullable=True, server_default=func.now())
     system_admin = Column(Boolean, nullable=False)
     agreed_to_tos = Column(Boolean, nullable=False, default=False)
     # Date of policies (any of Privacy Policy, Terms of Service, etc, etc) the user
