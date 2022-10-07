@@ -1,3 +1,4 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { compact, map, uniq } from "lodash";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -7,6 +8,8 @@ import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
 import { FilterPanel } from "src/components/FilterPanel";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { VIEWNAME } from "../../common/constants/types";
@@ -14,6 +17,8 @@ import { ROUTES } from "../../common/routes";
 import { PAGE_TITLES } from "../../common/titles";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/FilterPanelToggle";
+import { SamplesView } from "./components/SamplesView";
+import { TreesView } from "./components/TreesView";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import {
   Category,
@@ -66,6 +71,9 @@ const transformData = (
 
 const Data: FunctionComponent = () => {
   useProtectedRoute();
+
+  const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
+  const usesTableRefactor = isUserFlagOn(tableRefactorFlag, USER_FEATURE_FLAGS.table_refactor);
 
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
@@ -197,41 +205,65 @@ const Data: FunctionComponent = () => {
       return { name: l as string };
     });
 
+  if (!usesTableRefactor) {
+    return (
+      <Container>
+        <HeadAppTitle subTitle={subTitle} />
+
+        <Navigation data-test-id="menu-items">
+          <FilterPanelToggle
+            activeFilterCount={activeFilterCount}
+            onClick={() => {
+              setShouldShowFilters(!shouldShowFilters);
+            }}
+          />
+          <StyledMenu>{dataJSX.menuItems}</StyledMenu>
+        </Navigation>
+        <View>
+          {viewName === "Samples" && (
+            // TODO (mlila): replace with sds filterpanel once it's complete
+            <FilterPanel
+              lineages={lineages}
+              isOpen={shouldShowFilters}
+              setActiveFilterCount={setActiveFilterCount}
+              setDataFilterFunc={setDataFilterFunc}
+              data-test-id="menu-item-sample-count"
+            />
+          )}
+          <DataSubview
+            key={currentPath}
+            isLoading={category.isDataLoading}
+            data={category.data}
+            defaultSortKey={category.defaultSortKey}
+            headers={category.headers}
+            subheaders={category.subheaders}
+            renderer={category.renderer}
+            viewName={viewName}
+            dataFilterFunc={viewName === "Samples" ? dataFilterFunc : undefined}
+          />
+        </View>
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <HeadAppTitle subTitle={subTitle} />
 
       <Navigation data-test-id="menu-items">
-        <FilterPanelToggle
-          activeFilterCount={activeFilterCount}
-          onClick={() => {
-            setShouldShowFilters(!shouldShowFilters);
-          }}
-        />
+        {viewName === VIEWNAME.SAMPLES && (
+          <FilterPanelToggle
+            activeFilterCount={activeFilterCount}
+            onClick={() => {
+              setShouldShowFilters(!shouldShowFilters);
+            }}
+          />
+        )}
         <StyledMenu>{dataJSX.menuItems}</StyledMenu>
       </Navigation>
       <View>
-        {viewName === "Samples" && (
-          // TODO (mlila): replace with sds filterpanel once it's complete
-          <FilterPanel
-            lineages={lineages}
-            isOpen={shouldShowFilters}
-            setActiveFilterCount={setActiveFilterCount}
-            setDataFilterFunc={setDataFilterFunc}
-            data-test-id="menu-item-sample-count"
-          />
-        )}
-        <DataSubview
-          key={currentPath}
-          isLoading={category.isDataLoading}
-          data={category.data}
-          defaultSortKey={category.defaultSortKey}
-          headers={category.headers}
-          subheaders={category.subheaders}
-          renderer={category.renderer}
-          viewName={viewName}
-          dataFilterFunc={viewName === "Samples" ? dataFilterFunc : undefined}
-        />
+        {viewName === VIEWNAME.SAMPLES && <SamplesView />}
+        {viewName === VIEWNAME.TREES && <TreesView />}
       </View>
     </Container>
   );
