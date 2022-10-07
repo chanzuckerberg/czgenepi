@@ -1,3 +1,6 @@
+import { BrowserContext, Page } from "@playwright/test";
+import { ACCEPTCOOKIES } from "./constants";
+
 export function getValueOrDefault<T>(value: T, defaultValue: T): T {
   return value !== undefined ? value : defaultValue;
 }
@@ -43,4 +46,15 @@ export function getADateInThePast(min = 0, max = 10, refDate?: string): string {
     d.setDate(d.getDate() - randomNumber);
   } while (d.getTime() < fromDate.getTime());
   return d.toISOString().substring(0, 10);
+}
+
+/**
+ * Help function that navigates to sample page
+ * and accepts  site cookies
+ * @param page
+ */
+export async function acceptSiteCookieTerms(page: Page) {
+  if (await page.isVisible(ACCEPTCOOKIES)) {
+    await page.locator(ACCEPTCOOKIES).click();
+  }
 }

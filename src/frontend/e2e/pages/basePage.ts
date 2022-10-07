@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+import { acceptSiteCookieTerms } from "../utils/common";
 
 /**
  * Base class with convenience wrappers for interactions
@@ -6,6 +7,11 @@ import { Page } from "@playwright/test";
  */
 export class BasePage {
   constructor(public readonly page: Page) {}
+
+  async acceptCookies() {
+    //accept site cookies if prompted
+    await acceptSiteCookieTerms(this.page);
+  }
 
   async goto(url: string, option?: any) {
     if (option) {

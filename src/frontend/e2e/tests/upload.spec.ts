@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { uploadSampleFiles } from "../utils/upload";
 import { createSampleUploadData } from "../utils/sample";
+import { acceptSiteCookieTerms } from "../utils/common";
 
 const locations = [
   "Africa/Angola/Luanda",
@@ -9,20 +10,19 @@ const locations = [
 ];
 test.describe("Upload sample tests", () => {
   const dateErrorMessage = "Update format to YYYY-MM-DD";
-  const fileExtensions = [".txt", ".fa", ".fasta"]; //todo: add zip and gzip
+  const fileExtensions = ["fa", "fasta", "txt"]; //todo: add zip and gzip
   test.beforeEach(async ({ page }, workerInfo) => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
     const url = `${baseUrl}/data/samples`;
     await page.goto(url);
-    //accept cookie t&c (if prompted and not in CI)
-    const tAndCSelector =
-      '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
-    const tAndC = page.locator(tAndCSelector);
-    if (await tAndC.isVisible()) {
-      await page.locator(tAndCSelector).click();
-    }
+    //accept site cookies
+    await acceptSiteCookieTerms(page);
+
     //click upload button
     await page.locator('[data-test-id="upload-btn"]').click();
+
+    //accept site cookies if prompted again
+    await acceptSiteCookieTerms(page);
   });
 
   fileExtensions.forEach((extenstion) => {
@@ -35,10 +35,13 @@ test.describe("Upload sample tests", () => {
         samples.push(createSampleUploadData(defaults));
       }
       const uploadData = {
-        dataFile: extenstion,
+        fileExtension: extenstion,
         samples: samples,
       };
       await uploadSampleFiles(page, uploadData);
+
+      //accept site cookies if prompted again
+      await acceptSiteCookieTerms(page);
 
       //continue button
       await page.locator('a:has-text("Continue")').click();
@@ -65,7 +68,7 @@ test.describe("Upload sample tests", () => {
       samples.push(sample);
     }
     const uploadData = {
-      dataFile: ".txt",
+      fileExtension: "txt",
       samples: samples,
     };
     await uploadSampleFiles(page, uploadData);
@@ -83,7 +86,7 @@ test.describe("Upload sample tests", () => {
     }
 
     const uploadData = {
-      dataFile: ".txt",
+      fileExtension: "txt",
       samples: samples,
     };
     await uploadSampleFiles(page, uploadData);
