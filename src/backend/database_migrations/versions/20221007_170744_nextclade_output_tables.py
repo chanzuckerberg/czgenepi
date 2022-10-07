@@ -40,7 +40,7 @@ def upgrade():
     op.create_table(
         "sample_mutations",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("sample_id", sa.Integer(), nullable=True),
+        sa.Column("sample_id", sa.Integer(), nullable=False),
         sa.Column("substitutions", sa.String(), nullable=True),
         sa.Column("insertions", sa.String(), nullable=True),
         sa.Column("deletions", sa.String(), nullable=True),
