@@ -41,6 +41,7 @@ export const ContentStyles = (props: CommonThemeProps): string => {
 };
 
 export const MAX_CONTENT_WIDTH = 1308;
+export const MAX_MODAL_WIDTH = 600;
 
 export const ZebraStripes = (): string => {
   return `
