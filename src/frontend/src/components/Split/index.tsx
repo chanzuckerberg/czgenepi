@@ -53,6 +53,10 @@ const createUserFlagsForLocal = () => {
     simpleFlags[feature] = SPLIT_SIMPLE_FLAG.ON;
   });
 
+  // TODO-TR (mlila): leave the table refactor flag off (locally) for now, since it seriously
+  // TODO-TR          hinders use of the app and will be annoying.
+  simpleFlags.table_refactor = SPLIT_SIMPLE_FLAG.OFF;
+
   return simpleFlags;
 };
 
