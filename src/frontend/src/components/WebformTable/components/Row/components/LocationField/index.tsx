@@ -76,7 +76,7 @@ export default function LocationField({
    * END HOTFIX
    */
 
-  const filter = (
+  const filterLocations = (
     options: NamedGisaidLocation[],
     state: AutocompleteState
   ): NamedGisaidLocation[] => {
@@ -128,7 +128,7 @@ export default function LocationField({
         options={locations}
         search
         DropdownMenuProps={{
-          filterOptions: filter,
+          filterOptions: filterLocations,
           sdsStage: "userInput",
         }}
         InputDropdownProps={{ sdsStyle: "square", sdsStage: sdsStage }}

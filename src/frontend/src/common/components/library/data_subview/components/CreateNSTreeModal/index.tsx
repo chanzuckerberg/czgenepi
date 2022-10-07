@@ -13,7 +13,12 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import type { TreeType } from "src/common/constants/types";
 import { TreeTypes } from "src/common/constants/types";
 import GisaidLogo from "src/common/images/gisaid-logo-full.png";
+import { useGroupInfo } from "src/common/queries/groups";
 import { useLineages } from "src/common/queries/lineages";
+import {
+  foldInLocationName,
+  useNamedLocations,
+} from "src/common/queries/locations";
 import { RawTreeCreationWithId, useCreateTree } from "src/common/queries/trees";
 import { addNotification } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";
@@ -79,10 +84,32 @@ export const CreateNSTreeModal = ({
     []
   );
 
-  // Certain tree types can filter based on lineages and date ranges
+  // Certain tree types can filter based on lineages
   const { data: lineagesData } = useLineages();
   const availableLineages: string[] = lineagesData?.lineages || [];
   const [selectedLineages, setSelectedLineages] = useState<string[]>([]);
+
+  // Filter based on location
+  const { data: groupInfo } = useGroupInfo();
+  const { data: namedLocationsData } = useNamedLocations();
+  const namedLocations: NamedGisaidLocation[] =
+    namedLocationsData?.namedLocations ?? [];
+
+  // If we have the group's location, use this as the default for the filter
+  const [selectedLocation, setSelectedLocation] =
+    useState<NamedGisaidLocation | null>(
+      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
+    );
+
+  // If the group call isn't back when this is loaded, we need to update when the
+  // call returns
+  useEffect(() => {
+    setSelectedLocation(
+      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
+    );
+  }, [groupInfo?.location]);
+
+  // Filter based on date ranges
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
 
@@ -107,6 +134,9 @@ export const CreateNSTreeModal = ({
     setStartDate(undefined);
     setEndDate(undefined);
     setSelectedLineages([]);
+    setSelectedLocation(
+      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
+    );
   };
 
   const handleClose = function () {
@@ -194,6 +224,7 @@ export const CreateNSTreeModal = ({
         startDate,
         endDate,
         lineages: selectedLineages,
+        location: selectedLocation || undefined,
       },
     });
   };
@@ -288,6 +319,9 @@ export const CreateNSTreeModal = ({
                     availableLineages={availableLineages}
                     selectedLineages={selectedLineages}
                     setSelectedLineages={setSelectedLineages}
+                    namedLocations={namedLocations}
+                    selectedLocation={selectedLocation}
+                    setSelectedLocation={setSelectedLocation}
                     startDate={startDate}
                     endDate={endDate}
                     setStartDate={setStartDate}
@@ -302,6 +336,9 @@ export const CreateNSTreeModal = ({
                 label={
                   <RadioLabelTargeted
                     selected={treeType === TreeTypes.Targeted}
+                    namedLocations={namedLocations}
+                    selectedLocation={selectedLocation}
+                    setSelectedLocation={setSelectedLocation}
                   />
                 }
               />
@@ -315,6 +352,9 @@ export const CreateNSTreeModal = ({
                     availableLineages={availableLineages}
                     selectedLineages={selectedLineages}
                     setSelectedLineages={setSelectedLineages}
+                    namedLocations={namedLocations}
+                    selectedLocation={selectedLocation}
+                    setSelectedLocation={setSelectedLocation}
                     startDate={startDate}
                     endDate={endDate}
                     setStartDate={setStartDate}

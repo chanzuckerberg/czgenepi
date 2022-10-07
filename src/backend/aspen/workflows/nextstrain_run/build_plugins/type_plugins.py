@@ -15,7 +15,7 @@ class TreeTypePlugin(BaseConfigPlugin):
     def _update_config_params(self, config):
         build = config["builds"]["aspen"]
 
-        location = self.group.default_tree_location
+        location = self.template_args["location"]
         # Make a shortcut to decide whether this is a location vs division vs country level build
         if not location.division:
             self.tree_build_level = "country"

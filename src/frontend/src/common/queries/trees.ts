@@ -28,6 +28,7 @@ interface CreateTreePayload {
     filter_start_date?: string;
     filter_end_date?: string;
     filter_pango_lineages?: string[];
+    filter_location?: number;
   };
 }
 
@@ -39,6 +40,7 @@ interface CreateTreeType {
     startDate?: FormattedDateType;
     endDate?: FormattedDateType;
     lineages?: string[];
+    location?: NamedGisaidLocation;
   };
 }
 
@@ -64,7 +66,7 @@ async function createTree({
   treeType,
   filters,
 }: CreateTreeType): Promise<RawTreeCreationWithId> {
-  const { startDate, endDate, lineages } = filters;
+  const { startDate, endDate, lineages, location } = filters;
   const payload: CreateTreePayload = {
     name: treeName,
     samples: sampleIds,
@@ -73,6 +75,7 @@ async function createTree({
       filter_start_date: startDate,
       filter_end_date: endDate,
       filter_pango_lineages: lineages,
+      filter_location: location?.id,
     },
   };
 

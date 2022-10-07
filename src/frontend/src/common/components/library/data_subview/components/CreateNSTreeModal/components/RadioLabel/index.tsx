@@ -7,6 +7,12 @@ import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { SampleFiltering } from "../SampleFiltering";
+import {
+  EndDateFilterType,
+  StartDateFilterType,
+} from "../SampleFiltering/components/CollectionDateFilter";
+import { LineageFilterType } from "../SampleFiltering/components/LineageFilter";
+import { LocationFilterType } from "../SampleFiltering/components/LocationFilter";
 import { TargetedFiltering } from "../TargetedFiltering";
 import { pathogenStrings, tempLocationFilterCopyUpdates } from "./strings";
 import {
@@ -23,21 +29,21 @@ interface BaseTreeChoiceProps {
   selected: boolean;
 }
 
-interface TreeChoiceWithFilteringProps extends BaseTreeChoiceProps {
-  availableLineages: string[];
-  selectedLineages: string[];
-  setSelectedLineages: (lineages: string[]) => void;
-  startDate: FormattedDateType;
-  endDate: FormattedDateType;
-  setStartDate(d: FormattedDateType): void;
-  setEndDate(d: FormattedDateType): void;
-}
+interface TreeChoiceWithFilteringProps
+  extends BaseTreeChoiceProps,
+    StartDateFilterType,
+    EndDateFilterType,
+    LineageFilterType,
+    LocationFilterType {}
 
 export const RadioLabelOverview = ({
   selected,
   availableLineages,
+  namedLocations,
   selectedLineages,
+  selectedLocation,
   setSelectedLineages,
+  setSelectedLocation,
   startDate,
   endDate,
   setStartDate,
@@ -102,8 +108,11 @@ export const RadioLabelOverview = ({
           </StyledList>
           <SampleFiltering
             availableLineages={availableLineages}
+            namedLocations={namedLocations}
             selectedLineages={selectedLineages}
+            selectedLocation={selectedLocation}
             setSelectedLineages={setSelectedLineages}
+            setSelectedLocation={setSelectedLocation}
             startDate={startDate}
             endDate={endDate}
             setStartDate={setStartDate}
@@ -115,9 +124,16 @@ export const RadioLabelOverview = ({
   );
 };
 
+interface RadioLabelTargetedProps
+  extends BaseTreeChoiceProps,
+    LocationFilterType {}
+
 export const RadioLabelTargeted = ({
   selected,
-}: BaseTreeChoiceProps): JSX.Element => {
+  namedLocations,
+  selectedLocation,
+  setSelectedLocation,
+}: RadioLabelTargetedProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
   const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
@@ -166,7 +182,13 @@ export const RadioLabelTargeted = ({
               </ListItemText>
             </StyledListItem>
           </List>
-          {isTreeLocationFilterFlagOn && <TargetedFiltering />}
+          {isTreeLocationFilterFlagOn && (
+            <TargetedFiltering
+              namedLocations={namedLocations}
+              selectedLocation={selectedLocation}
+              setSelectedLocation={setSelectedLocation}
+            />
+          )}
         </>
       )}
     </div>
@@ -178,6 +200,9 @@ export const RadioLabelNonContextualized = ({
   availableLineages,
   selectedLineages,
   setSelectedLineages,
+  namedLocations,
+  selectedLocation,
+  setSelectedLocation,
   startDate,
   endDate,
   setStartDate,
@@ -244,6 +269,9 @@ export const RadioLabelNonContextualized = ({
             availableLineages={availableLineages}
             selectedLineages={selectedLineages}
             setSelectedLineages={setSelectedLineages}
+            namedLocations={namedLocations}
+            selectedLocation={selectedLocation}
+            setSelectedLocation={setSelectedLocation}
             startDate={startDate}
             endDate={endDate}
             setStartDate={setStartDate}

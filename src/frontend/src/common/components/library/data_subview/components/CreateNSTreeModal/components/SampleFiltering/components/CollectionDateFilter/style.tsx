@@ -1,9 +1,10 @@
 import styled from "@emotion/styled";
 import { InputDropdown } from "czifui";
 import { DateFilterMenu } from "src/components/DateFilterMenu";
+import { DROPDOWN_WIDTH } from "../../style";
 
 export const StyledInputDropdown = styled(InputDropdown)`
-  width: 224px;
+  width: ${DROPDOWN_WIDTH};
   span {
     color: black;
   }
