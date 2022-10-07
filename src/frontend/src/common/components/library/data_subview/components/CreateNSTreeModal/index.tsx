@@ -217,6 +217,7 @@ export const CreateNSTreeModal = ({
           phylo_run_workflow_id: respData.id,
           // Safe to assert treeType is not undefined here, can't create tree
           // otherwise, it's just that checking happens in a child component.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           tree_type: treeType!,
           location_id: selectedLocation?.id,
         }
