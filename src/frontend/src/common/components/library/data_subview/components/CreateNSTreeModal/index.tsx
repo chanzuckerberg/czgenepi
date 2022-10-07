@@ -62,6 +62,11 @@ import {
   TreeTypeSubtext,
 } from "./style";
 
+export type ResetFiltersType = {
+  isFilterEnabled: boolean;
+  resetFilters: () => void;
+};
+
 interface Props {
   checkedSampleIds: string[];
   failedSampleIds: string[];
@@ -83,6 +88,15 @@ export const CreateNSTreeModal = ({
   const [validatedInputSamples, setValidatedInputSamples] = useState<string[]>(
     []
   );
+
+  const handleChangeTreeType = (e: React.ChangeEvent<HTMLInputElement>) => {
+    resetFilters();
+    setTreeType(e.target.value as TreeType);
+  };
+
+  // --- FILTERS ---
+  // Keep track of whether any filters have changed, use to show reset button
+  const [isFilterEnabled, setIsFilterEnabled] = useState<boolean>(false);
 
   // Certain tree types can filter based on lineages
   const { data: lineagesData } = useLineages();
@@ -119,6 +133,37 @@ export const CreateNSTreeModal = ({
     USER_FEATURE_FLAGS.tree_location_filter
   );
 
+  const handleFilterChange = (onChangeFilter: () => void): void => {
+    setIsFilterEnabled(true);
+    onChangeFilter();
+  };
+
+  // Creating functions here rather than inline to avoid creating them
+  // multiple times. Each function sets the isFilterEnabled flag and calls
+  // the original useState set function.
+  const handleSetSelectedLineages = (lineages: string[]): void =>
+    handleFilterChange(() => setSelectedLineages(lineages));
+  const handleSetSelectedLocation = (
+    location: NamedGisaidLocation | null
+  ): void => handleFilterChange(() => setSelectedLocation(location));
+  const handleSetStartDate = (startDate: FormattedDateType): void =>
+    handleFilterChange(() => setStartDate(startDate));
+  const handleSetEndDate = (endDate: FormattedDateType): void =>
+    handleFilterChange(() => setEndDate(endDate));
+
+  // Reset filters
+  const resetFilters = (): void => {
+    setStartDate(undefined);
+    setEndDate(undefined);
+    setSelectedLineages([]);
+    setSelectedLocation(
+      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
+    );
+    setIsFilterEnabled(false);
+  };
+
+  // --- ^ FILTERS ^ ---
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -131,12 +176,7 @@ export const CreateNSTreeModal = ({
     setTreeType(undefined);
     setMissingInputSamples([]);
     setValidatedInputSamples([]);
-    setStartDate(undefined);
-    setEndDate(undefined);
-    setSelectedLineages([]);
-    setSelectedLocation(
-      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
-    );
+    resetFilters();
   };
 
   const handleClose = function () {
@@ -305,10 +345,7 @@ export const CreateNSTreeModal = ({
                 </Link>
               </TreeTypeSubtext>
             )}
-            <RadioGroup
-              value={treeType}
-              onChange={(e) => setTreeType(e.target.value as TreeType)}
-            >
+            <RadioGroup value={treeType} onChange={handleChangeTreeType}>
               <StyledFormControlLabel
                 value={TreeTypes.Overview}
                 checked={treeType === TreeTypes.Overview}
@@ -318,14 +355,16 @@ export const CreateNSTreeModal = ({
                     selected={treeType === TreeTypes.Overview}
                     availableLineages={availableLineages}
                     selectedLineages={selectedLineages}
-                    setSelectedLineages={setSelectedLineages}
+                    setSelectedLineages={handleSetSelectedLineages}
                     namedLocations={namedLocations}
                     selectedLocation={selectedLocation}
-                    setSelectedLocation={setSelectedLocation}
+                    setSelectedLocation={handleSetSelectedLocation}
                     startDate={startDate}
                     endDate={endDate}
-                    setStartDate={setStartDate}
-                    setEndDate={setEndDate}
+                    setStartDate={handleSetStartDate}
+                    setEndDate={handleSetEndDate}
+                    isFilterEnabled={isFilterEnabled}
+                    resetFilters={resetFilters}
                   />
                 }
               />
@@ -338,7 +377,9 @@ export const CreateNSTreeModal = ({
                     selected={treeType === TreeTypes.Targeted}
                     namedLocations={namedLocations}
                     selectedLocation={selectedLocation}
-                    setSelectedLocation={setSelectedLocation}
+                    setSelectedLocation={handleSetSelectedLocation}
+                    isFilterEnabled={isFilterEnabled}
+                    resetFilters={resetFilters}
                   />
                 }
               />
@@ -351,14 +392,16 @@ export const CreateNSTreeModal = ({
                     selected={treeType === TreeTypes.NonContextualized}
                     availableLineages={availableLineages}
                     selectedLineages={selectedLineages}
-                    setSelectedLineages={setSelectedLineages}
+                    setSelectedLineages={handleSetSelectedLineages}
                     namedLocations={namedLocations}
                     selectedLocation={selectedLocation}
-                    setSelectedLocation={setSelectedLocation}
+                    setSelectedLocation={handleSetSelectedLocation}
                     startDate={startDate}
                     endDate={endDate}
-                    setStartDate={setStartDate}
-                    setEndDate={setEndDate}
+                    setStartDate={handleSetStartDate}
+                    setEndDate={handleSetEndDate}
+                    isFilterEnabled={isFilterEnabled}
+                    resetFilters={resetFilters}
                   />
                 }
               />

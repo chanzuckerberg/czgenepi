@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { noop } from "src/common/constants/empty";
 import { getDateRangeLabel } from "src/common/utils/dateUtils";
 import {
@@ -38,6 +38,12 @@ const CollectionDateFilter = ({
   const handleClose = () => {
     setAnchorEl(undefined);
   };
+
+  useEffect(() => {
+    if (startDate === undefined && endDate === undefined) {
+      setSelectedDateMenuOption(MENU_OPTION_ALL_TIME);
+    }
+  }, [startDate, endDate]);
 
   const dateLabel = getDateRangeLabel({
     currentLabel: selectedDateMenuOption?.name,
