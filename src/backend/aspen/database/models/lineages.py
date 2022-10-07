@@ -64,34 +64,11 @@ class SampleLineage(idbase):  # type: ignore
     raw_lineage_output = Column(String, nullable=True)
 
 
-class QCType(enum.Enum):
-    PANGOLIN = "PANGOLIN"
-    NEXTCLADE = "NEXTCLADE"
-
-
-_QCTypeTable = enumtables.EnumTable(
-    QCType,
-    base,
-    tablename="qc_types",
-)
-
-
 class SampleQCMetric(idbase):  # type: ignore
     __tablename__ = "sample_qc_metrics"
-    __table_args__ = (
-        UniqueConstraint(
-            "sample_id",
-            "qc_type",
-        ),
-    )
 
     sample_id = Column(Integer, ForeignKey("samples.id"))
     sample = relationship("Sample", back_populates="qc_metrics")  # type: ignore
-    qc_type = Column(
-        Enum(QCType),
-        ForeignKey(_QCTypeTable.item_id),
-        nullable=False,
-    )
     qc_score = Column(String, nullable=False, unique=True)
     qc_software_version = Column(String, nullable=False)
     qc_status = Column(String, nullable=False)
