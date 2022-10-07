@@ -128,6 +128,10 @@ export type AnalyticsTreeCreationNextstrain = {
   phylo_run_workflow_id: number;
   // Type of tree being created
   tree_type: string;
+  // Location of samples used for tree creation. A null value indicates that
+  // the users group info was not successfully fetched before they created
+  // a tree. This generally shouldn't happen.
+  location_id: number | null;
 };
 
 /** EVENT_TYPES.TREE_ACTIONS_CLICK_GALAGO */
