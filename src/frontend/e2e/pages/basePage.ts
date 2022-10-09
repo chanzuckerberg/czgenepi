@@ -1,5 +1,4 @@
 import { Page } from "@playwright/test";
-import { acceptSiteCookieTerms } from "../utils/common";
 import * as path from "path";
 import { ACCEPTCOOKIES } from "../utils/constants";
 

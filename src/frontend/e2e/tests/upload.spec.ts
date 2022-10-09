@@ -6,6 +6,7 @@ import { getLocations } from "../utils/common";
 
 const locations = getLocations();
 const totalLocations = locations.length;
+const defaultFileExtension = "txt";
 
 let basePage: BasePage;
 test.describe("Upload sample tests", () => {
@@ -27,18 +28,14 @@ test.describe("Upload sample tests", () => {
     await basePage.acceptCookies();
   });
 
-  fileExtensions.forEach((extenstion) => {
-    test(`Should upload ${extenstion.toUpperCase()} sample file`, async () => {
+  fileExtensions.forEach((fileExtension) => {
+    test(`Should upload ${fileExtension.toUpperCase()} sample file`, async () => {
       const samples = [];
       for (let i = 0; i < totalLocations; i++) {
         const defaults = { location: locations[i] };
         samples.push(createSampleUploadData(defaults));
       }
-      const uploadData = {
-        fileExtension: extenstion,
-        samples,
-      };
-      await uploadSampleFiles(basePage, uploadData);
+      await uploadSampleFiles(basePage, fileExtension, samples);
 
       //accept site cookies if prompted again
       await basePage.acceptCookies();
@@ -70,11 +67,12 @@ test.describe("Upload sample tests", () => {
       sample.collection_date = "20-20-20";
       samples.push(sample);
     }
-    const uploadData = {
-      fileExtension: "txt",
+    await uploadSampleFiles(
+      basePage,
+      defaultFileExtension,
       samples,
-    };
-    await uploadSampleFiles(basePage, uploadData, ignoreLocation);
+      ignoreLocation
+    );
     //accept site cookies if prompted again
     await basePage.acceptCookies();
 
@@ -92,11 +90,12 @@ test.describe("Upload sample tests", () => {
       samples.push(sample);
     }
 
-    const uploadData = {
-      fileExtension: "txt",
+    await uploadSampleFiles(
+      basePage,
+      defaultFileExtension,
       samples,
-    };
-    await uploadSampleFiles(basePage, uploadData, ignoreLocation);
+      ignoreLocation
+    );
     //accept site cookies if prompted again
     await basePage.acceptCookies();
 

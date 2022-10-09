@@ -32,8 +32,7 @@ const fromDateInt = dateToInteger(fromDate);
 const toDateInt = dateToInteger(toDate);
 
 const collectionDateSelector = "row-collectionDate";
-const uploadDateSelector =
-  "//div[@data-test-id='table-row']/descendant::div[13]";
+const uploadDateSelector = "row-upload-date";
 
 const api = `${process.env.BASEAPI}/v2/orgs/${process.env.GROUPID}/pathogens/SC2/samples/`;
 let url = "";
@@ -96,7 +95,7 @@ test.describe("Sample filtering tests", () => {
     await applyFilter(base, filterBy);
 
     // verify only complete samples are listed
-    const sampleLineages = await base.findElement(".ez2j8c413");
+    const sampleLineages = await base.findByTestId("row-lineage");
     for (let i = 0; i < (await sampleLineages.count()); i++) {
       expect(sampleLineages.nth(i)).toHaveText(filterBy.lineage);
     }

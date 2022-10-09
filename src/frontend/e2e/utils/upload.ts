@@ -9,25 +9,26 @@ dotenv.config({
 //use ignoreLocation flag to skip locations and test validation of other fields
 export async function uploadSampleFiles(
   basePage: BasePage,
-  uploadData: any,
+  fileExtension: string,
+  samples: any,
   ignoreLocation = false
 ): Promise<any> {
-  await selectSampleFiles(basePage, uploadData.fileExtension);
+  await selectSampleFiles(basePage, fileExtension);
 
   // complete form
-  for (let i = 0; i < uploadData.samples.length; i++) {
+  for (let i = 0; i < samples.length; i++) {
     // fill private ID input
     await (await basePage.findByInputName("privateId"))
       .nth(i)
-      .type(uploadData.samples[i].private_id);
+      .type(samples[i].private_id);
     // fill public ID input
     await (await basePage.findByInputName("publicId"))
       .nth(i)
-      .type(uploadData.samples[i].public_id);
+      .type(samples[i].public_id);
     // fill collection date input
     await (await basePage.findByInputName("collectionDate"))
       .nth(i)
-      .fill(uploadData.samples[i].collection_date);
+      .fill(samples[i].collection_date);
 
     // select location
     // we will use long delay for location options to populate
@@ -38,7 +39,7 @@ export async function uploadSampleFiles(
         .click();
       await (
         await basePage.findByPlaceHolder("Search")
-      ).type(uploadData.samples[i].location, { delay: 700 }); //700ms is the optimium time for locations to load in local
+      ).type(samples[i].location, { delay: 700 }); //700ms is the optimium time for locations to load in local
       await basePage.pressKey("ArrowDown");
       await basePage.pressEnter();
       await (await basePage.findByText("APPLY TO ALL")).nth(1).click();
@@ -47,7 +48,7 @@ export async function uploadSampleFiles(
     // fill sequencing date input
     await (await basePage.findByInputName("sequencingDate"))
       .nth(i)
-      .fill(uploadData.samples[i].sequencing_date);
+      .fill(samples[i].sequencing_date);
 
     // toggle keep private switch
     await (await basePage.findByInputName("keepPrivate")).nth(i).click();

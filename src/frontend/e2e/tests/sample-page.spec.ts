@@ -23,10 +23,7 @@ const mockData = JSON.parse(
 );
 
 test.describe("Samples page tests", () => {
-  test("Should verify sample list headers", async ({
-    page,
-    context,
-  }, workerInfo) => {
+  test("Should verify sample list headers", async ({ page }, workerInfo) => {
     const { baseURL } = workerInfo.config.projects[0].use;
     const url = `${baseURL}/data/samples/groupId/${process.env.GROUPID}/pathogen/SC2`;
     // make the actual call, wait until all responses have been received
