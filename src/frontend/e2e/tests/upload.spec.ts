@@ -1,95 +1,105 @@
 import { test, expect } from "@playwright/test";
 import { uploadSampleFiles } from "../utils/upload";
 import { createSampleUploadData } from "../utils/sample";
-import { acceptSiteCookieTerms } from "../utils/common";
+import { BasePage } from "../pages/basePage";
+import { getLocations } from "../utils/common";
 
-const locations = [
-  "Africa/Angola/Luanda",
-  "Europe/Russia/Kaluga",
-  "Asia/China",
-];
+const locations = getLocations();
+const totalLocations = locations.length;
+
+let basePage: BasePage;
 test.describe("Upload sample tests", () => {
   const dateErrorMessage = "Update format to YYYY-MM-DD";
   const fileExtensions = ["fa", "fasta", "txt"]; //todo: add zip and gzip
   test.beforeEach(async ({ page }, workerInfo) => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
     const url = `${baseUrl}/data/samples`;
-    await page.goto(url);
-    //accept site cookies
-    await acceptSiteCookieTerms(page);
+    basePage = new BasePage(page);
+    await Promise.all([basePage.gotoUrl(url), page.waitForNavigation()]);
+    page.waitForNavigation(),
+      //accept site cookies
+      await basePage.acceptCookies();
 
     //click upload button
-    await page.locator('[data-test-id="upload-btn"]').click();
+    await basePage.clickByTestId("upload-btn");
 
     //accept site cookies if prompted again
-    await acceptSiteCookieTerms(page);
+    await basePage.acceptCookies();
   });
 
   fileExtensions.forEach((extenstion) => {
-    test(`Should upload ${extenstion.toUpperCase()} sample file`, async ({
-      page,
-    }) => {
+    test(`Should upload ${extenstion.toUpperCase()} sample file`, async () => {
       const samples = [];
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < totalLocations; i++) {
         const defaults = { location: locations[i] };
         samples.push(createSampleUploadData(defaults));
       }
       const uploadData = {
         fileExtension: extenstion,
-        samples: samples,
+        samples,
       };
-      await uploadSampleFiles(page, uploadData);
+      await uploadSampleFiles(basePage, uploadData);
 
       //accept site cookies if prompted again
-      await acceptSiteCookieTerms(page);
+      await basePage.acceptCookies();
 
       //continue button
-      await page.locator('a:has-text("Continue")').click();
+      await basePage.clickElement('a:has-text("Continue")');
 
       //accept terms and conditions
-      await page.locator('input[type="checkbox"]').nth(0).click();
-      await page.locator('input[type="checkbox"]').nth(1).click();
+      const acceptUploadToGroupCheckBox = 0;
+      const acceptCzGenepiTermsCheckBox = 1;
+      await basePage.clickCheckBox(acceptUploadToGroupCheckBox);
+      await basePage.clickCheckBox(acceptCzGenepiTermsCheckBox);
 
-      await page.locator("text=Start Upload").click();
+      await basePage.clickByText("Start Upload");
 
       // show confirmation and finish process
-      await expect(page.locator("text=Upload Complete!")).toBeVisible();
-      await page.locator("text=Go to Samples").click();
+      await expect(await basePage.findByText("Upload Complete!")).toBeVisible();
+      await basePage.clickByText("Go to Samples");
     });
   });
 
-  test(`Should validate collection dates`, async ({ page }) => {
+  test(`Should validate collection dates`, async () => {
     const samples = [];
+    const ignoreLocation = true;
     //overwrite collection dates with invalid values
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < totalLocations; i++) {
       const defaults = { location: locations[i] };
       const sample = createSampleUploadData(defaults);
-      sample.collection_date = " ";
+      sample.collection_date = "20-20-20";
       samples.push(sample);
     }
     const uploadData = {
       fileExtension: "txt",
-      samples: samples,
+      samples,
     };
-    await uploadSampleFiles(page, uploadData);
-    expect(await page.locator(`text=${dateErrorMessage}`).count()).toBe(3);
+    await uploadSampleFiles(basePage, uploadData, ignoreLocation);
+    //accept site cookies if prompted again
+    await basePage.acceptCookies();
+
+    expect(await (await basePage.findByText(dateErrorMessage)).count()).toBe(3);
   });
 
-  test(`Should validate sequencing dates`, async ({ page }) => {
+  test(`Should validate sequencing dates`, async () => {
     const samples = [];
+    const ignoreLocation = true;
     //overwrite collection dates with invalid values
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < totalLocations; i++) {
       const defaults = { location: locations[i] };
       const sample = createSampleUploadData(defaults);
-      sample.sequencing_date = " ";
+      sample.sequencing_date = "20-20-20";
       samples.push(sample);
     }
 
     const uploadData = {
       fileExtension: "txt",
-      samples: samples,
+      samples,
     };
-    await uploadSampleFiles(page, uploadData);
-    expect(await page.locator(`text=${dateErrorMessage}`).count()).toBe(3);
+    await uploadSampleFiles(basePage, uploadData, ignoreLocation);
+    //accept site cookies if prompted again
+    await basePage.acceptCookies();
+
+    expect(await (await basePage.findByText(dateErrorMessage)).count()).toBe(3);
   });
 });

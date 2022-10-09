@@ -1,11 +1,12 @@
 import { expect, test, Page, BrowserContext } from "@playwright/test";
-import { getSampleResponseData, SampleResponseDefaults } from "../utils/sample";
+import { getSampleResponseData } from "../utils/sample";
 import { applyFilter } from "../utils/filter";
 import path from "path";
 import * as dotenv from "dotenv";
 import { getByTestID } from "../utils/selectors";
 import { getADateInThePast } from "../utils/common";
 import { BasePage } from "../pages/basePage";
+import { SampleResponseDefaults } from "../utils/schemas/sampleResponseDefaults";
 
 dotenv.config({
   path: path.resolve(__dirname, "../../", `.env.${process.env.NODE_ENV}`),

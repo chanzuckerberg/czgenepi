@@ -1,5 +1,6 @@
-import { BrowserContext, Page } from "@playwright/test";
+import { Page } from "@playwright/test";
 import { ACCEPTCOOKIES } from "./constants";
+import fs from "fs";
 
 export function getValueOrDefault<T>(value: T, defaultValue: T): T {
   return value !== undefined ? value : defaultValue;
@@ -7,6 +8,13 @@ export function getValueOrDefault<T>(value: T, defaultValue: T): T {
 
 export function getRandomNumber(): number {
   return Math.floor(Math.random() * 99999) + 1;
+}
+
+// reads sample locations from json fixture
+// ideally we should generate them dynanamically if we know the source
+export function getLocations() {
+  const locations = fs.readFileSync("e2e/fixtures/locations.json");
+  return JSON.parse(locations.toString());
 }
 
 export function generatePublicSampleId(country?: string): string {

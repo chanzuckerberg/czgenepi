@@ -5,19 +5,18 @@ import {
   generatePrivateSampleId,
   generatePublicSampleId,
   getRandomNumber,
+  getLocations,
 } from "./common";
 import * as dotenv from "dotenv";
+import { SampleResponseDefaults } from "./schemas/sampleResponseDefaults";
+import { SampleResponseData } from "./schemas/sampleResponseData";
+import { SampleUploadData } from "./schemas/sampleUploadData";
 
 dotenv.config();
 
 const lineages = ["A", "BA.1.1", "BA.1.15"]; //todo: will be good to get this from API and then choose randomly
 
-//add more locations as required
-const locations = [
-  "Africa/Angola/Luanda",
-  "Europe/Russia/Kaluga",
-  "Asia/China",
-];
+const locations = getLocations();
 /**
  * This method generates sample data that can be used for uploading
  * @param defaults - user supplied sample data to be included
@@ -75,17 +74,17 @@ export function getSampleResponseData(
       gisaid_id: "",
       status: "Not Found",
     },
-    id: getValueOrDefault(defaults?.id, getRandomNumber()) as number,
+    id: getValueOrDefault(defaults?.id, getRandomNumber()),
     lineage: {
       confidence: "",
       last_updated: getADateInThePast(),
-      lineage: sample(lineages) as string,
+      lineage: sample(lineages),
       qc_status: "pass",
       scorpio_call: "Omicron (BA.1-like)",
       scorpio_support: 0.93,
       version: "PUSHER-v1.13",
     },
-    private: getValueOrDefault(defaults?.private, true) as boolean,
+    private: getValueOrDefault(defaults?.private, true),
     private_identifier: generatePrivateSampleId(),
     public_identifier: generatePublicSampleId(),
     sequencing_date: getADateInThePast(),
@@ -99,64 +98,4 @@ export function getSampleResponseData(
       name: "Playwright",
     },
   };
-}
-
-export interface SampleUploadData {
-  collection_date?: any;
-  location?: any;
-  private?: boolean | undefined;
-  private_id?: any;
-  public_id?: any;
-  sequencing_date?: any;
-}
-
-export interface SampleResponseData {
-  id: number | undefined;
-  collection_date: string | undefined;
-  collection_location: {
-    id?: number;
-    region: string;
-    country: string;
-    division: string;
-    location: string;
-  };
-  czb_failed_genome_recovery?: boolean;
-  gisaid: {
-    gisaid_id: any;
-    status: string;
-  };
-  lineage: {
-    last_updated: string;
-    lineage?: string;
-    confidence: string;
-    version: string;
-    scorpio_call: string;
-    scorpio_support: number;
-    qc_status: string;
-  };
-  private?: boolean;
-  private_identifier: string;
-  public_identifier: string;
-  sequencing_date: string;
-  submitting_group: {
-    id: number;
-    name: string;
-  };
-  upload_date?: string;
-  uploaded_by: {
-    id: number;
-    name: string;
-  };
-}
-
-export interface SampleResponseDefaults {
-  collection_date?: string;
-  collection_location?: number;
-  czb_failed_genome_recovery?: boolean;
-  gisaid_id?: string | null;
-  gisaid_status?: string;
-  id?: number;
-  lineage?: string;
-  private?: boolean;
-  upload_date?: string;
 }
