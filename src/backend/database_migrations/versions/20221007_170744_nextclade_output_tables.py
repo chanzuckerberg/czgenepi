@@ -92,6 +92,12 @@ def upgrade():
         type_="unique",
     )
     op.drop_constraint(
+        "uq_sample_qc_metrics_qc_score",
+        "sample_qc_metrics",
+        schema="aspen",
+        type_="unique",
+    )
+    op.drop_constraint(
         "fk_sample_qc_metrics_qc_type_qc_types",
         "sample_qc_metrics",
         schema="aspen",
