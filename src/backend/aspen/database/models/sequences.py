@@ -10,10 +10,12 @@ from sqlalchemy import (
     Integer,
     String,
     text,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import backref, deferred, relationship
+from sqlalchemy.orm import deferred, relationship
 
+from aspen.database.models.base import idbase
 from aspen.database.models.entity import Entity, EntityType
 from aspen.database.models.sample import Sample
 
@@ -23,7 +25,6 @@ class PathogenGenome(Entity):
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
     sequence = deferred(Column(String, nullable=False), raiseload=True)
-    sequencing_date = Column(Date, nullable=True)
 
     # statistics for the pathogen genome
     def calculate_num_unambiguous_sites(self):
@@ -63,7 +64,7 @@ class PathogenGenome(Entity):
             " indicating support for 2 or more alleles in the reads."
         ),
     )
-
+    sequencing_date = Column(Date, nullable=True)
     # Store a map of the fields in this pango output file
     pangolin_output = Column(
         JSONB,
@@ -88,14 +89,50 @@ class UploadedPathogenGenome(PathogenGenome):
     sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
     # The default value of cascade is "save-update, merge", so if we want to enable "delete", we
     # need to include the other options as well to maintain backwards compatibility.
-    sample = relationship(  # type: ignore
-        Sample,
-        backref=backref(
-            "uploaded_pathogen_genome",
+    sample = (
+        relationship(  # type: ignore
+            Sample,
+            back_populates="uploaded_pathogen_genome",
             uselist=False,
             cascade="delete, merge, save-update",
         ),
     )
-
     sequencing_depth = Column(Float)
     upload_date = Column(DateTime, nullable=False, server_default=func.now())
+
+
+class AlignedPathogenGenome(PathogenGenome):
+    __tablename__ = "aligned_pathogen_genome"
+    __mapper_args__ = {"polymorphic_identity": EntityType.ALIGNED_PATHOGEN_GENOME}
+
+    pathogen_genome_id = Column(
+        Integer, ForeignKey(PathogenGenome.entity_id), primary_key=True
+    )
+
+    sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
+    # The default value of cascade is "save-update, merge", so if we want to enable "delete", we
+    # need to include the other options as well to maintain backwards compatibility.
+    sample = relationship(  # type: ignore
+        Sample,
+        back_populates="aligned_pathogen_genome",
+        uselist=False,
+        cascade="delete, merge, save-update",
+    )
+    aligned_date = Column(DateTime, nullable=False, server_default=func.now())
+    reference_name = Column(String, nullable=False)
+
+
+class AlignedPeptides(idbase):
+    __tablename__ = "aligned_peptides"
+    __table_args__ = (
+        UniqueConstraint(
+            "s3_bucket",
+            "s3_key",
+            name="uq_aligned_peptides_s3_bucket_key",
+        ),
+    )
+    sample_id = Column(Integer, ForeignKey("samples.id"))
+    sample = relationship("Sample", back_populates="aligned_peptides")  # type: ignore
+
+    s3_bucket = Column(String, nullable=False)
+    s3_key = Column(String, nullable=False)
