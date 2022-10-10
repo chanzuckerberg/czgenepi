@@ -97,12 +97,6 @@ def upgrade():
         schema="aspen",
         type_="foreignkey",
     )
-    op.drop_constraint(
-        "fk_sample_qc_metrics_qc_type_qc_types",
-        "sample_qc_metrics",
-        schema="aspen",
-        type_="foreignkey",
-    )
     op.drop_column("sample_qc_metrics", "qc_type", schema="aspen")
     op.drop_table("qc_types", schema="aspen")
 
