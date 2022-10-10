@@ -197,8 +197,7 @@ class Sample(idbase, DictMixin):  # type: ignore
     )  # type: ignore
 
     uploaded_pathogen_genome: Optional[UploadedPathogenGenome]
-    # uploaded_pathogen_genome = relationship("UploadedPathogenGenome", back_populates="sample")
-    aligned_pathogen_genome = relationship(
+    aligned_pathogen_genome = relationship(  # type: ignore
         "AlignedPathogenGenome", back_populates="sample"
     )
     qc_metrics = relationship("SampleQCMetric", back_populates="sample")  # type: ignore

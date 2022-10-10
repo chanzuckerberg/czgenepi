@@ -122,7 +122,7 @@ class AlignedPathogenGenome(PathogenGenome):
     reference_name = Column(String, nullable=False)
 
 
-class AlignedPeptides(idbase):
+class AlignedPeptides(idbase):  # type: ignore
     __tablename__ = "aligned_peptides"
     __table_args__ = (
         UniqueConstraint(
