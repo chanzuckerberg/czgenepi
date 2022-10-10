@@ -13,7 +13,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import deferred, relationship, backref
+from sqlalchemy.orm import backref, deferred, relationship
 
 from aspen.database.models.base import idbase
 from aspen.database.models.entity import Entity, EntityType
