@@ -7,7 +7,7 @@ workflow nextstrain {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
-        String group_name
+        String group
         String s3_filestem
         String template_args
         String tree_type
@@ -19,7 +19,7 @@ workflow nextstrain {
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
-        group_name = group_name,
+        group = group,
         s3_filestem = s3_filestem,
         template_args = template_args,
         tree_type = tree_type
@@ -33,7 +33,7 @@ task nextstrain_workflow {
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
-        String group_name
+        String group
         String s3_filestem
         String template_args
         String tree_type
@@ -60,10 +60,10 @@ task nextstrain_workflow {
     genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
     aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 
-    workflow_id=$(aspen-cli db create-phylo-run                  \
-                      --group-name "~{group_name}"               \
-                      --builds-template-args '~{template_args}'  \
-                      --tree-type "~{tree_type}"
+    workflow_id=$(python3 /usr/src/app/aspen/workflows/nextstrain_run/create_phyloruns.py launch \
+                      "~{group}"                \
+                      --tree-type "~{tree_type}"   \
+                      --template-args '~{template_args}'
     )
 
     # set up ncov. keep the fetch command in case want to overwrite the version in Docker image
