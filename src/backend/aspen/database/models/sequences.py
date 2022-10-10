@@ -13,7 +13,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import deferred, relationship
+from sqlalchemy.orm import deferred, relationship, backref
 
 from aspen.database.models.base import idbase
 from aspen.database.models.entity import Entity, EntityType
@@ -89,10 +89,10 @@ class UploadedPathogenGenome(PathogenGenome):
     sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
     # The default value of cascade is "save-update, merge", so if we want to enable "delete", we
     # need to include the other options as well to maintain backwards compatibility.
-    sample = (
-        relationship(  # type: ignore
-            Sample,
-            back_populates="uploaded_pathogen_genome",
+    sample = relationship(  # type: ignore
+        Sample,
+        backref=backref(
+            "uploaded_pathogen_genome",
             uselist=False,
             cascade="delete, merge, save-update",
         ),
