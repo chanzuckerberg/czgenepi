@@ -10,9 +10,21 @@ export const FilterContainer = styled.div`
   }}
 `;
 
+export const StyledTitleContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+`;
+
 export const StyledExplainerTitle = styled.div`
   ${fontHeaderXs}
   display: flex;
   align-items: center;
   color: black;
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin: ${spaces?.xxs}px 0;
+    `;
+  }}
 `;

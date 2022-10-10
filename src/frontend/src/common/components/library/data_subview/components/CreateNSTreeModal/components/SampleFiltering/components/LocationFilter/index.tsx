@@ -83,7 +83,9 @@ export const LocationFilter = ({
         namedLocations.find(
           (location) => location.name === newSelectedOptions.name
         ) || null;
-      setSelectedLocation(newLocation);
+      if (newLocation && newLocation.id !== selectedLocation?.id) {
+        setSelectedLocation(newLocation);
+      }
     }
   };
 
