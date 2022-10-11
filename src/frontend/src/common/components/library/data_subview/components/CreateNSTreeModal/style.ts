@@ -16,9 +16,10 @@ import DialogTitle from "src/common/components/library/Dialog/components/DialogT
 import NextstrainLogoImg from "src/common/images/nextstrain-inline.svg";
 import { P, transparentScrollbars } from "src/common/styles/basicStyle";
 import { iconFillGrayHoverPrimary } from "src/common/styles/iconStyle";
+import { MAX_MODAL_WIDTH } from "src/common/styles/mixins/global";
 import Dialog from "src/components/Dialog";
 
-export const Attribution = styled.div`
+export const Attribution = styled.p`
   ${fontBodyS}
 
   display: flex;
@@ -26,9 +27,35 @@ export const Attribution = styled.div`
 
   ${(props) => {
     const colors = getColors(props);
+    const spaces = getSpaces(props);
 
     return `
       color: ${colors?.gray[600]};
+      margin: 0 0 ${spaces?.m}px;
+    `;
+  }}
+`;
+
+const gray500 = (props: CommonThemeProps) => {
+  const colors = getColors(props);
+
+  return `
+    color: ${colors?.gray[500]};
+  `;
+};
+
+export const Acknowledgements = styled.p`
+  margin: 0;
+  ${fontBodyXxxs}
+  ${gray500}
+`;
+
+export const SpacedAcknowledgements = styled(Acknowledgements)`
+  ${(props) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin: 0 0 ${spaces?.s}px;
     `;
   }}
 `;
@@ -54,28 +81,34 @@ export const StyledDialog = styled(Dialog)`
   display: flex;
   align-items: center;
   justify-content: center;
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin: ${spaces?.xxl}px;
+    `;
+  }}
 
   .MuiDialog-container {
     max-height: 100vh;
+    ${transparentScrollbars}
+  }
+
+  .MuiDialog-paper {
+    margin: 0;
+    min-width: ${MAX_MODAL_WIDTH}px;
   }
 `;
 
 export const StyledDialogContent = styled(DialogContent)`
   ${fontBodyS}
-  ${transparentScrollbars}
+  ${gray500}
 
   padding-bottom: 0;
   overflow-y: auto;
   & > div:last-child {
     margin-bottom: 0;
   }
-
-  ${(props) => {
-    const colors = getColors(props);
-    return `
-      color: ${colors?.gray[500]};
-    `;
-  }}
 `;
 
 export const Title = styled.span`
@@ -186,20 +219,21 @@ export const TreeNameTooLongAlert = styled.div`
   }}
 `;
 
-export const CreateTreeInfo = styled.div`
+export const CreateTreeInfo = styled.p`
   ${fontBodyXxs}
   ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
       color: ${colors?.gray[400]};
-      margin-top: ${spaces?.l}px;
+      margin: ${spaces?.l}px 0 0;
     `;
   }}
 `;
 
 interface SeparatorProps extends CommonThemeProps {
   marginSize: "l" | "xl";
+  marginBottomSize?: "l" | "xl";
 }
 
 const doNotForwardProps = ["marginSize"];
@@ -210,13 +244,17 @@ export const Separator = styled("div", {
   height: 0;
 
   ${(props: SeparatorProps) => {
-    const { marginSize } = props;
+    const { marginSize, marginBottomSize } = props;
     const colors = getColors(props);
     const spaces = getSpaces(props);
 
+    const margin = marginBottomSize
+      ? `${spaces?.[marginSize]}px 0 ${spaces?.[marginBottomSize]}px 0`
+      : `${spaces?.[marginSize]}px 0`;
+
     return `
       border-top: 1px solid ${colors?.gray[200]};
-      margin: ${spaces?.[marginSize]}px 0;
+      margin: ${margin};
     `;
   }}
 `;
@@ -266,13 +304,12 @@ export const StyledFormControlLabel = styled(FormControlLabel)`
 
 export const StyledFooter = styled.div`
   flex: 0 0 auto;
+  max-width: ${MAX_MODAL_WIDTH}px;
 
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
-      margin-bottom: ${spaces?.xxl}px;
-      margin-left: ${spaces?.xxl}px;
-      margin-top: ${spaces?.xl}px;
+      padding: ${spaces?.xl}px ${spaces?.xxl}px ${spaces?.xxl}px; 
     `;
   }}
 `;
