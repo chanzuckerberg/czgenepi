@@ -86,6 +86,11 @@ export const StyledDialog = styled(Dialog)`
     max-height: 100vh;
     ${transparentScrollbars}
   }
+
+  .MuiDialog-paper {
+    margin: 0;
+    min-width: 600px;
+  }
 `;
 
 export const StyledDialogContent = styled(DialogContent)`
