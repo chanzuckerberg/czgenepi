@@ -55,8 +55,8 @@ export const SpacedAcknowledgements = styled(Acknowledgements)`
     const spaces = getSpaces(props);
 
     return `
-    margin: 0 0 ${spaces?.s}px;
-  `;
+      margin: 0 0 ${spaces?.s}px;
+    `;
   }}
 `;
 
