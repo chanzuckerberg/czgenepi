@@ -20,11 +20,23 @@ export const StyledContainer = styled.div`
   }}
 `;
 
+export const StyledTitleContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+`;
+
 export const StyledExplainerTitle = styled.div`
   ${fontHeaderXs}
   display: flex;
   align-items: center;
   color: black;
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin: ${spaces?.xxs}px 0;
+    `;
+  }}
 `;
 
 export const StyledFiltersSection = styled.div`
@@ -96,6 +108,13 @@ export const StyledDropdown = styled(Dropdown)`
     const colors = getColors(props);
     const palette = getPalette(props);
     return `
+      ${
+        props.fullWidth &&
+        `
+        text-overflow: ellipsis;
+        max-width: 470px;
+        `
+      }
       width: ${width};
       border-color: ${colors?.gray[500]};
       path {

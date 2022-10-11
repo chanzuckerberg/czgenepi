@@ -1,7 +1,8 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
-import { Icon } from "czifui";
+import { Button, Icon } from "czifui";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
+import { ResetFiltersType } from "../..";
 import { StyledTooltip } from "../../style";
 import { SampleFilteringTooltip } from "../SampleFilteringTooltip";
 import {
@@ -14,19 +15,22 @@ import {
   LocationFilter,
   LocationFilterType,
 } from "./components/LocationFilter";
+
 import {
   StyledContainer,
   StyledExplainerTitle,
   StyledFiltersSection,
   StyledInfoIconWrapper,
   StyledNewTabLink,
+  StyledTitleContainer,
 } from "./style";
 
 interface Props
   extends StartDateFilterType,
     EndDateFilterType,
     LineageFilterType,
-    LocationFilterType {}
+    LocationFilterType,
+    ResetFiltersType {}
 
 const SAMPLE_FILTERING_TOOLTIP_TEXT = (
   <div>
@@ -51,7 +55,9 @@ const SAMPLE_FILTERING_TOOLTIP_TEXT = (
  */
 export function SampleFiltering({
   availableLineages,
+  isFilterEnabled,
   namedLocations,
+  resetFilters,
   selectedLineages,
   selectedLocation,
   setSelectedLineages,
@@ -68,25 +74,40 @@ export function SampleFiltering({
   );
   return (
     <StyledContainer>
-      <StyledExplainerTitle>
-        {isTreeLocationFilterFlagOn
-          ? "Define samples of interest by:"
-          : "Limit samples from my jurisdiction to:"}
+      <StyledTitleContainer>
         {isTreeLocationFilterFlagOn ? (
-          <SampleFilteringTooltip />
+          <>
+            <StyledExplainerTitle>
+              Define samples of interest by:
+              <SampleFilteringTooltip />
+            </StyledExplainerTitle>
+            {isFilterEnabled && (
+              <Button
+                onClick={resetFilters}
+                sdsType="primary"
+                sdsStyle="minimal"
+                isAllCap
+              >
+                Reset all
+              </Button>
+            )}
+          </>
         ) : (
-          <StyledTooltip
-            arrow
-            leaveDelay={1000}
-            title={SAMPLE_FILTERING_TOOLTIP_TEXT}
-            placement="top"
-          >
-            <StyledInfoIconWrapper>
-              <Icon sdsIcon="infoCircle" sdsSize="xs" sdsType="static" />
-            </StyledInfoIconWrapper>
-          </StyledTooltip>
+          <StyledExplainerTitle>
+            Limit samples from my jurisdiction to:
+            <StyledTooltip
+              arrow
+              leaveDelay={1000}
+              title={SAMPLE_FILTERING_TOOLTIP_TEXT}
+              placement="top"
+            >
+              <StyledInfoIconWrapper>
+                <Icon sdsIcon="infoCircle" sdsSize="xs" sdsType="static" />
+              </StyledInfoIconWrapper>
+            </StyledTooltip>
+          </StyledExplainerTitle>
         )}
-      </StyledExplainerTitle>
+      </StyledTitleContainer>
       <StyledFiltersSection>
         <LineageFilter
           availableLineages={availableLineages}
