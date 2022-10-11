@@ -10,7 +10,7 @@ export type SampleResponseData = {
   };
   czb_failed_genome_recovery?: boolean;
   gisaid: {
-    gisaid_id: any;
+    gisaid_id: string | null;
     status: string;
   };
   lineage: {
