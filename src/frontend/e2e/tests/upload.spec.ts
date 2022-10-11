@@ -17,8 +17,6 @@ test.describe("Upload sample tests", () => {
     const url = `${baseUrl}/data/samples`;
     basePage = new BasePage(page);
     await basePage.gotoUrl(url);
-    // await Promise.all([basePage.gotoUrl(url), page.waitForNavigation()]);
-    // page.waitForNavigation(),
     //accept site cookies
     await basePage.acceptCookies();
 
