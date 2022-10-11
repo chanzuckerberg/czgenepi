@@ -306,11 +306,11 @@ export const CreateNSTreeModal = ({
           <Attribution>
             Built in partnership with <NextstrainLogo />, enabled by data
             from&nbsp;
-            <Link href="https://gisaid.org/" target="_blank">
+            <NewTabLink href="https://gisaid.org/" target="_blank">
               <ImageSizer>
                 <Image src={GisaidLogo} alt="GISAID" />
               </ImageSizer>
-            </Link>
+            </NewTabLink>
             .
           </Attribution>
           <SpacedAcknowledgements>
