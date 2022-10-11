@@ -81,6 +81,13 @@ export const StyledDialog = styled(Dialog)`
   display: flex;
   align-items: center;
   justify-content: center;
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin: ${spaces?.xxl}px;
+    `;
+  }}
 
   .MuiDialog-container {
     max-height: 100vh;
@@ -89,7 +96,7 @@ export const StyledDialog = styled(Dialog)`
 
   .MuiDialog-paper {
     margin: 0;
-    min-width: 600px;
+    min-width: ${MAX_MODAL_WIDTH}px;
   }
 `;
 
