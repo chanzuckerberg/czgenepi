@@ -16,9 +16,9 @@ test.describe("Upload sample tests", () => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
     const url = `${baseUrl}/data/samples`;
     basePage = new BasePage(page);
-    await Promise.all([basePage.gotoUrl(url), page.waitForNavigation()]);
-    //basePage.gotoUrl(url),
-    //page.waitForNavigation(),
+    await basePage.gotoUrl(url);
+    // await Promise.all([basePage.gotoUrl(url), page.waitForNavigation()]);
+    // page.waitForNavigation(),
     //accept site cookies
     await basePage.acceptCookies();
 

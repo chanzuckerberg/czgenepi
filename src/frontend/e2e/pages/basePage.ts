@@ -18,9 +18,9 @@ export class BasePage {
 
   async gotoUrl(url: string, option?: any) {
     if (option) {
-      this.page.goto(url, option);
+      await this.page.goto(url, option);
     } else {
-      this.page.goto(url);
+      await this.page.goto(url);
     }
   }
   /**
