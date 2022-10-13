@@ -11,6 +11,6 @@ jobs:
     name: PR Checkboxes
     runs-on: ubuntu-latest
     steps:
-    - uses: chanzuckerberg/CZ-PR-bot@v1.0
+    - uses: chanzuckerberg/CZ-PR-bot@lvreynoso/omit_dev
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
