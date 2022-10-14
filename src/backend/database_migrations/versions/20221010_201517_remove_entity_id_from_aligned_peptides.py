@@ -25,4 +25,4 @@ def upgrade():
 
 
 def downgrade():
-   raise NotImplementedError("Downgrading the DB is not Allowed")
+    raise NotImplementedError("Downgrading the DB is not Allowed")
