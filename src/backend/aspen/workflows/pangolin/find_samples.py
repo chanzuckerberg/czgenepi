@@ -1,3 +1,4 @@
+import io
 import subprocess
 import urllib.request
 from typing import Iterable
@@ -25,7 +26,7 @@ def check_latest_pangolin_version() -> str:
     return latest_version
 
 
-def find_samples():
+def find_samples() -> Iterable[str]:
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     most_recent_pango_version: str = check_latest_pangolin_version()
 
@@ -53,13 +54,16 @@ def find_samples():
 
 
 @click.command("find_samples")
+@click.option("samples_fh", "--output-file", type=click.File("w"), required=True)
 @click.option("--test", type=bool, is_flag=True)
-def run_command(test: bool):
+def run_command(samples_fh: io.TextIOBase, test: bool):
     if test:
         print("Success!")
         return
     samples = find_samples()
-    subprocess.run(["bash", "run_pangolin.sh"] + samples)
+    for sample_id in samples:
+        samples_fh.write(f"{sample_id}\n")
+    print(f"{len(samples)} sample ids dumped to {samples_fh.name}")
 
 
 if __name__ == "__main__":
