@@ -19,7 +19,7 @@ RUN eval "$($HOME/miniconda/bin/conda shell.bash hook)" && conda init
 
 # install pangolin
 COPY aspen/workflows/pangolin/install_pangolin.sh .
-RUN bash install_pangolin.sh && echo "uncache"
+RUN bash install_pangolin.sh
 
 # Poetry: install app
 COPY pyproject.toml poetry.lock environment.yaml ./
