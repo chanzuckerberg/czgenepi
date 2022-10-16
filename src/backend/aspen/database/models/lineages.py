@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import base, idbase
 from aspen.database.models.enum import Enum
+from aspen.database.models.pathogens import Pathogen
 
 
 class PangoLineage(idbase):  # type: ignore
@@ -27,6 +28,32 @@ class PangoLineage(idbase):  # type: ignore
 
     def __repr__(self):
         return f"Pango Lineage <{self.lineage}>"
+
+
+class PathogenLinaage(idbase):  # type: ignore
+    """A pathogen lineage. Only real data is its official name (`lineage`).
+
+    Entire table taken together should be all the current lineages for a pathogen.
+    This table gets regularly updated by a data workflow.
+    See workflow named `import_pango_lineages` for that process. # TODO - support more pathogens!
+
+    Intent of this table and the workflow is to duplicate info at:
+    - https://raw.githubusercontent.com/cov-lineages/pango-designation/master/lineage_notes.txt
+    - https://github.com/mpxv-lineages/lineage-designation/blob/master/auto-generated/lineages.json
+    According to Pangolin and NCBI teams, these is the best indication of current list
+
+    Sources:
+    - https://github.com/cov-lineages/pango-designation/issues/456
+    """
+
+    __tablename__ = "pathogen_lineages"
+
+    pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
+    pathogen = relationship(Pathogen, back_populates="lineages", uselist=True)  # type: ignore
+    lineage = Column(String, nullable=False, unique=True)
+
+    def __repr__(self):
+        return f"Pathogen Lineage <{self.lineage}>"
 
 
 class LineageType(enum.Enum):
