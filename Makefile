@@ -156,7 +156,7 @@ create-new-db-image:
 check-images: ## Spot-check the gisaid image
 	$(docker_compose) run --no-deps --rm gisaid /usr/src/app/aspen/workflows/test-gisaid.sh
 	$(docker_compose) run --no-deps --rm nextstrain /usr/src/app/aspen/workflows/test-nextstrain.sh
-	$(docker_compose) run --no-deps --rm pangolin /usr/src/app/aspen/workflows/test-pangolin.sh
+	$(docker_compose) run --no-deps --rm lineage_qc /usr/src/app/aspen/workflows/test-pangolin.sh
 
 .PHONY: imagecheck-genepi-%
 imagecheck-genepi-%: ## Spot-check backend/batch images

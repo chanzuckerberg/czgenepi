@@ -103,7 +103,7 @@ ${local_aws} ssm put-parameter --name /genepi/local/localstack/pangolin-ondemand
     "Run":{
       "genepi_config_secret_name":"genepi-config",
       "aws_region":"us-west-2",
-      "docker_image_id":"genepi-pangolin",
+      "docker_image_id":"genepi-lineage_qc",
       "remote_dev_prefix":""}
     },
   "OutputPrefix":"s3://genepi-batch/pangolin-ondemand-sfn/results",
@@ -153,7 +153,7 @@ ${local_aws} ssm put-parameter --name /genepi/local/localstack/pangolin-ondemand
   "Input":{
     "Run":{
       "aws_region":"us-west-2",
-      "docker_image_id":"genepi-pangolin"}
+      "docker_image_id":"genepi-lineage_qc"}
     },
   "OutputPrefix":"s3://aspen-batch/pangolin-ondemand-sfn/results",
   "RUN_WDL_URI":"s3://aspen-batch/pangolin-ondemand.wdl-v0.0.1.wdl",

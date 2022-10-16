@@ -43,7 +43,7 @@ locals {
   backend_image    = join(":", [local.secret["ecrs"]["backend"]["url"], lookup(var.image_tags, "backend", var.image_tag)])
 
   # Workflow images
-  pangolin_image   = join(":", [local.secret["ecrs"]["pangolin"]["url"], lookup(var.image_tags, "pangolin", var.image_tag)])
+  lineage_qc_image   = join(":", [local.secret["ecrs"]["lineage_qc"]["url"], lookup(var.image_tags, "lineage_qc", var.image_tag)])
   nextstrain_image = join(":", [local.secret["ecrs"]["nextstrain"]["url"], lookup(var.image_tags, "nextstrain", var.image_tag)])
   gisaid_image     = join(":", [local.secret["ecrs"]["gisaid"]["url"], lookup(var.image_tags, "gisaid", var.image_tag)])
 
@@ -204,7 +204,7 @@ module gisaid_sfn_config {
 module pangolin_sfn_config {
   source   = "../sfn_config"
   app_name = "pangolin-sfn"
-  image    = local.pangolin_image
+  image    = local.lineage_qc_image
   memory   = 16000
   wdl_path = "workflows/pangolin.wdl"
   custom_stack_name     = local.custom_stack_name
@@ -225,7 +225,7 @@ module pangolin_sfn_config {
 module pangolin_ondemand_sfn_config {
   source   = "../sfn_config"
   app_name = "pangolin-ondemand-sfn"
-  image    = local.pangolin_image
+  image    = local.lineage_qc_image
   memory   = 16000
   wdl_path = "workflows/pangolin-ondemand.wdl"
   custom_stack_name     = local.custom_stack_name

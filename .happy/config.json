@@ -32,7 +32,7 @@
         "batch": {
             "build_images": [
                 "nextstrain",
-                "pangolin",
+                "lineage_qc",
                 "gisaid"
             ],
             "profile": "jobs"
@@ -43,11 +43,11 @@
             ],
             "profile": "nextstrain"
         },
-        "pangolin": {
+        "lineage_qc": {
             "build_images": [
-                "pangolin"
+                "lineage_qc"
             ],
-            "profile": "pangolin"
+            "profile": "lineage_qc"
         },
         "gisaid": {
             "build_images": [
