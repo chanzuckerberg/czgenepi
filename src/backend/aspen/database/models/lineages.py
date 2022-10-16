@@ -30,7 +30,7 @@ class PangoLineage(idbase):  # type: ignore
         return f"Pango Lineage <{self.lineage}>"
 
 
-class PathogenLinaage(idbase):  # type: ignore
+class PathogenLineage(idbase):  # type: ignore
     """A pathogen lineage. Only real data is its official name (`lineage`).
 
     Entire table taken together should be all the current lineages for a pathogen.

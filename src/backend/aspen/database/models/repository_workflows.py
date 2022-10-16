@@ -1,7 +1,5 @@
-"""This module describes the entities and workflow for processing the gisaid dump."""
+"""This module describes the entities and workflow for processing public repo datasets."""
 from __future__ import annotations
-
-from typing import MutableSequence, Sequence
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
@@ -12,35 +10,25 @@ from aspen.database.models.public_repositories import PublicRepository
 from aspen.database.models.workflow import Workflow, WorkflowType
 
 
-class RawRepositoryDump(Entity):
-    __tablename__ = "raw_repository_dump"
+class RawRepositoryData(Entity):
+    __tablename__ = "raw_repository_data"
     __table_args__ = (UniqueConstraint("s3_bucket", "s3_key"),)
+    __mapper_args__ = {"polymorphic_identity": EntityType.RAW_PUBLIC_REPOSITORY_DATA}
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
     pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
-    pathogen = relationship(Pathogen, back_populates="repository_dumps", uselist=True)  # type: ignore
+    pathogen = relationship(Pathogen, back_populates="raw_repository_data")  # type: ignore
     public_repository_id = Column(
         Integer, ForeignKey(PublicRepository.id), nullable=False
     )
-    public_repository = relationship(PublicRepository, back_populates="repository_dumps", uselist=True)  # type: ignore
+    public_repository = relationship(PublicRepository, back_populates="raw_repository_data")  # type: ignore
     download_date = Column(DateTime, nullable=False)
     s3_bucket = Column(String, nullable=False)
     s3_key = Column(String, nullable=False)
 
-    __mapper_args__ = {"polymorphic_identity": EntityType.RAW_PUBLIC_REPOSITORY_DUMP}
 
-    @property
-    def processed_repository_dumps(self) -> Sequence[ProcessedRepositoryDump]:
-        """A sequence of processed gisaid dumps generated from this raw gisaid dump."""
-        results: MutableSequence[ProcessedRepositoryDump] = list()
-        for workflow, entities in self.get_children(ProcessedRepositoryDump):
-            results.extend(entities)
-
-        return results
-
-
-class ProcessedRepositoryDump(Entity):
-    __tablename__ = "processed_repository_dump"
+class ProcessedRepositoryData(Entity):
+    __tablename__ = "processed_repository_data"
     __table_args__ = (
         UniqueConstraint(
             "s3_bucket",
@@ -51,32 +39,24 @@ class ProcessedRepositoryDump(Entity):
             "metadata_s3_key",
         ),
     )
+    __mapper_args__ = {
+        "polymorphic_identity": EntityType.PROCESSED_PUBLIC_REPOSITORY_DATA
+    }
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
     pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
-    pathogen = relationship(Pathogen, back_populates="repository_dumps", uselist=True)  # type: ignore
+    pathogen = relationship(Pathogen, back_populates="processed_repository_data")  # type: ignore
     public_repository_id = Column(
         Integer, ForeignKey(PublicRepository.id), nullable=False
     )
-    public_repository = relationship(PublicRepository, back_populates="repository_dumps", uselist=True)  # type: ignore
+    public_repository = relationship(PublicRepository, back_populates="processed_repository_data")  # type: ignore
     s3_bucket = Column(String, nullable=False)
     sequences_s3_key = Column(String, nullable=False)
     metadata_s3_key = Column(String, nullable=False)
 
-    __mapper_args__ = {
-        "polymorphic_identity": EntityType.PROCESSED_PUBLIC_REPOSITORY_DUMP
-    }
 
-    @property
-    def raw_repository_dump(self) -> RawRepositoryDump:
-        """The raw gisaid dump this processed gisaid dump was generated from."""
-        parents = self.get_parents(RawRepositoryDump)
-        assert len(parents) == 1
-        return parents[0]
-
-
-class AlignedRepositoryDump(Entity):
-    __tablename__ = "aligned_repository_dump"
+class AlignedRepositoryData(Entity):
+    __tablename__ = "aligned_repository_data"
     __table_args__ = (
         UniqueConstraint(
             "s3_bucket",
@@ -87,48 +67,45 @@ class AlignedRepositoryDump(Entity):
             "metadata_s3_key",
         ),
     )
+    __mapper_args__ = {
+        "polymorphic_identity": EntityType.ALIGNED_PUBLIC_REPOSITORY_DATA
+    }
 
     entity_id = Column(Integer, ForeignKey(Entity.id), primary_key=True)
     pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
-    pathogen = relationship(Pathogen, back_populates="repository_dumps", uselist=True)  # type: ignore
+    pathogen = relationship(Pathogen, back_populates="aligned_repository_data")  # type: ignore
     public_repository_id = Column(
         Integer, ForeignKey(PublicRepository.id), nullable=False
     )
-    public_repository = relationship(PublicRepository, back_populates="repository_dumps", uselist=True)  # type: ignore
+    public_repository = relationship(PublicRepository, back_populates="aligned_repository_data")  # type: ignore
     s3_bucket = Column(String, nullable=False)
     sequences_s3_key = Column(String, nullable=False)
     metadata_s3_key = Column(String, nullable=False)
 
-    __mapper_args__ = {
-        "polymorphic_identity": EntityType.ALIGNED_PUBLIC_REPOSITORY_DUMP
-    }
 
-
-class RepositoryDumpWorkflow(Workflow):
+class RepositoryDownloadWorkflow(Workflow):
     __tablename__ = "repository_workflows"
-    __mapper_args__ = {
-        "polymorphic_identity": WorkflowType.PROCESS_PUBLIC_REPOSITORY_DUMP
-    }
+    __mapper_args__ = {"polymorphic_identity": WorkflowType.DOWNLOAD_PUBLIC_REPOSITORY}
 
     workflow_id = Column(Integer, ForeignKey(Workflow.id), primary_key=True)
     pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
-    pathogen = relationship(Pathogen, back_populates="repository_dumps", uselist=True)  # type: ignore
+    pathogen = relationship(Pathogen, back_populates="repository_download_workflows")  # type: ignore
     public_repository_id = Column(
         Integer, ForeignKey(PublicRepository.id), nullable=False
     )
-    public_repository = relationship(PublicRepository, back_populates="repository_dumps", uselist=True)  # type: ignore
+    public_repository = relationship(PublicRepository, back_populates="repository_download_workflows")  # type: ignore
 
 
 class RepositoryAlignmentWorkflow(Workflow):
     __tablename__ = "repository_alignment_workflows"
     __mapper_args__ = {
-        "polymorphic_identity": WorkflowType.ALIGN_PUBLIC_REPOSITORY_DUMP
+        "polymorphic_identity": WorkflowType.ALIGN_PUBLIC_REPOSITORY_DATA
     }
 
     workflow_id = Column(Integer, ForeignKey(Workflow.id), primary_key=True)
     pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
-    pathogen = relationship(Pathogen, back_populates="repository_dumps", uselist=True)  # type: ignore
+    pathogen = relationship(Pathogen, back_populates="repository_alignment_workflows")  # type: ignore
     public_repository_id = Column(
         Integer, ForeignKey(PublicRepository.id), nullable=False
     )
-    public_repository = relationship(PublicRepository, back_populates="repository_dumps", uselist=True)  # type: ignore
+    public_repository = relationship(PublicRepository, back_populates="repository_alignment_workflows")  # type: ignore
