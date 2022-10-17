@@ -10,6 +10,7 @@ import { useSampleInfo } from "src/common/queries/samples";
 import { FilterPanel } from "src/components/FilterPanel";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
+import { Table } from "src/components/Table";
 import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { VIEWNAME } from "../../common/constants/types";
@@ -262,8 +263,11 @@ const Data: FunctionComponent = () => {
         <StyledMenu>{dataJSX.menuItems}</StyledMenu>
       </Navigation>
       <View>
-        {viewName === VIEWNAME.SAMPLES && <SamplesView />}
-        {viewName === VIEWNAME.TREES && <TreesView />}
+        <Table>
+          boop
+        </Table>
+        {/* {viewName === VIEWNAME.SAMPLES && <SamplesView />}
+        {viewName === VIEWNAME.TREES && <TreesView />} */}
       </View>
     </Container>
   );

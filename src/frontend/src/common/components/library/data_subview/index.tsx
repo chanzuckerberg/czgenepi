@@ -1,8 +1,8 @@
-import { InputSearch } from "czifui";
-import { compact, escapeRegExp, filter } from "lodash";
-import { FunctionComponent, useEffect, useReducer, useState } from "react";
+import { compact } from "lodash";
+import { FunctionComponent, useEffect, useState } from "react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
+import { SearchBar } from "src/components/Table/components/SearchBar";
 import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
 import { DeleteSamplesConfirmationModal } from "./components/DeleteSamplesConfirmationModal";
 import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
@@ -11,15 +11,13 @@ import { EditSamplesConfirmationModal } from "./components/EditSamplesConfirmati
 import { EditTreeConfirmationModal } from "./components/EditTreeConfirmationModal";
 import { IconButton } from "./components/IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
-import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
 import {
   Divider,
   DownloadWrapper,
   SamplesTable,
-  SearchBar,
-  SearchInput,
+  StyledBar,
   StyledChip,
   StyledDiv,
   StyledFlexChildDiv,
@@ -36,27 +34,6 @@ interface Props {
   renderer?: CustomRenderer;
   viewName: VIEWNAME;
   dataFilterFunc?: (data: TableItem[]) => TableItem[];
-}
-
-interface SearchState {
-  searching?: boolean;
-  results?: TableItem[];
-}
-
-function recursiveTest(
-  item: Record<string | number, JSONPrimitive | Record<string, JSONPrimitive>>,
-  query: RegExp
-): boolean {
-  return Object.values(item).some((value) => {
-    if (typeof value === "object" && value !== null) {
-      return recursiveTest(value, query);
-    }
-    return query.test(`${value}`);
-  });
-}
-
-function searchReducer(state: SearchState, action: SearchState): SearchState {
-  return { ...state, ...action };
 }
 
 function tsvDataMap(
@@ -118,12 +95,7 @@ const DataSubview: FunctionComponent<Props> = ({
   viewName,
   dataFilterFunc,
 }: Props) => {
-  // we are modifying state using hooks, so we need a reducer
-  const [state, dispatch] = useReducer(searchReducer, {
-    results: Object.values(data ?? {}),
-    searching: false,
-  });
-
+  const [searchResults, setSearchResults] = useState<TableItem[]>([]);
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
@@ -135,7 +107,6 @@ const DataSubview: FunctionComponent<Props> = ({
     useState<boolean>(false);
   const [isEditSampleConfirmationOpen, setEditSampleConfirmationOpen] =
     useState<boolean>(false);
-  const [searchQuery, setSearchQuery] = useState<string>("");
   // TODO (mlila): when table is refactored, this modal and related state should be moved closer
   // TODO-TR          to the actions that cause the modal to open (search for TODO-TR)
   const [isDeleteTreeConfirmationOpen, setDeleteTreeConfirmationOpen] =
@@ -175,10 +146,6 @@ const DataSubview: FunctionComponent<Props> = ({
     if (shouldStartUsherFlow) setShouldStartUsherFlow(false);
   }, [shouldStartUsherFlow]);
 
-  useEffect(() => {
-    searcher(searchQuery);
-  }, [data]);
-
   const handleDeleteSampleModalClose = () => {
     setDeleteSampleConfirmationOpen(false);
     setCheckedSampleIds([]);
@@ -206,28 +173,6 @@ const DataSubview: FunctionComponent<Props> = ({
   const handleEditTreeModalOpen = (phyloRun: PhyloRun) => {
     setPhyloRunToEdit(phyloRun);
     setEditTreeConfirmationOpen(true);
-  };
-
-  // search functions
-  const onSearchChange = (_event: React.ChangeEvent<HTMLInputElement>) => {
-    const query = _event.target.value;
-    searcher(query);
-    setSearchQuery(query);
-  };
-
-  const searcher = (query: string): void => {
-    if (data === undefined) {
-      return;
-    } else if (query.length === 0) {
-      dispatch({ results: Object.values(data) });
-      return;
-    }
-
-    dispatch({ searching: true });
-
-    const regex = new RegExp(escapeRegExp(query), "i");
-    const filteredData = filter(data, (item) => recursiveTest(item, regex));
-    dispatch({ results: filteredData, searching: false });
   };
 
   const DOWNLOAD_TOOLTIP_TEXT_DISABLED = (
@@ -344,23 +289,10 @@ const DataSubview: FunctionComponent<Props> = ({
           </>
         )}
         <StyledFlexChildDiv>
-          <SearchBar>
-            <SearchInput>
-              <InputSearch
-                id="search-samples"
-                label="search samples"
-                sdsStyle="rounded"
-                placeholder="Search"
-                onChange={onSearchChange}
-                value={searchQuery}
-                data-test-id="search-samples"
-              />
-            </SearchInput>
-            <div>
-              {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
-              {sampleActions}
-            </div>
-          </SearchBar>
+          <StyledBar>
+            <SearchBar onSearchComplete={setSearchResults} tableData={data} />
+            {viewName === VIEWNAME.SAMPLES && sampleActions}
+          </StyledBar>
           <SamplesTable>
             <DataTable
               isLoading={isLoading}
@@ -387,19 +319,7 @@ const DataSubview: FunctionComponent<Props> = ({
     );
   };
 
-  if (!state.results) {
-    let tableData;
-
-    if (data) {
-      const values = Object.values(data);
-      dispatch({ results: values });
-      tableData = values;
-    }
-
-    return render(tableData);
-  }
-
-  return render(state.results);
+  return render(searchResults);
 };
 
 export { DataSubview };
