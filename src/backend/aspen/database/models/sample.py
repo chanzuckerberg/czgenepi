@@ -197,8 +197,13 @@ class Sample(idbase, DictMixin):  # type: ignore
     )  # type: ignore
 
     uploaded_pathogen_genome: Optional[UploadedPathogenGenome]
+    aligned_pathogen_genome = relationship(  # type: ignore
+        "AlignedPathogenGenome", back_populates="sample"
+    )
     qc_metrics = relationship("SampleQCMetric", back_populates="sample")  # type: ignore
     lineages = relationship("SampleLineage", back_populates="sample")  # type: ignore
+    mutations = relationship("SampleMutation", back_populates="sample")  # type: ignore
+    aligned_peptides = relationship("AlignedPeptides", back_populates="sample")  # type: ignore
 
     def generate_public_identifier(self, already_exists=False):
         # If we don't have an explicit public identifier, generate one from
