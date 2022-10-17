@@ -2,7 +2,7 @@ version 1.1
 
 workflow pangolin {
     input {
-        String docker_image_id = "lineage_qc:latest"
+        String docker_image_id = "lineage-qc:latest"
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
