@@ -1,5 +1,5 @@
 import io
-from typing import Iterable, Sequence
+from typing import Iterable
 
 import click
 from sqlalchemy.orm import joinedload
