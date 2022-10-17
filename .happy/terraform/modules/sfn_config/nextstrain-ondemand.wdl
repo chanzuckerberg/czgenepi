@@ -48,8 +48,7 @@ task nextstrain_workflow {
     ncov_git_rev=""
 
     # run main workflow
-    cd /usr/src/app/aspen/workflows/nextstrain_run
-    ./run_nextstrain_ondemand.sh
+    cd /usr/src/app/aspen/workflows/nextstrain_run/run_nextstrain_ondemand.sh
 
     # error handling
     if [[ $? != 0 ]]; then
