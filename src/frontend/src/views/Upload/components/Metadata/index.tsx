@@ -26,6 +26,7 @@ import {
 import { Props } from "../common/types";
 import { initSampleMetadata } from "../common/utils";
 import ImportFile from "./components/ImportFile";
+import SDSTable from "./components/SDSTable";
 import {
   ParseResult,
   SampleIdToWarningMessages,
@@ -64,6 +65,11 @@ export default function Metadata({
   };
 
   const applyToAllColumn = useCallback(applyToAllColumn_, [setMetadata]);
+
+  let numberOfDetectedSamples = 0
+  if (samples != null) {
+    numberOfDetectedSamples = Object.keys(samples).length
+  }
 
   function handleMetadataFileUpload(result: ParseResult) {
     // If they're on the page but somehow have no samples (eg, refreshing on
@@ -131,7 +137,9 @@ export default function Metadata({
           stringToLocationFinder={stringToLocationFinder}
         />
 
-        <WebformTable
+        {(numberOfDetectedSamples >= 100) && <SDSTable metadata={metadata}/>}
+
+        {(numberOfDetectedSamples < 100) && <WebformTable
           setIsValid={setIsValid}
           metadata={metadata}
           hasImportedMetadataFile={hasImportedMetadataFile}
@@ -141,7 +149,7 @@ export default function Metadata({
           applyToAllColumn={applyToAllColumn}
           handleRowMetadata={handleRowMetadata}
           webformTableType="UPLOAD"
-        />
+        />}
 
         <ButtonWrapper>
           <NextStepWrapper isValid={isValid}>
