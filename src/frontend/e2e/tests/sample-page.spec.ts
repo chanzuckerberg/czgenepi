@@ -1,8 +1,9 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import path from "path";
 import dotenv from "dotenv";
 import fs from "fs";
 import { BasePage } from "../pages/basePage";
+import { acceptSiteCookieTerms } from "../utils/common";
 
 dotenv.config({ path: path.resolve(`.env.${process.env.NODE_ENV}`) });
 
@@ -27,6 +28,8 @@ test.describe("Samples page tests", () => {
     const url = `${baseURL}/data/samples/groupId/${process.env.GROUPID}/pathogen/SC2`;
     // make the actual call, wait until all responses have been received
     await page.goto(url, { waitUntil: "networkidle" });
+
+    //accept site cookies
     await acceptSiteCookieTerms(page);
     await page.waitForSelector(`text=Phylogenetic Trees`, { timeout: 300000 });
     const base = new BasePage(page);
@@ -35,7 +38,10 @@ test.describe("Samples page tests", () => {
     });
   });
 
-  test("Should verify sample data", async ({ page, context }, workerInfo) => {
+  test.only("Should verify sample data", async ({
+    page,
+    context,
+  }, workerInfo) => {
     const { baseURL } = workerInfo.config.projects[0].use;
     const url = `${baseURL}/data/samples/groupId/${process.env.GROUPID}/pathogen/SC2`;
 
@@ -57,6 +63,7 @@ test.describe("Samples page tests", () => {
     // make the actual call, wait until all responses have been received
     await page.goto(url, { waitUntil: "networkidle" });
 
+    //accept site cookies
     await acceptSiteCookieTerms(page);
 
     //wait for UI to render; give it ample time in local/ci
@@ -94,21 +101,6 @@ test.describe("Samples page tests", () => {
       sample.collection_location.location
     );
 
-    //todo: add remainining fields when test-id are added
+    //todo: add remaining fields when test-id are added
   });
 });
-
-/**
- * Help function that navigates to sample page
- * and accepts  site cookies
- * @param page
- */
-async function acceptSiteCookieTerms(page: Page): Promise<void> {
-  const acceptCookieSelector =
-    '[aria-label="Help us improve CZ GEN EPI"] >> text=Accept';
-  //accept cookie terms and conditions (if displayed)
-  if (await page.isVisible(acceptCookieSelector)) {
-    await page.locator(acceptCookieSelector).click();
-  }
-  await page.waitForSelector("text=Phylogenetic Trees", { timeout: 300000 });
-}
