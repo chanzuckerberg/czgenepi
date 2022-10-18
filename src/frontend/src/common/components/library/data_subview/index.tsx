@@ -11,6 +11,7 @@ import { EditSamplesConfirmationModal } from "./components/EditSamplesConfirmati
 import { EditTreeConfirmationModal } from "./components/EditTreeConfirmationModal";
 import { IconButton } from "./components/IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
+import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
 import {
@@ -291,6 +292,7 @@ const DataSubview: FunctionComponent<Props> = ({
         <StyledFlexChildDiv>
           <StyledBar>
             <SearchBar onSearchComplete={setSearchResults} tableData={data} />
+            {viewName === VIEWNAME.TREES && <TreeCreateHelpLink />}
             {viewName === VIEWNAME.SAMPLES && sampleActions}
           </StyledBar>
           <SamplesTable>
