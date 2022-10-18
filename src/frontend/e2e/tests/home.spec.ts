@@ -2,16 +2,9 @@ import { expect, test } from "@playwright/test";
 import path from "path";
 import dotenv from "dotenv";
 import { BasePage } from "../pages/basePage";
+import { HOME_PAGE } from "../utils/constants";
 
 dotenv.config({ path: path.resolve(`.env.${process.env.NODE_ENV}`) });
-
-const footer: Record<string, string> = {
-  Github: "https://github.com/chanzuckerberg/czgenepi/",
-  Careers:
-    "https://chanzuckerberg.com/careers/career-opportunities/?initiative=science",
-  "Learning Center":
-    "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
-};
 
 test.describe("Home page tests", () => {
   // overwrite global login with empty storage so we can visit home page
@@ -19,7 +12,7 @@ test.describe("Home page tests", () => {
   test("Should verify home page", async ({ page }) => {
     const base = new BasePage(page);
     //now go to home page
-    await base.goto(`${process.env.BASEURL}`);
+    await base.gotoUrl(`${process.env.BASEURL}`);
 
     await base.waitForSelector("text=No-code phylogenetic analysis");
 
@@ -32,10 +25,11 @@ test.describe("Home page tests", () => {
     await expect(await base.findByTestId("logo")).toBeVisible();
 
     // verify footer links
-    Object.keys(footer).forEach(async (key) => {
-      await expect(
-        await (await base.findLinkByText(key)).nth(0)
-      ).toHaveAttribute("href", footer[key]);
+    Object.keys(HOME_PAGE.FOOTER).forEach(async (key) => {
+      await expect((await base.findLinkByText(key)).nth(0)).toHaveAttribute(
+        "href",
+        HOME_PAGE.FOOTER[key as keyof typeof HOME_PAGE.FOOTER] as string
+      );
     });
   });
 });

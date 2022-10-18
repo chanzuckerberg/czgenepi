@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from pathlib import Path, PosixPath
 from typing import Collection
@@ -81,10 +82,8 @@ def test_pangolin_export(mocker, session, postgres_database):
         [
             "--sequences",
             "test.fa",
-            "--sample-public-identifier",
-            "public_identifier_1",
-            "--sample-public-identifier",
-            "public_identifier_2",
+            "--sample-ids-file",
+            f"{str(os.path.dirname(os.path.realpath(__file__)))}/sample_ids.txt",
         ],
     )
     assert result.exit_code == 0
