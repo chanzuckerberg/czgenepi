@@ -1,4 +1,6 @@
 import { Page } from "@playwright/test";
+import * as path from "path";
+import { ACCEPTCOOKIES } from "../utils/constants";
 
 /**
  * Base class with convenience wrappers for interactions
@@ -7,11 +9,18 @@ import { Page } from "@playwright/test";
 export class BasePage {
   constructor(public readonly page: Page) {}
 
-  async goto(url: string, option?: any) {
+  async acceptCookies() {
+    //accept site cookies if prompted
+    if (await this.page.isVisible(ACCEPTCOOKIES)) {
+      await this.page.locator(ACCEPTCOOKIES).click();
+    }
+  }
+
+  async gotoUrl(url: string, option?: any) {
     if (option) {
-      this.page.goto(url, option);
+      await this.page.goto(url, option);
     } else {
-      this.page.goto(url);
+      await this.page.goto(url);
     }
   }
   /**
@@ -28,6 +37,12 @@ export class BasePage {
     this.page.keyboard.press("Escape");
   }
 
+  /**
+   * Convenience method to press key.
+   */
+  async pressKey(key: string) {
+    this.page.keyboard.press(key, { delay: 100 });
+  }
   /**
    * Convenience method to press the tab key.
    */
@@ -61,6 +76,10 @@ export class BasePage {
    */
   async clickByTestId(value: string) {
     await this.page.click(`[data-test-id="${value}"]`);
+  }
+
+  async clickCheckBox(index: number) {
+    await this.page.locator('input[type="checkbox"]').nth(index).click();
   }
 
   /**
@@ -141,8 +160,21 @@ export class BasePage {
     return this.page.locator(`[placeholder="${placeholder}"]`);
   }
 
-  async waitForSelector(selector: string) {
-    return this.page.waitForSelector(selector, { timeout: 300000 });
+  async findByInputName(name: string) {
+    return this.page.locator(`input[name="${name}"]`);
+  }
+
+  async waitForSelector(selector: string, waitTime = 120000) {
+    return this.page.waitForSelector(selector, { timeout: waitTime });
+  }
+
+  async waitForTimeout(timeout: number) {
+    return this.page.waitForTimeout(timeout);
+  }
+
+  async selectFile(filePath: string) {
+    this.page.setInputFiles("input[type='file']", path.resolve(filePath));
+    await this.page.waitForTimeout(3000);
   }
 
   async queryElement(selector: string) {

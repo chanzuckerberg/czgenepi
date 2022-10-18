@@ -1,6 +1,6 @@
-import subprocess
+import io
 import urllib.request
-from typing import Iterable
+from typing import Collection
 
 import click
 from sqlalchemy.orm import joinedload
@@ -25,21 +25,21 @@ def check_latest_pangolin_version() -> str:
     return latest_version
 
 
-def find_samples():
+def find_samples() -> Collection[str]:
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     most_recent_pango_version: str = check_latest_pangolin_version()
 
     with session_scope(interface) as session:
         # filter for sequences that were run with an older version of pangolin
 
-        all_samples: Iterable[Sample] = session.query(Sample).options(
+        all_samples: Collection[Sample] = session.query(Sample).options(
             joinedload(Sample.uploaded_pathogen_genome)
         )
 
         # TODO: update this comparison to be <= most_recent_pango_version
         # once we update this field to be a date instead of string
 
-        samples_to_be_updated: Iterable[str] = [
+        samples_to_be_updated: Collection[str] = [
             sample.public_identifier
             for sample in all_samples
             if (
@@ -53,13 +53,16 @@ def find_samples():
 
 
 @click.command("find_samples")
+@click.option("samples_fh", "--output-file", type=click.File("w"), required=True)
 @click.option("--test", type=bool, is_flag=True)
-def run_command(test: bool):
+def run_command(samples_fh: io.TextIOWrapper, test: bool):
     if test:
         print("Success!")
         return
     samples = find_samples()
-    subprocess.run(["bash", "run_pangolin.sh"] + samples)
+    for sample_id in samples:
+        samples_fh.write(f"{sample_id}\n")
+    print(f"{len(samples)} sample ids dumped to {samples_fh.name}")
 
 
 if __name__ == "__main__":
