@@ -129,9 +129,25 @@ export type AnalyticsTreeCreationNextstrain = {
   // Type of tree being created
   tree_type: string;
   // Location of samples used for tree creation. A null value indicates that
-  // the users group info was not successfully fetched before they created
+  // the user's group info was not successfully fetched before they created
   // a tree. This generally shouldn't happen.
   location_id: number | null;
+  // Location of the user's group. This is provided for comparison with the
+  // location_id above. A null value indicates that the user's
+  // group was not successfully fetched before they created a tree. This
+  // generally shouldn't happen.
+  group_location_id: number | null;
+  // Lineages selected for tree creation. json stringified list of strings.
+  // "[]" indicates "All lineages"
+  selected_lineages: JsonString;
+  // Time range filter for tree creation. A null value indicates that
+  // the user did not change the default value and there is
+  // no start date set. FormattedDateType is "YYYY-MM-DD"
+  start_date: FormattedDateType | null;
+  // Time range filter for tree creation. A null value indicates that
+  // the user did not change the default value and there is
+  // no end date set. FormattedDateType is "YYYY-MM-DD"
+  end_date: FormattedDateType | null;
 };
 
 /** EVENT_TYPES.TREE_ACTIONS_CLICK_GALAGO */
