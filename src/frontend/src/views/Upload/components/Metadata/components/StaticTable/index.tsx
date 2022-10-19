@@ -55,19 +55,19 @@ export default function StaticTable({ metadata, setIsValid }: Props): JSX.Elemen
       setIsValid(false);
       return;
     }
-    const rowValidation: Record<string, boolean> = {}
+    const rowValidation: Record<string, boolean> = {};
     for (const [sampleId, sampleMetadata] of Object.entries(metadata)) {
-      const isRowValid = await validationSchema.isValid(sampleMetadata)
-      rowValidation[sampleId] = isRowValid
+      const isRowValid = await validationSchema.isValid(sampleMetadata);
+      rowValidation[sampleId] = isRowValid;
     }
     const isValid = Object.keys(metadata).every(
       (sampleId) => rowValidation[sampleId]
     );
     setIsValid(isValid);
-  }, [])
+  }, []);
 
   useEffect(() => {
-    validateMetadata(metadata)
+    validateMetadata(metadata);
   }, [metadata]);
 
 

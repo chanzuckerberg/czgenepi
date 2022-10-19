@@ -54,14 +54,14 @@ export default function Metadata({
     USER_FEATURE_FLAGS.static_metadata_table
   );
 
-  let numberOfDetectedSamples = 0
+  let numberOfDetectedSamples = 0;
   if (samples != null) {
-    numberOfDetectedSamples = Object.keys(samples).length
+    numberOfDetectedSamples = Object.keys(samples).length;
   }
 
-  let useStaticMetadataTable = false
+  let useStaticMetadataTable = false;
   if (numberOfDetectedSamples >= 100 && isStaticMetadataTableFlagOn) {
-    useStaticMetadataTable = true
+    useStaticMetadataTable = true;
   }
 
   // Used by file upload parser to convert location strings to Locations
@@ -152,7 +152,7 @@ export default function Metadata({
           stringToLocationFinder={stringToLocationFinder}
         />
 
-        {useStaticMetadataTable && <StaticTable metadata={metadata} setIsValid={setIsValid}/>}
+        {useStaticMetadataTable && <StaticTable metadata={metadata} setIsValid={setIsValid} />}
 
         {!useStaticMetadataTable && <WebformTable
           setIsValid={setIsValid}
