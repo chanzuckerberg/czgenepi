@@ -45,7 +45,6 @@ module.exports = {
     "react/jsx-no-target-blank": 0,
     "react/prop-types": "off",
     "sort-keys": "off",
-    "@typescript-eslint/no-var-requires": 0,
   },
   settings: {
     react: {
