@@ -20,7 +20,7 @@ export const Id = styled.p`
     const spaces = getSpaces(props);
 
     return `
-      padding: ${spaces?.m}px ${spaces?.m}px ${spaces?.m}px ${spaces?.s}px;
+      padding: ${spaces?.xs}px ${spaces?.m}px ${spaces?.xs}px ${spaces?.xs}px;
     `;
   }}
 `;
@@ -49,7 +49,7 @@ export const StyledTableCell = styled(TableCell)`
     const spaces = getSpaces(props);
 
     return `
-      padding: ${spaces?.m}px;
+      padding: ${spaces?.xs}px;
     `;
   }}
 `;
@@ -61,7 +61,7 @@ export const PrivateTableCell = styled(TableCell)`
     const colors = getColors(props);
 
     return `
-      padding: ${spaces?.m}px;
+      padding: ${spaces?.xs}px;
       border-left: solid 2px ${colors?.gray[200]};
       border-right: solid 2px ${colors?.gray[200]};
     `;

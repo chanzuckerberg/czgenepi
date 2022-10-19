@@ -75,38 +75,36 @@ export default function StaticTable({ metadata, setIsValid }: Props): JSX.Elemen
     <Overflow>
       <form autoComplete="off">
         <StyledTableContainer>
-          <MuiTable component="div" stickyHeader>
-            <TableHead component="div">
-              {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-              {/* @ts-ignore: spread types error */}
-              <StyledTableRow {...({ component: "div" } as unknown)}>
-                <StyledTableCell component="div">
+          <MuiTable stickyHeader>
+            <TableHead>
+              <StyledTableRow>
+                <StyledTableCell>
                   <IdColumn>
                     {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId}
                   </IdColumn>
                 </StyledTableCell>
-                <StyledTableCell component="div">
+                <StyledTableCell>
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId}
                 </StyledTableCell>
-                <StyledTableCell component="div">
+                <StyledTableCell>
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.publicId}
                 </StyledTableCell>
-                <StyledTableCell component="div">
+                <StyledTableCell>
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionDate}
                 </StyledTableCell>
-                <StyledTableCell component="div">
+                <StyledTableCell>
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionLocation}
                 </StyledTableCell>
-                <StyledTableCell component="div">
+                <StyledTableCell>
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate}
                 </StyledTableCell>
-                <PrivateTableCell align="center" component="div">
+                <PrivateTableCell align="center">
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.keepPrivate}
                 </PrivateTableCell>
               </StyledTableRow>
             </TableHead>
             {metadata && (
-              <TableBody component="div">
+              <TableBody>
                 {Object.entries(metadata).map(([sampleId, sampleMetadata]) => {
                   return (
                     <Row
