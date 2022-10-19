@@ -4,7 +4,7 @@ import { B } from "src/common/styles/basicStyle";
 export const DownloadFilesFailureNotif = (): JSX.Element => (
   <>
     <B>
-      Something went wrong and we were unable to complete one or more of
+      Something went wrong and we were unable to complete one or more of your
       downloads.
     </B>{" "}
     <ContactUsLink />
