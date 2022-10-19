@@ -37,4 +37,5 @@ export interface Props {
   metadata: SampleIdToMetadata | null;
   setMetadata: React.Dispatch<React.SetStateAction<SampleIdToMetadata | null>>;
   cancelPrompt: () => void;
+  analyticsFlowUuid: string;
 }
