@@ -4,8 +4,8 @@ import { getNameFromCollectionLocation } from "src/common/utils/locationUtils";
 import { Metadata } from "src/components/WebformTable/common/types";
 import {
   Id,
-  IsPrivateContent,
-  IsPrivateTableCell,
+  PrivateContent,
+  PrivateTableCell,
   StyledLockIconWrapper,
   StyledTableCell,
   StyledTableRow,
@@ -40,18 +40,18 @@ export default memo(function Row({ id, metadata }: Props): JSX.Element {
       <StyledTableCell component="div">
         {sequencingDate || "--"}
       </StyledTableCell>
-      <IsPrivateTableCell align="center" component="div">
+      <PrivateTableCell align="center" component="div">
         {keepPrivate ? (
-          <IsPrivateContent>
+          <PrivateContent>
             <StyledLockIconWrapper>
               <Icon sdsIcon="lock" sdsSize="s" sdsType="static" />
             </StyledLockIconWrapper>
             Private
-          </IsPrivateContent>
+          </PrivateContent>
         ) : (
           "Public"
         )}
-      </IsPrivateTableCell>
+      </PrivateTableCell>
     </StyledTableRow>
   );
 });

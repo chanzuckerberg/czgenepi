@@ -43,7 +43,7 @@ export const StyledTableCell = styled(TableCell)`
   }}
 `;
 
-export const IsPrivateTableCell = styled(StyledTableCell)`
+export const PrivateTableCell = styled(StyledTableCell)`
   ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     const spaces = getSpaces(props);

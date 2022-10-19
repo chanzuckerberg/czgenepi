@@ -7,7 +7,7 @@ import {
 import { CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
 import { rightMarginXxs } from "src/common/styles/iconStyle";
 
-export const Id = styled.div`
+export const Id = styled.p`
   ${fontHeaderS}
 
   min-width: 300px;
@@ -54,7 +54,7 @@ export const StyledTableCell = styled(TableCell)`
   }}
 `;
 
-export const IsPrivateTableCell = styled(TableCell)`
+export const PrivateTableCell = styled(TableCell)`
   min-width: 100px;
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
@@ -68,7 +68,7 @@ export const IsPrivateTableCell = styled(TableCell)`
   }}
 `;
 
-export const IsPrivateContent = styled.div`
+export const PrivateContent = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;

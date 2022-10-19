@@ -5,7 +5,7 @@ import { Props as CommonProps } from "../../../common/types";
 import Row from "./components/Row";
 import {
   IdColumn,
-  IsPrivateTableCell,
+  PrivateTableCell,
   Overflow,
   StyledTableCell,
   StyledTableContainer,
@@ -19,7 +19,7 @@ import {
   DATE_ERROR_MESSAGE,
   DATE_REGEX,
 } from "src/components/DateField/constants";
-import * as yup from "yup";
+import { object, string, number } from "yup";
 import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 
 interface Props {
@@ -27,26 +27,22 @@ interface Props {
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const validationSchema = yup.object({
-  collectionDate: yup
-    .string()
+const validationSchema = object({
+  collectionDate: string()
     .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
     .min(10, DATE_ERROR_MESSAGE)
     .max(10, DATE_ERROR_MESSAGE)
     .required("Required"),
-  collectionLocation: yup
-    .object({
-      id: yup.number().required(),
+  collectionLocation: object({
+      id: number().required(),
     })
     .required("Required"),
-  sequencingDate: yup
-    .string()
+  sequencingDate: string()
     .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
     .min(10, DATE_ERROR_MESSAGE)
     .max(10, DATE_ERROR_MESSAGE)
     .nullable(),
-  privateId: yup
-    .string()
+  privateId: string()
     .required("Required")
     .matches(VALID_NAME_REGEX, "Invalid character(s)")
     .max(MAX_NAME_LENGTH, "Too long"),
@@ -104,9 +100,9 @@ export default function StaticTable({ metadata, setIsValid }: Props): JSX.Elemen
                 <StyledTableCell component="div">
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate}
                 </StyledTableCell>
-                <IsPrivateTableCell align="center" component="div">
+                <PrivateTableCell align="center" component="div">
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.keepPrivate}
-                </IsPrivateTableCell>
+                </PrivateTableCell>
               </StyledTableRow>
             </TableHead>
             {metadata && (
