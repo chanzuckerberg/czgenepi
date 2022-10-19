@@ -152,19 +152,23 @@ export default function Metadata({
           stringToLocationFinder={stringToLocationFinder}
         />
 
-        {useStaticMetadataTable && <StaticTable metadata={metadata} setIsValid={setIsValid} />}
+        {useStaticMetadataTable && (
+          <StaticTable metadata={metadata} setIsValid={setIsValid} />
+        )}
 
-        {!useStaticMetadataTable && <WebformTable
-          setIsValid={setIsValid}
-          metadata={metadata}
-          hasImportedMetadataFile={hasImportedMetadataFile}
-          setMetadata={setMetadata}
-          autocorrectWarnings={autocorrectWarnings}
-          locations={namedLocations}
-          applyToAllColumn={applyToAllColumn}
-          handleRowMetadata={handleRowMetadata}
-          webformTableType="UPLOAD"
-        />}
+        {!useStaticMetadataTable && (
+          <WebformTable
+            setIsValid={setIsValid}
+            metadata={metadata}
+            hasImportedMetadataFile={hasImportedMetadataFile}
+            setMetadata={setMetadata}
+            autocorrectWarnings={autocorrectWarnings}
+            locations={namedLocations}
+            applyToAllColumn={applyToAllColumn}
+            handleRowMetadata={handleRowMetadata}
+            webformTableType="UPLOAD"
+          />
+        )}
 
         <ButtonWrapper>
           <NextStepWrapper isValid={isValid}>

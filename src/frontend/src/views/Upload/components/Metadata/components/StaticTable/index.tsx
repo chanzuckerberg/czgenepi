@@ -34,9 +34,8 @@ const validationSchema = object({
     .max(10, DATE_ERROR_MESSAGE)
     .required("Required"),
   collectionLocation: object({
-      id: number().required(),
-    })
-    .required("Required"),
+    id: number().required(),
+  }).required("Required"),
   sequencingDate: string()
     .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
     .min(10, DATE_ERROR_MESSAGE)
@@ -48,28 +47,32 @@ const validationSchema = object({
     .max(MAX_NAME_LENGTH, "Too long"),
 });
 
-export default function StaticTable({ metadata, setIsValid }: Props): JSX.Element {
-
-  const validateMetadata = useCallback(async (metadata: SampleIdToMetadata | null) => {
-    if (metadata == null) {
-      setIsValid(false);
-      return;
-    }
-    const rowValidation: Record<string, boolean> = {};
-    for (const [sampleId, sampleMetadata] of Object.entries(metadata)) {
-      const isRowValid = await validationSchema.isValid(sampleMetadata);
-      rowValidation[sampleId] = isRowValid;
-    }
-    const isValid = Object.keys(metadata).every(
-      (sampleId) => rowValidation[sampleId]
-    );
-    setIsValid(isValid);
-  }, []);
+export default function StaticTable({
+  metadata,
+  setIsValid,
+}: Props): JSX.Element {
+  const validateMetadata = useCallback(
+    async (metadata: SampleIdToMetadata | null) => {
+      if (metadata == null) {
+        setIsValid(false);
+        return;
+      }
+      const rowValidation: Record<string, boolean> = {};
+      for (const [sampleId, sampleMetadata] of Object.entries(metadata)) {
+        const isRowValid = await validationSchema.isValid(sampleMetadata);
+        rowValidation[sampleId] = isRowValid;
+      }
+      const isValid = Object.keys(metadata).every(
+        (sampleId) => rowValidation[sampleId]
+      );
+      setIsValid(isValid);
+    },
+    []
+  );
 
   useEffect(() => {
     validateMetadata(metadata);
   }, [metadata]);
-
 
   return (
     <Overflow>

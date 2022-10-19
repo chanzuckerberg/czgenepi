@@ -1,5 +1,5 @@
 import { forEach } from "lodash";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import {
@@ -57,15 +57,16 @@ export default function Upload(): JSX.Element | null {
       if (!analyticsFlowUuid) {
         setAnalyticsFlowUuid(uuidv4());
       }
-    }
+    };
     // In testing even with slow processor+network, 1sec safely passed jitter
     const timeoutID = setTimeout(establishUuid, 1000);
     // For a de-mount+re-mount, avoid setting the first go-around.
     return () => {
       clearTimeout(timeoutID);
     };
-  }, [])
-  const [analyticsLastSeenRoute, setAnalyticsLastSeenRoute] = useState(INITIAL_MATCHED_PATH);
+  }, []);
+  const [analyticsLastSeenRoute, setAnalyticsLastSeenRoute] =
+    useState(INITIAL_MATCHED_PATH);
 
   const router = useRouter();
 
