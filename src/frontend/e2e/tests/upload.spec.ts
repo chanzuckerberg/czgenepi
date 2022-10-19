@@ -1,65 +1,107 @@
 import { test, expect } from "@playwright/test";
-import { UploadSample } from "../pages/upload";
+import { uploadSampleFiles } from "../utils/upload";
+import { createSampleUploadData } from "../utils/sample";
+import { BasePage } from "../pages/basePage";
+import { getLocations } from "../utils/common";
 
+const locations = getLocations();
+const totalLocations = locations.length;
+const defaultFileExtension = "txt";
+
+let basePage: BasePage;
 test.describe("Upload sample tests", () => {
   const dateErrorMessage = "Update format to YYYY-MM-DD";
-  const fileExtensions = [".txt", ".fasta", ".fa"]; //todo zip and gzip
+  const fileExtensions = ["fa", "fasta", "txt"]; //todo: add zip and gzip
   test.beforeEach(async ({ page }, workerInfo) => {
     const baseUrl = workerInfo.config.projects[0].use.baseURL;
     const url = `${baseUrl}/data/samples`;
-    await page.goto(url);
+    basePage = new BasePage(page);
+    await basePage.gotoUrl(url);
+    //accept site cookies
+    await basePage.acceptCookies();
+
+    //click upload button
+    await basePage.clickByTestId("upload-btn");
+
+    //accept site cookies if prompted again
+    await basePage.acceptCookies();
   });
 
-  fileExtensions.forEach((extenstion) => {
-    test.skip(`Should upload ${extenstion.toUpperCase()} sample file`, async ({
-      page,
-    }) => {
-      const uploadData = {
-        dataFile: extenstion,
-        samples: UploadSample.getSampleData(),
-      };
-      await UploadSample.uploadSequencingFiles(page, uploadData);
-      await expect(
-        page.locator(
-          "//button[not(contains(@class,'Mui-disabled')) and text()='Continue']"
-        )
-      ).toBeVisible();
+  fileExtensions.forEach((fileExtension) => {
+    test(`Should upload ${fileExtension.toUpperCase()} sample file`, async () => {
+      const samples = [];
+      for (let i = 0; i < totalLocations; i++) {
+        const defaults = { location: locations[i] };
+        samples.push(createSampleUploadData(defaults));
+      }
+      await uploadSampleFiles(basePage, fileExtension, samples);
+
+      //accept site cookies if prompted again
+      await basePage.acceptCookies();
+
+      //continue button
+      await basePage.clickElement('a:has-text("Continue")');
+
+      //accept terms and conditions
+      const acceptUploadToGroupCheckBox = 0;
+      const acceptCzGenepiTermsCheckBox = 1;
+      await basePage.clickCheckBox(acceptUploadToGroupCheckBox);
+      await basePage.clickCheckBox(acceptCzGenepiTermsCheckBox);
+
+      await basePage.clickByText("Start Upload");
+
+      // show confirmation and finish process
+      await expect(await basePage.findByText("Upload Complete!")).toBeVisible();
+      await basePage.clickByText("Go to Samples");
     });
   });
 
-  test.skip(`Should validate collection dates`, async ({ page }) => {
-    const samples = UploadSample.getSampleData();
+  test(`Should validate collection dates`, async () => {
+    const samples = [];
+    const ignoreLocation = true;
     //overwrite collection dates with invalid values
-    for (let i = 0; i < samples.length; i++) {
-      samples[i].collectionDate = " ";
+    for (let i = 0; i < totalLocations; i++) {
+      const defaults = { location: locations[i] };
+      const sample = createSampleUploadData(defaults);
+      sample.collection_date = "20-20-20";
+      samples.push(sample);
     }
-    const uploadData = {
-      dataFile: ".txt",
-      samples: samples,
-    };
-    await UploadSample.uploadSequencingFiles(page, uploadData);
-    const errors = page.locator("//input[@name='collectionDate']/../../p");
-    for (let i = 0; i < samples.length; i++) {
-      await expect(await errors.nth(i).textContent()).toBe(dateErrorMessage);
-    }
+    await uploadSampleFiles(
+      basePage,
+      defaultFileExtension,
+      samples,
+      ignoreLocation
+    );
+    //accept site cookies if prompted again
+    await basePage.acceptCookies();
+
+    expect((await basePage.findByText(dateErrorMessage)).count()).toBe(
+      samples.length
+    );
   });
 
-  test.skip(`Should validate sequencing dates`, async ({ page }) => {
-    const samples = UploadSample.getSampleData();
-    //overwrite equencing dates with invalid values
-    for (let i = 0; i < samples.length; i++) {
-      samples[i].sequencingDate = " ";
+  test(`Should validate sequencing dates`, async () => {
+    const samples = [];
+    const ignoreLocation = true;
+    //overwrite collection dates with invalid values
+    for (let i = 0; i < totalLocations; i++) {
+      const defaults = { location: locations[i] };
+      const sample = createSampleUploadData(defaults);
+      sample.sequencing_date = "20-20-20";
+      samples.push(sample);
     }
-    const uploadData = {
-      dataFile: ".txt",
-      samples: samples,
-    };
-    await UploadSample.uploadSequencingFiles(page, uploadData);
-    const errors = page.locator(
-      "//input[@name='sequencingDate']/../following-sibling::p"
+
+    await uploadSampleFiles(
+      basePage,
+      defaultFileExtension,
+      samples,
+      ignoreLocation
     );
-    for (let i = 0; i < samples.length; i++) {
-      await expect(await errors.nth(i).textContent()).toBe(dateErrorMessage);
-    }
+    //accept site cookies if prompted again
+    await basePage.acceptCookies();
+
+    expect((await basePage.findByText(dateErrorMessage)).count()).toBe(
+      samples.length
+    );
   });
 });

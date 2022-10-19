@@ -82,5 +82,8 @@ export const transparentScrollbars = (): string => {
     &::-webkit-scrollbar-track {
       background: transparent;
     }
+    &::-webkit-scrollbar {
+      display: none;
+    }
   `;
 };
