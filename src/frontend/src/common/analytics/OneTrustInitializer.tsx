@@ -70,7 +70,7 @@ export const ONETRUST_ENABLING_CLASS = `optanon-category-${ANALYTICS_GROUP}`;
  * events first check for `isCzGenEpiAnalyticsEnabled`, we can be sure our
  * user remains opted-in and fire off the analytics event.
  */
-export function OneTrustInitializer() {
+export function OneTrustInitializer(): JSX.Element | null {
   // `userInfo` will be false-y if user is not logged in
   const { data: userInfo } = useUserInfo();
   return userInfo && ONETRUST_KEY ? (
