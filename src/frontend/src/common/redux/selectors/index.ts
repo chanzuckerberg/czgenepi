@@ -7,5 +7,6 @@ export const selectCurrentGroup = (state: RootStateType): number =>
 export const selectCurrentPathogen = (state: RootStateType): Pathogen =>
   state.current.pathogen;
 
-export const selectNotifications = (state: RootStateType): ReduxNotification[] =>
-  state.notifications;
+export const selectNotifications = (
+  state: RootStateType
+): ReduxNotification[] => state.notifications;

@@ -132,11 +132,13 @@ const DownloadModal = ({
   const useFileMutationGenerator = () =>
     useFileDownload({
       componentOnError: () => {
-        dispatch(addNotification({
-          componentKey: NotificationComponents.DOWNLOAD_FILES_FAILURE,
-          intent: "error",
-          shouldShowCloseButton: true,
-        }));
+        dispatch(
+          addNotification({
+            componentKey: NotificationComponents.DOWNLOAD_FILES_FAILURE,
+            intent: "error",
+            shouldShowCloseButton: true,
+          })
+        );
         handleCloseModal();
       },
       componentOnSuccess: ({ data, filename }: FileDownloadResponsePayload) => {

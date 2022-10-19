@@ -12,7 +12,7 @@ export function getRandomNumber(): number {
 
 // reads sample locations from json fixture
 // ideally we should generate them dynanamically if we know the source
-export function getLocations() {
+export function getLocations(): any {
   const locations = fs.readFileSync("e2e/fixtures/locations.json");
   return JSON.parse(locations.toString());
 }
@@ -38,8 +38,8 @@ export function generatePrivateSampleId(): string {
 }
 
 /*
-  Sample collection and sequencing dates need to be in the past. 
-  This helper method generates a date in the past it does not need to be hard coded. 
+  Sample collection and sequencing dates need to be in the past.
+  This helper method generates a date in the past it does not need to be hard coded.
   @param {number} howRecent: how recent the date should be, defaults to 10, meaning the date can be 1 - 10 days in the past
   @param {string} refDate: reference date to use, especially useful for sequencing date that needs to be older that collection date
   */
@@ -61,7 +61,7 @@ export function getADateInThePast(min = 0, max = 10, refDate?: string): string {
  * and accepts  site cookies
  * @param page
  */
-export async function acceptSiteCookieTerms(page: Page) {
+export async function acceptSiteCookieTerms(page: Page): Promise<void> {
   if (await page.isVisible(ACCEPTCOOKIES)) {
     await page.locator(ACCEPTCOOKIES).click();
   }

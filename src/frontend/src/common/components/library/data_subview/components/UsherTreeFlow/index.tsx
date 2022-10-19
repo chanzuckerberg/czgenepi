@@ -84,15 +84,17 @@ const UsherTreeFlow = ({
     setIsConfirmOpen(false);
     setIsPlacementOpen(false);
 
-    dispatch(addNotification({
-      buttonOnClick: () => setUsherLink(""),
-      componentKey: NotificationComponents.USHER_PLACEMENT_SUCCESS,
-      componentProps: {
-        usherLink,
-      },
-      intent: "info",
-      shouldShowCloseButton: true,
-    }));
+    dispatch(
+      addNotification({
+        buttonOnClick: () => setUsherLink(""),
+        componentKey: NotificationComponents.USHER_PLACEMENT_SUCCESS,
+        componentProps: {
+          usherLink,
+        },
+        intent: "info",
+        shouldShowCloseButton: true,
+      })
+    );
   };
 
   return (
