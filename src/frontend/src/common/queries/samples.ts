@@ -18,6 +18,7 @@ import {
   SampleResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
+import { reduceObjectArrayToLookupDict } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
@@ -268,6 +269,10 @@ export function useCreateSamples({
 /**
  * sample cache
  */
+// TODO-TR (mlila): types
+const mapSampleData = (data) => {
+  return reduceObjectArrayToLookupDict(data.samples, "publicId");
+};
 
 export const USE_SAMPLE_INFO = {
   entities: [ENTITIES.SAMPLE_INFO],
@@ -277,6 +282,7 @@ export const USE_SAMPLE_INFO = {
 export function useSampleInfo(): UseQueryResult<SampleResponse, unknown> {
   return useQuery([USE_SAMPLE_INFO], () => fetchSamples(), {
     retry: false,
+    select: mapSampleData,
   });
 }
 
