@@ -52,7 +52,7 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
       const counts = getUploadCounts(samples);
       setSampleCount(counts.sampleCount);
       setFileCount(counts.fileCount);
-      setTooManySamples(Object.keys(samples).length > 500);
+      setTooManySamples(Object.keys(samples).length > 10000);
     }
   }, [samples]);
 
