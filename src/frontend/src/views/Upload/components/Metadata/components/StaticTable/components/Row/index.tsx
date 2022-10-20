@@ -9,6 +9,7 @@ import {
   StyledLockIconWrapper,
   StyledTableCell,
   StyledTableRow,
+  StyledCallout,
 } from "./style";
 
 interface Props {
@@ -27,23 +28,36 @@ export default memo(function Row({ id, metadata, validationError }: Props): JSX.
     publicId,
   } = metadata;
 
-  // if (validationError != null) {
-  //   console.log(id, metadata, validationError)
-  // }
+  const validatedCellData: Record<string, React.ReactElement | string | undefined> = {
+    "privateId": privateId || "--",
+    "collectionDate": collectionDate || "--",
+    "collectionLocation": getNameFromCollectionLocation(collectionLocation),
+    "sequencingDate": sequencingDate || "--",
+  }
+
+  if (validationError != null) {
+    console.log(id, metadata, validationError)
+    Object.entries(validationError).forEach(([key, message]) => {
+      if (key == "collectionLocation") {
+        message = "Required"
+      }
+      validatedCellData[key] = (<><p>{validatedCellData[key]}</p><p><StyledCallout intent="error">{message}</StyledCallout></p></>)
+    })
+  }
 
   return (
     <StyledTableRow>
       <StyledTableCell>
         <Id>{id}</Id>
       </StyledTableCell>
-      <StyledTableCell>{privateId}</StyledTableCell>
+      <StyledTableCell>{validatedCellData.privateId}</StyledTableCell>
       <StyledTableCell>{publicId || "--"}</StyledTableCell>
-      <StyledTableCell>{collectionDate}</StyledTableCell>
+      <StyledTableCell>{validatedCellData.collectionDate}</StyledTableCell>
       <StyledTableCell>
-        {getNameFromCollectionLocation(collectionLocation)}
+        {validatedCellData.collectionLocation}
       </StyledTableCell>
       <StyledTableCell>
-        {sequencingDate || "--"}
+        {validatedCellData.sequencingDate}
       </StyledTableCell>
       <PrivateTableCell align="center">
         {keepPrivate ? (

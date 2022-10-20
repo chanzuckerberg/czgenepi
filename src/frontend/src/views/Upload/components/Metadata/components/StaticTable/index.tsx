@@ -28,6 +28,13 @@ interface Props {
   setIsValid: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+interface ValidationErrorRecord {
+  collectionDate?: string;
+  collectionLocation?: string;
+  sequencingDate?: string;
+  privateId?: string;
+}
+
 const validationSchema = object({
   collectionDate: string()
     .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
@@ -52,23 +59,23 @@ const validationSchema = object({
 });
 
 export default function StaticTable({ metadata, setIsValid }: Props): JSX.Element {
-  const [validationErrors, setValidationErrors] = useState<Record<string, Record<string, string> | null>>(EMPTY_OBJECT);
+  const [validationErrors, setValidationErrors] = useState<Record<string, ValidationErrorRecord | null>>(EMPTY_OBJECT);
 
   const validateMetadata = useCallback(async (metadata: SampleIdToMetadata | null) => {
     if (metadata == null) {
       setIsValid(false);
       return;
     }
-    const validationErrors: Record<string, Record<string, string> | null> = Object.fromEntries(Object.keys(metadata).map(sampleId => [sampleId, null]));
+    const validationErrors: Record<string, ValidationErrorRecord | null> = Object.fromEntries(Object.keys(metadata).map(sampleId => [sampleId, null]));
     for (const [sampleId, sampleMetadata] of Object.entries(metadata)) {
       try {
         const _ = await validationSchema.validate(sampleMetadata, { "abortEarly": false });
       } catch (error) {
         if (error instanceof ValidationError) {
-          const errorRecord: Record<string, string> = {}
+          const errorRecord: ValidationErrorRecord = {}
           error.inner.forEach(validationError => {
             if (validationError.path != undefined) {
-              errorRecord[validationError.path] = validationError.message
+              errorRecord[validationError.path as keyof ValidationErrorRecord] = validationError.message
             }
           })
           validationErrors[sampleId] = errorRecord;

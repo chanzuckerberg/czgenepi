@@ -4,7 +4,7 @@ import {
   TableRow,
   TableRowProps as MuiTableRowProps,
 } from "@mui/material";
-import { CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
+import { Callout, CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
 import { rightMarginXxs } from "src/common/styles/iconStyle";
 
 export const Id = styled.p`
@@ -77,3 +77,16 @@ export const PrivateContent = styled.div`
 export const StyledLockIconWrapper = styled.div`
   ${rightMarginXxs}
 `;
+
+export const StyledCallout = styled(Callout)`
+  background-color: rgba(0, 0, 0, 0);
+  max-width: 80%;
+  
+  ${(props: CommonThemeProps) => {
+    const colors = getColors(props);
+
+    return `
+      color: ${colors?.error[600]}
+    `;
+  }}
+`
