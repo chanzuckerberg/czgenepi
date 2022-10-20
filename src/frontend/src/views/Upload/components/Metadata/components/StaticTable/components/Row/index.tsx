@@ -2,6 +2,7 @@ import { Icon } from "czifui";
 import { memo } from "react";
 import { getNameFromCollectionLocation } from "src/common/utils/locationUtils";
 import { Metadata } from "src/components/WebformTable/common/types";
+import { ValidationErrorRecord } from "../..";
 import {
   Id,
   PrivateContent,
@@ -15,7 +16,7 @@ import {
 interface Props {
   id: string;
   metadata: Metadata;
-  validationError: Record<string, string> | null;
+  validationError: ValidationErrorRecord | null;
 }
 
 export default memo(function Row({ id, metadata, validationError }: Props): JSX.Element {
@@ -31,14 +32,14 @@ export default memo(function Row({ id, metadata, validationError }: Props): JSX.
   const validatedCellData: Record<string, React.ReactElement | string | undefined> = {
     "privateId": privateId || "--",
     "collectionDate": collectionDate || "--",
-    "collectionLocation": getNameFromCollectionLocation(collectionLocation),
+    "collectionLocation": getNameFromCollectionLocation(collectionLocation) || "--",
     "sequencingDate": sequencingDate || "--",
   }
 
   if (validationError != null) {
     console.log(id, metadata, validationError)
     Object.entries(validationError).forEach(([key, message]) => {
-      if (key == "collectionLocation") {
+      if (key == "collectionLocation" && message) {
         message = "Required"
       }
       validatedCellData[key] = (<><p>{validatedCellData[key]}</p><p><StyledCallout intent="error">{message}</StyledCallout></p></>)

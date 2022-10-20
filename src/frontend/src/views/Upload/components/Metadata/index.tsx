@@ -155,6 +155,7 @@ export default function Metadata({
         {useStaticMetadataTable && <StaticTable 
           metadata={metadata} 
           setIsValid={setIsValid}
+          hasImportedMetadataFile={hasImportedMetadataFile}
           autocorrectWarnings={autocorrectWarnings} 
         />}
 

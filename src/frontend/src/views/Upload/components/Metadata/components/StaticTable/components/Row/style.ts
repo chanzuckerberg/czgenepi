@@ -83,10 +83,13 @@ export const StyledCallout = styled(Callout)`
   max-width: 80%;
   
   ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
     const colors = getColors(props);
 
     return `
-      color: ${colors?.error[600]}
+      color: ${colors?.error[600]};
+      padding: 0 0 0 0;
+      font-size: 95%;
     `;
   }}
 `
