@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import {
   Button,
+  Callout,
   Checkbox,
   CommonThemeProps,
   fontBodyM,
@@ -139,4 +140,14 @@ export const StyledCheckbox = styled(Checkbox)`
       background-color: transparent;
     }
   }
+`;
+
+export const StyledCallout = styled(Callout)`
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-top: ${spaces?.l}px;
+      width: 100%;
+    `;
+  }}
 `;
