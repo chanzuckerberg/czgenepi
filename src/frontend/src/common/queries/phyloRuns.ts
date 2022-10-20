@@ -1,4 +1,3 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
 import {
   useMutation,
   UseMutationResult,
@@ -6,8 +5,6 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import {
   DEFAULT_DELETE_OPTIONS,
   fetchPhyloRuns,
@@ -25,8 +22,6 @@ import {
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
-/* custom hook to automatically expire tree info when needed */
-/* such as when trees are deleted */
 const mapPhyloRuns = (data: PhyloRunResponse) => {
   const phyloRuns = data.phylo_runs;
 
@@ -44,16 +39,20 @@ export const USE_PHYLO_RUN_INFO = {
   id: "phyloRunInfo",
 };
 
-export function usePhyloRunInfo(): UseQueryResult<IdMap<PhyloRun>, unknown> {
-  const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
-  const usesTableRefactor = isUserFlagOn(
-    tableRefactorFlag,
-    USER_FEATURE_FLAGS.table_refactor
-  );
-
+/**
+ * custom hook to automatically expire tree info when needed
+ * such as when trees are deleted
+ */
+export function usePhyloRunInfo(): UseQueryResult<PhyloRunResponse, unknown> {
   return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
     retry: false,
-    select: usesTableRefactor ? mapPhyloRuns : undefined,
+  });
+}
+
+export function useNewPhyloRunInfo(): UseQueryResult<IdMap<PhyloRun>, unknown> {
+  return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
+    retry: false,
+    select: mapPhyloRuns,
   });
 }
 

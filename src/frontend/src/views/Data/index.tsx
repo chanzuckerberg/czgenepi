@@ -7,7 +7,10 @@ import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
-import { reduceObjectArrayToLookupDict } from "src/common/utils/dataTransforms";
+import {
+  IdMap,
+  reduceObjectArrayToLookupDict,
+} from "src/common/utils/dataTransforms";
 import { FilterPanel } from "src/components/FilterPanel";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
@@ -38,9 +41,9 @@ const transformData = (
   data: BioinformaticsDataArray,
   keyedOn: string,
   transforms?: Transform[]
-): BioinformaticsMap => {
+): IdMap<BioinformaticsData> => {
   if (!transforms || !data) {
-    return reduceObjectArrayToLookupDict(data, keyedOn);
+    return reduceObjectArrayToLookupDict<BioinformaticsData>(data, keyedOn);
   }
 
   const transformedData = data.map((datum: BioinformaticsData) => {
@@ -54,7 +57,10 @@ const transformData = (
     return transformedDatum;
   }) as BioinformaticsDataArray;
 
-  return reduceObjectArrayToLookupDict(transformedData, keyedOn);
+  return reduceObjectArrayToLookupDict<BioinformaticsData>(
+    transformedData,
+    keyedOn
+  );
 };
 
 const Data: FunctionComponent = () => {

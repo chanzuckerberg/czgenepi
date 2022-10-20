@@ -1,4 +1,3 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
 import {
   useMutation,
   UseMutationResult,
@@ -6,8 +5,6 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { METADATA_KEYS_TO_API_KEYS } from "src/views/Upload/components/common/constants";
 import { Samples } from "src/views/Upload/components/common/types";
@@ -281,16 +278,16 @@ export const USE_SAMPLE_INFO = {
   id: "sampleInfo",
 };
 
-export function useSampleInfo(): UseQueryResult<IdMap<Sample>, unknown> {
-  const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
-  const usesTableRefactor = isUserFlagOn(
-    tableRefactorFlag,
-    USER_FEATURE_FLAGS.table_refactor
-  );
-
+export function useSampleInfo(): UseQueryResult<SampleResponse, unknown> {
   return useQuery([USE_SAMPLE_INFO], () => fetchSamples(), {
     retry: false,
-    select: usesTableRefactor ? mapSampleData : undefined,
+  });
+}
+
+export function useNewSampleInfo(): UseQueryResult<IdMap<Sample>, unknown> {
+  return useQuery([USE_SAMPLE_INFO], () => fetchSamples(), {
+    retry: false,
+    select: mapSampleData,
   });
 }
 

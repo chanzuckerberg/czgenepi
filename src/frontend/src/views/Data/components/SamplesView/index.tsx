@@ -1,7 +1,7 @@
 import { map } from "lodash";
 import { useEffect, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
-import { useSampleInfo } from "src/common/queries/samples";
+import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 
 const SamplesView = (): JSX.Element => {
   // initialize state

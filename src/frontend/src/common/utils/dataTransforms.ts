@@ -2,14 +2,15 @@ import { generateOrgSpecificUrl, ORG_API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 
 const { API_URL } = ENV;
-/**
- * Reduces an array of objects to a mapping between the keyString arg and the objects
- * that make up the array. Effective for quickly looking up objects by id, for example.
- */
+
 export interface IdMap<T> {
   [key: string]: T;
 }
 
+/**
+ * Reduces an array of objects to a mapping between the keyString arg and the objects
+ * that make up the array. Effective for quickly looking up objects by id, for example.
+ */
 export const reduceObjectArrayToLookupDict = <T extends Record<string, any>>(
   arr: T[],
   keyedOn: string

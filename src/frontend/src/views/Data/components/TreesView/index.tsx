@@ -1,7 +1,7 @@
 import { map } from "lodash";
 import { useEffect, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
-import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
+import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
 
 const TreesView = (): JSX.Element => {
   // initialize state
