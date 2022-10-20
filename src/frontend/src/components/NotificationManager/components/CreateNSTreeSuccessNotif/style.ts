@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
-import { Button, CommonThemeProps, fontBodyXxs, getFontWeights, getSpaces } from "czifui";
+import {
+  Button,
+  CommonThemeProps,
+  fontBodyXxs,
+  getFontWeights,
+  getSpaces,
+} from "czifui";
 
 export const StyledButton = styled(Button)`
   ${fontBodyXxs}

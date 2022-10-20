@@ -21,7 +21,7 @@ export enum NotificationComponents {
   CREATE_NS_TREE_FAILURE = "createNSTreeFailure",
   DOWNLOAD_FILES_FAILURE = "downloadFilesFailure",
   INVITE_USERS_SUCCESS = "inviteUserSuccess",
-  INVITE_USERS_FAILURE =  "inviteUsersFailure",
+  INVITE_USERS_FAILURE = "inviteUsersFailure",
   USHER_PLACEMENT_SUCCESS = "usherPlacementSuccess",
 }
 
@@ -44,7 +44,14 @@ interface Props {
 
 const Notification = ({ notification }: Props): JSX.Element => {
   const dispatch = useDispatch();
-  const { notifId, componentKey, componentProps, shouldShowCloseButton, text, ...rest } = notification;
+  const {
+    notifId,
+    componentKey,
+    componentProps,
+    shouldShowCloseButton,
+    text,
+    ...rest
+  } = notification;
 
   const onDismiss = () => {
     dispatch(deleteNotification(notifId));
@@ -54,11 +61,15 @@ const Notification = ({ notification }: Props): JSX.Element => {
 
   if (!children && componentKey) {
     const Content = componentMap[componentKey];
-    children = <Content onDismiss={onDismiss} {...componentProps} />
+    children = <Content onDismiss={onDismiss} {...componentProps} />;
   }
 
   return (
-    <SDSNotification {...rest} buttonOnClick={shouldShowCloseButton ? onDismiss : undefined} onClose={onDismiss}>
+    <SDSNotification
+      {...rest}
+      buttonOnClick={shouldShowCloseButton ? onDismiss : undefined}
+      onClose={onDismiss}
+    >
       {children}
     </SDSNotification>
   );

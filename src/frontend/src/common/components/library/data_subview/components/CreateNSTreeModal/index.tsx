@@ -222,6 +222,10 @@ export const CreateNSTreeModal = ({
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           tree_type: treeType!,
           location_id: selectedLocation?.id || null,
+          group_location_id: groupInfo?.location?.id || null,
+          selected_lineages: JSON.stringify(selectedLineages),
+          start_date: startDate || null,
+          end_date: endDate || null,
         }
       );
 

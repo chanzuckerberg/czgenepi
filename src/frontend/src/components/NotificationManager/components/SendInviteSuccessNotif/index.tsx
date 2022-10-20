@@ -21,7 +21,8 @@ const SendInviteSuccessNotif = ({ numSent, onDismiss }: Props): JSX.Element => {
       been sent.{" "}
       <Link sdsStyle="dashed" onClick={onClick}>
         View Invitations
-      </Link>.
+      </Link>
+      .
     </span>
   );
 };
