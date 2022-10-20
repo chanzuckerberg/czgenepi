@@ -5,7 +5,6 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { map } from "lodash";
 import {
   DEFAULT_DELETE_OPTIONS,
   fetchPhyloRuns,
@@ -17,6 +16,7 @@ import { API_URL } from "../constants/ENV";
 import {
   getDownloadLinks,
   getTreeType,
+  IdMap,
   reduceObjectArrayToLookupDict,
 } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
@@ -24,17 +24,16 @@ import { MutationCallbacks } from "./types";
 
 /* custom hook to automatically expire tree info when needed */
 /* such as when trees are deleted */
-// TODO-TR (mlila): types
-const mapPhyloRuns = (data) => {
-  const phyloRuns: any[] = data.phylo_runs;
+const mapPhyloRuns = (data: PhyloRunResponse) => {
+  const phyloRuns = data.phylo_runs;
 
-  const transformedRuns = phyloRuns.map((p) => ({
+  const transformedRuns = phyloRuns.map((p: PhyloRun) => ({
     ...p,
     ...getDownloadLinks(p),
     treeType: getTreeType(p),
   }));
 
-  return reduceObjectArrayToLookupDict(transformedRuns, "id");
+  return reduceObjectArrayToLookupDict<PhyloRun>(transformedRuns, "id");
 };
 
 export const USE_PHYLO_RUN_INFO = {
@@ -42,7 +41,7 @@ export const USE_PHYLO_RUN_INFO = {
   id: "phyloRunInfo",
 };
 
-export function usePhyloRunInfo(): UseQueryResult<PhyloRunResponse, unknown> {
+export function usePhyloRunInfo(): UseQueryResult<IdMap<PhyloRun>, unknown> {
   return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
     retry: false,
     select: mapPhyloRuns,

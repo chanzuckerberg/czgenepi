@@ -20,6 +20,10 @@ const SamplesView = (): JSX.Element => {
     setIsDataLoading(false);
   }, [isLoading, isFetching]);
 
+  if (isDataLoading) {
+    return <div>Loading ...</div>;
+  }
+
   return (
     <>
       <HeadAppTitle subTitle="Samples" />

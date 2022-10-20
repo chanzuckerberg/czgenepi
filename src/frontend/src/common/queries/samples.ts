@@ -18,7 +18,7 @@ import {
   SampleResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
-import { reduceObjectArrayToLookupDict } from "../utils/dataTransforms";
+import { IdMap, reduceObjectArrayToLookupDict } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
@@ -269,9 +269,8 @@ export function useCreateSamples({
 /**
  * sample cache
  */
-// TODO-TR (mlila): types
-const mapSampleData = (data) => {
-  return reduceObjectArrayToLookupDict(data.samples, "publicId");
+const mapSampleData = (data: SampleResponse) => {
+  return reduceObjectArrayToLookupDict<Sample>(data.samples, "publicId");
 };
 
 export const USE_SAMPLE_INFO = {
@@ -279,7 +278,7 @@ export const USE_SAMPLE_INFO = {
   id: "sampleInfo",
 };
 
-export function useSampleInfo(): UseQueryResult<SampleResponse, unknown> {
+export function useSampleInfo(): UseQueryResult<IdMap<Sample>, unknown> {
   return useQuery([USE_SAMPLE_INFO], () => fetchSamples(), {
     retry: false,
     select: mapSampleData,

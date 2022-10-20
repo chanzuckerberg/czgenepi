@@ -6,11 +6,15 @@ const { API_URL } = ENV;
  * Reduces an array of objects to a mapping between the keyString arg and the objects
  * that make up the array. Effective for quickly looking up objects by id, for example.
  */
-export const reduceObjectArrayToLookupDict = (
-  arr: BioinformaticsDataArray,
+export interface IdMap<T> {
+  [key: string]: T;
+}
+
+export const reduceObjectArrayToLookupDict = <T extends Record<string, any>>(
+  arr: T[],
   keyedOn: string
-): BioinformaticsMap => {
-  const keyValuePairs = arr.map((obj) => {
+): IdMap<T> => {
+  const keyValuePairs = arr.map((obj: T) => {
     const id = obj[keyedOn];
     return [id, obj];
   });
@@ -24,10 +28,16 @@ export const reduceObjectArrayToLookupDict = (
 /**
  * If there is a tree associated with this run, return links to download tree data
  */
-export const getDownloadLinks = (phyloRun) => {
+interface PhyloRunLinks {
+  downloadLinkIdStylePublicIdentifiers: string | undefined;
+  downloadLinkIdStylePrivateIdentifiers: string | undefined;
+  accessionsLink: string | undefined;
+}
+
+export const getDownloadLinks = (phyloRun: PhyloRun): PhyloRunLinks => {
   const id = phyloRun?.phyloTree?.id;
 
-  const links = {
+  const links: PhyloRunLinks = {
     downloadLinkIdStylePublicIdentifiers: undefined,
     downloadLinkIdStylePrivateIdentifiers: undefined,
     accessionsLink: undefined,
@@ -53,7 +63,7 @@ export const getDownloadLinks = (phyloRun) => {
 /**
  * Converts a completely uppercase tree type to a capitalcase tree type.
  */
-export const getTreeType = (phyloRun) => {
+export const getTreeType = (phyloRun: PhyloRun): string | undefined => {
   const { treeType } = phyloRun;
 
   if (typeof treeType !== "string" || treeType.toLowerCase() == "unknown") {
