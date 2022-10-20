@@ -20,8 +20,6 @@ const TreesView = (): JSX.Element => {
     setIsDataLoading(false);
   }, [isLoading, isFetching]);
 
-  console.log(phyloRuns);
-
   return (
     <>
       <HeadAppTitle subTitle="Trees" />
