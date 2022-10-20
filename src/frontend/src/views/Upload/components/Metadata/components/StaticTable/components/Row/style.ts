@@ -4,7 +4,7 @@ import {
   TableRow,
   TableRowProps as MuiTableRowProps,
 } from "@mui/material";
-import { Callout, CommonThemeProps, fontHeaderS, getColors, getSpaces, Icon } from "czifui";
+import { CommonThemeProps, fontBodyXxxs, fontHeaderS, getColors, getSpaces, Icon } from "czifui";
 import { rightMarginXxs } from "src/common/styles/iconStyle";
 
 export const Id = styled.p`
@@ -78,34 +78,16 @@ export const StyledLockIconWrapper = styled.div`
   ${rightMarginXxs}
 `;
 
-export const StyledCallout = styled(Callout)`
-  background-color: rgba(0, 0, 0, 0);
-  max-width: 80%;
-  
-  ${(props: CommonThemeProps) => {
-    const spaces = getSpaces(props);
-    const colors = getColors(props);
-
-    return `
-      color: ${colors?.error[600]};
-      padding: 0 0 0 0;
-      font-size: 95%;
-    `;
-  }}
-`
-
 export const StyledAlertText = styled.p`
-  background-color: rgba(0, 0, 0, 0);
   vertical-align: middle;
+  ${fontBodyXxxs}
   
   ${(props: CommonThemeProps) => {
-    const spaces = getSpaces(props);
     const colors = getColors(props);
 
     return `
       color: ${colors?.error[500]};
       padding: 0 0 0 0;
-      font-size: 95%;
     `;
   }}
 `
@@ -118,8 +100,7 @@ export const StyledExclamationMark = styled(Icon)`
     const colors = getColors(props);
 
     return `
-      padding: 0 0 0 0;
-      margin: 0 ${spaces?.xxs}px ${spaces?.xxs}px 0;
+      margin: 0 ${spaces?.xxs}px ${spaces?.xxs}px ${spaces?.xxs}px;
       fill: ${colors?.error[500]}
     `;
   }}

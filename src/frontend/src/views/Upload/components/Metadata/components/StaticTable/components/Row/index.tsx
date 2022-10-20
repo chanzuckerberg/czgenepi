@@ -10,7 +10,6 @@ import {
   StyledLockIconWrapper,
   StyledTableCell,
   StyledTableRow,
-  StyledCallout,
   StyledAlertText,
   StyledExclamationMark,
 } from "./style";
@@ -39,12 +38,22 @@ export default memo(function Row({ id, metadata, validationError }: Props): JSX.
   }
 
   if (validationError != null) {
-    console.log(id, metadata, validationError)
     Object.entries(validationError).forEach(([key, message]) => {
-      if (key == "collectionLocation" && message) {
+      // The validation error for a location is for an id,
+      // which is internal and not something a user would know about.
+      // The only case in which the field does not validate is if the
+      // value is missing entirely.
+      if (key == "collectionLocation") {
         message = "Required"
       }
-      validatedCellData[key] = (<><p>{validatedCellData[key]}</p><StyledAlertText><StyledExclamationMark sdsIcon="exclamationMarkCircle" sdsSize="s" sdsType="static" /> {message}</StyledAlertText></>)
+      validatedCellData[key] = (
+        <>
+          <p>{validatedCellData[key]}</p>
+          <StyledAlertText>
+            <StyledExclamationMark sdsIcon="exclamationMarkCircle" sdsSize="s" sdsType="static" />{" "}{message}
+          </StyledAlertText>
+        </>
+      )
     })
   }
 
