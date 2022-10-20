@@ -159,7 +159,6 @@ export default function Metadata({
           metadata={metadata} 
           setIsValid={setIsValid}
           hasImportedMetadataFile={hasImportedMetadataFile}
-          autocorrectWarnings={autocorrectWarnings} 
         />}
 
         {!useStaticMetadataTable && <WebformTable
