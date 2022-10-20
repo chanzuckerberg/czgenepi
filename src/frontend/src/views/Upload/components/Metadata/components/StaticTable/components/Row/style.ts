@@ -26,7 +26,6 @@ export const Id = styled.p`
 `;
 
 interface TableRowProps extends MuiTableRowProps, CommonThemeProps {
-  component: "div";
 }
 
 export const StyledTableRow = styled(TableRow)`

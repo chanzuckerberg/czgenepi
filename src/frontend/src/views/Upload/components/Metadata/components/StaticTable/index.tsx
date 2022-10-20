@@ -1,6 +1,7 @@
 import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
+import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { Props as CommonProps } from "../../../common/types";
 import Row from "./components/Row";
 import {
@@ -19,7 +20,7 @@ import {
   DATE_ERROR_MESSAGE,
   DATE_REGEX,
 } from "src/components/DateField/constants";
-import { object, string, number } from "yup";
+import { object, string, number, ValidationError } from "yup";
 import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 
 interface Props {
@@ -38,10 +39,12 @@ const validationSchema = object({
     })
     .required("Required"),
   sequencingDate: string()
+    .notRequired()
     .matches(DATE_REGEX, DATE_ERROR_MESSAGE)
     .min(10, DATE_ERROR_MESSAGE)
     .max(10, DATE_ERROR_MESSAGE)
-    .nullable(),
+    .nullable()
+    .transform((value) => !!value ? value : null),
   privateId: string()
     .required("Required")
     .matches(VALID_NAME_REGEX, "Invalid character(s)")
@@ -49,20 +52,35 @@ const validationSchema = object({
 });
 
 export default function StaticTable({ metadata, setIsValid }: Props): JSX.Element {
+  const [validationErrors, setValidationErrors] = useState<Record<string, Record<string, string> | null>>(EMPTY_OBJECT);
 
   const validateMetadata = useCallback(async (metadata: SampleIdToMetadata | null) => {
     if (metadata == null) {
       setIsValid(false);
       return;
     }
-    const rowValidation: Record<string, boolean> = {};
+    const validationErrors: Record<string, Record<string, string> | null> = Object.fromEntries(Object.keys(metadata).map(sampleId => [sampleId, null]));
     for (const [sampleId, sampleMetadata] of Object.entries(metadata)) {
-      const isRowValid = await validationSchema.isValid(sampleMetadata);
-      rowValidation[sampleId] = isRowValid;
+      try {
+        const _ = await validationSchema.validate(sampleMetadata, { "abortEarly": false });
+      } catch (error) {
+        if (error instanceof ValidationError) {
+          const errorRecord: Record<string, string> = {}
+          error.inner.forEach(validationError => {
+            if (validationError.path != undefined) {
+              errorRecord[validationError.path] = validationError.message
+            }
+          })
+          validationErrors[sampleId] = errorRecord;
+        } else {
+          throw error
+        }
+      }
     }
     const isValid = Object.keys(metadata).every(
-      (sampleId) => rowValidation[sampleId]
+      (sampleId) => validationErrors[sampleId] == null
     );
+    setValidationErrors(validationErrors);
     setIsValid(isValid);
   }, []);
 
@@ -106,11 +124,16 @@ export default function StaticTable({ metadata, setIsValid }: Props): JSX.Elemen
             {metadata && (
               <TableBody>
                 {Object.entries(metadata).map(([sampleId, sampleMetadata]) => {
+                  let validationError = null;
+                  if (Object.hasOwn(validationErrors, sampleId)) {
+                    validationError = validationErrors[sampleId]
+                  }
                   return (
                     <Row
                       key={sampleId}
                       id={sampleId}
                       metadata={sampleMetadata}
+                      validationError={validationError}
                     />
                   );
                 })}

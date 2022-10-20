@@ -14,9 +14,10 @@ import {
 interface Props {
   id: string;
   metadata: Metadata;
+  validationError: Record<string, string> | null;
 }
 
-export default memo(function Row({ id, metadata }: Props): JSX.Element {
+export default memo(function Row({ id, metadata, validationError }: Props): JSX.Element {
   const {
     privateId,
     collectionDate,
@@ -26,21 +27,25 @@ export default memo(function Row({ id, metadata }: Props): JSX.Element {
     publicId,
   } = metadata;
 
+  // if (validationError != null) {
+  //   console.log(id, metadata, validationError)
+  // }
+
   return (
-    <StyledTableRow component="div">
-      <StyledTableCell component="div">
+    <StyledTableRow>
+      <StyledTableCell>
         <Id>{id}</Id>
       </StyledTableCell>
-      <StyledTableCell component="div">{privateId}</StyledTableCell>
-      <StyledTableCell component="div">{publicId || "--"}</StyledTableCell>
-      <StyledTableCell component="div">{collectionDate}</StyledTableCell>
-      <StyledTableCell component="div">
+      <StyledTableCell>{privateId}</StyledTableCell>
+      <StyledTableCell>{publicId || "--"}</StyledTableCell>
+      <StyledTableCell>{collectionDate}</StyledTableCell>
+      <StyledTableCell>
         {getNameFromCollectionLocation(collectionLocation)}
       </StyledTableCell>
-      <StyledTableCell component="div">
+      <StyledTableCell>
         {sequencingDate || "--"}
       </StyledTableCell>
-      <PrivateTableCell align="center" component="div">
+      <PrivateTableCell align="center">
         {keepPrivate ? (
           <PrivateContent>
             <StyledLockIconWrapper>

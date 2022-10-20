@@ -152,7 +152,11 @@ export default function Metadata({
           stringToLocationFinder={stringToLocationFinder}
         />
 
-        {useStaticMetadataTable && <StaticTable metadata={metadata} setIsValid={setIsValid} />}
+        {useStaticMetadataTable && <StaticTable 
+          metadata={metadata} 
+          setIsValid={setIsValid}
+          autocorrectWarnings={autocorrectWarnings} 
+        />}
 
         {!useStaticMetadataTable && <WebformTable
           setIsValid={setIsValid}
