@@ -4,7 +4,7 @@ import {
   TableRow,
   TableRowProps as MuiTableRowProps,
 } from "@mui/material";
-import { Callout, CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
+import { Callout, CommonThemeProps, fontHeaderS, getColors, getSpaces, Icon } from "czifui";
 import { rightMarginXxs } from "src/common/styles/iconStyle";
 
 export const Id = styled.p`
@@ -90,6 +90,37 @@ export const StyledCallout = styled(Callout)`
       color: ${colors?.error[600]};
       padding: 0 0 0 0;
       font-size: 95%;
+    `;
+  }}
+`
+
+export const StyledAlertText = styled.p`
+  background-color: rgba(0, 0, 0, 0);
+  vertical-align: middle;
+  
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    const colors = getColors(props);
+
+    return `
+      color: ${colors?.error[500]};
+      padding: 0 0 0 0;
+      font-size: 95%;
+    `;
+  }}
+`
+
+export const StyledExclamationMark = styled(Icon)`
+  vertical-align: middle;
+
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    const colors = getColors(props);
+
+    return `
+      padding: 0 0 0 0;
+      margin: 0 ${spaces?.xxs}px ${spaces?.xxs}px 0;
+      fill: ${colors?.error[500]}
     `;
   }}
 `

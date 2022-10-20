@@ -11,6 +11,8 @@ import {
   StyledTableCell,
   StyledTableRow,
   StyledCallout,
+  StyledAlertText,
+  StyledExclamationMark,
 } from "./style";
 
 interface Props {
@@ -42,7 +44,7 @@ export default memo(function Row({ id, metadata, validationError }: Props): JSX.
       if (key == "collectionLocation" && message) {
         message = "Required"
       }
-      validatedCellData[key] = (<><p>{validatedCellData[key]}</p><p><StyledCallout intent="error">{message}</StyledCallout></p></>)
+      validatedCellData[key] = (<><p>{validatedCellData[key]}</p><StyledAlertText><StyledExclamationMark sdsIcon="exclamationMarkCircle" sdsSize="s" sdsType="static" /> {message}</StyledAlertText></>)
     })
   }
 
