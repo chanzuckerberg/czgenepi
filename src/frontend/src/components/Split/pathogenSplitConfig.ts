@@ -31,7 +31,10 @@ const pathogenTrafficFlagConfig: PathogenTrafficFlagConfig = {
   },
 };
 
-export type CurrentPathogenFlagMapping = Record<PATHOGEN_FEATURE_FLAGS, SPLIT_SIMPLE_FLAG>;
+export type CurrentPathogenFlagMapping = Record<
+  PATHOGEN_FEATURE_FLAGS,
+  SPLIT_SIMPLE_FLAG
+>;
 
 /**
  * Creates a `features` object for when Split is running in "localhost" mode.
@@ -39,12 +42,15 @@ export type CurrentPathogenFlagMapping = Record<PATHOGEN_FEATURE_FLAGS, SPLIT_SI
  * This maps flags with traffic type `pathogen` to the appropriate setting as given in the config.
  * This does not draw from the actual split configuration online -- this is for local use only.
  */
-export const createPathogenFlagsForLocal = (pathogen: Pathogen): CurrentPathogenFlagMapping => {
+export const createPathogenFlagsForLocal = (
+  pathogen: Pathogen
+): CurrentPathogenFlagMapping => {
   const localFeatures = {} as CurrentPathogenFlagMapping;
 
   forEach(pathogenTrafficFlagConfig, (value, key) => {
     const flag = value?.[pathogen];
-    localFeatures[key as PATHOGEN_FEATURE_FLAGS] = flag ?? SPLIT_SIMPLE_FLAG.OFF;
+    localFeatures[key as PATHOGEN_FEATURE_FLAGS] =
+      flag ?? SPLIT_SIMPLE_FLAG.OFF;
   });
 
   return localFeatures;

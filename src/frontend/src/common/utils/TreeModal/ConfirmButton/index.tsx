@@ -19,11 +19,14 @@ interface Props extends ButtonProps {
 // How our various destinations construct their fetch routes
 const ROUTE_LOOKUP: Record<OutgoingDestination, string> = {
   galago: ROUTES.GALAGO + "#/fetch/",
-  nextstrain: ROUTES.NEXTSTRAIN + "fetch/"
+  nextstrain: ROUTES.NEXTSTRAIN + "fetch/",
 };
 
 // Get URL for where we should send user based on tree + destination.
-const getOutgoingUrl = async (treeId: number, outgoingDestination: OutgoingDestination) => {
+const getOutgoingUrl = async (
+  treeId: number,
+  outgoingDestination: OutgoingDestination
+) => {
   // Start by having BE make a URL we can get the tree's JSON from publicly.
   const requestData = { tree_id: treeId };
   const result = await fetch(

@@ -73,7 +73,10 @@ const Data: FunctionComponent = () => {
   useProtectedRoute();
 
   const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
-  const usesTableRefactor = isUserFlagOn(tableRefactorFlag, USER_FEATURE_FLAGS.table_refactor);
+  const usesTableRefactor = isUserFlagOn(
+    tableRefactorFlag,
+    USER_FEATURE_FLAGS.table_refactor
+  );
 
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);

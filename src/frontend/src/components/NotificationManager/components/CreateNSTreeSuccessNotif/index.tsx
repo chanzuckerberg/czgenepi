@@ -14,11 +14,7 @@ export const CreateNSTreeSuccessNotif = ({ onDismiss }: Props): JSX.Element => (
     </span>
     <NextLink href={ROUTES.PHYLO_TREES} passHref>
       <a href="passRef">
-        <StyledButton
-          sdsType="primary"
-          sdsStyle="minimal"
-          onClick={onDismiss}
-        >
+        <StyledButton sdsType="primary" sdsStyle="minimal" onClick={onDismiss}>
           VIEW MY TREES
         </StyledButton>
       </a>

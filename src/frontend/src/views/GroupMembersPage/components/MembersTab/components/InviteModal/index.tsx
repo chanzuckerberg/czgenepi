@@ -55,29 +55,33 @@ const InviteModal = ({
       const failedInvites = filter(invitations, (i) => !i.success);
       setFailedToSendAddresses(failedInvites.map((i) => i.email));
       if (failedInvites.length > 0) {
-        dispatch(addNotification({
-          shouldShowCloseButton: true,
-          intent: "warning",
-          componentKey: NotificationComponents.INVITE_USERS_FAILURE,
-          componentProps: {
-            failedToSendAddresses,
-          }
-        }));
+        dispatch(
+          addNotification({
+            shouldShowCloseButton: true,
+            intent: "warning",
+            componentKey: NotificationComponents.INVITE_USERS_FAILURE,
+            componentProps: {
+              failedToSendAddresses,
+            },
+          })
+        );
       }
 
       // show success for any invites we did send
       const successCount = invitations.length - failedInvites.length;
       setSentCount(successCount);
       if (successCount > 0) {
-        dispatch(addNotification({
-          shouldShowCloseButton: true,
-          intent: "info",
-          autoDismiss: true,
-          componentKey: NotificationComponents.INVITE_USERS_SUCCESS,
-          componentProps: {
-            numSent: sentCount,
-          }
-        }));
+        dispatch(
+          addNotification({
+            shouldShowCloseButton: true,
+            intent: "info",
+            autoDismiss: true,
+            componentKey: NotificationComponents.INVITE_USERS_SUCCESS,
+            componentProps: {
+              numSent: sentCount,
+            },
+          })
+        );
       }
 
       handleClose();

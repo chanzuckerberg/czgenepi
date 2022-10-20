@@ -16,7 +16,7 @@ const SearchBar = ({ onSearchComplete, tableData }: Props): JSX.Element => {
     onSearchChange({
       target: {
         value: searchQuery,
-      }
+      },
     } as ChangeEvent<HTMLInputElement>);
   }, [tableData]);
 
@@ -38,7 +38,7 @@ const SearchBar = ({ onSearchComplete, tableData }: Props): JSX.Element => {
       }
       return searchQuery.test(`${value}`);
     });
-  }
+  };
 
   const onSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const query = event?.target?.value;
@@ -55,7 +55,9 @@ const SearchBar = ({ onSearchComplete, tableData }: Props): JSX.Element => {
 
     // there is data in the table AND a search query -- execute a search
     const regex = new RegExp(escapeRegExp(query), "i");
-    const filteredData = filter(tableData, (item) => deepTableRowItemSearch(item, regex))
+    const filteredData = filter(tableData, (item) =>
+      deepTableRowItemSearch(item, regex)
+    );
 
     onSearchComplete(filteredData);
   };

@@ -39,6 +39,7 @@ import {
   DownloadTypeInfo,
   Header,
   StyledButton,
+  StyledCallout,
   StyledCheckbox,
   StyledFileTypeItem,
   Title,
@@ -132,11 +133,13 @@ const DownloadModal = ({
   const useFileMutationGenerator = () =>
     useFileDownload({
       componentOnError: () => {
-        dispatch(addNotification({
-          componentKey: NotificationComponents.DOWNLOAD_FILES_FAILURE,
-          intent: "error",
-          shouldShowCloseButton: true,
-        }));
+        dispatch(
+          addNotification({
+            componentKey: NotificationComponents.DOWNLOAD_FILES_FAILURE,
+            intent: "error",
+            shouldShowCloseButton: true,
+          })
+        );
         handleCloseModal();
       },
       componentOnSuccess: ({ data, filename }: FileDownloadResponsePayload) => {
@@ -302,6 +305,13 @@ const DownloadModal = ({
                   </DownloadTypeInfo>
                 </Alert>
               )}
+            {isGisaidSelected && checkedSampleIds.length > 1000 && (
+              <StyledCallout intent="warning">
+                The number of samples selected exceeds GISAID’s upload limit of
+                1000 samples. To avoid an error while submitting to GISIAD, we
+                recommend splitting your download into smaller batches.
+              </StyledCallout>
+            )}
             {getDownloadButton()}
           </Content>
         </DialogContent>
