@@ -1,3 +1,4 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
 import {
   useMutation,
   UseMutationResult,
@@ -5,6 +6,8 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import {
   DEFAULT_DELETE_OPTIONS,
   fetchPhyloRuns,
@@ -42,9 +45,15 @@ export const USE_PHYLO_RUN_INFO = {
 };
 
 export function usePhyloRunInfo(): UseQueryResult<IdMap<PhyloRun>, unknown> {
+  const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
+  const usesTableRefactor = isUserFlagOn(
+    tableRefactorFlag,
+    USER_FEATURE_FLAGS.table_refactor
+  );
+
   return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
     retry: false,
-    select: mapPhyloRuns,
+    select: usesTableRefactor ? mapPhyloRuns : undefined,
   });
 }
 
