@@ -7,6 +7,7 @@ import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
+import { reduceObjectArrayToLookupDict } from "src/common/utils/dataTransforms";
 import { FilterPanel } from "src/components/FilterPanel";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
@@ -31,19 +32,6 @@ import {
   View,
 } from "./style";
 import { PHYLO_RUN_TRANSFORMS } from "./transforms";
-
-// reduces an array of objects to a mapping between the keyString arg and the objects
-// that make up the array. Effective for quickly looking up objects by id, for example.
-const reduceObjectArrayToLookupDict = (
-  arr: BioinformaticsDataArray,
-  keyedOn: string
-): BioinformaticsMap => {
-  const keyValuePairs = arr.map((obj) => {
-    const id = obj[keyedOn];
-    return [id, obj];
-  });
-  return Object.fromEntries(keyValuePairs);
-};
 
 // run data through transforms
 const transformData = (
