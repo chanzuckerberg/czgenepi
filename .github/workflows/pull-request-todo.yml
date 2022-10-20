@@ -16,5 +16,3 @@ jobs:
     - uses: chanzuckerberg/CZ-PR-bot@v1.2
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        fetch-depth: 0 # fetch all commits/branches
