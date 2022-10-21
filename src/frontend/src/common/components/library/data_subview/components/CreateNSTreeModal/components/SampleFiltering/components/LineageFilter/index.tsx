@@ -20,15 +20,9 @@ export type LineageFilterType = {
   setSelectedLineages: (lineages: string[]) => void;
 };
 
-// We present a pseudo-option to the user to enable choosing "All" lineages,
-// but internally this means no lineages were chosen to filter down to.
-const ALL_LINEAGES_KEYWORD = "All";
-
 function makeDropdownOption(name: string): DefaultMenuSelectOption {
   return { name: name };
 }
-// Generate only once because we need to reference same object throughout.
-const ALL_LINEAGES_CHOICE = makeDropdownOption(ALL_LINEAGES_KEYWORD);
 
 /**
  * `Dropdown` defaults to checking if option is selected (`value`) by equality.
@@ -41,7 +35,6 @@ const getOptionSelected = (
   option: DefaultMenuSelectOption,
   value: DefaultMenuSelectOption
 ) => {
-  console.log({ option, value });
   return option.name === value.name;
 };
 /**
@@ -59,13 +52,9 @@ function filterLineageOptions(
   // MUI has a nice set of defaults for its Autocomplete filter, we use those
   const baseFilter = createFilterOptions<DefaultMenuSelectOption>();
   const baseFilteredResults = baseFilter(options, state);
-  // We conditionally add the "All" choice if not already in results.
-  let addlPrependResults: DefaultMenuSelectOption[] = [];
-  if (!baseFilteredResults.includes(ALL_LINEAGES_CHOICE)) {
-    addlPrependResults = [ALL_LINEAGES_CHOICE];
-  }
+
   // Cap the actual search results returned to keep render speed sane.
-  return [...addlPrependResults, ...baseFilteredResults.slice(0, 99)];
+  return baseFilteredResults.slice(0, 99);
 }
 // `Dropdown` doesn't directly handle above, it's done by its child MenuSelect.
 // This prop was renamed to DropdownMenuProps
@@ -77,7 +66,7 @@ const lineageDropdownMenuProps = {
 // Label of lineages dropdown varies based on number lineages selected.
 function getLineageDropdownLabel(selectedLineages: string[]): string {
   const count = selectedLineages.length;
-  return count ? `${count} Selected` : ALL_LINEAGES_KEYWORD;
+  return count ? `${count} Selected` : "All";
 }
 
 // For lineages dropdown, "All" is shown as chosen when user has selected
@@ -86,7 +75,7 @@ function getLineageDropdownValue(
   selectedLineages: string[]
 ): DefaultMenuSelectOption[] {
   // Default to case of empty selection. Swap out if there is real selection.
-  let selectedLineagesOptions = [ALL_LINEAGES_CHOICE];
+  let selectedLineagesOptions: DefaultMenuSelectOption[] = [];
   if (selectedLineages.length > 0) {
     selectedLineagesOptions = selectedLineages.map(makeDropdownOption);
   }
@@ -124,7 +113,6 @@ function generateLineageDropdownOptions(
     .filter((lineage) => !selectedLineages.includes(lineage))
     .sort();
   return [
-    ALL_LINEAGES_CHOICE,
     ...sortedSelection.map(makeDropdownOption),
     ...remainingAvailable.map(makeDropdownOption),
   ];
@@ -241,9 +229,10 @@ export function LineageFilter({
     let emittedSelection: string[];
 
     // When beginning selection process, had nothing selected / "All" selected
-    if (selectedLineages.length === 0) {
+    if (selectedLineages.length === 0 && newSelectedLineages.length === 0) {
+      return;
       // Only value "chosen" was All so this is a no-op
-      if (isEqual(newSelectedLineages, [ALL_LINEAGES_KEYWORD])) {
+      if (isEqual(newSelectedLineages, "All")) {
         return; // short-circuit to avoid infinite render loop
       }
       if (newSelectedLineages.length === 0) {
@@ -255,7 +244,7 @@ export function LineageFilter({
       } else {
         // Made a meaningful choice, so need to drop "All"
         emittedSelection = newSelectedLineages.filter(
-          (lineage) => lineage !== ALL_LINEAGES_KEYWORD
+          (lineage) => lineage !== "All"
         );
       }
     } else {
@@ -264,7 +253,7 @@ export function LineageFilter({
       if (isEqual(newSelectedLineages, selectedLineages)) {
         console.log("isEqual", { selectedLineages, lineageDropdownValue });
         return; // short-circuit to avoid infinite render loop
-      } else if (newSelectedLineages.includes(ALL_LINEAGES_KEYWORD)) {
+      } else if (newSelectedLineages.includes("All")) {
         // User chose "All" option, so we reset selection.
         // Verified with Design that this is intention, even when user had also
         // chosen additional real lineages along with "All" choice. "All" wins!
