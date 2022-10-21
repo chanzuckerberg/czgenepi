@@ -21,7 +21,6 @@ from aspen.api.schemas.phylo_runs import (
 )
 from aspen.api.settings import APISettings
 from aspen.api.utils import (
-    expand_lineage_wildcards,
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,

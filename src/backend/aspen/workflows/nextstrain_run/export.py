@@ -7,6 +7,7 @@ from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional,
 import click
 from sqlalchemy.orm import aliased, joinedload, with_polymorphic
 
+from aspen.api.utils import expand_lineage_wildcards
 from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
@@ -22,6 +23,7 @@ from aspen.database.models import (
     Entity,
     Group,
     Location,
+    PangoLineage,
     PathogenGenome,
     PhyloRun,
     Sample,
@@ -236,19 +238,42 @@ def get_phylo_run(session, phylo_run_id):
     return phylo_run
 
 
+def resolve_filter_pango_lineages(
+    session: Session, template_args: Dict[str, Any]
+) -> Optional[List[str]]:
+    """Takes raw lineage filter, expands it. Helper for `resolve_template_args`
+
+    User can specify the lineages they want a tree build to filter on and are
+    able to use wildcards and some other, non-pango lineages as part of that.
+    Downstream needs Pango-only lineages. This handles using the originally
+    provided `filter_pango_lineages` arg and converting it. If arg was not
+    present in original template_args, returns None instead.
+    """
+    lineage_list = template_args.get("filter_pango_lineages")
+    if lineage_list is None:  # short-circuit if template arg was not present
+        return None
+    # Utility that does expansion depends on having set of all lineages.
+    all_lineages = {
+        query_result.lineage
+        for query_result
+        in session.query(PangoLineage.lineage).all()
+    }
+    return expand_lineage_wildcards(all_lineages, lineage_list)
+
+
 def resolve_template_args(
     session: Session, template_args: Dict[str, Any], group: Group
 ) -> Dict[str, Any]:
     """Takes raw template_args and interprets them so ready for downstream use.
 
-    Some of the raw args from upstream (eg, `location_id`) need to resolved
+    Some of the raw args from upstream (eg, `location_id`) need to be resolved
     into something usable downstream. There's no definite line between args
     that can stay "raw" and those that need to be interpreted. Generally, it's
     if it needs (A) to involve database usage or (B) to make a clearer version
     of the arg for eventual display to user (eg, in the trees table).
     """
     # We do not pass thru any template_args that get special interpretation
-    NON_PASSTHRU_ARGS = ["location_id"]
+    NON_PASSTHRU_ARGS = ["location_id", "filter_pango_lineages"]
 
     # Handle location. If custom set, use that, otherwise use group's default.
     resolved_location = group.default_tree_location
@@ -258,11 +283,19 @@ def resolve_template_args(
             session.query(Location).filter(Location.id == custom_location_id).one()
         )
 
+    resolved_filter_pango_lineages = resolve_filter_pango_lineages(
+        session,
+        template_args
+    )
+
     # Avoid mutating original template_args; resolved args handled special.
     resolved_template_args = {
         key: template_args[key] for key in template_args if key not in NON_PASSTHRU_ARGS
     }
     resolved_template_args["location"] = resolved_location
+    if resolved_filter_pango_lineages:  # only use lineages if we had any
+        resolved_template_args["filter_pango_lineages"] = resolved_filter_pango_lineages
+
     return resolved_template_args
 
 
