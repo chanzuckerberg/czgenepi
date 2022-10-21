@@ -29,6 +29,7 @@ interface Props {
   samples: Samples | null;
   metadata: SampleIdToMetadata | null;
   cancelPrompt: () => void;
+  analyticsFlowUuid: string;
 }
 
 export default function Upload({
@@ -36,6 +37,7 @@ export default function Upload({
   samples,
   metadata,
   cancelPrompt,
+  analyticsFlowUuid,
 }: Props): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -49,6 +51,7 @@ export default function Upload({
         {
           sample_count: createdIds.length,
           sample_ids: JSON.stringify(createdIds),
+          upload_flow_uuid: analyticsFlowUuid,
         }
       );
 

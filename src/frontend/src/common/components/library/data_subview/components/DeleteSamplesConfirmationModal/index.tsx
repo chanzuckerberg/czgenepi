@@ -33,20 +33,27 @@ const DeleteSamplesConfirmationModal = ({
 
   const deleteSampleMutation = useDeleteSamples({
     componentOnError: () => {
-      dispatch(addNotification({
-        autoDismiss: true,
-        intent: "error",
-        shouldShowCloseButton: true,
-        text: "We were unable to delete the selected samples. Please try again later.",
-      }));
+      dispatch(
+        addNotification({
+          autoDismiss: true,
+          intent: "error",
+          shouldShowCloseButton: true,
+          text: "We were unable to delete the selected samples. Please try again later.",
+        })
+      );
     },
     componentOnSuccess: () => {
-      dispatch(addNotification({
-        autoDismiss: true,
-        intent: "info",
-        shouldShowCloseButton: true,
-        text: `${numDeletedSamples} ${pluralize("sample", numDeletedSamples)} ${pluralize("has", numDeletedSamples)} been deleted.`,
-      }));
+      dispatch(
+        addNotification({
+          autoDismiss: true,
+          intent: "info",
+          shouldShowCloseButton: true,
+          text: `${numDeletedSamples} ${pluralize(
+            "sample",
+            numDeletedSamples
+          )} ${pluralize("has", numDeletedSamples)} been deleted.`,
+        })
+      );
     },
   });
 

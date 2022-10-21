@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # TODO: fix pipefail flags to be informative
-#set -Eex pipefail
+set -Eeuxo pipefail
+shopt -s inherit_errexit  # no silent breaking
 
 # activate miniconda
 eval "$($HOME/miniconda/bin/conda shell.bash hook)"
@@ -11,19 +12,12 @@ conda activate pangolin
 # check pangolin is present:
 pangolin -pv
 
-# process all trailing args to include --sample-public-identifiers flag
-args=""
-for sample_id in "${@}"
-do
-    args="$args --sample-public-identifier $sample_id"
-done
-
 sequences_output="sequences.fasta"
 
 cd /usr/src/app/aspen/workflows/pangolin
 # call export script to export renamed sequences
 /usr/local/bin/python3.9 export.py \
-  $args \
+  --sample-ids-file "$SAMPLE_IDS_FILE" \
   --sequences "$sequences_output"
 
 # call pangolin on the exported sequences

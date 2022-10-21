@@ -63,3 +63,5 @@ ENV PYTHONPATH=.
 COPY . .
 # Install the aspen package
 RUN poetry install
+
+WORKDIR /nextstrain
