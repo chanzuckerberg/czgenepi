@@ -9,12 +9,6 @@ from aspen.database.models.public_repositories import PublicRepository  # noqa: 
 from aspen.database.models.public_repository_metadata import (  # noqa: F401
     PublicRepositoryMetadata,
 )
-from aspen.database.models.workflow import (  # noqa: F401
-    Workflow,
-    WorkflowInputs,
-    WorkflowStatusType,
-    WorkflowType,
-)
 from aspen.database.models.gisaid_dump import (  # noqa: F401
     AlignedGisaidDump,
     GisaidAlignmentWorkflow,
