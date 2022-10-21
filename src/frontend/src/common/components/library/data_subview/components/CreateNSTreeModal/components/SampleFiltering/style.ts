@@ -20,11 +20,23 @@ export const StyledContainer = styled.div`
   }}
 `;
 
+export const StyledTitleContainer = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+`;
+
 export const StyledExplainerTitle = styled.div`
   ${fontHeaderXs}
   display: flex;
   align-items: center;
   color: black;
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin: ${spaces?.xxs}px 0;
+    `;
+  }}
 `;
 
 export const StyledFiltersSection = styled.div`
@@ -47,8 +59,10 @@ export const StyledFilterGroup = styled.div`
     const spaces = getSpaces(props);
     const leftMargin = props.fullWidth ? "0" : `${spaces?.xl}px`;
     const topMargin = props.fullWidth ? `${spaces?.m}px` : "0";
+    const width = props.fullWidth ? `100%` : `40%`;
 
     return `
+      width: ${width};
       margin-left: ${leftMargin};
       margin-top: ${topMargin};
     `;
@@ -90,13 +104,18 @@ interface StyledDropdownProps extends CommonThemeProps {
   fullWidth?: boolean;
 }
 export const StyledDropdown = styled(Dropdown)`
-  ${(props: StyledDropdownProps) => {
-    const width = props.fullWidth ? "100%" : DROPDOWN_WIDTH;
+  width: 100%;
 
+  ${(props: StyledDropdownProps) => {
     const colors = getColors(props);
     const palette = getPalette(props);
+    const fullWidthStyle = props.fullWidth
+      ? `
+      text-overflow: ellipsis;
+      max-width: 470px;
+      `
+      : "";
     return `
-      width: ${width};
       border-color: ${colors?.gray[500]};
       path {
         fill: ${colors?.gray[500]};
@@ -111,6 +130,7 @@ export const StyledDropdown = styled(Dropdown)`
           fill: ${colors?.gray[600]};
         }
       }
+      ${fullWidthStyle}
     `;
   }}
 `;

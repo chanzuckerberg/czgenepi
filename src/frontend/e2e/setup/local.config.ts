@@ -32,6 +32,7 @@ const config: PlaywrightTestConfig = {
     screenshot: "only-on-failure",
     storageState: "e2e/storage/state.json",
     trace: "on-first-retry",
+    viewport: { width: 800, height: 7200 },
   },
 };
 export default config;

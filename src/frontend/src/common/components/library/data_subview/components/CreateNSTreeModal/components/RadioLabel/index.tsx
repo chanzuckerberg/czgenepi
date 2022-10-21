@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
+import { ResetFiltersType } from "../..";
 import { SampleFiltering } from "../SampleFiltering";
 import {
   EndDateFilterType,
@@ -34,7 +35,8 @@ interface TreeChoiceWithFilteringProps
     StartDateFilterType,
     EndDateFilterType,
     LineageFilterType,
-    LocationFilterType {}
+    LocationFilterType,
+    ResetFiltersType {}
 
 export const RadioLabelOverview = ({
   selected,
@@ -48,6 +50,8 @@ export const RadioLabelOverview = ({
   endDate,
   setStartDate,
   setEndDate,
+  isFilterEnabled,
+  resetFilters,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
@@ -77,6 +81,7 @@ export const RadioLabelOverview = ({
       <Label>
         <LabelMain>Overview </LabelMain>
       </Label>
+
       <SmallText>{overviewDescription}</SmallText>
       {selected && (
         <>
@@ -117,6 +122,8 @@ export const RadioLabelOverview = ({
             endDate={endDate}
             setStartDate={setStartDate}
             setEndDate={setEndDate}
+            isFilterEnabled={isFilterEnabled}
+            resetFilters={resetFilters}
           />
         </>
       )}
@@ -126,13 +133,16 @@ export const RadioLabelOverview = ({
 
 interface RadioLabelTargetedProps
   extends BaseTreeChoiceProps,
-    LocationFilterType {}
+    LocationFilterType,
+    ResetFiltersType {}
 
 export const RadioLabelTargeted = ({
   selected,
   namedLocations,
   selectedLocation,
   setSelectedLocation,
+  isFilterEnabled,
+  resetFilters,
 }: RadioLabelTargetedProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
@@ -187,6 +197,8 @@ export const RadioLabelTargeted = ({
               namedLocations={namedLocations}
               selectedLocation={selectedLocation}
               setSelectedLocation={setSelectedLocation}
+              isFilterEnabled={isFilterEnabled}
+              resetFilters={resetFilters}
             />
           )}
         </>
@@ -207,6 +219,8 @@ export const RadioLabelNonContextualized = ({
   endDate,
   setStartDate,
   setEndDate,
+  isFilterEnabled,
+  resetFilters,
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
@@ -276,6 +290,8 @@ export const RadioLabelNonContextualized = ({
             endDate={endDate}
             setStartDate={setStartDate}
             setEndDate={setEndDate}
+            isFilterEnabled={isFilterEnabled}
+            resetFilters={resetFilters}
           />
         </>
       )}

@@ -33,6 +33,7 @@ export default function Review({
   samples,
   metadata,
   cancelPrompt,
+  analyticsFlowUuid,
 }: Props): JSX.Element {
   const { data: userInfo } = useUserInfo();
   const [isGroupConfirmationChecked, setIsGroupConfirmationChecked] =
@@ -123,6 +124,7 @@ export default function Review({
             metadata={metadata}
             isDisabled={!isGroupConfirmationChecked || !isConsentChecked}
             cancelPrompt={cancelPrompt}
+            analyticsFlowUuid={analyticsFlowUuid}
           />
           <NextLink href={ROUTES.UPLOAD_STEP2} passHref>
             <a href="passHref">

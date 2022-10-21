@@ -37,10 +37,12 @@ task pangolin_workflow {
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
+    export SAMPLE_IDS_FILE="${HOME}/sample_ids.txt"
 
     cd /usr/src/app/aspen/workflows/pangolin
     ./update_pangolin.sh
-    /usr/local/bin/python3.9 find_samples.py
+    /usr/local/bin/python3.9 find_samples.py --output-file "${SAMPLE_IDS_FILE}"
+    ./run_pangolin.sh
     >>>
 
     runtime {

@@ -33,9 +33,11 @@ task pangolin_workflow {
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
+    export SAMPLE_IDS_FILE="${HOME}/sample_ids.txt"
 
     cd /usr/src/app/aspen/workflows/pangolin
-    ./run_pangolin.sh ~{sep(' ', samples)}
+    echo "~{sep('\n', samples)}" > $SAMPLE_IDS_FILE
+    ./run_pangolin.sh
     >>>
 
     runtime {

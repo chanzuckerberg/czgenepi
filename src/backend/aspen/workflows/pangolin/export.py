@@ -1,5 +1,5 @@
 import io
-from typing import Iterable, Sequence
+from typing import Iterable
 
 import click
 from sqlalchemy.orm import joinedload
@@ -15,15 +15,17 @@ from aspen.database.models import Sample, UploadedPathogenGenome
 
 
 @click.command("export")
-@click.option("--sample-public-identifier", type=str, required=True, multiple=True)
+@click.option("samples_fh", "--sample-ids-file", type=click.File("r"), required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
-def cli(sample_public_identifier: Sequence[str], sequences_fh: io.TextIOBase):
+def cli(samples_fh: io.TextIOBase, sequences_fh: io.TextIOBase):
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
+
+    sample_public_identifiers: list[str] = samples_fh.read().split("\n")
 
     with session_scope(interface) as session:
         all_samples: Iterable[Sample] = (
             session.query(Sample)
-            .filter(Sample.public_identifier.in_(sample_public_identifier))
+            .filter(Sample.public_identifier.in_(sample_public_identifiers))
             .options(
                 joinedload(Sample.uploaded_pathogen_genome).undefer(
                     UploadedPathogenGenome.sequence

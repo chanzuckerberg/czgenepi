@@ -28,6 +28,8 @@ class Pathogen(idbase):  # type: ignore
         unique=True,
         comment=("full pathogen abbreviated name, ex: SARS-CoV-2"),
     )
+    # not all pathogens will have a dataset name once we get into a generalized case
+    nextclade_dataset_name = Column(String, nullable=True)
 
     samples = relationship("Sample", back_populates="pathogen")  # type: ignore
     phylo_runs = relationship("PhyloRun", back_populates="pathogen")  # type: ignore

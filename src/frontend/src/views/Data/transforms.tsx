@@ -15,7 +15,9 @@ export const PHYLO_RUN_TRANSFORMS: Transform[] = [
       if (typeof id !== "number") {
         return undefined;
       }
-      return `${API_URL}${generateOrgSpecificUrl(ORG_API.PHYLO_TREES)}${id}/download`;
+      return `${API_URL}${generateOrgSpecificUrl(
+        ORG_API.PHYLO_TREES
+      )}${id}/download`;
     },
   },
   {
@@ -26,7 +28,9 @@ export const PHYLO_RUN_TRANSFORMS: Transform[] = [
       if (typeof id !== "number") {
         return undefined;
       }
-      return `${API_URL}${generateOrgSpecificUrl(ORG_API.PHYLO_TREES)}${id}/download?id_style=public`;
+      return `${API_URL}${generateOrgSpecificUrl(
+        ORG_API.PHYLO_TREES
+      )}${id}/download?id_style=public`;
     },
   },
   {
@@ -37,7 +41,9 @@ export const PHYLO_RUN_TRANSFORMS: Transform[] = [
       if (typeof id !== "number") {
         return undefined;
       }
-      return `${API_URL}${generateOrgSpecificUrl(ORG_API.PHYLO_TREES)}${id}/sample_ids`;
+      return `${API_URL}${generateOrgSpecificUrl(
+        ORG_API.PHYLO_TREES
+      )}${id}/sample_ids`;
     },
   },
   {

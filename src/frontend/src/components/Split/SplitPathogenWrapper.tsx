@@ -1,7 +1,10 @@
 import { SplitClient, SplitTreatments } from "@splitsoftware/splitio-react";
 import { ReactNode, useEffect, useState } from "react";
 import { isLocalSplitEnv } from "./util";
-import { createPathogenFlagsForLocal, CurrentPathogenFlagMapping } from "./pathogenSplitConfig";
+import {
+  createPathogenFlagsForLocal,
+  CurrentPathogenFlagMapping,
+} from "./pathogenSplitConfig";
 import { PATHOGEN_FEATURE_FLAGS, SPLIT_SIMPLE_FLAG } from "./types";
 import { Pathogen } from "src/common/redux/types";
 
@@ -11,7 +14,11 @@ interface Props {
   feature: PATHOGEN_FEATURE_FLAGS;
 }
 
-const SplitPathogenWrapper = ({ children, feature, pathogen }: Props): JSX.Element | null => {
+const SplitPathogenWrapper = ({
+  children,
+  feature,
+  pathogen,
+}: Props): JSX.Element | null => {
   const [localFlags, setLocalFlags] = useState<CurrentPathogenFlagMapping>();
 
   // if pathogen changes, make sure to update whether pathogen-dependent feature flags
@@ -38,7 +45,9 @@ const SplitPathogenWrapper = ({ children, feature, pathogen }: Props): JSX.Eleme
         {({ isReady, treatments }) => {
           if (isReady) {
             const { treatment } = treatments[feature];
-            return treatment === SPLIT_SIMPLE_FLAG.ON ? (<div>{children}</div>) : null;
+            return treatment === SPLIT_SIMPLE_FLAG.ON ? (
+              <div>{children}</div>
+            ) : null;
           }
 
           // wait until treatments are loaded to show anything

@@ -4,7 +4,6 @@ import {
   CommonThemeProps,
   fontHeaderXs,
   getColors,
-  getCorners,
   getFontWeights,
   getSpaces,
 } from "czifui";
@@ -82,45 +81,6 @@ export const StyledFlexChildDiv = styled.div`
   }}
 `;
 
-export const SearchBar = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-
-  ${(props: CommonThemeProps) => {
-    const colors = getColors(props);
-    const corners = getCorners(props);
-    const spaces = getSpaces(props);
-
-    return `
-      margin-bottom: ${spaces?.xxl}px;
-
-      input {
-        border-radius: ${corners?.l}px !important;
-
-        &:hover {
-          border-color: ${colors?.gray[400]};
-        }
-
-        &:focus {
-          border-color: ${colors?.primary[400]};
-        }
-      }
-    `;
-  }}
-`;
-
-export const SearchInput = styled.div`
-  width: 25%;
-  min-width: 20em;
-
-  > div {
-    width: 100%;
-  }
-`;
-
 export const SamplesTable = styled.div`
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
@@ -128,4 +88,9 @@ export const SamplesTable = styled.div`
       margin-top: ${spaces?.m}px;
     `;
   }}
+`;
+
+export const StyledBar = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;

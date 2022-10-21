@@ -40,6 +40,15 @@ export enum EVENT_TYPES {
   // the selected samples. User can add more metadata to overlay on tree view.
   TREE_DOWNLOAD_SELECTED_SAMPLES_TEMPLATE = "TREE_DOWNLOAD_SELECTED_SAMPLES_TEMPLATE",
 
+  // User has either just entered or changed pages in the process of uploading
+  // samples. See event data docs for info on how to tell the difference.
+  // NOTE: There is no event for user leaving the Upload flow in the middle.
+  // Because of how leaving works, it would be hard to reliably capture this
+  // event. Instead, we can check how many Upload flows made it to a successful
+  // completion by correlating `SAMPLES_UPLOAD_SUCCESS` events with these. Any
+  // flows that did not eventually have a SUCCESS must have ended otherwise.
+  SAMPLES_UPLOAD_PAGE_CHANGE = "SAMPLES_UPLOAD_PAGE_CHANGE",
+
   // User has successfully uploaded new samples
   SAMPLES_UPLOAD_SUCCESS = "SAMPLES_UPLOAD_SUCCESS",
 
@@ -128,6 +137,26 @@ export type AnalyticsTreeCreationNextstrain = {
   phylo_run_workflow_id: number;
   // Type of tree being created
   tree_type: string;
+  // Location of samples used for tree creation. A null value indicates that
+  // the user's group info was not successfully fetched before they created
+  // a tree. This generally shouldn't happen.
+  location_id: number | null;
+  // Location of the user's group. This is provided for comparison with the
+  // location_id above. A null value indicates that the user's
+  // group was not successfully fetched before they created a tree. This
+  // generally shouldn't happen.
+  group_location_id: number | null;
+  // Lineages selected for tree creation. json stringified list of strings.
+  // "[]" indicates "All lineages"
+  selected_lineages: JsonString;
+  // Time range filter for tree creation. A null value indicates that
+  // the user did not change the default value and there is
+  // no start date set. FormattedDateType is "YYYY-MM-DD"
+  start_date: FormattedDateType | null;
+  // Time range filter for tree creation. A null value indicates that
+  // the user did not change the default value and there is
+  // no end date set. FormattedDateType is "YYYY-MM-DD"
+  end_date: FormattedDateType | null;
 };
 
 /** EVENT_TYPES.TREE_ACTIONS_CLICK_GALAGO */
@@ -169,12 +198,29 @@ export type AnalyticsTreeDownloadSelectedSamplesTemplate = {
   phylo_run_workflow_id: number | null;
 };
 
+/** EVENT_TYPES.SAMPLES_UPLOAD_PAGE_CHANGE*/
+export type AnalyticsSamplesUploadPageChange = {
+  // The Samples Upload route user has just come from. If user is entering a
+  // new Upload process with this event, this will be empty string.
+  prev_route: string;
+  // The Samples Upload route user has just gone to.
+  new_route: string;
+  // Random ID generated at start of a given Samples Upload process.
+  // This allows us to correlate all the steps in a single Upload process into
+  // a unified "flow". If a new Upload is started in same browser session, this
+  // will be re-generated, so distinct Upload "flows" will have distinct IDs.
+  upload_flow_uuid: string;
+};
+
 /** EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS*/
 export type AnalyticsSamplesUploadSuccess = {
   // How many samples the user just uploaded
   sample_count: number;
   // JSON array of all the IDs for newly created samples for this upload
   sample_ids: JsonString;
+  // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
+  // For an Upload "flow" that ends in successful upload, this will match up.
+  upload_flow_uuid: string;
 };
 
 /** EVENT_TYPES.SAMPLES_DOWNLOAD_FILE*/
