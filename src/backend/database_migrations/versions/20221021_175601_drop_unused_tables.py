@@ -17,12 +17,6 @@ depends_on = None
 def upgrade():
     op.drop_table("can_see", schema="aspen")
     op.drop_table("data_types", schema="aspen")
-    op.create_unique_constraint(
-        op.f("uq_sample_qc_metrics_qc_score"),
-        "sample_qc_metrics",
-        ["qc_score"],
-        schema="aspen",
-    )
     op.drop_constraint(
         "fk_users_group_id_groups", "users", schema="aspen", type_="foreignkey"
     )
