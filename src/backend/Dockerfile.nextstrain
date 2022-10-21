@@ -32,7 +32,7 @@ RUN apt-get -qq update && apt-get -qq -y install \
 
 # Install poetry
 RUN apt install -y libdigest-sha-perl
-ENV POETRY_VERSION=1.1.15
+ENV POETRY_VERSION=1.2.2
 RUN python3 -m pip install poetry==$POETRY_VERSION
 
 ENV FLASK_ENV=development
