@@ -102,6 +102,13 @@ class PhyloRun(Workflow):
     pathogen: Pathogen = relationship(Pathogen, back_populates="phylo_runs")  # type: ignore
 
     template_file_path = Column(String, nullable=True)
+    """[Tony Tung, Spring2021] This is the path, relative to aspen root, for
+    the builds template file.  For all new builds, this should be set.
+    However, for runs imported from covidhub, this would not be available.
+
+    [Vincent, Fall2022] Above appears not to be true anymore, and seems to have
+    stopped being true at end of 2021. TODO Potentially remove this column?
+    """
 
     # Store a list of gisaid ID's we're going to use as inputs
     # to the phylo run.
@@ -111,9 +118,6 @@ class PhyloRun(Workflow):
         default=text("'[]'::jsonb"),
         server_default=text("'[]'::jsonb"),
     )
-    """This is the path, relative to aspen root, for the builds template file.  For all
-    new builds, this should be set.  However, for runs imported from covidhub, this
-    would not be available."""
 
     template_args = Column(
         JSONB,
@@ -122,7 +126,12 @@ class PhyloRun(Workflow):
         server_default=text("'{}'::jsonb"),
     )
     """The arguments, in conjunction with the template file, used to produce the final
-    builds file."""
+    builds file. These args represent the literal args given by the request
+    that kicked off the phylo_run. While we filter the original args down to
+    just those args our app supports, this is generally intended to be the args
+    as originally sent, before any additional interpretation/extrapolation.
+    To see what the args wind up being extrapolated to, see the column
+    PhyloTree.resolved_template_args"""
 
     name = Column(String, nullable=True)
 
