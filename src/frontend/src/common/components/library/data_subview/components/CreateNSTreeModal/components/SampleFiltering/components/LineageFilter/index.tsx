@@ -201,7 +201,6 @@ export function LineageFilter({
       | DefaultMenuSelectOption[]
       | null
   ): void {
-    console.log("handleLineageDropdownChange", { newSelectedOptions });
     // No selection at all means empty all lineage choices.
     // (Vince) Poked around: I don't think Dropdown emits this in our case?
     // But interface for the component says it's there, so defensive code here.
@@ -216,7 +215,6 @@ export function LineageFilter({
     // with jus the one option. It's unclear if this will happen when multi-
     // select is enabled.
     if (!Array.isArray(newSelectedOptions)) {
-      console.log("not an array");
       setSelectedLineages([newSelectedOptions.name]);
       return;
     }
@@ -224,47 +222,18 @@ export function LineageFilter({
     const newSelectedLineages = newSelectedOptions.map(
       (option: DefaultMenuSelectOption) => option.name
     );
-    console.log({ newSelectedLineages, selectedLineages });
-    // What we actually emit as selection does not always match user selected.
-    let emittedSelection: string[];
 
     // When beginning selection process, had nothing selected / "All" selected
     if (selectedLineages.length === 0 && newSelectedLineages.length === 0) {
       return;
-      // Only value "chosen" was All so this is a no-op
-      if (isEqual(newSelectedLineages, "All")) {
-        return; // short-circuit to avoid infinite render loop
-      }
-      if (newSelectedLineages.length === 0) {
-        // Mild HACK -- this means no choices, so effectively "All". Would
-        // want a no-op, BUT if we do nothing the internal Dropdown state
-        // drifts and "All" is visually deselected. So we emit a selection
-        // to force refresh the internal state and keep visuals good.
-        emittedSelection = [];
-      } else {
-        // Made a meaningful choice, so need to drop "All"
-        emittedSelection = newSelectedLineages.filter(
-          (lineage) => lineage !== "All"
-        );
-      }
-    } else {
-      // When beginning selection process, had actual lineages chosen
-      // Opened and closed dropdown, but didn't change selection, so a no-op
-      if (isEqual(newSelectedLineages, selectedLineages)) {
-        console.log("isEqual", { selectedLineages, lineageDropdownValue });
-        return; // short-circuit to avoid infinite render loop
-      } else if (newSelectedLineages.includes("All")) {
-        // User chose "All" option, so we reset selection.
-        // Verified with Design that this is intention, even when user had also
-        // chosen additional real lineages along with "All" choice. "All" wins!
-        emittedSelection = [];
-      } else {
-        // User did not choose "All", made new choices
-        emittedSelection = newSelectedLineages;
-      }
+    }
+    // When beginning selection process, had actual lineages chosen
+    // Opened and closed dropdown, but didn't change selection, so a no-op
+    if (isEqual(newSelectedLineages, selectedLineages)) {
+      return; // short-circuit to avoid infinite render loop
     }
 
-    setSelectedLineages(emittedSelection);
+    setSelectedLineages(newSelectedLineages);
   }
 
   return (
