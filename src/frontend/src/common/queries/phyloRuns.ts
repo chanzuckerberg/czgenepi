@@ -14,8 +14,8 @@ import {
 } from "../api";
 import { API_URL } from "../constants/ENV";
 import {
+  getCapitalCaseTreeType,
   getDownloadLinks,
-  getTreeType,
   IdMap,
   reduceObjectArrayToLookupDict,
 } from "../utils/dataTransforms";
@@ -28,7 +28,7 @@ const mapPhyloRuns = (data: PhyloRunResponse) => {
   const transformedRuns = phyloRuns.map((p: PhyloRun) => ({
     ...p,
     ...getDownloadLinks(p),
-    treeType: getTreeType(p),
+    treeType: getCapitalCaseTreeType(p),
   }));
 
   return reduceObjectArrayToLookupDict<PhyloRun>(transformedRuns, "id");

@@ -64,18 +64,20 @@ export const getDownloadLinks = (phyloRun: PhyloRun): PhyloRunLinks => {
 /**
  * Converts a completely uppercase tree type to a capitalcase tree type.
  */
-export const getTreeType = (phyloRun: PhyloRun): string | undefined => {
+export const getCapitalCaseTreeType = (
+  phyloRun: PhyloRun
+): string | undefined => {
   const { treeType } = phyloRun;
 
   if (typeof treeType !== "string" || treeType.toLowerCase() == "unknown") {
     return undefined;
   }
 
-  const name_parts = treeType.toLowerCase().split("_");
-  for (let i = 0; i < name_parts.length; i++) {
-    const part = name_parts[i];
-    name_parts[i] = part.charAt(0).toUpperCase() + part.slice(1);
+  const nameParts = treeType.toLowerCase().split("_");
+  for (let i = 0; i < nameParts.length; i++) {
+    const part = nameParts[i];
+    nameParts[i] = part.charAt(0).toUpperCase() + part.slice(1);
   }
 
-  return name_parts.join("-");
+  return nameParts.join("-");
 };

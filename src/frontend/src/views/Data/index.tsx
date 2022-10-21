@@ -18,7 +18,6 @@ import { DataSubview } from "../../common/components";
 import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
-import { PAGE_TITLES } from "../../common/titles";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/FilterPanelToggle";
 import { SamplesView } from "./components/SamplesView";
@@ -182,8 +181,8 @@ const Data: FunctionComponent = () => {
   });
 
   const subTitle = currentPath.startsWith(ROUTES.DATA_SAMPLES)
-    ? PAGE_TITLES[ROUTES.DATA_SAMPLES]
-    : PAGE_TITLES[ROUTES.PHYLO_TREES];
+    ? "Samples"
+    : "Phylogenetic Trees";
 
   const category =
     dataCategories.find((category) => currentPath.startsWith(category.to)) ||
