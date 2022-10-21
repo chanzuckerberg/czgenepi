@@ -2,7 +2,6 @@ import { FilterOptionsState, PopperProps } from "@mui/material";
 import { createFilterOptions } from "@mui/material/Autocomplete";
 import { DefaultMenuSelectOption } from "czifui";
 import { isEqual } from "lodash";
-import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { SplitPathogenWrapper } from "src/components/Split/SplitPathogenWrapper";
