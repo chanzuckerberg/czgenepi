@@ -1,11 +1,6 @@
 import re
 from typing import List, Set
 
-import sqlalchemy as sa
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from aspen.database.models import PangoLineage
-
 NEXTSTRAIN_LINEAGE_MAP = {
     "BA.1*": "21K",
     "BA.2*": "21L",

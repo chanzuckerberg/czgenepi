@@ -254,9 +254,8 @@ def resolve_filter_pango_lineages(
         return None
     # Utility that does expansion depends on having set of all lineages.
     all_lineages = {
-        query_result.lineage
-        for query_result
-        in session.query(PangoLineage.lineage).all()
+        query_result[0]  # query_result is 1-length tuple of just lineage
+        for query_result in session.query(PangoLineage.lineage).all()
     }
     return expand_lineage_wildcards(all_lineages, lineage_list)
 
@@ -284,8 +283,7 @@ def resolve_template_args(
         )
 
     resolved_filter_pango_lineages = resolve_filter_pango_lineages(
-        session,
-        template_args
+        session, template_args
     )
 
     # Avoid mutating original template_args; resolved args handled special.
