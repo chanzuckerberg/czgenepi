@@ -25,20 +25,7 @@ function makeDropdownOption(name: string): DefaultMenuSelectOption {
 }
 
 /**
- * `Dropdown` defaults to checking if option is selected (`value`) by equality.
- * However, because we dynamically generate our option objects as selection
- * changes, object equality won't work because they're not the same object,
- * even if same content. Instead, we create a custom selection checker to
- * compare underlying data and pass that to `Dropdown` component.
- */
-const getOptionSelected = (
-  option: DefaultMenuSelectOption,
-  value: DefaultMenuSelectOption
-) => {
-  return option.name === value.name;
-};
-/**
- * The lineages Dropdown has a couple special requirements for filtering when
+ * The lineages Dropdown has a special requirement for filtering when
  * user searches with the Dropdown open.
  * - "All" option must always be present and always comes first.
  * - If we allow all of the possible options to match, the Dropdown slows to
@@ -59,7 +46,6 @@ function filterLineageOptions(
 // `Dropdown` doesn't directly handle above, it's done by its child MenuSelect.
 // This prop was renamed to DropdownMenuProps
 const lineageDropdownMenuProps = {
-  getOptionSelected,
   filterOptions: filterLineageOptions,
 };
 
@@ -79,7 +65,6 @@ function getLineageDropdownValue(
   if (selectedLineages.length > 0) {
     selectedLineagesOptions = selectedLineages.map(makeDropdownOption);
   }
-  console.log({ selectedLineages, selectedLineagesOptions });
   return selectedLineagesOptions;
 }
 
@@ -90,8 +75,6 @@ function getLineageDropdownValue(
  * to come in a certain format, so this converts the internal lineage arrays
  * into something Dropdown can display. Second, it handles moving up selected
  * lineages to the top of the list to be displayed above unchosen lineages.
- * Third, it ensures that the "All" choice -- reset back to having no selected
- * lineages -- is always available and at the top of the list.
  *
  * Notes:
  * - Could be optimized for speed somewhat, everything is just based around
@@ -144,57 +127,13 @@ export function LineageFilter({
 }: LineageFilterType): JSX.Element {
   const pathogen = useSelector(selectCurrentPathogen);
 
-  const [lineageDropdownOptions, setLineageDropdownOptions] = useState(
-    generateLineageDropdownOptions(selectedLineages, availableLineages)
+  const lineageDropdownOptions = generateLineageDropdownOptions(
+    selectedLineages,
+    availableLineages
   );
+  const lineageDropdownLabel = getLineageDropdownLabel(selectedLineages);
+  const lineageDropdownValue = getLineageDropdownValue(selectedLineages);
 
-  const [lineageDropdownLabel, setLineageDropdownLabel] = useState(
-    getLineageDropdownLabel(selectedLineages)
-  );
-  const [lineageDropdownValue, setLineageDropdownValue] = useState(
-    getLineageDropdownValue(selectedLineages)
-  );
-
-  useEffect(() => {
-    setLineageDropdownOptions(
-      generateLineageDropdownOptions(selectedLineages, availableLineages)
-    );
-    setLineageDropdownLabel(getLineageDropdownLabel(selectedLineages));
-    setLineageDropdownValue(getLineageDropdownValue(selectedLineages));
-  }, [selectedLineages, availableLineages]);
-
-  /**
-   * Handles setting selected lineages from user's lineage Dropdown choices.
-   *
-   * Depending on if user had started with the "All" choice selected -- that
-   * is, if no lineages had been chosen to filter to; the "All" choice can
-   * both be explicitly selected by the user or implicitly selected b/c no
-   * actual lineages are chosen -- emitted result changes. If "All" is selected
-   * when Dropdown is opened, we ignore that option choice in preference of the
-   * newly selected lineages. On the other hand, if "All" is not selected when
-   * Dropdown is opened (b/c lineages are chosen), we ignore any other lineages
-   * that get chosen if "All" is also chosen, instead preferring to reset the
-   * lineage filter back to allowing all lineages.
-   *
-   * HACK (Vince):
-   * I don't particularly like my implementation, but it's the best I could
-   * come up with over a few hours of work and thinking about it. Because "All"
-   * is not really a choice, but rather a pseudo-choice that means no lineages
-   * are selected or that the lineage filter should be reset, we get into some
-   * weird places. The Dropdown component expects every option to just be an
-   * object that is either selected or not selected. But b/c of the above, the
-   * options now have side-effects: choosing a lineage removes "All" from being
-   * selected, or choosing "All" can reset and de-select all the other options.
-   * So in addition to needing to handle this side-effect logic, we also have
-   * to avoid infinite render loops due to the side-effect setting a new
-   * `selectedLineages` upstream, which then goes down into the Dropdown, which
-   * then kicks off the onChange (b/c it's controlled), which can then trigger
-   * another new side-effect handling and spiral into an infinite loop...
-   *
-   * If this winds up being refactored into something better, that would be
-   * great, but make sure to test your work pretty aggressively if you do that
-   * refactor -- the above interactions cause a lot of edge cases.
-   */
   function handleLineageDropdownChange(
     newSelectedOptions:
       | DefaultMenuSelectOption
