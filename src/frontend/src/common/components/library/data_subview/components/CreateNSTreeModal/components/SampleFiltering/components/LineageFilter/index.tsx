@@ -1,6 +1,7 @@
 import { FilterOptionsState, PopperProps } from "@mui/material";
 import { createFilterOptions } from "@mui/material/Autocomplete";
 import { DefaultMenuSelectOption } from "czifui";
+import { isEqual } from "lodash";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
@@ -19,13 +20,34 @@ export type LineageFilterType = {
   setSelectedLineages: (lineages: string[]) => void;
 };
 
+// We present a pseudo-option to the user to enable choosing "All" lineages,
+// but internally this means no lineages were chosen to filter down to.
+const ALL_LINEAGES_KEYWORD = "All";
+
 function makeDropdownOption(name: string): DefaultMenuSelectOption {
   return { name: name };
 }
+// Generate only once because we need to reference same object throughout.
+const ALL_LINEAGES_CHOICE = makeDropdownOption(ALL_LINEAGES_KEYWORD);
 
 /**
- * The lineages Dropdown has a special requirements for filtering when
+ * `Dropdown` defaults to checking if option is selected (`value`) by equality.
+ * However, because we dynamically generate our option objects as selection
+ * changes, object equality won't work because they're not the same object,
+ * even if same content. Instead, we create a custom selection checker to
+ * compare underlying data and pass that to `Dropdown` component.
+ */
+const getOptionSelected = (
+  option: DefaultMenuSelectOption,
+  value: DefaultMenuSelectOption
+) => {
+  console.log({ option, value });
+  return option.name === value.name;
+};
+/**
+ * The lineages Dropdown has a couple special requirements for filtering when
  * user searches with the Dropdown open.
+ * - "All" option must always be present and always comes first.
  * - If we allow all of the possible options to match, the Dropdown slows to
  *   a crawl because it's rendering 1000+ options at once. We could fix with
  *   virtualizing, but we can also just limit to showing first 100 results.
@@ -37,21 +59,25 @@ function filterLineageOptions(
   // MUI has a nice set of defaults for its Autocomplete filter, we use those
   const baseFilter = createFilterOptions<DefaultMenuSelectOption>();
   const baseFilteredResults = baseFilter(options, state);
-
+  // We conditionally add the "All" choice if not already in results.
+  let addlPrependResults: DefaultMenuSelectOption[] = [];
+  if (!baseFilteredResults.includes(ALL_LINEAGES_CHOICE)) {
+    addlPrependResults = [ALL_LINEAGES_CHOICE];
+  }
   // Cap the actual search results returned to keep render speed sane.
-  return [...baseFilteredResults.slice(0, 99)];
+  return [...addlPrependResults, ...baseFilteredResults.slice(0, 99)];
 }
 // `Dropdown` doesn't directly handle above, it's done by its child MenuSelect.
 // This prop was renamed to DropdownMenuProps
 const lineageDropdownMenuProps = {
+  getOptionSelected,
   filterOptions: filterLineageOptions,
 };
 
 // Label of lineages dropdown varies based on number lineages selected.
-// If 0 lineages are selected, all lineages are used
 function getLineageDropdownLabel(selectedLineages: string[]): string {
   const count = selectedLineages.length;
-  return count ? `${count} Selected` : "All";
+  return count ? `${count} Selected` : ALL_LINEAGES_KEYWORD;
 }
 
 // For lineages dropdown, "All" is shown as chosen when user has selected
@@ -60,10 +86,11 @@ function getLineageDropdownValue(
   selectedLineages: string[]
 ): DefaultMenuSelectOption[] {
   // Default to case of empty selection. Swap out if there is real selection.
-  let selectedLineagesOptions: DefaultMenuSelectOption[] = [];
+  let selectedLineagesOptions = [ALL_LINEAGES_CHOICE];
   if (selectedLineages.length > 0) {
     selectedLineagesOptions = selectedLineages.map(makeDropdownOption);
   }
+  console.log({ selectedLineages, selectedLineagesOptions });
   return selectedLineagesOptions;
 }
 
@@ -74,6 +101,8 @@ function getLineageDropdownValue(
  * to come in a certain format, so this converts the internal lineage arrays
  * into something Dropdown can display. Second, it handles moving up selected
  * lineages to the top of the list to be displayed above unchosen lineages.
+ * Third, it ensures that the "All" choice -- reset back to having no selected
+ * lineages -- is always available and at the top of the list.
  *
  * Notes:
  * - Could be optimized for speed somewhat, everything is just based around
@@ -95,6 +124,7 @@ function generateLineageDropdownOptions(
     .filter((lineage) => !selectedLineages.includes(lineage))
     .sort();
   return [
+    ALL_LINEAGES_CHOICE,
     ...sortedSelection.map(makeDropdownOption),
     ...remainingAvailable.map(makeDropdownOption),
   ];
@@ -145,20 +175,50 @@ export function LineageFilter({
     setLineageDropdownValue(getLineageDropdownValue(selectedLineages));
   }, [selectedLineages, availableLineages]);
 
+  /**
+   * Handles setting selected lineages from user's lineage Dropdown choices.
+   *
+   * Depending on if user had started with the "All" choice selected -- that
+   * is, if no lineages had been chosen to filter to; the "All" choice can
+   * both be explicitly selected by the user or implicitly selected b/c no
+   * actual lineages are chosen -- emitted result changes. If "All" is selected
+   * when Dropdown is opened, we ignore that option choice in preference of the
+   * newly selected lineages. On the other hand, if "All" is not selected when
+   * Dropdown is opened (b/c lineages are chosen), we ignore any other lineages
+   * that get chosen if "All" is also chosen, instead preferring to reset the
+   * lineage filter back to allowing all lineages.
+   *
+   * HACK (Vince):
+   * I don't particularly like my implementation, but it's the best I could
+   * come up with over a few hours of work and thinking about it. Because "All"
+   * is not really a choice, but rather a pseudo-choice that means no lineages
+   * are selected or that the lineage filter should be reset, we get into some
+   * weird places. The Dropdown component expects every option to just be an
+   * object that is either selected or not selected. But b/c of the above, the
+   * options now have side-effects: choosing a lineage removes "All" from being
+   * selected, or choosing "All" can reset and de-select all the other options.
+   * So in addition to needing to handle this side-effect logic, we also have
+   * to avoid infinite render loops due to the side-effect setting a new
+   * `selectedLineages` upstream, which then goes down into the Dropdown, which
+   * then kicks off the onChange (b/c it's controlled), which can then trigger
+   * another new side-effect handling and spiral into an infinite loop...
+   *
+   * If this winds up being refactored into something better, that would be
+   * great, but make sure to test your work pretty aggressively if you do that
+   * refactor -- the above interactions cause a lot of edge cases.
+   */
   function handleLineageDropdownChange(
     newSelectedOptions:
       | DefaultMenuSelectOption
       | DefaultMenuSelectOption[]
       | null
   ): void {
+    console.log("handleLineageDropdownChange", { newSelectedOptions });
     // No selection at all means empty all lineage choices.
     // (Vince) Poked around: I don't think Dropdown emits this in our case?
     // But interface for the component says it's there, so defensive code here.
-    if (newSelectedOptions === null && selectedLineages.length !== 0) {
-      setSelectedLineages([]);
-    }
-
     if (newSelectedOptions === null) {
+      setSelectedLineages([]);
       return;
     }
 
@@ -167,7 +227,8 @@ export function LineageFilter({
     // To keep this consistent, check for the single option and return a list
     // with jus the one option. It's unclear if this will happen when multi-
     // select is enabled.
-    if (newSelectedOptions && !Array.isArray(newSelectedOptions)) {
+    if (!Array.isArray(newSelectedOptions)) {
+      console.log("not an array");
       setSelectedLineages([newSelectedOptions.name]);
       return;
     }
@@ -175,8 +236,46 @@ export function LineageFilter({
     const newSelectedLineages = newSelectedOptions.map(
       (option: DefaultMenuSelectOption) => option.name
     );
+    console.log({ newSelectedLineages, selectedLineages });
+    // What we actually emit as selection does not always match user selected.
+    let emittedSelection: string[];
 
-    setSelectedLineages(newSelectedLineages);
+    // When beginning selection process, had nothing selected / "All" selected
+    if (selectedLineages.length === 0) {
+      // Only value "chosen" was All so this is a no-op
+      if (isEqual(newSelectedLineages, [ALL_LINEAGES_KEYWORD])) {
+        return; // short-circuit to avoid infinite render loop
+      }
+      if (newSelectedLineages.length === 0) {
+        // Mild HACK -- this means no choices, so effectively "All". Would
+        // want a no-op, BUT if we do nothing the internal Dropdown state
+        // drifts and "All" is visually deselected. So we emit a selection
+        // to force refresh the internal state and keep visuals good.
+        emittedSelection = [];
+      } else {
+        // Made a meaningful choice, so need to drop "All"
+        emittedSelection = newSelectedLineages.filter(
+          (lineage) => lineage !== ALL_LINEAGES_KEYWORD
+        );
+      }
+    } else {
+      // When beginning selection process, had actual lineages chosen
+      // Opened and closed dropdown, but didn't change selection, so a no-op
+      if (isEqual(newSelectedLineages, selectedLineages)) {
+        console.log("isEqual", { selectedLineages, lineageDropdownValue });
+        return; // short-circuit to avoid infinite render loop
+      } else if (newSelectedLineages.includes(ALL_LINEAGES_KEYWORD)) {
+        // User chose "All" option, so we reset selection.
+        // Verified with Design that this is intention, even when user had also
+        // chosen additional real lineages along with "All" choice. "All" wins!
+        emittedSelection = [];
+      } else {
+        // User did not choose "All", made new choices
+        emittedSelection = newSelectedLineages;
+      }
+    }
+
+    setSelectedLineages(emittedSelection);
   }
 
   return (
