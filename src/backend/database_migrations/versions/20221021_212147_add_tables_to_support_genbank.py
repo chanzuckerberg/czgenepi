@@ -30,7 +30,7 @@ def upgrade():
         schema="aspen",
     )
     op.create_table(
-        "repository_metadata",
+        "public_repository_metadata",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("pathogen_id", sa.Integer(), nullable=False),
         sa.Column("public_repository_id", sa.Integer(), nullable=False),
@@ -46,21 +46,21 @@ def upgrade():
         sa.ForeignKeyConstraint(
             ["pathogen_id"],
             ["aspen.pathogens.id"],
-            name=op.f("fk_repository_metadata_pathogen_id_pathogens"),
+            name=op.f("fk_public_repository_metadata_pathogen_id_pathogens"),
         ),
         sa.ForeignKeyConstraint(
             ["public_repository_id"],
             ["aspen.public_repositories.id"],
             name=op.f(
-                "fk_repository_metadata_public_repository_id_public_repositories"
+                "fk_public_repository_metadata_public_repository_id_public_repositories"
             ),
         ),
-        sa.PrimaryKeyConstraint("id", "strain", name=op.f("pk_repository_metadata")),
+        sa.PrimaryKeyConstraint("id", "strain", name=op.f("pk_public_repository_metadata")),
         sa.UniqueConstraint(
             "pathogen_id",
             "public_repository_id",
             "strain",
-            name=op.f("uq_repository_metadata_pathogen_id_public_repository_id_strain"),
+            name=op.f("uq_public_repository_metadata_pathogen_id_public_repository_id_strain"),
         ),
         schema="aspen",
     )
@@ -92,28 +92,28 @@ def upgrade():
         schema="aspen",
     )
     op.create_table(
-        "repository_workflows",
+        "repository_download_workflows",
         sa.Column("workflow_id", sa.Integer(), nullable=False),
         sa.Column("pathogen_id", sa.Integer(), nullable=False),
         sa.Column("public_repository_id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["pathogen_id"],
             ["aspen.pathogens.id"],
-            name=op.f("fk_repository_workflows_pathogen_id_pathogens"),
+            name=op.f("fk_repository_download_workflows_pathogen_id_pathogens"),
         ),
         sa.ForeignKeyConstraint(
             ["public_repository_id"],
             ["aspen.public_repositories.id"],
             name=op.f(
-                "fk_repository_workflows_public_repository_id_public_repositories"
+                "fk_repository_download_workflows_public_repository_id_public_repositories"
             ),
         ),
         sa.ForeignKeyConstraint(
             ["workflow_id"],
             ["aspen.workflows.id"],
-            name=op.f("fk_repository_workflows_workflow_id_workflows"),
+            name=op.f("fk_repository_download_workflows_workflow_id_workflows"),
         ),
-        sa.PrimaryKeyConstraint("workflow_id", name=op.f("pk_repository_workflows")),
+        sa.PrimaryKeyConstraint("workflow_id", name=op.f("pk_repository_download_workflows")),
         schema="aspen",
     )
     op.create_table(
