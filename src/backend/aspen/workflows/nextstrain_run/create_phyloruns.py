@@ -76,7 +76,7 @@ def cli():
 @click.option("--pathogen", type=str, default="SC2")
 @click.option("--launch-sfn", is_flag=True, default=False)
 def launch_one(
-    group: Group, template_args: str, tree_type: str, pathogen: str, launch_sfn: bool
+    group: str, template_args: str, tree_type: str, pathogen: str, launch_sfn: bool
 ):
     # NOTE/TODO - this currently doesn't do any smart input validation, it will just
     # let python raise an exception and explode if anything doesn't make sense.
@@ -86,13 +86,13 @@ def launch_one(
     template_args_obj: Dict[str, Any] = json.loads(template_args)
     with session_scope(interface) as db:
         if re.match(r"^[0-9]+$", group):
-            where_clause = Group.id == group
+            where_clause = Group.id == int(group)
         else:
             where_clause = Group.name == group
-        groups_query = sa.select(Group).where(where_clause)
-        group: Group = db.execute(groups_query).scalars().one()
+        groups_query = sa.select(Group).where(where_clause)  # type: ignore
+        group_obj: Group = db.execute(groups_query).scalars().one()
         workflow = create_phylo_run(
-            db, group, template_args_obj, tree_type_obj, pathogen
+            db, group_obj, template_args_obj, tree_type_obj, pathogen
         )
 
         job = NextstrainScheduledJob(settings)
