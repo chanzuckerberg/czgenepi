@@ -13,19 +13,46 @@ import {
   PhyloRunResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
+import {
+  getCapitalCaseTreeType,
+  getDownloadLinks,
+  IdMap,
+  reduceObjectArrayToLookupDict,
+} from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
-/* custom hook to automatically expire tree info when needed */
-/* such as when trees are deleted */
+const mapPhyloRuns = (data: PhyloRunResponse) => {
+  const phyloRuns = data.phylo_runs;
+
+  const transformedRuns = phyloRuns.map((p: PhyloRun) => ({
+    ...p,
+    ...getDownloadLinks(p),
+    treeType: getCapitalCaseTreeType(p),
+  }));
+
+  return reduceObjectArrayToLookupDict<PhyloRun>(transformedRuns, "id");
+};
+
 export const USE_PHYLO_RUN_INFO = {
   entities: [ENTITIES.PHYLO_RUN_INFO],
   id: "phyloRunInfo",
 };
 
+/**
+ * custom hook to automatically expire tree info when needed
+ * such as when trees are deleted
+ */
 export function usePhyloRunInfo(): UseQueryResult<PhyloRunResponse, unknown> {
   return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
     retry: false,
+  });
+}
+
+export function useNewPhyloRunInfo(): UseQueryResult<IdMap<PhyloRun>, unknown> {
+  return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
+    retry: false,
+    select: mapPhyloRuns,
   });
 }
 

@@ -33,6 +33,7 @@ task pangolin_workflow {
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
+    set -Euxo pipefail
     export SAMPLE_IDS_FILE="${HOME}/sample_ids.txt"
 
     cd /usr/src/app/aspen/workflows/pangolin
