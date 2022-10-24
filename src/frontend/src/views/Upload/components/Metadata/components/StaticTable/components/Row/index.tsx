@@ -20,7 +20,11 @@ interface Props {
   validationError: ValidationErrorRecord | null;
 }
 
-export default memo(function Row({ id, metadata, validationError }: Props): JSX.Element {
+export default memo(function Row({
+  id,
+  metadata,
+  validationError,
+}: Props): JSX.Element {
   const {
     privateId,
     collectionDate,
@@ -30,12 +34,16 @@ export default memo(function Row({ id, metadata, validationError }: Props): JSX.
     publicId,
   } = metadata;
 
-  const validatedCellData: Record<string, React.ReactElement | string | undefined> = {
-    "privateId": privateId || "--",
-    "collectionDate": collectionDate || "--",
-    "collectionLocation": getNameFromCollectionLocation(collectionLocation) || "--",
-    "sequencingDate": sequencingDate || "--",
-  }
+  const validatedCellData: Record<
+    string,
+    React.ReactElement | string | undefined
+  > = {
+    privateId: privateId || "--",
+    collectionDate: collectionDate || "--",
+    collectionLocation:
+      getNameFromCollectionLocation(collectionLocation) || "--",
+    sequencingDate: sequencingDate || "--",
+  };
 
   if (validationError != null) {
     Object.entries(validationError).forEach(([key, message]) => {
@@ -44,17 +52,22 @@ export default memo(function Row({ id, metadata, validationError }: Props): JSX.
       // The only case in which the field does not validate is if the
       // value is missing entirely.
       if (key == "collectionLocation") {
-        message = "Required"
+        message = "Required";
       }
       validatedCellData[key] = (
         <>
           <p>{validatedCellData[key]}</p>
           <StyledAlertText>
-            <StyledExclamationMark sdsIcon="exclamationMarkCircle" sdsSize="s" sdsType="static" />{" "}{message}
+            <StyledExclamationMark
+              sdsIcon="exclamationMarkCircle"
+              sdsSize="s"
+              sdsType="static"
+            />{" "}
+            {message}
           </StyledAlertText>
         </>
-      )
-    })
+      );
+    });
   }
 
   return (
@@ -65,12 +78,8 @@ export default memo(function Row({ id, metadata, validationError }: Props): JSX.
       <StyledTableCell>{validatedCellData.privateId}</StyledTableCell>
       <StyledTableCell>{publicId || "--"}</StyledTableCell>
       <StyledTableCell>{validatedCellData.collectionDate}</StyledTableCell>
-      <StyledTableCell>
-        {validatedCellData.collectionLocation}
-      </StyledTableCell>
-      <StyledTableCell>
-        {validatedCellData.sequencingDate}
-      </StyledTableCell>
+      <StyledTableCell>{validatedCellData.collectionLocation}</StyledTableCell>
+      <StyledTableCell>{validatedCellData.sequencingDate}</StyledTableCell>
       <PrivateTableCell align="center">
         {keepPrivate ? (
           <PrivateContent>

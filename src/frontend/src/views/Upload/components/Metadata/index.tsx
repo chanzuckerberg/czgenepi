@@ -134,7 +134,13 @@ export default function Metadata({
         <Progress step="2" />
       </Header>
       <Content>
-        {useStaticMetadataTable && <StyledCallout intent="info" autoDismiss={false} onClose={noop}><B>Notice something different about this page?</B> When uploading 100 or more samples, metadata must be imported from a TSV or CSV. Download the metadata template below.</StyledCallout>}
+        {useStaticMetadataTable && (
+          <StyledCallout intent="info" autoDismiss={false} onClose={noop}>
+            <B>Notice something different about this page?</B> When uploading
+            100 or more samples, metadata must be imported from a TSV or CSV.
+            Download the metadata template below.
+          </StyledCallout>
+        )}
         <StyledInstructions
           title="Sample Privacy & Sharing"
           items={[
@@ -155,23 +161,27 @@ export default function Metadata({
           stringToLocationFinder={stringToLocationFinder}
         />
 
-        {useStaticMetadataTable && <StaticTable 
-          metadata={metadata} 
-          setIsValid={setIsValid}
-          hasImportedMetadataFile={hasImportedMetadataFile}
-        />}
+        {useStaticMetadataTable && (
+          <StaticTable
+            metadata={metadata}
+            setIsValid={setIsValid}
+            hasImportedMetadataFile={hasImportedMetadataFile}
+          />
+        )}
 
-        {!useStaticMetadataTable && <WebformTable
-          setIsValid={setIsValid}
-          metadata={metadata}
-          hasImportedMetadataFile={hasImportedMetadataFile}
-          setMetadata={setMetadata}
-          autocorrectWarnings={autocorrectWarnings}
-          locations={namedLocations}
-          applyToAllColumn={applyToAllColumn}
-          handleRowMetadata={handleRowMetadata}
-          webformTableType="UPLOAD"
-        />}
+        {!useStaticMetadataTable && (
+          <WebformTable
+            setIsValid={setIsValid}
+            metadata={metadata}
+            hasImportedMetadataFile={hasImportedMetadataFile}
+            setMetadata={setMetadata}
+            autocorrectWarnings={autocorrectWarnings}
+            locations={namedLocations}
+            applyToAllColumn={applyToAllColumn}
+            handleRowMetadata={handleRowMetadata}
+            webformTableType="UPLOAD"
+          />
+        )}
 
         <ButtonWrapper>
           <NextStepWrapper isValid={isValid}>

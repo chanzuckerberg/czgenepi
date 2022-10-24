@@ -1,10 +1,5 @@
 import styled from "@emotion/styled";
-import {
-  Callout,
-  CommonThemeProps,
-  getColors,
-  getSpaces,
-} from "czifui";
+import { Callout, CommonThemeProps, getColors, getSpaces } from "czifui";
 
 export function marginBottom(props: CommonThemeProps): string {
   const spaces = getSpaces(props);
@@ -25,4 +20,4 @@ export const StyledCallout = styled(Callout)`
       background-color: ${colors?.info[100]};
     `;
   }}
-`
+`;

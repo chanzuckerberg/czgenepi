@@ -4,7 +4,14 @@ import {
   TableRow,
   TableRowProps as MuiTableRowProps,
 } from "@mui/material";
-import { CommonThemeProps, fontBodyXxxs, fontHeaderS, getColors, getSpaces, Icon } from "czifui";
+import {
+  CommonThemeProps,
+  fontBodyXxxs,
+  fontHeaderS,
+  getColors,
+  getSpaces,
+  Icon,
+} from "czifui";
 import { rightMarginXxs } from "src/common/styles/iconStyle";
 
 export const Id = styled.p`
@@ -25,8 +32,7 @@ export const Id = styled.p`
   }}
 `;
 
-interface TableRowProps extends MuiTableRowProps, CommonThemeProps {
-}
+interface TableRowProps extends MuiTableRowProps, CommonThemeProps {}
 
 export const StyledTableRow = styled(TableRow)`
   &:nth-of-type(even) {
@@ -81,7 +87,7 @@ export const StyledLockIconWrapper = styled.div`
 export const StyledAlertText = styled.p`
   vertical-align: middle;
   ${fontBodyXxxs}
-  
+
   ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
@@ -90,7 +96,7 @@ export const StyledAlertText = styled.p`
       padding: 0 0 0 0;
     `;
   }}
-`
+`;
 
 export const StyledExclamationMark = styled(Icon)`
   vertical-align: middle;
@@ -104,4 +110,4 @@ export const StyledExclamationMark = styled(Icon)`
       fill: ${colors?.error[500]}
     `;
   }}
-`
+`;
