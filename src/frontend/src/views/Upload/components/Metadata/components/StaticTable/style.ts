@@ -1,6 +1,12 @@
 import styled from "@emotion/styled";
 import { TableCell, TableContainer, TableRow } from "@mui/material";
-import { CommonThemeProps, fontHeaderXs, getColors, getSpaces, Tooltip } from "czifui";
+import {
+  CommonThemeProps,
+  fontHeaderXs,
+  getColors,
+  getSpaces,
+  Tooltip,
+} from "czifui";
 
 export const Overflow = styled.div`
   overflow: auto;
@@ -62,8 +68,6 @@ export const StyledTableRow = styled(TableRow)`
   }
 `;
 
-export const StyledHeaderTooltip = styled(Tooltip)`
-`
+export const StyledHeaderTooltip = styled(Tooltip)``;
 
-export const StyledBodyTooltip = styled(Tooltip)`
-`
+export const StyledBodyTooltip = styled(Tooltip)``;

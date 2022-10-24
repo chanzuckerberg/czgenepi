@@ -150,8 +150,13 @@ export default function StaticTable({
         <MuiTable stickyHeader>
           <TableHead>
             <StyledTableRow>
-              <StyledHeaderTooltip 
-                title={<><B>Sample Name (from FASTA):</B> ID of the sample, extracted from uploaded FASTA file(s).</>}
+              <StyledHeaderTooltip
+                title={
+                  <>
+                    <B>Sample Name (from FASTA):</B> ID of the sample, extracted
+                    from uploaded FASTA file(s).
+                  </>
+                }
                 placement="bottom"
                 sdsStyle="light"
                 arrow={true}
@@ -162,8 +167,13 @@ export default function StaticTable({
                   </IdColumn>
                 </StyledTableCell>
               </StyledHeaderTooltip>
-              <StyledHeaderTooltip 
-                title={<><B>Private ID:</B> ID your group uses internally for the sample.</>}
+              <StyledHeaderTooltip
+                title={
+                  <>
+                    <B>Private ID:</B> ID your group uses internally for the
+                    sample.
+                  </>
+                }
                 placement="bottom"
                 sdsStyle="light"
                 arrow={true}
@@ -172,8 +182,13 @@ export default function StaticTable({
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId}
                 </StyledTableCell>
               </StyledHeaderTooltip>
-              <StyledHeaderTooltip 
-                title={<><B>GISAID ID (Public ID):</B> ID of the sample as it appears in the GISAID database. Optional.</>}
+              <StyledHeaderTooltip
+                title={
+                  <>
+                    <B>GISAID ID (Public ID):</B> ID of the sample as it appears
+                    in the GISAID database. Optional.
+                  </>
+                }
                 placement="bottom"
                 sdsStyle="light"
                 arrow={true}
@@ -182,8 +197,13 @@ export default function StaticTable({
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.publicId}
                 </StyledTableCell>
               </StyledHeaderTooltip>
-              <StyledHeaderTooltip 
-                title={<><B>Collection Date:</B> The date the sample was collected from the host.</>}
+              <StyledHeaderTooltip
+                title={
+                  <>
+                    <B>Collection Date:</B> The date the sample was collected
+                    from the host.
+                  </>
+                }
                 placement="bottom"
                 sdsStyle="light"
                 arrow={true}
@@ -192,8 +212,14 @@ export default function StaticTable({
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionDate}
                 </StyledTableCell>
               </StyledHeaderTooltip>
-              <StyledHeaderTooltip 
-                title={<><B>Collection Location:</B> The location where sample collection occurred. This field is filled in using the closest match available in the GISAID database.</>}
+              <StyledHeaderTooltip
+                title={
+                  <>
+                    <B>Collection Location:</B> The location where sample
+                    collection occurred. This field is filled in using the
+                    closest match available in the GISAID database.
+                  </>
+                }
                 placement="bottom"
                 sdsStyle="light"
                 arrow={true}
@@ -202,8 +228,13 @@ export default function StaticTable({
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionLocation}
                 </StyledTableCell>
               </StyledHeaderTooltip>
-              <StyledHeaderTooltip 
-                title={<><B>Sequencing Date:</B> Date on which the sample was sequenced.</>}
+              <StyledHeaderTooltip
+                title={
+                  <>
+                    <B>Sequencing Date:</B> Date on which the sample was
+                    sequenced.
+                  </>
+                }
                 placement="bottom"
                 sdsStyle="light"
                 arrow={true}
@@ -212,8 +243,13 @@ export default function StaticTable({
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate}
                 </StyledTableCell>
               </StyledHeaderTooltip>
-              <StyledHeaderTooltip 
-                title={<><B>Sample is Private:</B> If private, your sample will not be shared beyond your group.</>}
+              <StyledHeaderTooltip
+                title={
+                  <>
+                    <B>Sample is Private:</B> If private, your sample will not
+                    be shared beyond your group.
+                  </>
+                }
                 placement="bottom"
                 sdsStyle="light"
                 arrow={true}
@@ -225,8 +261,10 @@ export default function StaticTable({
             </StyledTableRow>
           </TableHead>
           {metadata && (
-            <StyledBodyTooltip 
-              title={"Import metadata into this table by uploading a TSV or CSV. Download the metadata template above to get started."}
+            <StyledBodyTooltip
+              title={
+                "Import metadata into this table by uploading a TSV or CSV. Download the metadata template above to get started."
+              }
               placement="bottom-start"
               sdsStyle="light"
               arrow={false}
