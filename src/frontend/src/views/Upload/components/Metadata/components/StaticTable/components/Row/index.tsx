@@ -14,6 +14,8 @@ import {
   StyledExclamationMark,
 } from "./style";
 
+const NO_CONTENT_FALLBACK = "--";
+
 interface Props {
   id: string;
   metadata: Metadata;
@@ -38,11 +40,11 @@ export default memo(function Row({
     string,
     React.ReactElement | string | undefined
   > = {
-    privateId: privateId || "--",
-    collectionDate: collectionDate || "--",
+    privateId: privateId || NO_CONTENT_FALLBACK,
+    collectionDate: collectionDate || NO_CONTENT_FALLBACK,
     collectionLocation:
-      getNameFromCollectionLocation(collectionLocation) || "--",
-    sequencingDate: sequencingDate || "--",
+      getNameFromCollectionLocation(collectionLocation) || NO_CONTENT_FALLBACK,
+    sequencingDate: sequencingDate || NO_CONTENT_FALLBACK,
   };
 
   if (validationError != null) {

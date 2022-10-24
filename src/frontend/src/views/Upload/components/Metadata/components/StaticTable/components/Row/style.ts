@@ -93,7 +93,7 @@ export const StyledAlertText = styled.p`
 
     return `
       color: ${colors?.error[500]};
-      padding: 0 0 0 0;
+      padding: 0;
     `;
   }}
 `;
@@ -107,7 +107,7 @@ export const StyledExclamationMark = styled(Icon)`
 
     return `
       margin: 0 ${spaces?.xxs}px ${spaces?.xxs}px ${spaces?.xxs}px;
-      fill: ${colors?.error[500]}
+      fill: ${colors?.error[500]};
     `;
   }}
 `;
