@@ -12,7 +12,10 @@ import {
   StyledTableCell,
   StyledTableContainer,
   StyledTableRow,
+  StyledBodyTooltip,
+  StyledHeaderTooltip,
 } from "./style";
+import { B } from "src/common/styles/basicStyle";
 import {
   MAX_NAME_LENGTH,
   VALID_NAME_REGEX,
@@ -147,44 +150,101 @@ export default function StaticTable({
         <MuiTable stickyHeader>
           <TableHead>
             <StyledTableRow>
-              <StyledTableCell>
-                <IdColumn>
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId}
-                </IdColumn>
-              </StyledTableCell>
-              <StyledTableCell>
-                {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId}
-              </StyledTableCell>
-              <StyledTableCell>
-                {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.publicId}
-              </StyledTableCell>
-              <StyledTableCell>
-                {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionDate}
-              </StyledTableCell>
-              <StyledTableCell>
-                {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionLocation}
-              </StyledTableCell>
-              <StyledTableCell>
-                {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate}
-              </StyledTableCell>
-              <PrivateTableCell align="center">
-                {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.keepPrivate}
-              </PrivateTableCell>
+              <StyledHeaderTooltip 
+                title={<><B>Sample Name (from FASTA):</B> ID of the sample, extracted from uploaded FASTA file(s).</>}
+                placement="bottom"
+                sdsStyle="light"
+                arrow={true}
+              >
+                <StyledTableCell>
+                  <IdColumn>
+                    {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId}
+                  </IdColumn>
+                </StyledTableCell>
+              </StyledHeaderTooltip>
+              <StyledHeaderTooltip 
+                title={<><B>Private ID:</B> ID your group uses internally for the sample.</>}
+                placement="bottom"
+                sdsStyle="light"
+                arrow={true}
+              >
+                <StyledTableCell>
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId}
+                </StyledTableCell>
+              </StyledHeaderTooltip>
+              <StyledHeaderTooltip 
+                title={<><B>GISAID ID (Public ID):</B> ID of the sample as it appears in the GISAID database. Optional.</>}
+                placement="bottom"
+                sdsStyle="light"
+                arrow={true}
+              >
+                <StyledTableCell>
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.publicId}
+                </StyledTableCell>
+              </StyledHeaderTooltip>
+              <StyledHeaderTooltip 
+                title={<><B>Collection Date:</B> The date the sample was collected from the host.</>}
+                placement="bottom"
+                sdsStyle="light"
+                arrow={true}
+              >
+                <StyledTableCell>
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionDate}
+                </StyledTableCell>
+              </StyledHeaderTooltip>
+              <StyledHeaderTooltip 
+                title={<><B>Collection Location:</B> The location where sample collection occurred. This field is filled in using the closest match available in the GISAID database.</>}
+                placement="bottom"
+                sdsStyle="light"
+                arrow={true}
+              >
+                <StyledTableCell>
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionLocation}
+                </StyledTableCell>
+              </StyledHeaderTooltip>
+              <StyledHeaderTooltip 
+                title={<><B>Sequencing Date:</B> Date on which the sample was sequenced.</>}
+                placement="bottom"
+                sdsStyle="light"
+                arrow={true}
+              >
+                <StyledTableCell>
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate}
+                </StyledTableCell>
+              </StyledHeaderTooltip>
+              <StyledHeaderTooltip 
+                title={<><B>Sample is Private:</B> If private, your sample will not be shared beyond your group.</>}
+                placement="bottom"
+                sdsStyle="light"
+                arrow={true}
+              >
+                <PrivateTableCell align="center">
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.keepPrivate}
+                </PrivateTableCell>
+              </StyledHeaderTooltip>
             </StyledTableRow>
           </TableHead>
           {metadata && (
-            <TableBody>
-              {errorSortedMetadata.map(([sampleId, sampleMetadata]) => {
-                return (
-                  <Row
-                    key={sampleId}
-                    id={sampleId}
-                    metadata={sampleMetadata}
-                    validationError={validationErrors[sampleId]}
-                  />
-                );
-              })}
-            </TableBody>
+            <StyledBodyTooltip 
+              title={"Import metadata into this table by uploading a TSV or CSV. Download the metadata template above to get started."}
+              placement="bottom-start"
+              sdsStyle="light"
+              arrow={false}
+              followCursor
+            >
+              <TableBody>
+                {errorSortedMetadata.map(([sampleId, sampleMetadata]) => {
+                  return (
+                    <Row
+                      key={sampleId}
+                      id={sampleId}
+                      metadata={sampleMetadata}
+                      validationError={validationErrors[sampleId]}
+                    />
+                  );
+                })}
+              </TableBody>
+            </StyledBodyTooltip>
           )}
         </MuiTable>
       </StyledTableContainer>
