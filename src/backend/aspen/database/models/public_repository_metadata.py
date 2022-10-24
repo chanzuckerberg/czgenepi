@@ -8,7 +8,7 @@ from aspen.database.models.public_repositories import PublicRepository
 
 
 class PublicRepositoryMetadata(idbase, DictMixin):  # type: ignore
-    """Nightly snapshot of gisaid metadata"""
+    """Nightly snapshot of public repository (ex: gisaid/genbank) metadata"""
 
     __tablename__ = "repository_metadata"
     __table_args__ = (
