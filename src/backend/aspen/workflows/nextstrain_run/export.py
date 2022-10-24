@@ -2,7 +2,7 @@ import csv
 import io
 import json
 import re
-from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional, Set
+from typing import Any, Dict, IO, Iterable, List, Mapping, MutableMapping, Optional, Set
 
 import click
 from sqlalchemy.orm import aliased, joinedload, with_polymorphic
@@ -69,6 +69,12 @@ METADATA_CSV_FIELDS = [
     "selected_fh", "--selected", type=click.File("w", lazy=False), required=True
 )
 @click.option("metadata_fh", "--metadata", type=click.File("w"), required=True)
+@click.option(
+    "resolved_template_args_fh",
+    "--resolved-template-args",
+    type=click.File("w"),
+    required=True,
+)
 @click.option("builds_file_fh", "--builds-file", type=click.File("w"), required=True)
 @click.option(
     "--reset-status",
@@ -84,6 +90,7 @@ def cli(
     selected_fh: io.TextIOWrapper,
     metadata_fh: io.TextIOWrapper,
     builds_file_fh: io.TextIOWrapper,
+    resolved_template_args_fh: IO[str],
     reset_status: bool,
     test: bool,
     builds_file_only: bool,
@@ -99,6 +106,7 @@ def cli(
         sequences_fh,
         selected_fh,
         metadata_fh,
+        resolved_template_args_fh,
         builds_file_fh,
         reset_status,
     )
@@ -137,6 +145,7 @@ def export_run_config(
     sequences_fh: io.TextIOBase,
     selected_fh: io.TextIOBase,
     metadata_fh: io.TextIOBase,
+    resolved_template_args_fh: IO[str],
     builds_file_fh: io.TextIOBase,
     reset_status: bool = False,
 ):
@@ -182,6 +191,8 @@ def export_run_config(
         resolved_template_args = resolve_template_args(
             session, phylo_run.template_args, group
         )
+        # Keep a record of what they resolved to. Make permanent in `save.py`
+        save_resolved_template_args(resolved_template_args_fh, resolved_template_args)
 
         builder: TemplateBuilder = TemplateBuilder(
             phylo_run.tree_type,
@@ -295,6 +306,30 @@ def resolve_template_args(
         resolved_template_args["filter_pango_lineages"] = resolved_filter_pango_lineages
 
     return resolved_template_args
+
+
+def save_resolved_template_args(
+    resolved_template_args_fh: IO[str], resolved_template_args: Dict[str, Any]
+):
+    """Writes a JSON version of resolved template args to disk.
+
+    Intent is that we want to keep a permanent record of what the template args
+    resolved to as part of saving out a tree after its creation. Since save
+    step happens in different script `save.py`, we write them to disk here,
+    then that script loads them in before permamently recording that info."""
+    # Some of the resolved args are not directly serializable (eg, objects).
+    # We do special handling of them so we can serialize them to JSON.
+    NON_SERIALIZABLE_ARGS = ["location"]
+    json_ready_dict = {
+        key: resolved_template_args[key]
+        for key in resolved_template_args
+        if key not in NON_SERIALIZABLE_ARGS
+    }
+    # `location` is a DB object, so we manually dump to dict before JSON output
+    tree_location = resolved_template_args["location"]
+    json_ready_dict["location"] = tree_location.to_dict()
+
+    json.dump(json_ready_dict, resolved_template_args_fh)
 
 
 def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
