@@ -1,3 +1,4 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { Button, Link } from "czifui";
 import NextLink from "next/link";
 import { useCallback, useMemo, useState } from "react";
@@ -7,6 +8,8 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { WebformTable } from "src/components/WebformTable";
 import {
   Metadata as MetadataType,
@@ -26,6 +29,7 @@ import {
 import { Props } from "../common/types";
 import { initSampleMetadata } from "../common/utils";
 import ImportFile from "./components/ImportFile";
+import StaticTable from "./components/StaticTable";
 import {
   ParseResult,
   SampleIdToWarningMessages,
@@ -42,6 +46,23 @@ export default function Metadata({
     useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+
+  // Used for displaying a static metadata table
+  const flag = useTreatments([USER_FEATURE_FLAGS.static_metadata_table]);
+  const isStaticMetadataTableFlagOn = isUserFlagOn(
+    flag,
+    USER_FEATURE_FLAGS.static_metadata_table
+  );
+
+  let numberOfDetectedSamples = 0;
+  if (samples != null) {
+    numberOfDetectedSamples = Object.keys(samples).length;
+  }
+
+  let useStaticMetadataTable = false;
+  if (numberOfDetectedSamples >= 100 && isStaticMetadataTableFlagOn) {
+    useStaticMetadataTable = true;
+  }
 
   // Used by file upload parser to convert location strings to Locations
   const stringToLocationFinder = useMemo(() => {
@@ -131,17 +152,23 @@ export default function Metadata({
           stringToLocationFinder={stringToLocationFinder}
         />
 
-        <WebformTable
-          setIsValid={setIsValid}
-          metadata={metadata}
-          hasImportedMetadataFile={hasImportedMetadataFile}
-          setMetadata={setMetadata}
-          autocorrectWarnings={autocorrectWarnings}
-          locations={namedLocations}
-          applyToAllColumn={applyToAllColumn}
-          handleRowMetadata={handleRowMetadata}
-          webformTableType="UPLOAD"
-        />
+        {useStaticMetadataTable && (
+          <StaticTable metadata={metadata} setIsValid={setIsValid} />
+        )}
+
+        {!useStaticMetadataTable && (
+          <WebformTable
+            setIsValid={setIsValid}
+            metadata={metadata}
+            hasImportedMetadataFile={hasImportedMetadataFile}
+            setMetadata={setMetadata}
+            autocorrectWarnings={autocorrectWarnings}
+            locations={namedLocations}
+            applyToAllColumn={applyToAllColumn}
+            handleRowMetadata={handleRowMetadata}
+            webformTableType="UPLOAD"
+          />
+        )}
 
         <ButtonWrapper>
           <NextStepWrapper isValid={isValid}>

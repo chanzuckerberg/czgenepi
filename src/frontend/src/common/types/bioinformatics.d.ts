@@ -78,6 +78,7 @@ interface PhyloRun extends BioinformaticsType {
   phyloTree?: Tree;
 }
 
+// TODO-TR (mlila): remove these types after removing transforms from Data/index.tsx
 type BioinformaticsData = Sample | PhyloRun;
 type BioinformaticsDataArray = Array<Sample> | Array<PhyloRun>;
 
