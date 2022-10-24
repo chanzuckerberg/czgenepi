@@ -57,7 +57,6 @@ class SampleLineage(idbase):  # type: ignore
         ForeignKey(_LineageTypeTable.item_id),
         nullable=False,
     )
-    lineage = Column(String, nullable=False, unique=True)
     lineage_software_version = Column(String, nullable=False)
     lineage = Column(String, nullable=False)
     lineage_probability = Column(Float, nullable=False)

@@ -172,7 +172,7 @@ backend-debugger: ## Attach to the backend service (useful for pdb)
 
 .PHONY: local-status
 local-status: ## Show the status of the containers in the dev environment.
-	docker ps -a | grep --color=no -e 'CONTAINER\|aspen'
+	docker ps -a | grep --color=no -e 'CONTAINER\|genepi'
 
 .PHONY: local-rebuild
 local-rebuild: .env.ecr local-ecr-login ## Rebuild local dev without re-importing data
