@@ -161,7 +161,8 @@ export function LineageFilter({
       (option: DefaultMenuSelectOption) => option.name
     );
 
-    // When beginning selection process, had nothing selected / "All" selected
+    // When beginning selection process, nothing is selected - we display "All" since
+    // we are not filtering the lineages yet.
     if (selectedLineages.length === 0 && newSelectedLineages.length === 0) {
       return;
     }
