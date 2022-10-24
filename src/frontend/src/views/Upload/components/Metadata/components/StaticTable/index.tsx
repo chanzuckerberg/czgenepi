@@ -30,12 +30,9 @@ interface Props {
   hasImportedMetadataFile: boolean;
 }
 
-export interface ValidationErrorRecord {
-  collectionDate?: string;
-  collectionLocation?: string;
-  sequencingDate?: string;
-  privateId?: string;
-}
+export type ValidationErrorRecord = Record<string, string>;
+
+type ValidationErrorMap = Record<string, ValidationErrorRecord | null>;
 
 const validationSchema = object({
   collectionDate: string()
@@ -65,7 +62,7 @@ export default function StaticTable({
   hasImportedMetadataFile,
 }: Props): JSX.Element {
   const [validationErrors, setValidationErrors] =
-    useState<Record<string, ValidationErrorRecord | null>>(EMPTY_OBJECT);
+    useState<ValidationErrorMap>(EMPTY_OBJECT);
 
   // This function validates metadata by creating a mapping of sample ids to
   // either null or a ValidationErrorRecord, an object which is itself a mapping
@@ -80,10 +77,9 @@ export default function StaticTable({
         setIsValid(false);
         return;
       }
-      const validationErrors: Record<string, ValidationErrorRecord | null> =
-        Object.fromEntries(
-          Object.keys(metadata).map((sampleId) => [sampleId, null])
-        );
+      const validationErrors: ValidationErrorMap = Object.fromEntries(
+        Object.keys(metadata).map((sampleId) => [sampleId, null])
+      );
       for (const [sampleId, sampleMetadata] of Object.entries(metadata)) {
         try {
           await validationSchema.validate(sampleMetadata, {
@@ -93,10 +89,9 @@ export default function StaticTable({
           if (error instanceof ValidationError) {
             const errorRecord: ValidationErrorRecord = {};
             error.inner.forEach((validationError) => {
-              if (validationError.path != undefined) {
+              if (validationError.path !== undefined) {
                 const rootMetadataKey = validationError.path.split(".")[0];
-                errorRecord[rootMetadataKey as keyof ValidationErrorRecord] =
-                  validationError.message;
+                errorRecord[rootMetadataKey] = validationError.message;
               }
             });
             validationErrors[sampleId] = errorRecord;
@@ -122,19 +117,19 @@ export default function StaticTable({
 
   // Sort entries by error status, then by sampleId
   let errorSortedMetadata: [string, Metadata][] = [];
-  if (metadata != null) {
+  if (metadata !== null) {
     errorSortedMetadata = Object.entries(metadata)
       .map(([sampleId, sampleMetadata]) => {
         return [sampleId, sampleMetadata] as [string, Metadata];
       })
       .sort((a, b) => {
-        const a_error_sort = validationErrors[a[0]] == null ? 1 : 0;
-        const b_error_sort = validationErrors[b[0]] == null ? 1 : 0;
-        if (a_error_sort == b_error_sort) {
+        const aErrorSortValue = validationErrors[a[0]] == null ? 1 : 0;
+        const bErrorSortValue = validationErrors[b[0]] == null ? 1 : 0;
+        if (aErrorSortValue == bErrorSortValue) {
           return a[0].localeCompare(b[0]);
-        } else if (a_error_sort < b_error_sort) {
+        } else if (aErrorSortValue < bErrorSortValue) {
           return -1;
-        } else if (a_error_sort > b_error_sort) {
+        } else if (aErrorSortValue > bErrorSortValue) {
           return 1;
         }
         return 0;
