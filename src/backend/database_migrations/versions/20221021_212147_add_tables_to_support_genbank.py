@@ -26,7 +26,11 @@ def upgrade():
             name=op.f("fk_pathogen_lineages_pathogen_id_pathogens"),
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_pathogen_lineages")),
-        sa.UniqueConstraint("lineage", name=op.f("uq_pathogen_lineages_lineage")),
+        sa.UniqueConstraint(
+            "pathogen_id",
+            "lineage",
+            name=op.f("uq_pathogen_lineages_pathogen_id_lineage"),
+        ),
         schema="aspen",
     )
     op.create_table(

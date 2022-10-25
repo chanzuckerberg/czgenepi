@@ -47,10 +47,16 @@ class PathogenLineage(idbase):  # type: ignore
     """
 
     __tablename__ = "pathogen_lineages"
+    __table_args__ = (
+        UniqueConstraint(
+            "pathogen_id",
+            "lineage",
+        ),
+    )
 
     pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
-    pathogen = relationship(Pathogen, back_populates="lineages", uselist=True)  # type: ignore
-    lineage = Column(String, nullable=False, unique=True)
+    pathogen = relationship(Pathogen, back_populates="lineages")  # type: ignore
+    lineage = Column(String, nullable=False)
 
     def __repr__(self):
         return f"Pathogen Lineage <{self.lineage}>"
