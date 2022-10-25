@@ -7,6 +7,7 @@ workflow nextstrain {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
+        String deployment_stage
         String group
         String s3_filestem
         String template_args
@@ -19,6 +20,7 @@ workflow nextstrain {
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
+        deployment_stage = deployment_stage,
         group = group,
         s3_filestem = s3_filestem,
         template_args = template_args,
@@ -33,6 +35,7 @@ task nextstrain_workflow {
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
+        String deployment_stage
         String group
         String s3_filestem
         String template_args
@@ -40,7 +43,7 @@ task nextstrain_workflow {
     }
 
     command <<<
-    set -Eeuxo pipefail
+    set -Eeuo pipefail
     shopt -s inherit_errexit
 
     df 1>&2
@@ -48,11 +51,16 @@ task nextstrain_workflow {
 
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
-
-    export GENEPI_CONFIG_SECRET_NAME=~{genepi_config_secret_name}
+    # secrets
+    echo "export GENEPI_CONFIG_SECRET_NAME"
+    export GENEPI_CONFIG_SECRET_NAME="~{genepi_config_secret_name}"
+    # setup
+    set -x
+    export AWS_REGION="~{aws_region}"
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
+    export DEPLOYMENT_STAGE="~{deployment_stage}"
 
     aws configure set region ~{aws_region}
 
