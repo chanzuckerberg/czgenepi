@@ -40,7 +40,6 @@ def upgrade():
         sa.Column("public_repository_id", sa.Integer(), nullable=False),
         sa.Column("strain", sa.String(), nullable=False),
         sa.Column("lineage", sa.String(), nullable=True),
-        sa.Column("clade", sa.String(), nullable=True),
         sa.Column("isl", sa.String(), nullable=True),
         sa.Column("date", sa.DateTime(), nullable=True),
         sa.Column("region", sa.String(), nullable=True),
@@ -246,7 +245,7 @@ def upgrade():
     )
     op.enum_insert(
         "workflow_types",
-        ["ALIGN_PUBLIC_REPOSITORY_DATA", "DOWNLOAD_PUBLIC_REPOSITORY"],
+        ["ALIGN_PUBLIC_REPOSITORY_DATA", "DOWNLOAD_PUBLIC_REPOSITORY_DATA"],
         schema="aspen",
     )
 

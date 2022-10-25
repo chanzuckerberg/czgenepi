@@ -29,7 +29,6 @@ class PublicRepositoryMetadata(idbase, DictMixin):  # type: ignore
     public_repository = relationship(PublicRepository, back_populates="public_repository_metadata")  # type: ignore
     strain = Column(String, primary_key=True)
     lineage = Column(String, nullable=True)
-    clade = Column(String, nullable=True)
     isl = Column(String, nullable=True)
     date = Column(DateTime, nullable=True)
     region = Column(

@@ -85,7 +85,9 @@ class AlignedRepositoryData(Entity):
 
 class RepositoryDownloadWorkflow(Workflow):
     __tablename__ = "repository_download_workflows"
-    __mapper_args__ = {"polymorphic_identity": WorkflowType.DOWNLOAD_PUBLIC_REPOSITORY}
+    __mapper_args__ = {
+        "polymorphic_identity": WorkflowType.DOWNLOAD_PUBLIC_REPOSITORY_DATA
+    }
 
     workflow_id = Column(Integer, ForeignKey(Workflow.id), primary_key=True)
     pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
