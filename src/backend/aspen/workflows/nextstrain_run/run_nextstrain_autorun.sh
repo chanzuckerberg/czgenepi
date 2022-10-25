@@ -30,4 +30,4 @@ echo "* set \$aspen_s3_db_bucket"
 aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 set -x
 
-python3 /usr/src/app/aspen/workflows/nextstrain_run/autorun_scheduled.py
+python3 /usr/src/app/aspen/workflows/nextstrain_run/create_phyloruns.py launch-all
