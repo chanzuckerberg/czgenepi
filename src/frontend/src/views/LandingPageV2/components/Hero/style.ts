@@ -58,7 +58,7 @@ export const HeroMaxWidthContainer = styled.div`
 `;
 
 export const HeroImage = styled.div`
-  margin-top: -120px;
+  margin-top: -117px;
   margin-left: auto;
 
   ${SmallerThanBreakpoint(`
