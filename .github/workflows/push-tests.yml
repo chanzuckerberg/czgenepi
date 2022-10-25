@@ -214,6 +214,9 @@ jobs:
           - dockerfile: src/backend/Dockerfile.nextstrain
             context: ./src/backend/
             name: genepi-nextstrain
+          - dockerfile: src/backend/Dockerfile.pangolin
+            context: ./src/backend/
+            name: genepi-pangolin
           - dockerfile: src/backend/Dockerfile.lineage_qc
             context: ./src/backend/
             name: genepi-lineage-qc

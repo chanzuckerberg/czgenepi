@@ -32,6 +32,7 @@
         "batch": {
             "build_images": [
                 "nextstrain",
+                "pangolin",
                 "lineage_qc",
                 "gisaid"
             ],
@@ -42,6 +43,12 @@
                 "nextstrain"
             ],
             "profile": "nextstrain"
+        },
+        "pangolin": {
+            "build_images": [
+                "pangolin"
+            ],
+            "profile": "pangolin"
         },
         "lineage_qc": {
             "build_images": [

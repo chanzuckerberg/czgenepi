@@ -3,6 +3,7 @@ name: aspen
 channels:
   - default
   - conda-forge
+  - bioconda
 
 dependencies:
   - python=3.7

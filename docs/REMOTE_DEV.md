@@ -37,9 +37,10 @@ The currently supported slices are:
 | frontend | frontend |
 | backend | backend |
 | fullstack | frontend, backend |
-| batch | nextstrain, lineage_qc, gisaid |
+| batch | nextstrain, pangolin, lineage_qc, gisaid |
 | nextstrain | nextsttrain |
 | gisaid | gisaid |
+| pangolin | pangolin |
 | lineage_qc | lineage_qc |
 
 ### Connecting to remote dev databases
