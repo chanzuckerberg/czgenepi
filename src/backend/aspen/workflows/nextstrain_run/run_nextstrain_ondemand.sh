@@ -96,4 +96,5 @@ python3 /usr/src/app/aspen/workflows/nextstrain_run/save.py                 \
     --phylo-run-id "${WORKFLOW_ID}"                                         \
     --bucket "${aspen_s3_db_bucket}"                                        \
     --key "${key}"                                                          \
+    --resolved-template-args /tmp/resolved_template_args.json               \
     --tree-path /ncov/auspice/ncov_aspen.json                                \
