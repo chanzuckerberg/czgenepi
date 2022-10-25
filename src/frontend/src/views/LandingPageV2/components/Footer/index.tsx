@@ -40,7 +40,7 @@ export default function Footer(): JSX.Element {
     <FooterContainer data-test-id="landing-footer">
       <FooterTopContainer>
         <FooterLogoContainer href={ROUTES.HOMEPAGE}>
-          <FooterLogo />
+          <FooterLogo title="CZ Gen Epi Home" />
         </FooterLogoContainer>
         <FooterTopLinks>
           <FooterTopListItem>
@@ -90,10 +90,10 @@ export default function Footer(): JSX.Element {
             <Span>In partnership with:</Span>
             <CZLogoContainer>
               <CZILogo href={ROUTES.CZI} target="_blank">
-                <Image src={CZILogoImg} alt="" />
+                <Image src={CZILogoImg} alt="Chan Zuckerberg Initiative" />
               </CZILogo>
               <CZBiohubLogo href={ROUTES.BIOHUB} target="_blank">
-                <Image src={BiohubLogoImg} alt="" />
+                <Image src={BiohubLogoImg} alt="CZ Bio Hub" />
               </CZBiohubLogo>
             </CZLogoContainer>
           </CZContainer>

@@ -16,6 +16,8 @@ export enum ROUTES {
   GROUP_INVITATIONS = "/group/members/invitations",
   GROUP_MEMBERS = "/group/members",
   HELP_CENTER = "https://help.czgenepi.org",
+  NCBI_VIRUS = "https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/",
+  NEXTCLADE = "https://clades.nextstrain.org/",
   NEXTSTRAIN = "https://nextstrain.org/",
   PANGOLIN = "https://pangolin.cog-uk.io/",
   PHYLO_TREES = "/data/phylogenetic_trees",
