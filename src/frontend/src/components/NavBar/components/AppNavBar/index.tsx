@@ -8,6 +8,7 @@ import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { InviteModal } from "src/views/GroupMembersPage/components/MembersTab/components/InviteModal";
 import RightNav from "../RightNav";
 import { GroupDetailsDropdown } from "./components/GroupDetailsDropdown";
+import { PathogenTabs } from "./components/PathogenTabs";
 import {
   DropdownClickTarget,
   LeftNav,
@@ -51,6 +52,7 @@ const AppNavBar = (): JSX.Element => {
             <Logo data-test-id="logo" aria-hidden="true" />
           </LogoAnchor>
         </Link>
+        <PathogenTabs />
         {name && (
           <>
             <Separator />

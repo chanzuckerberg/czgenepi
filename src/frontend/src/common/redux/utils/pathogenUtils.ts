@@ -8,7 +8,7 @@ import { selectCurrentPathogen } from "../selectors";
 import { Pathogen, ReduxPersistenceTokens } from "../types";
 
 export const isValidPathogen = (pathogen: string): boolean => {
-  // make TS happy enough to search Pthogen enum for arbitrary strings
+  // make TS happy enough to search Pathogen enum for arbitrary strings
   const pathogenStrs: string[] = Object.values(Pathogen);
   return pathogenStrs.includes(pathogen);
 };
