@@ -80,6 +80,14 @@ class PhyloTree(Entity):
         nullable=False,
     )
 
+    # The "interpreted" version of the template_args for doing a PhyloRun.
+    # While PhyloRun.template_args represents the args as originally submitted,
+    # resolved_template_args is what we extrapolated those args to mean during
+    # the tree build process.
+    # NULL for trees prior to Nov 2022 (ie, before this column was added).
+    # TODO evaluate setting a default {} once in use.
+    resolved_template_args = Column(JSONB, nullable=True)
+
     def __str__(self) -> str:
         return f"PhyloTree <id={self.entity_id}>"
 
