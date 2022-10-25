@@ -55,12 +55,16 @@ def upgrade():
                 "fk_public_repository_metadata_public_repository_id_public_repositories"
             ),
         ),
-        sa.PrimaryKeyConstraint("id", "strain", name=op.f("pk_public_repository_metadata")),
+        sa.PrimaryKeyConstraint(
+            "id", "strain", name=op.f("pk_public_repository_metadata")
+        ),
         sa.UniqueConstraint(
             "pathogen_id",
             "public_repository_id",
             "strain",
-            name=op.f("uq_public_repository_metadata_pathogen_id_public_repository_id_strain"),
+            name=op.f(
+                "uq_public_repository_metadata_pathogen_id_public_repository_id_strain"
+            ),
         ),
         schema="aspen",
     )
@@ -113,7 +117,9 @@ def upgrade():
             ["aspen.workflows.id"],
             name=op.f("fk_repository_download_workflows_workflow_id_workflows"),
         ),
-        sa.PrimaryKeyConstraint("workflow_id", name=op.f("pk_repository_download_workflows")),
+        sa.PrimaryKeyConstraint(
+            "workflow_id", name=op.f("pk_repository_download_workflows")
+        ),
         schema="aspen",
     )
     op.create_table(
