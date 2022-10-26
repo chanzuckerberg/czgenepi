@@ -31,6 +31,17 @@ class Pathogen(idbase):  # type: ignore
     # not all pathogens will have a dataset name once we get into a generalized case
     nextclade_dataset_name = Column(String, nullable=True)
 
+    # Lineages available for the pathogen
+    lineages = relationship("PathogenLineage", back_populates="pathogen", uselist=True)  # type: ignore
+
+    # workflows and workflow outputs
+    raw_repository_data = relationship("RawRepositoryData", back_populates="pathogen", uselist=True)  # type: ignore
+    processed_repository_data = relationship("ProcessedRepositoryData", back_populates="pathogen", uselist=True)  # type: ignore
+    aligned_repository_data = relationship("AlignedRepositoryData", back_populates="pathogen", uselist=True)  # type: ignore
+    repository_download_workflows = relationship("RepositoryDownloadWorkflow", back_populates="pathogen", uselist=True)  # type: ignore
+    repository_alignment_workflows = relationship("RepositoryAlignmentWorkflow", back_populates="pathogen", uselist=True)  # type: ignore
+    public_repository_metadata = relationship("PublicRepositoryMetadata", back_populates="pathogen", uselist=True)  # type: ignore
+
     samples = relationship("Sample", back_populates="pathogen")  # type: ignore
     phylo_runs = relationship("PhyloRun", back_populates="pathogen")  # type: ignore
     phylo_trees = relationship("PhyloTree", back_populates="pathogen")  # type: ignore
