@@ -110,7 +110,9 @@ def write_table(metadata_fh, pathogen_slug: str, public_repository_name: str):
         dest_table = PublicRepositoryMetadata.__table__
         temp_table = create_temp_table(session, dest_table)
 
-        objects: List[Dict[str, Union[Optional[str], Optional[datetime.datetime]]]] = []
+        objects: List[
+            Dict[str, Union[Optional[str], Optional[int], Optional[datetime.datetime]]]
+        ] = []
         # We insert into a temporary table and then swap table contents with public_repository_metadata
         for row in data:
             num_rows += 1
