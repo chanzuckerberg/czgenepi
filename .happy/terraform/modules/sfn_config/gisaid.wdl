@@ -183,7 +183,7 @@ task TransformGISAID {
     set -x
 
     # get the bucket/key from the object id
-    raw_gisaid_location=$(python3 /usr/src/app/aspen/workflows/transform_gisaid/lookup_raw_gisaid_object.py --raw-gisaid-object-id "~{raw_gisaid_object_id}")
+    raw_gisaid_location=$(python3 /usr/src/app/aspen/workflows/transform_gisaid/lookup_raw_download_object.py --raw-download-object-id "~{raw_gisaid_object_id}")
     raw_gisaid_s3_bucket=$(echo "${raw_gisaid_location}" | jq -r .bucket)
     raw_gisaid_s3_key=$(echo "${raw_gisaid_location}" | jq -r .key)
 
@@ -268,7 +268,7 @@ task AlignGISAID {
     set -x
 
     # get the bucket/key from the object id
-    processed_gisaid_location=$(python3 /usr/src/app/aspen/workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "~{processed_gisaid_object_id}")
+    processed_gisaid_location=$(python3 /usr/src/app/aspen/workflows/align_gisaid/lookup_processed_repo_data_object.py --processed-object-id "~{processed_gisaid_object_id}")
     processed_gisaid_s3_bucket=$(echo "${processed_gisaid_location}" | jq -r .bucket)
     processed_gisaid_sequences_s3_key=$(echo "${processed_gisaid_location}" | jq -r .sequences_key)
     processed_gisaid_metadata_s3_key=$(echo "${processed_gisaid_location}" | jq -r .metadata_key)

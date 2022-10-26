@@ -1,6 +1,7 @@
 import datetime
 
 import click
+import sqlalchemy as sa
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -11,8 +12,12 @@ from aspen.database.connection import (
 )
 from aspen.database.models import (
     GisaidDumpWorkflow,
+    Pathogen,
     ProcessedGisaidDump,
-    RawGisaidDump,
+    ProcessedRepositoryData,
+    PublicRepository,
+    RawRepositoryData,
+    RepositoryDownloadWorkflow,
     WorkflowStatusType,
 )
 from aspen.database.models.workflow import SoftwareNames
@@ -28,6 +33,8 @@ from aspen.database.models.workflow import SoftwareNames
 @click.option("--gisaid-s3-bucket", type=str, required=True)
 @click.option("--gisaid-sequences-s3-key", type=str, required=True)
 @click.option("--gisaid-metadata-s3-key", type=str, required=True)
+@click.option("--pathogen", type=str, default="SC2")
+@click.option("--public_repository", type=str, default="GISAID")
 @click.option("--test", type=bool, is_flag=True)
 def cli(
     aspen_workflow_rev: str,
@@ -39,6 +46,8 @@ def cli(
     gisaid_s3_bucket: str,
     gisaid_sequences_s3_key: str,
     gisaid_metadata_s3_key: str,
+    pathogen: str,
+    public_repository: str,
     test: bool,
 ):
     if test:
@@ -49,21 +58,28 @@ def cli(
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
-        raw_gisaid_dump: RawGisaidDump = (
-            session.query(RawGisaidDump)
-            .filter(RawGisaidDump.id == raw_gisaid_object_id)
+        pathogen_obj = session.execute(sa.select(Pathogen).where(Pathogen.slug == pathogen)).scalars().one()  # type: ignore
+        public_repository_obj = session.execute(sa.select(PublicRepository).where(PublicRepository.name == public_repository)).scalars().one()  # type: ignore
+
+        raw_repo_dump: RawRepositoryData = (
+            session.query(RawRepositoryData)
+            .filter(RawRepositoryData.id == raw_gisaid_object_id)
             .one()
         )
 
         # create an output
-        processed_gisaid_dump = ProcessedGisaidDump(
+        processed_repo_dump: ProcessedRepositoryData = ProcessedRepositoryData(
+            pathogen=pathogen_obj,
+            public_repository=public_repository_obj,
             s3_bucket=gisaid_s3_bucket,
             sequences_s3_key=gisaid_sequences_s3_key,
             metadata_s3_key=gisaid_metadata_s3_key,
         )
 
         # attach a workflow
-        workflow = GisaidDumpWorkflow(
+        workflow = RepositoryDownloadWorkflow(
+            pathogen=pathogen_obj,
+            public_repository=public_repository_obj,
             start_datetime=start_time_datetime,
             end_datetime=end_time_datetime,
             workflow_status=WorkflowStatusType.COMPLETED,
@@ -74,10 +90,27 @@ def cli(
             },
         )
 
-        workflow.inputs.append(raw_gisaid_dump)
-        workflow.outputs.append(processed_gisaid_dump)
+        workflow.inputs.append(raw_repo_dump)
+        workflow.outputs.append(processed_repo_dump)
         session.flush()
-        print(processed_gisaid_dump.entity_id)
+
+        # TODO - these tables are deprecated, please remove this block once we're reading from new tables
+        session.execute(
+            ProcessedGisaidDump.__table__.insert().values(
+                entity_id=processed_repo_dump.id,
+                s3_bucket=gisaid_s3_bucket,
+                sequences_s3_key=gisaid_sequences_s3_key,
+                metadata_s3_key=gisaid_metadata_s3_key,
+            )
+        )
+        session.execute(
+            GisaidDumpWorkflow.__table__.insert().values(
+                workflow_id=workflow.id,
+            )
+        )
+        # End deprecated inserts
+
+        print(processed_repo_dump.entity_id)
 
 
 if __name__ == "__main__":

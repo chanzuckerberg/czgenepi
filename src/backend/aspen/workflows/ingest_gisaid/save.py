@@ -1,6 +1,7 @@
 import datetime
 
 import click
+import sqlalchemy as sa
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -9,24 +10,27 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import RawGisaidDump
+from aspen.database.models import (
+    Pathogen,
+    PublicRepository,
+    RawGisaidDump,
+    RawRepositoryData,
+)
 
 
 @click.command("save")
-@click.option("--aspen-workflow-rev", type=str, required=True)
-@click.option("--aspen-creation-rev", type=str, required=True)
 @click.option("--start-time", type=int, required=True)
-@click.option("--end-time", type=int, required=True)
 @click.option("--gisaid-s3-bucket", type=str, required=True)
 @click.option("--gisaid-s3-key", type=str, required=True)
+@click.option("--pathogen", type=str, default="SC2")
+@click.option("--public_repository", type=str, default="GISAID")
 @click.option("--test", type=bool, is_flag=True)
 def cli(
-    aspen_workflow_rev: str,
-    aspen_creation_rev: str,
     start_time: int,
-    end_time: int,
     gisaid_s3_bucket: str,
     gisaid_s3_key: str,
+    pathogen: str,
+    public_repository: str,
     test: bool,
 ):
     if test:
@@ -35,16 +39,32 @@ def cli(
     start_time_datetime = datetime.datetime.fromtimestamp(start_time)
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
-
-    entity = RawGisaidDump(
-        download_date=start_time_datetime,
-        s3_bucket=gisaid_s3_bucket,
-        s3_key=gisaid_s3_key,
-    )
-
     with session_scope(interface) as session:
+
+        pathogen_obj = session.execute(sa.select(Pathogen).where(Pathogen.slug == pathogen)).scalars().one()  # type: ignore
+        public_repository_obj = session.execute(sa.select(PublicRepository).where(PublicRepository.name == public_repository)).scalars().one()  # type: ignore
+        entity: RawRepositoryData = RawRepositoryData(
+            pathogen=pathogen_obj,
+            public_repository=public_repository_obj,
+            download_date=start_time_datetime,
+            s3_bucket=gisaid_s3_bucket,
+            s3_key=gisaid_s3_key,
+        )
+
         session.add(entity)
         session.flush()
+
+        # TODO - these tables are deprecated, please remove this block once we're reading from new tables
+        session.execute(
+            RawGisaidDump.__table__.insert().values(
+                entity_id=entity.id,
+                download_date=start_time_datetime,
+                s3_bucket=gisaid_s3_bucket,
+                s3_key=gisaid_s3_key,
+            )
+        )
+        # End deprecated inserts
+
         print(entity.entity_id)
 
 
