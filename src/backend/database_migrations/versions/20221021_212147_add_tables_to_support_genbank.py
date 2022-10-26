@@ -24,7 +24,9 @@ def upgrade():
             ["aspen.pathogens.id"],
             name=op.f("fk_pathogen_lineages_pathogen_id_pathogens"),
         ),
-        sa.PrimaryKeyConstraint("pathogen_id", "lineage", name=op.f("pk_pathogen_lineages")),
+        sa.PrimaryKeyConstraint(
+            "pathogen_id", "lineage", name=op.f("pk_pathogen_lineages")
+        ),
         schema="aspen",
     )
     op.create_table(
@@ -52,7 +54,10 @@ def upgrade():
             ),
         ),
         sa.PrimaryKeyConstraint(
-            "pathogen_id", "strain", "public_repository_id", name=op.f("pk_public_repository_metadata")
+            "pathogen_id",
+            "strain",
+            "public_repository_id",
+            name=op.f("pk_public_repository_metadata"),
         ),
         schema="aspen",
     )
