@@ -205,7 +205,7 @@ services:
     networks:
       genepinet:
         aliases:
-          - lineage-qc.genepinet.localdev
+          - pangolin.genepinet.localdev
     volumes:
       - ./src/backend:/usr/src/app
   lineage_qc:

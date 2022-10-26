@@ -43,8 +43,8 @@ locals {
   backend_image    = join(":", [local.secret["ecrs"]["backend"]["url"], lookup(var.image_tags, "backend", var.image_tag)])
 
   # Workflow images
-  pangolin_image   = join(":", [local.secret["ecrs"]["lineage-qc"]["url"], lookup(var.image_tags, "pangolin", var.image_tag)])
-  lineage_qc_image   = join(":", [local.secret["ecrs"]["lineage-qc"]["url"], lookup(var.image_tags, "lineage-qc", var.image_tag)])
+  pangolin_image   = join(":", [local.secret["ecrs"]["pangolin"]["url"], lookup(var.image_tags, "pangolin", var.image_tag)])
+  lineage_qc_image = join(":", [local.secret["ecrs"]["lineage-qc"]["url"], lookup(var.image_tags, "lineage-qc", var.image_tag)])
   nextstrain_image = join(":", [local.secret["ecrs"]["nextstrain"]["url"], lookup(var.image_tags, "nextstrain", var.image_tag)])
   gisaid_image     = join(":", [local.secret["ecrs"]["gisaid"]["url"], lookup(var.image_tags, "gisaid", var.image_tag)])
 
