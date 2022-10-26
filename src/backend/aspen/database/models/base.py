@@ -1,5 +1,5 @@
 from sqlalchemy import MetaData
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import registry
 
 from aspen.database.models import mixins as mx
 
@@ -14,5 +14,6 @@ meta = MetaData(
     },
 )
 
-base = declarative_base(metadata=meta)
-idbase = declarative_base(cls=mx.BaseMixin, metadata=meta)
+mapper_registry = registry(metadata=meta)
+base = mapper_registry.generate_base()
+idbase = mapper_registry.generate_base(cls=mx.BaseMixin)

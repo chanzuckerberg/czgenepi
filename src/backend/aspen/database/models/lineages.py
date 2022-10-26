@@ -1,7 +1,15 @@
 import enum
 
 import enumtables
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    Float,
+    ForeignKey,
+    Integer,
+    PrimaryKeyConstraint,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import base, idbase
@@ -30,7 +38,7 @@ class PangoLineage(idbase):  # type: ignore
         return f"Pango Lineage <{self.lineage}>"
 
 
-class PathogenLineage(idbase):  # type: ignore
+class PathogenLineage(base):  # type: ignore
     """A pathogen lineage. Only real data is its official name (`lineage`).
 
     Entire table taken together should be all the current lineages for a pathogen.
@@ -48,15 +56,17 @@ class PathogenLineage(idbase):  # type: ignore
 
     __tablename__ = "pathogen_lineages"
     __table_args__ = (
-        UniqueConstraint(
+        PrimaryKeyConstraint(
             "pathogen_id",
             "lineage",
         ),
     )
 
-    pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
-    pathogen = relationship(Pathogen, back_populates="lineages")  # type: ignore
-    lineage = Column(String, nullable=False)
+    pathogen_id = Column(
+        Integer, ForeignKey(Pathogen.id), nullable=False, primary_key=True
+    )
+    pathogen = relationship(Pathogen)  # type: ignore
+    lineage = Column(String, nullable=False, primary_key=True)
 
     def __repr__(self):
         return f"Pathogen Lineage <{self.lineage}>"

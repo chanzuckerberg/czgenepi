@@ -196,7 +196,7 @@ local-stop: ## Stop the local dev environment.
 	$(docker_compose) --profile '*' stop
 
 .PHONY: local-clean
-local-clean: local-nohostconfig ## Remove everything related to the local dev environment (including db data!)
+local-clean: local-stop local-nohostconfig ## Remove everything related to the local dev environment (including db data!)
 	-if [ -f ./oauth/pkcs12/server.crt ] ; then \
 		if [ "$$(uname -s)" == "Linux" ]; then \
 			echo "Removing this certificate from /usr/local/share requires sudo access"; \
@@ -212,7 +212,7 @@ local-clean: local-nohostconfig ## Remove everything related to the local dev en
 	fi;
 	-rm -rf ./oauth/pkcs12/server*
 	-rm -rf ./oauth/pkcs12/certificate*
-	$(docker_compose) rm -sfv
+	$(docker_compose) --profile $(LOCALDEV_PROFILE) rm -sfv
 	-docker volume rm czgenepi_localstack
 
 .PHONY: local-logs

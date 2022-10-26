@@ -17,7 +17,6 @@ depends_on = None
 def upgrade():
     op.create_table(
         "pathogen_lineages",
-        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("pathogen_id", sa.Integer(), nullable=False),
         sa.Column("lineage", sa.String(), nullable=False),
         sa.ForeignKeyConstraint(
@@ -25,17 +24,11 @@ def upgrade():
             ["aspen.pathogens.id"],
             name=op.f("fk_pathogen_lineages_pathogen_id_pathogens"),
         ),
-        sa.PrimaryKeyConstraint("id", name=op.f("pk_pathogen_lineages")),
-        sa.UniqueConstraint(
-            "pathogen_id",
-            "lineage",
-            name=op.f("uq_pathogen_lineages_pathogen_id_lineage"),
-        ),
+        sa.PrimaryKeyConstraint("pathogen_id", "lineage", name=op.f("pk_pathogen_lineages")),
         schema="aspen",
     )
     op.create_table(
         "public_repository_metadata",
-        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("pathogen_id", sa.Integer(), nullable=False),
         sa.Column("public_repository_id", sa.Integer(), nullable=False),
         sa.Column("strain", sa.String(), nullable=False),
@@ -59,15 +52,7 @@ def upgrade():
             ),
         ),
         sa.PrimaryKeyConstraint(
-            "id", "strain", name=op.f("pk_public_repository_metadata")
-        ),
-        sa.UniqueConstraint(
-            "pathogen_id",
-            "public_repository_id",
-            "strain",
-            name=op.f(
-                "uq_public_repository_metadata_pathogen_id_public_repository_id_strain"
-            ),
+            "pathogen_id", "strain", "public_repository_id", name=op.f("pk_public_repository_metadata")
         ),
         schema="aspen",
     )
