@@ -8,7 +8,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "20221021_205409"
-down_revision = "20221021_175601"
+down_revision = "20221025_234200"
 branch_labels = None
 depends_on = None
 
