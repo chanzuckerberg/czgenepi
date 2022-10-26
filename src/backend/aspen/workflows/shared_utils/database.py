@@ -2,7 +2,6 @@ import re
 import uuid
 from typing import Iterable, Optional
 
-import sqlalchemy as sa
 from sqlalchemy import Column, MetaData, Table
 from sqlalchemy.orm.session import Session
 from sqlalchemy.schema import CreateTable, DropTable
@@ -49,17 +48,12 @@ def mv_table_contents(
     All the data that dest_table starts with will be dropped as part
     of copying in the incoming data from source_table.
     """
-    dest_cols = [col.name for col in dest_table.columns if col.name != "id"]
-    source_cols = [col for col in source_table.columns if col.name != "id"]
+    cols = [col.name for col in dest_table.columns]
     delete_query = dest_table.delete()
     if filters is not None:
         delete_query = delete_query.where(*filters)
     session.execute(delete_query)
-    print(dest_table.insert().from_select(dest_cols, sa.select(source_cols)))
-    import pdb
-
-    pdb.set_trace()
-    session.execute(dest_table.insert().from_select(dest_cols, sa.select(source_cols)))
+    session.execute(dest_table.insert().from_select(cols, source_table.select()))
 
 
 def drop_temp_table(
