@@ -14,22 +14,3 @@ export const Navigation = styled.div`
     `;
   }}
 `;
-
-export const StyledMenu = styled.ul`
-  align-items: center;
-  display: flex;
-  flex-direction: row;
-  padding: 0;
-`;
-
-export const StyledMenuItem = styled.li`
-  list-style: none;
-  padding: 0;
-  ${(props: CommonThemeProps) => {
-    const spaces = getSpaces(props);
-
-    return `
-      margin: 0 ${spaces?.m}px;
-    `;
-  }}
-`;

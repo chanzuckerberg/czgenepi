@@ -195,3 +195,8 @@ export const StyledMenuItem = styled.li`
     `;
   }}
 `;
+
+export const StyledView = styled.div`
+  display: flex;
+  flex-direction: column;
+`;

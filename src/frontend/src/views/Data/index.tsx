@@ -19,7 +19,6 @@ import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
-import { DataNavigation } from "./components/DataNavigation";
 import { FilterPanelToggle } from "./components/DataNavigation/FilterPanelToggle";
 import { SamplesView } from "./components/SamplesView";
 import { TreesView } from "./components/TreesView";
@@ -28,6 +27,7 @@ import {
   Category,
   CategoryTitle,
   Container,
+  FlexCol,
   Navigation,
   StyledCount,
   StyledMenu,
@@ -245,7 +245,6 @@ const Data: FunctionComponent = () => {
 
   return (
     <Container>
-      <DataNavigation />
       <View>
         {viewName === VIEWNAME.SAMPLES && <SamplesView />}
         {viewName === VIEWNAME.TREES && <TreesView />}
