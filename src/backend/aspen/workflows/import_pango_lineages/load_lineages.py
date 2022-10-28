@@ -92,7 +92,7 @@ def get_lineages(lineage_notes_file: io.TextIOBase) -> list[str]:
 
 
 # TODO this function is only here for reverse-compatibility. We'll remove it soon
-def load_old_lineages_data(lineages: list[str]) -> None:
+def deprecated_load_lineages_data(lineages: list[str]) -> None:
     """Loads all the lineages into DB.
 
     Approach to this is basically duplicating what's in
@@ -221,7 +221,7 @@ def cli(
         return  # End here to avoid importing to DB
 
     print("Loading Pango lineages to DB...")
-    load_old_lineages_data(lineages)
+    deprecated_load_lineages_data(lineages)
     load_lineages_data(lineages)
     print("Loading Pango lineages complete!")
 

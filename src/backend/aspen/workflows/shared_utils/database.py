@@ -42,11 +42,12 @@ def mv_table_contents(
     dest_table: Table,
     filters: Optional[Iterable[ClauseElement]] = None,
 ) -> None:
-    """Deletes contents of dest, copies in contents from source to dest.
+    """Deletes (optionally filtered) contents of dest, copies in contents
+    from source to dest.
 
     WARNING: This function is destructive for the data in dest_table.
-    All the data that dest_table starts with will be dropped as part
-    of copying in the incoming data from source_table.
+    All the data that dest_table starts with that match our filter arguments
+    will be dropped as part of copying in the incoming data from source_table.
     """
     cols = [col.name for col in dest_table.columns]
     delete_query = dest_table.delete()
