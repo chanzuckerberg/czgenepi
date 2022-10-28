@@ -1,36 +1,55 @@
-import { map } from "lodash";
+import { DefaultMenuSelectOption } from "czifui";
+import { compact, map, noop, uniq } from "lodash";
 import { useEffect, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
+import { FilterPanel } from "src/components/FilterPanel";
+import { StyledView } from "../../style";
+import { DataNavigation } from "../DataNavigation";
+import { Flex } from "./style";
 
 const SamplesView = (): JSX.Element => {
   // initialize state
-  const [isDataLoading, setIsDataLoading] = useState(false);
+  // TODO-TR (mlilia): types
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState<boolean>(true);
+  // @ts-expect-error: temp
+  const [dataFilterFunc, setDataFilterFunc] = useState<any>(); // eslint-disable-line
+  const [lineages, setLineages] = useState<DefaultMenuSelectOption[]>([]);
 
   // load sample data from server
-  const sampleResponse = useSampleInfo();
-  const { data: samples, isLoading, isFetching } = sampleResponse;
+  const { data: samples } = useSampleInfo();
 
-  // determine whether we should show loading ui or interactive ui
+  // update list of lineages to use in the filter panel on the left side of the screen
   useEffect(() => {
-    setIsDataLoading(true);
+    const lineages = uniq(compact(map(samples, (d) => d.lineage?.lineage)))
+      .sort()
+      .map((name) => ({ name }));
 
-    if (isLoading || isFetching) return;
+    setLineages(lineages);
+  }, [samples]);
 
-    setIsDataLoading(false);
-  }, [isLoading, isFetching]);
-
-  if (isDataLoading) {
-    return <div>Loading ...</div>;
-  }
+  const toggleFilterPanel = () => {
+    setIsFilterPanelOpen(!isFilterPanelOpen);
+  };
 
   return (
-    <>
+    <StyledView>
       <HeadAppTitle subTitle="Samples" />
-      {map(samples, (s) => (
-        <div>{s.publicId}</div>
-      ))}
-    </>
+      <DataNavigation
+        shouldShowSampleFilterToggle
+        activeFilterCount={0} // TODO-TR (mlila): use actual count
+        toggleFilterPanel={toggleFilterPanel}
+      />
+      <Flex>
+        <FilterPanel
+          lineages={lineages}
+          isOpen={isFilterPanelOpen}
+          setActiveFilterCount={noop}
+          setDataFilterFunc={setDataFilterFunc}
+          data-test-id="menu-item-sample-count"
+        />
+      </Flex>
+    </StyledView>
   );
 };
 
