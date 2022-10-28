@@ -4,16 +4,9 @@ import { useEffect, useState } from "react";
 import { useNewPhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useNewSampleInfo } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
-import { FilterPanelToggle } from "./FilterPanelToggle";
 import { Navigation } from "./style";
 
-interface Props {
-  shouldShowSampleFilterToggle: boolean;
-}
-
-const DataNavigation = ({
-  shouldShowSampleFilterToggle,
-}: Props): JSX.Element => {
+const DataNavigation = (): JSX.Element => {
   const [currentTab, setCurrentTab] = useState<string>();
   const [tabData, setTabData] = useState<Partial<DataCategory>[]>([]);
 
@@ -55,14 +48,6 @@ const DataNavigation = ({
 
   return (
     <Navigation data-test-id="menu-items">
-      {shouldShowSampleFilterToggle && (
-        <FilterPanelToggle
-          activeFilterCount={activeFilterCount}
-          onClick={() => {
-            setShouldShowFilters(!shouldShowFilters);
-          }}
-        />
-      )}
       <Tabs value={currentTab} sdsSize="large" onChange={handleTabClick}>
         {tabData.map((tab) => (
           <Tab
