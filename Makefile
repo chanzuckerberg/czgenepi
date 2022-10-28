@@ -253,6 +253,16 @@ backend-%: .env.ecr  ## Run make commands in a NEW backend container. See src/ba
 frontend-%: .env.ecr ## Run make commands in the frontend container (src/frontend/Makefile)
 	$(docker_compose) run -e CI=true --no-deps --rm frontend make $(subst frontend-,,$@)
 
+### PIPELINE TESTS ###################################################
+.PHONY: pipeline-test-gisaid
+pipeline-test-gisaid:
+	export BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566; \
+	export AWS_ACCESS_KEY_ID=aaa; \
+	export AWS_SECRET_ACCESS_KEY=bbb; \
+	export MINIWDL__TASK_RUNTIME__DEFAULTS='{"docker_network":"genepinet"}'; \
+	miniwdl run --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env BOTO_ENDPOINT_URL --input inputs.json --verbose -o output.json .happy/terraform/modules/sfn_config/gisaid-test.wdl 
+	$(docker_compose) run --no-deps --rm backend make pipeline-test-gisaid
+
 
 ### WDL ###################################################
 .PHONY: wdl-lint
