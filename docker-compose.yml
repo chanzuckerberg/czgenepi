@@ -107,6 +107,7 @@ services:
     profiles: [ "backend", "web", "all" ]
     ports:
       - "4566:4566"
+      - "8083:8083"
     environment:
       - HOSTNAME_EXTERNAL=localstack
       - LEGACY_PERSISTENCE=1
@@ -240,5 +241,8 @@ services:
       - ./src/backend:/usr/src/app
 networks:
   genepinet:
+    name: genepinet
+    driver: overlay
+    attachable: true
 volumes:
   localstack:
