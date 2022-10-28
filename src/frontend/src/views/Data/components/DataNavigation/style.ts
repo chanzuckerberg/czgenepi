@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getSpaces } from "czifui";
+import { CommonThemeProps, getColors, getSpaces } from "czifui";
 
 export const Navigation = styled.div`
   display: flex;

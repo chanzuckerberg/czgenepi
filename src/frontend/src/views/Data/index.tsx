@@ -27,7 +27,6 @@ import {
   Category,
   CategoryTitle,
   Container,
-  FlexCol,
   Navigation,
   StyledCount,
   StyledMenu,

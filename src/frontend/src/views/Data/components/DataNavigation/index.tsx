@@ -17,6 +17,11 @@ type Props =
     }
   | Record<string, never>;
 
+type TabEventHandler = (
+  event: React.SyntheticEvent<Element, Event>,
+  tabsValue: ROUTES
+) => void;
+
 const DataNavigation = ({
   activeFilterCount,
   shouldShowSampleFilterToggle,
@@ -53,11 +58,14 @@ const DataNavigation = ({
   // set which tab is active
   useEffect(() => {
     tabData.forEach((d) => {
-      if (currentPath.startsWith(d.to)) setCurrentTab(d.to);
+      const { to } = d;
+      if (!to) return;
+
+      if (currentPath.startsWith(to)) setCurrentTab(to);
     });
   }, [currentPath, tabData]);
 
-  const handleTabClick: SecondaryTabEventHandler = (_, value) => {
+  const handleTabClick: TabEventHandler = (_, value) => {
     // TODO-TR: smoother view transition
     router.push(value);
   };

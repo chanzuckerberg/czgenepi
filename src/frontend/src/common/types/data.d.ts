@@ -6,6 +6,7 @@ interface Transform {
 
 // TODO-TR (mlila): remove this type
 interface DataCategory {
+  count?: number;
   data: SampleMapType | TreeMapType;
   defaultSortKey: string[];
   headers: Header[];
