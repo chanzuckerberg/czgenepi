@@ -12,7 +12,7 @@ const SamplesView = (): JSX.Element => {
   // initialize state
   // TODO-TR (mlilia): types
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState<boolean>(true);
-  // @ts-ignore: temp
+  // @ts-expect-error: temp
   const [dataFilterFunc, setDataFilterFunc] = useState<any>(); // eslint-disable-line
   const [lineages, setLineages] = useState<DefaultMenuSelectOption[]>([]);
 
