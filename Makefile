@@ -256,11 +256,15 @@ frontend-%: .env.ecr ## Run make commands in the frontend container (src/fronten
 ### PIPELINE TESTS ###################################################
 .PHONY: pipeline-test-gisaid
 pipeline-test-gisaid:
+	source .env.ecr; \
+	export DOCKER_REPO; \
 	export BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566; \
-	export AWS_ACCESS_KEY_ID=aaa; \
-	export AWS_SECRET_ACCESS_KEY=bbb; \
-	export MINIWDL__TASK_RUNTIME__DEFAULTS='{"docker_network":"genepinet"}'; \
-	miniwdl run --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env BOTO_ENDPOINT_URL --input inputs.json --verbose -o output.json .happy/terraform/modules/sfn_config/gisaid-test.wdl 
+	export AWS_ACCESS_KEY_ID=NONCE; \
+	export AWS_SECRET_ACCESS_KEY=NONCE; \
+	export MINIWDL_CFG=miniwdl.cfg; \
+	cd src/backend/pipeline_tests; \
+	cat test_data/gisaid_pipeline_inputs.json | envsubst > test_inputs.json; \
+	miniwdl run --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env BOTO_ENDPOINT_URL --input test_inputs.json --verbose -o output.json .happy/terraform/modules/sfn_config/gisaid-test.wdl 
 	$(docker_compose) run --no-deps --rm backend make pipeline-test-gisaid
 
 
