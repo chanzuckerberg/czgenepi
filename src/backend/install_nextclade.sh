@@ -1,16 +1,8 @@
 #!/bin/bash
 
-eval "$($HOME/miniconda/bin/conda shell.bash hook)"
-conda init
 
-conda create --name nextclade
-conda activate nextclade
-conda config --add channels bioconda
-
-# install nextclade
-conda install -c bioconda nextclade --yes
+# install latest version of nextclade
+curl -fsSL "https://github.com/nextstrain/nextclade/releases/latest/download/nextclade-x86_64-unknown-linux-gnu" -o "nextclade" && chmod +x nextclade
 
 # test nextclade installed
 nextclade --version
-
-conda deactivate
