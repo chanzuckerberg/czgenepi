@@ -37,10 +37,11 @@ The currently supported slices are:
 | frontend | frontend |
 | backend | backend |
 | fullstack | frontend, backend |
-| batch | nextsttrain, pangolin, gisaid |
+| batch | nextstrain, pangolin, lineage_qc, gisaid |
 | nextstrain | nextsttrain |
 | gisaid | gisaid |
 | pangolin | pangolin |
+| lineage_qc | lineage_qc |
 
 ### Connecting to remote dev databases
 NOTE - You'll need to [install and configure blessclient](https://czi.atlassian.net/wiki/spaces/SI/pages/1779598774/Install+BlessClient) first!
