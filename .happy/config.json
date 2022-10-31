@@ -33,6 +33,7 @@
             "build_images": [
                 "nextstrain",
                 "pangolin",
+                "lineage_qc",
                 "gisaid"
             ],
             "profile": "jobs"
@@ -48,6 +49,12 @@
                 "pangolin"
             ],
             "profile": "pangolin"
+        },
+        "lineage_qc": {
+            "build_images": [
+                "lineage_qc"
+            ],
+            "profile": "lineage_qc"
         },
         "gisaid": {
             "build_images": [

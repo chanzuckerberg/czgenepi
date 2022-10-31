@@ -1,9 +1,11 @@
 import re
 import uuid
+from typing import Iterable, Optional
 
 from sqlalchemy import Column, MetaData, Table
 from sqlalchemy.orm.session import Session
 from sqlalchemy.schema import CreateTable, DropTable
+from sqlalchemy.sql.elements import ClauseElement
 
 # Used in names of temp tables to show intention to be temporary.
 TEMPORARY_INDICATOR = "temporary"
@@ -34,15 +36,24 @@ def create_temp_table(session: Session, source_table: Table) -> Table:
     return table_object
 
 
-def mv_table_contents(session: Session, source_table: Table, dest_table: Table) -> None:
-    """Deletes contents of dest, copies in contents from source to dest.
+def mv_table_contents(
+    session: Session,
+    source_table: Table,
+    dest_table: Table,
+    filters: Optional[Iterable[ClauseElement]] = None,
+) -> None:
+    """Deletes (optionally filtered) contents of dest, copies in contents
+    from source to dest.
 
     WARNING: This function is destructive for the data in dest_table.
-    All the data that dest_table starts with will be dropped as part
-    of copying in the incoming data from source_table.
+    All the data that dest_table starts with that match our filter arguments
+    will be dropped as part of copying in the incoming data from source_table.
     """
     cols = [col.name for col in dest_table.columns]
-    session.execute(dest_table.delete())
+    delete_query = dest_table.delete()
+    if filters is not None:
+        delete_query = delete_query.where(*filters)
+    session.execute(delete_query)
     session.execute(dest_table.insert().from_select(cols, source_table.select()))
 
 

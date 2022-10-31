@@ -153,10 +153,11 @@ create-new-db-image:
 	echo "  $${TAGGED_IMAGE}"
 
 .PHONY: check-images
-check-images: ## Spot-check the gisaid image
+check-images: ## Spot-check the workflow images
 	$(docker_compose) run --no-deps --rm gisaid /usr/src/app/aspen/workflows/test-gisaid.sh
 	$(docker_compose) run --no-deps --rm nextstrain /usr/src/app/aspen/workflows/test-nextstrain.sh
-	$(docker_compose) run --no-deps --rm pangolin /usr/src/app/aspen/workflows/test-pangolin.sh
+	$(docker_compose) run --no-deps --rm panoglin /usr/src/app/aspen/workflows/test-pangolin.sh
+	$(docker_compose) run --no-deps --rm lineage_qc /usr/src/app/aspen/workflows/test-pangolin.sh
 
 .PHONY: imagecheck-genepi-%
 imagecheck-genepi-%: ## Spot-check backend/batch images
@@ -196,7 +197,7 @@ local-stop: ## Stop the local dev environment.
 	$(docker_compose) --profile '*' stop
 
 .PHONY: local-clean
-local-clean: local-nohostconfig ## Remove everything related to the local dev environment (including db data!)
+local-clean: local-stop local-nohostconfig ## Remove everything related to the local dev environment (including db data!)
 	-if [ -f ./oauth/pkcs12/server.crt ] ; then \
 		if [ "$$(uname -s)" == "Linux" ]; then \
 			echo "Removing this certificate from /usr/local/share requires sudo access"; \
@@ -212,7 +213,7 @@ local-clean: local-nohostconfig ## Remove everything related to the local dev en
 	fi;
 	-rm -rf ./oauth/pkcs12/server*
 	-rm -rf ./oauth/pkcs12/certificate*
-	$(docker_compose) rm -sfv
+	$(docker_compose) --profile $(LOCALDEV_PROFILE) rm -sfv
 	-docker volume rm czgenepi_localstack
 
 .PHONY: local-logs
