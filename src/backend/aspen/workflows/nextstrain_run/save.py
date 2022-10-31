@@ -36,7 +36,7 @@ from aspen.phylo_tree.identifiers import get_names_from_tree
 @click.option(
     "resolved_template_args_fh",
     "--resolved-template-args",
-    type=click.File("r", lazy=True),
+    type=click.File("r"),
     required=True,
     help="JSON file containing resolved template args from setup process",
 )
@@ -60,8 +60,7 @@ def cli(
         return
 
     end_time_datetime = datetime.datetime.fromtimestamp(end_time)
-    # TODO Add below to resulting PhyloTree once model/DB updated.
-    # resolved_template_args = json.load(resolved_template_args_fh)
+    resolved_template_args = json.load(resolved_template_args_fh)
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
@@ -113,6 +112,7 @@ def cli(
             group=phylo_run.group,
             tree_type=phylo_run.tree_type,
             pathogen=phylo_run.pathogen,
+            resolved_template_args=resolved_template_args,
         )
 
         # update the run object with the metadata about the run.
