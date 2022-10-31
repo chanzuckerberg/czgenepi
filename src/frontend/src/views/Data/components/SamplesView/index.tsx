@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 import { FilterPanel } from "src/components/FilterPanel";
+import { SearchBar } from "src/components/Table/components/SearchBar";
 import { StyledView } from "../../style";
 import { DataNavigation } from "../DataNavigation";
 import { SamplesTable } from "./components/SamplesTable";
@@ -16,6 +17,7 @@ const SamplesView = (): JSX.Element => {
   // @ts-expect-error: temp
   const [dataFilterFunc, setDataFilterFunc] = useState<any>(); // eslint-disable-line
   const [lineages, setLineages] = useState<DefaultMenuSelectOption[]>([]);
+  const [displayedRows, setDisplayedRows] = useState<IdMap<Sample>>({});
 
   // load sample data from server
   const { data: samples, isFetching, isLoading } = useSampleInfo();
@@ -49,7 +51,13 @@ const SamplesView = (): JSX.Element => {
           setDataFilterFunc={setDataFilterFunc}
           data-test-id="menu-item-sample-count"
         />
-        <SamplesTable isLoading={isLoading || isFetching} data={samples} />
+        <div>
+          <SearchBar tableData={samples} onSearchComplete={setDisplayedRows} />
+          <SamplesTable
+            isLoading={isLoading || isFetching}
+            data={displayedRows}
+          />
+        </div>
       </Flex>
     </StyledView>
   );
