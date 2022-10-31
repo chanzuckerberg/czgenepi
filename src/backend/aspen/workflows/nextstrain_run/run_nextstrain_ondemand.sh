@@ -39,6 +39,9 @@ mkdir -p /ncov/my_profiles/aspen /ncov/results
 ncov_git_rev=$(cd /ncov && git rev-parse HEAD)
 echo "${ncov_git_rev}" >| "/tmp/ncov_git_rev"
 
+# We use a file to pass from `export.py` to `save.py` before writing them to DB
+RESOLVED_TEMPLATE_ARGS_SAVEFILE=/tmp/resolved_template_args.json
+
 cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* /ncov/my_profiles/aspen/
 
 # dump the sequences, metadata, and builds.yaml for a run out to disk.
@@ -48,7 +51,7 @@ aligned_gisaid_location=$(
            --sequences /ncov/data/sequences_aspen.fasta     \
            --metadata /ncov/data/metadata_aspen.tsv         \
            --selected /ncov/data/include.txt                       \
-           --resolved-template-args /tmp/resolved_template_args.json \
+           --resolved-template-args "${RESOLVED_TEMPLATE_ARGS_SAVEFILE}" \
            --builds-file /ncov/my_profiles/aspen/builds.yaml       \
            --reset-status \
 )
@@ -96,5 +99,5 @@ python3 /usr/src/app/aspen/workflows/nextstrain_run/save.py                 \
     --phylo-run-id "${WORKFLOW_ID}"                                         \
     --bucket "${aspen_s3_db_bucket}"                                        \
     --key "${key}"                                                          \
-    --resolved-template-args /tmp/resolved_template_args.json               \
+    --resolved-template-args "${RESOLVED_TEMPLATE_ARGS_SAVEFILE}"           \
     --tree-path /ncov/auspice/ncov_aspen.json                                \
