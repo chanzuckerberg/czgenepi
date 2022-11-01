@@ -1,0 +1,45 @@
+FROM python:3.10-slim AS base
+ENV FLASK_APP=aspen.main
+EXPOSE 3000
+
+# Install poetry
+RUN apt update && apt install -y libdigest-sha-perl wget
+ENV POETRY_VERSION=1.1.15
+RUN python3 -m pip install poetry==$POETRY_VERSION
+# install libffi-dev (needed for installing cffi with python 3.10-slim image)
+RUN apt-get --yes install libffi-dev
+
+WORKDIR /usr/src/app
+
+RUN apt-get update && apt-get install -y make wget git jq gcc unzip
+
+# install miniconda
+RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+RUN chmod +x Miniconda3-latest-Linux-x86_64.sh
+RUN ./Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
+RUN eval "$($HOME/miniconda/bin/conda shell.bash hook)" && conda init
+
+# install nextclade, check it installed correctly
+RUN apt-get --yes install curl
+RUN curl -fsSL "https://github.com/nextstrain/nextclade/releases/latest/download/nextclade-x86_64-unknown-linux-gnu" -o "nextclade" && chmod +x nextclade
+RUN  ln -s /usr/src/app/nextclade /usr/local/bin
+RUN nextclade --version
+
+# install pangolin
+COPY aspen/workflows/pangolin/install_pangolin.sh .
+RUN bash install_pangolin.sh
+
+
+# Poetry: install app
+COPY pyproject.toml poetry.lock environment.yaml ./
+COPY third-party ./third-party
+RUN wget https://github.com/chanzuckerberg/oso/archive/czge-oso25.zip -O oso.zip && \
+    unzip -q oso.zip && \
+    mv oso-czge-oso25/languages/python/sqlalchemy-oso sqlalchemy-oso && rm oso.zip
+RUN poetry config virtualenvs.create false && \
+    poetry install
+ENV PYTHONPATH=.
+
+COPY . .
+# Install the aspen package
+RUN poetry install

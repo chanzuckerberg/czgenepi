@@ -209,6 +209,36 @@ services:
           - pangolin.genepinet.localdev
     volumes:
       - ./src/backend:/usr/src/app
+  lineage_qc:
+    image: "${DOCKER_REPO}genepi-lineage-qc"
+    profiles: [ "lineage_qc", "jobs", "all" ]
+    platform: linux/amd64
+    build:
+      context: src/backend
+      dockerfile: Dockerfile.lineage_qc
+      cache_from:
+        - "${DOCKER_REPO}genepi-lineage-qc:branch-trunk"
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    environment:
+      - AWS_REGION=us-west-2
+      - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
+      - AWS_ACCESS_KEY_ID=dev_access_key_id
+      - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
+      - FLASK_ENV=development
+      - PYTHONUNBUFFERED=1
+      - DB=docker
+      - ENV=local
+      - DEPLOYMENT_STAGE=local
+      - PYTHONPATH=.
+    command: [ "true" ]
+    restart: "no"
+    networks:
+      genepinet:
+        aliases:
+          - lineage-qc.genepinet.localdev
+    volumes:
+      - ./src/backend:/usr/src/app
   nextstrain:
     image: "${DOCKER_REPO}genepi-nextstrain"
     profiles: [ "nextstrain", "jobs", "all" ]
