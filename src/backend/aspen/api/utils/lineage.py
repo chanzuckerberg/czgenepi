@@ -1,10 +1,5 @@
 import re
-from typing import List
-
-import sqlalchemy as sa
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from aspen.database.models import PangoLineage
+from typing import List, Set
 
 NEXTSTRAIN_LINEAGE_MAP = {
     "BA.1*": "21K",
@@ -19,11 +14,16 @@ WHO_LINEAGE_MAP = {
 }
 
 
-async def expand_lineage_wildcards(db: AsyncSession, lineage_list: List[str]):
+def expand_lineage_wildcards(all_lineages: Set[str], lineage_list: List[str]):
     """
-    Takes in a list of lineages and wildcard lineage expressions (as strings) and
-    returns a list of specific lineages. Wildcards are expanded to include both
-    the base expression and all sublineages.
+    Takes in a set of all lineages and a list of wildcard lineage expressions
+    (as strings) and returns a list of specific lineages. Wildcards are
+    expanded to include both the base expression and all sublineages.
+
+    While we return the result as a list, there's no guarantee of an order
+    that has any meaning. It returns a list simply because downstream where
+    utility func gets used has one less step, but implementation details
+    here don't really care much about trying to create/preserve an order.
 
     Example:
     We encounter the wildcard expression 'BA.1*'.
@@ -33,10 +33,6 @@ async def expand_lineage_wildcards(db: AsyncSession, lineage_list: List[str]):
     'BA.1.1.7',
     etc., but not 'BA.11'.
     """
-    all_lineages_query = sa.select(PangoLineage.lineage)  # type: ignore
-    result = await db.execute(all_lineages_query)
-    all_lineages = set(result.scalars().all())
-
     # Expand WHO aliases
     who_mapped_lineage_list = []
     for entry in lineage_list:
