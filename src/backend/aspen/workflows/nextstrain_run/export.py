@@ -5,6 +5,7 @@ import re
 from typing import Any, Dict, IO, Iterable, List, Mapping, MutableMapping, Optional, Set
 
 import click
+import sqlalchemy as sa
 from sqlalchemy.orm import aliased, joinedload, with_polymorphic
 
 from aspen.api.utils import expand_lineage_wildcards
@@ -263,11 +264,9 @@ def resolve_filter_pango_lineages(
     lineage_list = template_args.get("filter_pango_lineages")
     if lineage_list is None:  # short-circuit if template arg was not present
         return None
+    all_lineages_query = sa.select(PangoLineage.lineage)
     # Utility that does expansion depends on having set of all lineages.
-    all_lineages = {
-        query_result[0]  # query_result is 1-length tuple of just lineage
-        for query_result in session.query(PangoLineage.lineage).all()
-    }
+    all_lineages = set(session.execute(all_lineages_query).scalars().all())
     return expand_lineage_wildcards(all_lineages, lineage_list)
 
 
