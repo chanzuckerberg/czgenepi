@@ -188,7 +188,9 @@ def test_overview_config_ondemand(mocker, session, postgres_database):
     max_date = dateparser.parse("10 days ago").strftime("%Y-%m-%d")
     assert nextstrain_config["files"]["include"] == "data/include.txt"
     # Order does not matter for lineages, just verify matched sets.
-    assert set(nextstrain_config["builds"]["aspen"]["pango_lineage"]) == set(query["filter_pango_lineages"])
+    assert set(nextstrain_config["builds"]["aspen"]["pango_lineage"]) == set(
+        query["filter_pango_lineages"]
+    )
     assert subsampling_scheme["group"]["min_date"] == "--min-date 2021-04-30"
     assert subsampling_scheme["group"]["max_date"] == f"--max-date {max_date}"
     assert subsampling_scheme["group"]["max_sequences"] == 2000

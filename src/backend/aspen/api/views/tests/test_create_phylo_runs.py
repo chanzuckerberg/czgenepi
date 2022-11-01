@@ -5,7 +5,6 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
-from aspen.test_infra.models.lineage import pango_lineage_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.sample import sample_factory
