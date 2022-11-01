@@ -416,12 +416,14 @@ def generate_run(phylo_run_id, reset_status=False):
     sequences_fh = StringIO()
     selected_fh = StringIO()
     metadata_fh = StringIO()
+    resolved_template_args_fh = StringIO()
     builds_file_fh = StringIO()
     export_run_config(
         phylo_run_id,
         sequences_fh,
         selected_fh,
         metadata_fh,
+        resolved_template_args_fh,
         builds_file_fh,
         reset_status,
     )
