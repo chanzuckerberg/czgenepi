@@ -11,9 +11,7 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
-    AlignedGisaidDump,
     AlignedRepositoryData,
-    GisaidAlignmentWorkflow,
     Pathogen,
     ProcessedRepositoryData,
     PublicRepository,
@@ -97,22 +95,6 @@ def cli(
         workflow.outputs.append(aligned_data_entity)
         session.flush()
         session.flush()
-
-        # TODO - these tables are deprecated, please remove this block once we're reading from new tables
-        session.execute(
-            AlignedGisaidDump.__table__.insert().values(
-                entity_id=aligned_data_entity.id,
-                s3_bucket=gisaid_s3_bucket,
-                sequences_s3_key=gisaid_sequences_s3_key,
-                metadata_s3_key=gisaid_metadata_s3_key,
-            )
-        )
-        session.execute(
-            GisaidAlignmentWorkflow.__table__.insert().values(
-                workflow_id=workflow.id,
-            )
-        )
-        # End deprecated inserts
 
         print(aligned_data_entity.entity_id)
 

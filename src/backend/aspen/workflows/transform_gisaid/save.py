@@ -11,9 +11,7 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
-    GisaidDumpWorkflow,
     Pathogen,
-    ProcessedGisaidDump,
     ProcessedRepositoryData,
     PublicRepository,
     RawRepositoryData,
@@ -93,22 +91,6 @@ def cli(
         workflow.inputs.append(raw_repo_dump)
         workflow.outputs.append(processed_repo_dump)
         session.flush()
-
-        # TODO - these tables are deprecated, please remove this block once we're reading from new tables
-        session.execute(
-            ProcessedGisaidDump.__table__.insert().values(
-                entity_id=processed_repo_dump.id,
-                s3_bucket=gisaid_s3_bucket,
-                sequences_s3_key=gisaid_sequences_s3_key,
-                metadata_s3_key=gisaid_metadata_s3_key,
-            )
-        )
-        session.execute(
-            GisaidDumpWorkflow.__table__.insert().values(
-                workflow_id=workflow.id,
-            )
-        )
-        # End deprecated inserts
 
         print(processed_repo_dump.entity_id)
 

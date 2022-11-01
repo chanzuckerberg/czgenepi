@@ -10,12 +10,7 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import (
-    Pathogen,
-    PublicRepository,
-    RawGisaidDump,
-    RawRepositoryData,
-)
+from aspen.database.models import Pathogen, PublicRepository, RawRepositoryData
 
 
 @click.command("save")
@@ -53,17 +48,6 @@ def cli(
 
         session.add(entity)
         session.flush()
-
-        # TODO - these tables are deprecated, please remove this block once we're reading from new tables
-        session.execute(
-            RawGisaidDump.__table__.insert().values(
-                entity_id=entity.id,
-                download_date=start_time_datetime,
-                s3_bucket=gisaid_s3_bucket,
-                s3_key=gisaid_s3_key,
-            )
-        )
-        # End deprecated inserts
 
         print(entity.entity_id)
 
