@@ -18,8 +18,20 @@ from aspen.database.models import Sample, UploadedPathogenGenome
 @click.option("samples_fh", "--sample-ids-file", type=click.File("r"), required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
 # fasta identifier used for writing out ids to fasta file '>{fasta_identifier}'
-@click.option("fasta_identifier", "--fasta-identifier-type", type=click.Choice(['public_identifier', 'private_identifier', 'pathogen_genome_entity_id'], case_sensitive=False), required=False)
-def cli(samples_fh: io.TextIOBase, sequences_fh: io.TextIOBase, fasta_identifier: str="pathogen_genome_entity_id"):
+@click.option(
+    "fasta_identifier",
+    "--fasta-identifier-type",
+    type=click.Choice(
+        ["public_identifier", "private_identifier", "pathogen_genome_entity_id"],
+        case_sensitive=False,
+    ),
+    required=False,
+)
+def cli(
+    samples_fh: io.TextIOBase,
+    sequences_fh: io.TextIOBase,
+    fasta_identifier: str = "pathogen_genome_entity_id",
+):
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
     sample_public_identifiers: list[str] = samples_fh.read().split("\n")

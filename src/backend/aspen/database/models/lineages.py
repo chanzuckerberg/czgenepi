@@ -10,8 +10,8 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
-from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import base, idbase
 from aspen.database.models.enum import Enum

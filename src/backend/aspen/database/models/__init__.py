@@ -22,7 +22,7 @@ from aspen.database.models.lineages import (  # noqa: F401
     PathogenLineage,
     SampleLineage,
     SampleQCMetric,
-    LineageType
+    LineageType,
 )
 from aspen.database.models.locations import Location  # noqa: F401
 from aspen.database.models.mutations import SampleMutation  # noqa: F401
