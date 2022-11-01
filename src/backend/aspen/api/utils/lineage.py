@@ -20,6 +20,11 @@ def expand_lineage_wildcards(all_lineages: Set[str], lineage_list: List[str]):
     (as strings) and returns a list of specific lineages. Wildcards are
     expanded to include both the base expression and all sublineages.
 
+    While we return the result as a list, there's no guarantee of an order
+    that has any meaning. It returns a list simply because downstream where
+    utility func gets used has one less step, but implementation details
+    here don't really care much about trying to create/preserve an order.
+
     Example:
     We encounter the wildcard expression 'BA.1*'.
     We add:
