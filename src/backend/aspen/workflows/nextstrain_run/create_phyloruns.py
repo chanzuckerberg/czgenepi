@@ -15,15 +15,17 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
-    AlignedGisaidDump,
+    AlignedRepositoryData,
     Group,
     Pathogen,
     PhyloRun,
+    PublicRepository,
     TreeType,
     User,
     Workflow,
     WorkflowStatusType,
 )
+from aspen.util.split import SplitClient
 from aspen.util.swipe import NextstrainScheduledJob
 
 SCHEDULED_TREE_TYPE = "OVERVIEW"
@@ -37,16 +39,19 @@ def create_phylo_run(
     template_args: Dict[str, str],
     tree_type: TreeType,
     pathogen: str,
+    repository: str,
 ):
+
     user = session.query(User).filter(User.email == "hello@czgenepi.org").one()
     aligned_gisaid_dump = (
-        session.query(AlignedGisaidDump)
-        .join(AlignedGisaidDump.producing_workflow)
+        session.query(AlignedRepositoryData)
+        .join(AlignedRepositoryData.producing_workflow)
+        .filter(AlignedRepositoryData.pathogen == pathogen)
+        .filter(AlignedRepositoryData.public_repository == repository)
         .order_by(Workflow.end_datetime.desc())
         .first()
     )
 
-    pathogen = session.query(Pathogen).filter(Pathogen.slug == pathogen).one()
     workflow: PhyloRun = PhyloRun(
         start_datetime=datetime.datetime.now(),
         workflow_status=WorkflowStatusType.STARTED,
@@ -84,7 +89,28 @@ def launch_one(
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     settings = CLISettings()
     template_args_obj: Dict[str, Any] = json.loads(template_args)
+
+    split_client = SplitClient(settings)
+
     with session_scope(interface) as db:
+        pathogen_obj = (
+            db.execute(sa.select(Pathogen).filter(Pathogen.slug == pathogen))
+            .scalars()
+            .one()
+        )
+        default_repository = split_client.get_pathogen_treatment(
+            "PATHOGEN_public_repository", pathogen_obj
+        )
+        repository = (
+            db.execute(
+                sa.select(PublicRepository).filter(
+                    PublicRepository.name == default_repository
+                )
+            )
+            .scalars()
+            .one()
+        )
+
         if re.match(r"^[0-9]+$", group):
             where_clause = Group.id == int(group)
         else:
@@ -92,7 +118,7 @@ def launch_one(
         groups_query = sa.select(Group).where(where_clause)  # type: ignore
         group_obj: Group = db.execute(groups_query).scalars().one()
         workflow = create_phylo_run(
-            db, group_obj, template_args_obj, tree_type_obj, pathogen
+            db, group_obj, template_args_obj, tree_type_obj, pathogen_obj, repository
         )
 
         job = NextstrainScheduledJob(settings)
@@ -110,7 +136,26 @@ def launch_all(pathogen):
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     tree_type = TreeType("OVERVIEW")
+    split_client = SplitClient(settings)
     with session_scope(interface) as db:
+        pathogen_obj = (
+            db.execute(sa.select(Pathogen).filter(Pathogen.slug == pathogen))
+            .scalars()
+            .one()
+        )
+        default_repository = split_client.get_pathogen_treatment(
+            "PATHOGEN_public_repository", pathogen_obj
+        )
+        repository = (
+            db.execute(
+                sa.select(PublicRepository).filter(
+                    PublicRepository.name == default_repository
+                )
+            )
+            .scalars()
+            .one()
+        )
+
         all_groups_query = sa.select(Group)
         all_groups: MutableSequence[Group] = (
             db.execute(all_groups_query).scalars().all()
@@ -122,7 +167,7 @@ def launch_all(pathogen):
                 or datetime.date.today().weekday() in schedule_expression
             ):
                 workflow = create_phylo_run(
-                    db, group, TEMPLATE_ARGS, tree_type, pathogen
+                    db, group, TEMPLATE_ARGS, tree_type, pathogen_obj, repository
                 )
 
                 job = NextstrainScheduledJob(settings)
