@@ -84,7 +84,8 @@ def test_nextclade_save(mocker, session, postgres_database):
     qc_metrics = session.query(SampleQCMetric).filter(SampleQCMetric.sample==sample).one()
     lineage = session.query(SampleLineage).filter(SampleLineage.sample==sample).one()
     
-    assert qc_metrics.qc_score == 18.062500
+    # matched against values from test nextclade.csv in test data directory
+    assert qc_metrics.qc_score == '18.062500'
     assert qc_metrics.qc_status == "good"
     assert qc_metrics.qc_software_version == "v1.1"
     assert lineage.lineage == "21J (Delta)"

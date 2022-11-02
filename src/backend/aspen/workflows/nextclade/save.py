@@ -53,11 +53,10 @@ def cli(
             existing_qc_metric_q = (
                 sa.select(SampleQCMetric)
                 .join(SampleQCMetric.sample)
-                .filter(sample == sample)
+                .filter(SampleQCMetric.sample == sample)
             )
             qc_metric = session.execute(existing_qc_metric_q).scalars().one_or_none()
 
-            import pdb; pdb.set_trace()
             if qc_metric is None:
                 qc_metric = SampleQCMetric(
                     sample=sample,
@@ -77,7 +76,7 @@ def cli(
             existing_mutation_q = (
                 sa.select(SampleMutation)
                 .join(SampleMutation.sample)
-                .filter(sample == sample)
+                .filter(SampleMutation.sample == sample)
             )
             mutation = session.execute(existing_mutation_q).scalars().one_or_none()
             if mutation is None:
@@ -105,7 +104,7 @@ def cli(
                 existing_sample_lineage_q = (
                     sa.select(SampleLineage)
                     .join(SampleLineage.sample)
-                    .filter(sample == sample)
+                    .filter(SampleLineage.sample == sample)
                 )
                 sample_lineage = (
                     session.execute(existing_sample_lineage_q).scalars().one_or_none()
