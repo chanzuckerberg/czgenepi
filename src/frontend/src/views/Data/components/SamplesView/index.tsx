@@ -6,6 +6,7 @@ import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 import { FilterPanel } from "src/components/FilterPanel";
 import { StyledView } from "../../style";
 import { DataNavigation } from "../DataNavigation";
+import { SamplesTable } from "./components/SamplesTable";
 import { Flex } from "./style";
 
 const SamplesView = (): JSX.Element => {
@@ -17,7 +18,7 @@ const SamplesView = (): JSX.Element => {
   const [lineages, setLineages] = useState<DefaultMenuSelectOption[]>([]);
 
   // load sample data from server
-  const { data: samples } = useSampleInfo();
+  const { data: samples, isFetching, isLoading } = useSampleInfo();
 
   // update list of lineages to use in the filter panel on the left side of the screen
   useEffect(() => {
@@ -48,6 +49,7 @@ const SamplesView = (): JSX.Element => {
           setDataFilterFunc={setDataFilterFunc}
           data-test-id="menu-item-sample-count"
         />
+        <SamplesTable isLoading={isLoading || isFetching} data={samples} />
       </Flex>
     </StyledView>
   );
