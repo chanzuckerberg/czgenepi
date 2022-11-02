@@ -29,7 +29,10 @@ const SamplesView = (): JSX.Element => {
   // only display rows that match the current search and the current filters
   useEffect(() => {
     const hasSearchFilteredRows = Object.keys(searchResults).length > 0;
-    if (!hasSearchFilteredRows) return;
+    if (!hasSearchFilteredRows) {
+      setDisplayedRows({});
+      return;
+    }
 
     if (!dataFilterFunc) {
       setDisplayedRows(searchResults);
