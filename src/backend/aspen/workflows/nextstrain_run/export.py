@@ -8,7 +8,6 @@ import click
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased, joinedload, with_polymorphic
 
-from aspen.api.utils import expand_lineage_wildcards
 from aspen.config.config import Config
 from aspen.database.connection import (
     get_db_uri,
@@ -31,6 +30,7 @@ from aspen.database.models import (
     UploadedPathogenGenome,
 )
 from aspen.database.models.workflow import WorkflowStatusType
+from aspen.util.lineage import expand_lineage_wildcards
 from aspen.workflows.nextstrain_run.build_config import TemplateBuilder
 
 METADATA_CSV_FIELDS = [
