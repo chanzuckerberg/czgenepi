@@ -1,4 +1,4 @@
-from aspen.api.utils.lineage import expand_lineage_wildcards
+from aspen.util.lineage import expand_lineage_wildcards
 
 
 def test_expand_lineage_aliases():
