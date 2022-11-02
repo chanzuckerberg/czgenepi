@@ -283,5 +283,5 @@ tf-lint:
 ### GitHub Actions ###################################################
 .PHONY: gha-setup
 gha-setup:
-	join_cmd=$$(docker swarm init 2>&1 | grep 'swarm join --token'); $$join_cmd
+	docker swarm init
 	echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
