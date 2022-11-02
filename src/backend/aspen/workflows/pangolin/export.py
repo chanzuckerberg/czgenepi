@@ -26,14 +26,14 @@ from aspen.database.models import Sample, UploadedPathogenGenome
         case_sensitive=False,
     ),
     required=False,
+    default="pathogen_genome_entity_id"
 )
 def cli(
     samples_fh: io.TextIOBase,
     sequences_fh: io.TextIOBase,
-    fasta_identifier: str = "pathogen_genome_entity_id",
+    fasta_identifier: str,
 ):
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
-
     sample_public_identifiers: list[str] = samples_fh.read().split("\n")
 
     with session_scope(interface) as session:
@@ -48,14 +48,14 @@ def cli(
         )
 
         for sample in all_samples:
+            pathogen_genome = sample.uploaded_pathogen_genome
+
             if fasta_identifier == "public_identifier":
                 identifier = sample.public_identifier
             if fasta_identifier == "private_identifier":
                 identifier = sample.private_identifier
             if fasta_identifier == "pathogen_genome_entity_id":
                 identifier = pathogen_genome.entity_id
-
-            pathogen_genome = sample.uploaded_pathogen_genome
 
             sequence: str = "".join(
                 [
