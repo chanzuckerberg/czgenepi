@@ -21,6 +21,7 @@ from aspen.database.models import (
     SampleQCMetric,
 )
 
+
 @click.command("save")
 @click.option("nextclade_fh", "--nextclade-csv", type=click.File("r"), required=True)
 @click.option("nextclade_version", "--nextclade-version", type=str, required=True)
@@ -120,7 +121,7 @@ def cli(
                     sample_lineage.lineage_software_version = nextclade_version
                     sample_lineage.lineage = row["clade"]
                 session.add(sample_lineage)
-            
+
         session.commit()
 
 

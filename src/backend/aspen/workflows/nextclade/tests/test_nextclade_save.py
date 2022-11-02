@@ -1,10 +1,8 @@
-import os
-from datetime import datetime
 from pathlib import Path, PosixPath
-from typing import Collection
 
 from click.testing import CliRunner, Result
 
+from aspen.database.models import SampleLineage, SampleQCMetric
 from aspen.database.models.sample import Sample
 from aspen.database.models.sequences import UploadedPathogenGenome
 from aspen.database.models.usergroup import Group
@@ -14,7 +12,6 @@ from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 from aspen.workflows.nextclade.save import cli as save_cli
-from aspen.database.models import SampleLineage, SampleMutation, SampleQCMetric
 
 
 def create_test_data(session):
@@ -70,7 +67,16 @@ def test_nextclade_save(mocker, session, postgres_database):
     runner: CliRunner = CliRunner()
     result: Result = runner.invoke(
         save_cli,
-        ["--nextclade-csv", nextclade_csv, "--nextclade-version", "v1.1", "--group-name", group.name, "--pathogen-slug", "MPX"],
+        [
+            "--nextclade-csv",
+            nextclade_csv,
+            "--nextclade-version",
+            "v1.1",
+            "--group-name",
+            group.name,
+            "--pathogen-slug",
+            "MPX",
+        ],
     )
 
     assert result.exit_code == 0
@@ -79,14 +85,19 @@ def test_nextclade_save(mocker, session, postgres_database):
     session.close()
     session.begin()
 
-    sample = session.query(Sample).filter(Sample.public_identifier=="public_identifier_1").one()
+    sample = (
+        session.query(Sample)
+        .filter(Sample.public_identifier == "public_identifier_1")
+        .one()
+    )
 
-    qc_metrics = session.query(SampleQCMetric).filter(SampleQCMetric.sample==sample).one()
-    lineage = session.query(SampleLineage).filter(SampleLineage.sample==sample).one()
-    
+    qc_metrics = (
+        session.query(SampleQCMetric).filter(SampleQCMetric.sample == sample).one()
+    )
+    lineage = session.query(SampleLineage).filter(SampleLineage.sample == sample).one()
+
     # matched against values from test nextclade.csv in test data directory
-    assert qc_metrics.qc_score == '18.062500'
+    assert qc_metrics.qc_score == "18.062500"
     assert qc_metrics.qc_status == "good"
     assert qc_metrics.qc_software_version == "v1.1"
     assert lineage.lineage == "21J (Delta)"
-
