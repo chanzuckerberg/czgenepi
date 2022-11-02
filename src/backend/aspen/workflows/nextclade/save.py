@@ -57,7 +57,8 @@ def cli(
             )
             qc_metric = session.execute(existing_qc_metric_q).scalars().one_or_none()
 
-            if not qc_metric:
+            import pdb; pdb.set_trace()
+            if qc_metric is None:
                 qc_metric = SampleQCMetric(
                     sample=sample,
                     qc_score=row["qc.overallScore"],
@@ -79,7 +80,7 @@ def cli(
                 .filter(sample == sample)
             )
             mutation = session.execute(existing_mutation_q).scalars().one_or_none()
-            if not mutation:
+            if mutation is None:
                 mutation = SampleMutation(
                     sample=sample,
                     substitutions=row["substitutions"],
@@ -110,7 +111,7 @@ def cli(
                     session.execute(existing_sample_lineage_q).scalars().one_or_none()
                 )
                 LineageType.NEXTCLADE
-                if not sample_lineage:
+                if sample_lineage is None:
                     sample_lineage = SampleLineage(
                         sample=sample,
                         lineage_type=LineageType.NEXTCLADE,
