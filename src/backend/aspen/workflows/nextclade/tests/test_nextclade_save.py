@@ -9,10 +9,8 @@ from aspen.database.models import (
     SampleLineage,
     SampleMutation,
     SampleQCMetric,
+    UploadedPathogenGenome
 )
-from aspen.database.models.sample import Sample
-from aspen.database.models.sequences import UploadedPathogenGenome
-from aspen.database.models.usergroup import Group
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.sample import sample_factory
