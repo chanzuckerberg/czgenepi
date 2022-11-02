@@ -37,7 +37,6 @@ def cli(
     with session_scope(interface) as session:
         nextclade_csv: csv.DictReader = csv.DictReader(nextclade_fh, delimiter=";")
         for row in nextclade_csv:
-            print(row["seqName"])
             sample_q = (
                 sa.select(Sample)
                 .join(Sample.submitting_group)
@@ -49,7 +48,6 @@ def cli(
                 )
             )
             sample = session.execute(sample_q).scalars().one()
-            print(sample.public_identifier)
             existing_qc_metric_q = (
                 sa.select(SampleQCMetric)
                 .join(SampleQCMetric.sample)
