@@ -122,6 +122,7 @@ def cli(
                     sample_lineage.lineage = row["clade"]
                 session.add(sample_lineage)
 
+        # TODO: commit session after 1000 entries to limit transaction size
         session.commit()
 
 
