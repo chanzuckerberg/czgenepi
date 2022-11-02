@@ -73,7 +73,6 @@ def test_nextclade_save(mocker, session, postgres_database):
         ["--nextclade-csv", nextclade_csv, "--nextclade-version", "v1.1", "--group-name", group.name, "--pathogen-slug", "MPX"],
     )
 
-    import pdb; pdb.set_trace()
     assert result.exit_code == 0
 
     # start new transaction
@@ -84,7 +83,7 @@ def test_nextclade_save(mocker, session, postgres_database):
 
     qc_metrics = session.query(SampleQCMetric).filter(SampleQCMetric.sample==sample).one()
     lineage = session.query(SampleLineage).filter(SampleLineage.sample==sample).one()
-
+    
     assert qc_metrics.qc_score == 18.062500
     assert qc_metrics.qc_status == "good"
     assert qc_metrics.qc_software_version == "v1.1"
