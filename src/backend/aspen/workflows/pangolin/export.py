@@ -26,7 +26,7 @@ from aspen.database.models import Sample, UploadedPathogenGenome
         case_sensitive=False,
     ),
     required=False,
-    default="pathogen_genome_entity_id"
+    default="pathogen_genome_entity_id",
 )
 def cli(
     samples_fh: io.TextIOBase,

@@ -9,7 +9,7 @@ from aspen.database.models import (
     SampleLineage,
     SampleMutation,
     SampleQCMetric,
-    UploadedPathogenGenome
+    UploadedPathogenGenome,
 )
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import random_pathogen_factory
