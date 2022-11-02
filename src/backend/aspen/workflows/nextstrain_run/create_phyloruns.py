@@ -43,7 +43,7 @@ def create_phylo_run(
 ):
 
     user = session.query(User).filter(User.email == "hello@czgenepi.org").one()
-    aligned_gisaid_dump = (
+    aligned_repo_data = (
         session.query(AlignedRepositoryData)
         .join(AlignedRepositoryData.producing_workflow)
         .filter(AlignedRepositoryData.pathogen == pathogen)
@@ -60,7 +60,7 @@ def create_phylo_run(
         group=group,
         tree_type=tree_type,
     )
-    workflow.inputs = [aligned_gisaid_dump]
+    workflow.inputs = [aligned_repo_data]
     workflow.template_args = template_args
     workflow.name = f"{group.name} Contextual Recency-Focused Build"
     workflow.user = user
