@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.api.deps import get_db
 from aspen.api.schemas.pango_lineages import PangoLineagesResponse
-from aspen.api.utils.lineage import NEXTSTRAIN_LINEAGE_MAP, WHO_LINEAGE_MAP
 from aspen.database.models import PangoLineage
+from aspen.util.lineage import NEXTSTRAIN_LINEAGE_MAP, WHO_LINEAGE_MAP
 
 router = APIRouter()
 
