@@ -56,9 +56,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Lint ts
         run: |
-          docker swarm init
-          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build frontend image
+          make gha-setup
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
           make frontend-check-style
   ts-test:
@@ -79,8 +78,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Test ts
         run: |
-          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build frontend
+          make gha-setup
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-frontend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-frontend:latest src/frontend
           make frontend-tests
   ts-test-build:
@@ -101,7 +100,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Test ts build
         run: |
-          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          make gha-setup
           mkdir src/frontend/build
           chmod -R a+w src/frontend/build
           # Build frontend
@@ -125,8 +124,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Lint Python
         run: |
-          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
           # Build backend
+          make gha-setup
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
           make backend-check-style
   # run Playwright E2E tests
@@ -153,7 +152,7 @@ jobs:
   #         install_globally: "true"
   #     - name: Playwright tests
   #       run: |
-  #         echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+  #         make gha-setup
   #         # Build backend image
   #         docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
   #         # Build frontend
@@ -191,7 +190,7 @@ jobs:
           install_globally: "true"
       - name: Test Python
         run: |
-          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          make gha-setup
           # Build backend image
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-backend:latest src/backend
           make local-init LOCALDEV_PROFILE=backend
@@ -219,7 +218,7 @@ jobs:
           install_globally: "true"
       - name: Test Gisaid workflow
         run: |
-          echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
+          make gha-setup
           # Build backend image
           docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-gisaid:latest -f Dockerfile.gisaid src/backend
           make local-init LOCALDEV_PROFILE=backend
