@@ -55,7 +55,7 @@ def cli(
             if fasta_identifier == "private_identifier":
                 identifier = sample.private_identifier
             if fasta_identifier == "pathogen_genome_entity_id":
-                identifier = pathogen_genome.entity_id
+                identifier = pathogen_genome.entity_id  # type: ignore
 
             sequence: str = "".join(
                 [
