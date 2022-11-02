@@ -3,6 +3,7 @@ import { compact, map, uniq } from "lodash";
 import { useEffect, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
+import { IdMap } from "src/common/utils/dataTransforms";
 import { FilterPanel } from "src/components/FilterPanel";
 import { SearchBar } from "src/components/Table/components/SearchBar";
 import { StyledView } from "../../style";
@@ -25,10 +26,19 @@ const SamplesView = (): JSX.Element => {
   // load sample data from server
   const { data: samples, isFetching, isLoading } = useSampleInfo();
 
-  // load data into table on first load only
+  // only display rows that match the current search and the current filters
   useEffect(() => {
-    setDisplayedRows(samples);
-  }, []);
+    const hasSearchFilteredRows = Object.keys(searchResults).length > 0;
+    if (!hasSearchFilteredRows) return;
+
+    if (!dataFilterFunc) {
+      setDisplayedRows(searchResults);
+      return;
+    }
+
+    const filteredRows = dataFilterFunc(searchResults);
+    setDisplayedRows(filteredRows);
+  }, [searchResults, dataFilterFunc]);
 
   // update list of lineages to use in the filter panel on the left side of the screen
   useEffect(() => {
@@ -38,17 +48,6 @@ const SamplesView = (): JSX.Element => {
 
     setLineages(newLineages);
   }, [samples]);
-
-  // only display rows that match the current search and the current filters
-  useEffect(() => {
-    if (!dataFilterFunc) {
-      setDisplayedRows(searchResults);
-      return;
-    }
-
-    const filteredRows = dataFilterFunc(searchResults);
-    setDisplayedRows(filteredRows);
-  }, [searchResults, dataFilterFunc]);
 
   const toggleFilterPanel = () => {
     setIsFilterPanelOpen(!isFilterPanelOpen);
