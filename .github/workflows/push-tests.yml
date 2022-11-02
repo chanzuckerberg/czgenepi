@@ -219,9 +219,9 @@ jobs:
       - name: Test Gisaid workflow
         run: |
           make gha-setup
-          # Build backend image
-          docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-gisaid:latest -f src/backend/Dockerfile.gisaid src/backend
-          make local-init LOCALDEV_PROFILE=backend
+          # Build gisaid image
+          # docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-gisaid:latest -f src/backend/Dockerfile.gisaid src/backend
+          make local-init LOCALDEV_PROFILE=gisaid
           python3 -m pip install miniwdl
           make pipeline-test-gisaid
   build-push-images:

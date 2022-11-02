@@ -3,7 +3,7 @@ version: "3.8"
 services:
   database:
     image: "${DOCKER_REPO}genepi-devdb:latest"
-    profiles: [ "backend", "web", "all" ]
+    profiles: [ "backend", "web", "gisaid", "all" ]
     platform: linux/amd64
     ports:
       - "5432:5432"
@@ -55,7 +55,7 @@ services:
           - frontend.genepinet.localdev
   backend:
     image: "${DOCKER_REPO}genepi-backend"
-    profiles: [ "backend", "web", "all" ]
+    profiles: [ "backend", "web", "gisaid", "all" ]
     platform: linux/amd64
     build:
       context: src/backend
@@ -104,7 +104,7 @@ services:
           - backend.genepinet.localdev
   localstack:
     image: localstack/localstack:0.13.0
-    profiles: [ "backend", "web", "all" ]
+    profiles: [ "backend", "web", "gisaid", "all" ]
     ports:
       - "4566:4566"
       - "8083:8083"
@@ -126,7 +126,7 @@ services:
           - localstack.genepinet.localdev
   oidc:
     image: ghcr.io/soluto/oidc-server-mock:latest
-    profiles: [ "backend", "web", "all" ]
+    profiles: [ "backend", "web", "gisaid", "all" ]
     ports:
       - "4011:80"
       - "8443:8443"
