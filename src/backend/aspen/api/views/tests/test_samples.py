@@ -18,9 +18,10 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     User,
 )
-from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import pathogen_factory, random_pathogen_factory
+from aspen.test_infra.models.repo_metadata import repo_metadata_factory
+from aspen.test_infra.models.repository import random_default_repo_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import (
@@ -28,6 +29,7 @@ from aspen.test_infra.models.usergroup import (
     grouprole_factory,
     userrole_factory,
 )
+from aspen.util.split import SplitClient
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -1169,27 +1171,27 @@ async def test_update_samples_request_failures(
         assert res.status_code == response_code
 
 
-async def setup_validation_data(async_session: AsyncSession):
+async def setup_validation_data(async_session: AsyncSession, split_client: SplitClient):
     group = group_factory()
     pathogen = random_pathogen_factory()
+    repo = random_default_repo_factory(split_client)
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
     sample = sample_factory(group, user, location, pathogen=pathogen)
-    gisaid_sample = gisaid_metadata_factory()
-    isl_sample = gisaid_metadata_factory(
-        strain="USA/ISL-TEST/hCov-19", gisaid_epi_isl="EPI_ISL_3141592"
+    strain_sample = repo_metadata_factory(pathogen, repo)
+    isl_sample = repo_metadata_factory(
+        pathogen, repo, strain="USA/ISL-TEST/hCov-19", isl="EPI_ISL_3141592"
     )
-    async_session.add_all([group, pathogen, sample, gisaid_sample, isl_sample])
+    async_session.add_all([group, pathogen, sample, strain_sample, isl_sample])
     await async_session.commit()
 
-    return user, group, pathogen, sample, gisaid_sample, isl_sample
+    return user, group, pathogen, repo, sample, strain_sample, isl_sample
 
 
 async def test_validation_endpoint(
-    async_session: AsyncSession,
-    http_client: AsyncClient,
+    async_session: AsyncSession, http_client: AsyncClient, split_client: SplitClient
 ):
     """
     Test that validation endpoint is correctly identifying identifiers that are in the DB, and that samples are properly stripped of hCoV-19/ prefix
@@ -1199,17 +1201,18 @@ async def test_validation_endpoint(
         user,
         group,
         pathogen,
+        repo,
         sample,
         gisaid_sample,
         isl_sample,
-    ) = await setup_validation_data(async_session)
+    ) = await setup_validation_data(async_session, split_client)
 
     # add hCoV-19/ as prefix to gisaid identifier to check that stripping of prefix is being done correctly
     data = {
         "sample_ids": [
             sample.public_identifier,
             f"hCoV-19/{gisaid_sample.strain}",
-            isl_sample.gisaid_epi_isl,
+            isl_sample.isl,
         ],
     }
     auth_headers = {"user_id": user.auth0_user_id}
@@ -1225,8 +1228,7 @@ async def test_validation_endpoint(
 
 
 async def test_validation_endpoint_missing_identifier(
-    async_session: AsyncSession,
-    http_client: AsyncClient,
+    async_session: AsyncSession, http_client: AsyncClient, split_client: SplitClient
 ):
     """
     Test that validation endpoint is correctly identifying identifiers that are not aspen public or private ids or gisaid ids
@@ -1236,15 +1238,16 @@ async def test_validation_endpoint_missing_identifier(
         user,
         group,
         pathogen,
+        repo,
         sample,
         gisaid_sample,
         isl_sample,
-    ) = await setup_validation_data(async_session)
+    ) = await setup_validation_data(async_session, split_client)
     data = {
         "sample_ids": [
             sample.public_identifier,
             gisaid_sample.strain,
-            isl_sample.gisaid_epi_isl,
+            isl_sample.isl,
             "this_is_missing",
         ],
     }

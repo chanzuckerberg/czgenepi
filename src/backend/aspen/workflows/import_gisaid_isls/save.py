@@ -16,7 +16,12 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Accession, AccessionType, GisaidMetadata, Sample
+from aspen.database.models import (
+    Accession,
+    AccessionType,
+    PublicRepositoryMetadata,
+    Sample,
+)
 
 
 def save():
@@ -34,13 +39,13 @@ def save():
                 literal_column(f"'{AccessionType.GISAID_ISL.value}'").label(
                     "accession_type"
                 ),
-                GisaidMetadata.gisaid_epi_isl,
+                PublicRepositoryMetadata.isl,
             )
             .select_from(Sample)
             .join(
-                GisaidMetadata,
+                PublicRepositoryMetadata,
                 func.regexp_replace(Sample.public_identifier, "^hcov-19/", "", "i")
-                == GisaidMetadata.strain,
+                == PublicRepositoryMetadata.strain,
             )
             .subquery()
         )

@@ -4,32 +4,12 @@ import sqlalchemy as sa
 
 from aspen.database.models import (
     AlignedRepositoryData,
-    GisaidMetadata,
     Location,
     Pathogen,
     PublicRepository,
     PublicRepositoryMetadata,
     Workflow,
 )
-
-
-def test_gisiad_db_objects_were_created(session):
-    sample = (
-        session.execute(
-            sa.select(GisaidMetadata).where(
-                GisaidMetadata.strain == "Wuhan/TEST_SAMPLE/2019"
-            )
-        )
-        .scalars()
-        .one()
-    )
-    assert sample.strain == "Wuhan/TEST_SAMPLE/2019"
-    assert sample.pango_lineage == "B"
-    assert sample.region == "Asia"
-    assert sample.country == "China"
-    assert sample.division == "Hubei"
-    assert sample.location == "Test Location"
-    assert sample.gisaid_epi_isl == "TEST_EPI_ISL_123"
 
 
 def test_public_repo_db_objects_were_created(session):
