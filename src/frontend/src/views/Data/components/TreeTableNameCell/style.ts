@@ -70,6 +70,10 @@ export const StyledTreeCreator = styled.div`
   }}
 `;
 
+export const StyledDetailsTooltipTarget = styled.p`
+  cursor: pointer;
+`;
+
 export const StyledTreeIconWrapper = styled.div`
   ${iconFillGray}
   ${(props) => {
