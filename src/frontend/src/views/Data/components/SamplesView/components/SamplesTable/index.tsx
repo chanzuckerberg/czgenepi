@@ -1,6 +1,13 @@
-import { CellBasic, CellHeader, Checkbox, Table, TableHeader, TableRow } from "czifui";
 import {
-  createColumnHelper,
+  CellBasic,
+  CellHeader,
+  Checkbox,
+  Table,
+  TableHeader,
+  TableRow,
+} from "czifui";
+import {
+  ColumnDef,
   flexRender,
   getCoreRowModel,
   RowSelectionState,
@@ -8,8 +15,7 @@ import {
 } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
-import { useEffect, useRef, useState } from "react";
-import { getValue } from "@mui/system";
+import { useEffect, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 
 // TODO-TR (mlila): types
@@ -18,86 +24,59 @@ interface Props {
   isLoading: boolean;
 }
 
-const columns = [
+const columns: ColumnDef<Sample, any>[] = [
   {
-    id: 'select',
+    id: "select",
     header: ({ table }) => {
       const {
         getIsAllRowsSelected,
         getIsSomeRowsSelected,
-        getToggleAllRowsSelectedHandler
+        getToggleAllRowsSelectedHandler,
       } = table;
 
       const isChecked = getIsAllRowsSelected();
       const isIndeterminate = getIsSomeRowsSelected();
-      const checkboxStage = isChecked ? "checked" : (
-        isIndeterminate ? "indeterminate" : "unchecked"
-      );
+      const checkboxStage = isChecked
+        ? "checked"
+        : isIndeterminate
+        ? "indeterminate"
+        : "unchecked";
 
       const onChange = getToggleAllRowsSelectedHandler();
 
-      return (
-        <Checkbox
-          stage={checkboxStage}
-          onChange={onChange}
-        />
-      );
+      return <Checkbox stage={checkboxStage} onChange={onChange} />;
     },
     cell: ({ row }) => {
-      const {
-        getIsSelected,
-        getToggleSelectedHandler,
-      } = row;
+      const { getIsSelected, getToggleSelectedHandler } = row;
 
       const checkboxStage = getIsSelected() ? "checked" : "unchecked";
       const onChange = getToggleSelectedHandler();
 
-      return (
-        <Checkbox
-          stage={checkboxStage}
-          onChange={onChange}
-        />
-      );
+      return <Checkbox stage={checkboxStage} onChange={onChange} />;
     },
   },
   {
     id: "privateId",
     accessorKey: "privateId",
-    header: () => (
-      <CellHeader>
-        Private ID
-      </CellHeader>
-    ),
+    header: () => <CellHeader>Private ID</CellHeader>,
     cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
   },
   {
     id: "publicId",
     accessorKey: "publicId",
-    header: () => (
-      <CellHeader>
-        Public ID
-      </CellHeader>
-    ),
+    header: () => <CellHeader>Public ID</CellHeader>,
     cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
   },
   {
     id: "collectionDate",
     accessorKey: "collectionDate",
-    header: () => (
-      <CellHeader>
-        Collection Date
-      </CellHeader>
-    ),
+    header: () => <CellHeader>Collection Date</CellHeader>,
     cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
   },
   {
     id: "lineage",
     accessorKey: "lineage",
-    header: () => (
-      <CellHeader>
-        Lineage
-      </CellHeader>
-    ),
+    header: () => <CellHeader>Lineage</CellHeader>,
     cell: ({ getValue }) => {
       const { lineage } = getValue();
       return <CellBasic primaryText={lineage} />;
@@ -106,43 +85,27 @@ const columns = [
   {
     id: "uploadDate",
     accessorKey: "uploadDate",
-    header: () => (
-      <CellHeader>
-        Upload Date
-      </CellHeader>
-    ),
+    header: () => <CellHeader>Upload Date</CellHeader>,
     cell: ({ getValue }) => (
       <CellBasic primaryText={datetimeWithTzToLocalDate(getValue())} />
-    )
+    ),
   },
   {
     id: "collectionLocation",
     accessorKey: "collectionLocation",
-    header: () => (
-      <CellHeader>
-        Collection Location
-      </CellHeader>
-    ),
-    cell: ({ getValue }) => <CellBasic primaryText={getValue().location} />
+    header: () => <CellHeader>Collection Location</CellHeader>,
+    cell: ({ getValue }) => <CellBasic primaryText={getValue().location} />,
   },
   {
     id: "sequencingDate",
     accessorKey: "sequencingDate",
-    header: () => (
-      <CellHeader>
-        Sequencing Date
-      </CellHeader>
-    ),
-    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />
+    header: () => <CellHeader>Sequencing Date</CellHeader>,
+    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
   },
   {
     id: "gisaid",
     accessorKey: "gisaid",
-    header: () => (
-      <CellHeader>
-        GISAID
-      </CellHeader>
-    ),
+    header: () => <CellHeader>GISAID</CellHeader>,
     cell: ({ getValue }) => {
       const { status } = getValue();
       return <CellBasic primaryText={status} />;
@@ -180,22 +143,20 @@ const SamplesTable = ({ data, isLoading }: Props): JSX.Element => {
   return (
     <Table>
       <TableHeader>
-        {table.getLeafHeaders().map((header) => (
-            flexRender(
-              header.column.columnDef.header,
-              header.getContext()
-            )
-        ))}
+        {table
+          .getLeafHeaders()
+          .map((header) =>
+            flexRender(header.column.columnDef.header, header.getContext())
+          )}
       </TableHeader>
       <tbody>
         {table.getRowModel().rows.map((row) => (
           <TableRow key={row.id}>
-            {row.getVisibleCells().map((cell) => (
-              flexRender(
-                cell.column.columnDef.cell,
-                cell.getContext()
-              )
-            ))}
+            {row
+              .getVisibleCells()
+              .map((cell) =>
+                flexRender(cell.column.columnDef.cell, cell.getContext())
+              )}
           </TableRow>
         ))}
       </tbody>
