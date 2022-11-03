@@ -186,6 +186,7 @@ def export_run_config(
         context = {
             "num_sequences": num_sequences,
             "num_included_samples": num_included_samples,
+            "run_start_datetime": phylo_run.start_datetime,  # can be None
         }
 
         # Some template args need to be resolved before ready to use.
