@@ -74,6 +74,22 @@ async def get_pathogen(
         raise ex.BadRequestException("Invalid pathogen slug")
 
 
+async def get_public_repository(
+    pathogen: Pathogen = Depends(get_pathogen),
+    db: AsyncSession = Depends(get_db),
+    split_client: SplitClient = Depends(get_splitio),
+) -> PublicRepository:
+    preferred_public_db = split_client.get_pathogen_treatment(
+        "PATHOGEN_public_repository", pathogen
+    )
+
+    try:
+        repo = (await db.execute(sa.select(PublicRepository).filter_by(name=preferred_public_db))).scalars().one()  # type: ignore
+        return repo
+    except NoResultFound:
+        raise ex.BadRequestException("Invalid public repository")
+
+
 async def get_pathogen_repo_config(
     splitio: SplitClient = Depends(get_splitio),
     pathogen: Pathogen = Depends(get_pathogen),

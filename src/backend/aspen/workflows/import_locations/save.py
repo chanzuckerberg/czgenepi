@@ -15,7 +15,7 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import GisaidMetadata, Location
+from aspen.database.models import Location, PublicRepositoryMetadata
 
 
 def save():
@@ -26,12 +26,17 @@ def save():
         # Insert all locations from gisaid_metadata
         gisaid_locations_select = (
             sa.select(
-                GisaidMetadata.region,
-                GisaidMetadata.country,
-                GisaidMetadata.division,
-                GisaidMetadata.location,
+                PublicRepositoryMetadata.region,
+                PublicRepositoryMetadata.country,
+                PublicRepositoryMetadata.division,
+                PublicRepositoryMetadata.location,
             )
-            .where(and_(GisaidMetadata.location != "", GisaidMetadata.location != None))
+            .where(
+                and_(
+                    PublicRepositoryMetadata.location != "",
+                    PublicRepositoryMetadata.location != None,
+                )
+            )
             .distinct()
         )
         gisaid_locations_insert = (
@@ -56,9 +61,9 @@ def save():
         )
 
         gisaid_null_locations_select = sa.select(
-            GisaidMetadata.region,
-            GisaidMetadata.country,
-            GisaidMetadata.division,
+            PublicRepositoryMetadata.region,
+            PublicRepositoryMetadata.country,
+            PublicRepositoryMetadata.division,
         ).distinct()
         gisaid_null_locations = set(session.execute(gisaid_null_locations_select).all())
 
@@ -91,7 +96,7 @@ def save():
         )
 
         country_level_loc_select = sa.select(
-            GisaidMetadata.region, GisaidMetadata.country
+            PublicRepositoryMetadata.region, PublicRepositoryMetadata.country
         ).distinct()
         country_level_locations = set(session.execute(country_level_loc_select).all())
 
