@@ -67,6 +67,7 @@ export const StyledTreeCreator = styled.div`
     return `
       color: ${colors?.gray[500]};
       margin-top: ${spaces?.xxxs}px;
+      height: ${spaces?.l}px;
     `;
   }}
 `;
