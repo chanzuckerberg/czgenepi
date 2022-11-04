@@ -12,6 +12,7 @@ import NextstrainConfirmationModal from "../NextstrainConfirmationModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
 import {
   CellWrapper,
+  popperPropsSx,
   StyledDetailsTooltipTarget,
   StyledInfoIconWrapper,
   StyledNameWrapper,
@@ -130,10 +131,10 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
             </span>
             <StyledTreeCreator data-test-id="tree-creator-name">
               <Tooltip
-                placement="bottom-end"
+                placement="bottom-start"
                 title={<TooltipTable data={detailsData} itemAlign="left" />}
                 onOpen={onDetailsOpen}
-                width="wide"
+                PopperProps={popperPropsSx}
               >
                 <StyledDetailsTooltipTarget>Details</StyledDetailsTooltipTarget>
               </Tooltip>

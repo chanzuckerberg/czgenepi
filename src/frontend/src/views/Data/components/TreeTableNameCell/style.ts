@@ -6,6 +6,7 @@ import {
   getColors,
   getSpaces,
 } from "czifui";
+
 import { TreeRowContent } from "src/common/components/library/data_table/style";
 import {
   iconFillGray,
@@ -84,3 +85,19 @@ export const StyledTreeIconWrapper = styled.div`
     `;
   }}
 `;
+
+export const popperPropsSx = {
+  sx: {
+    "& .MuiTooltip-tooltip": {
+      width: "350px",
+      maxWidth: "none !important",
+      padding: "10px !important",
+    },
+    "& .MuiTableRow-root": {
+      verticalAlign: "top",
+    },
+    "& .MuiTableCell-root": {
+      width: "25%",
+    },
+  },
+};
