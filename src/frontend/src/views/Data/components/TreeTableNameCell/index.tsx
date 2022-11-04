@@ -1,5 +1,10 @@
 import { Icon, Tooltip, TooltipTable } from "czifui";
 import { SyntheticEvent, useMemo, useState } from "react";
+import {
+  AnalyticsTreeDetailsView,
+  EVENT_TYPES,
+} from "src/common/analytics/eventTypes";
+import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { StyledTooltip } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { TREE_STATUS } from "src/common/constants/types";
 import { useGroupInfo } from "src/common/queries/groups";
@@ -90,7 +95,12 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
 
   const onDetailsOpen = (event: SyntheticEvent<Element, Event>) => {
     event.stopPropagation();
-    // TODO: analytics event
+    analyticsTrackEvent<AnalyticsTreeDetailsView>(
+      EVENT_TYPES.TREE_DETAILS_VIEW,
+      {
+        tree_id: treeId || null,
+      }
+    );
   };
 
   const filterDetails = [
