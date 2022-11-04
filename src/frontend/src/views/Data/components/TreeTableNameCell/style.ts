@@ -92,7 +92,10 @@ export const popperPropsSx = {
     "& .MuiTooltip-tooltip": {
       width: "350px",
       maxWidth: "none !important",
-      padding: "10px !important",
+    },
+    "& .MuiTable-root": {
+      borderCollapse: "separate",
+      borderSpacing: "8px",
     },
     "& .MuiTableRow-root": {
       verticalAlign: "top",
