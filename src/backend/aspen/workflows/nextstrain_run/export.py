@@ -2,9 +2,10 @@ import csv
 import io
 import json
 import re
-from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional, Set
+from typing import Any, Dict, IO, Iterable, List, Mapping, MutableMapping, Optional, Set
 
 import click
+import sqlalchemy as sa
 from sqlalchemy.orm import aliased, joinedload, with_polymorphic
 
 from aspen.config.config import Config
@@ -22,12 +23,14 @@ from aspen.database.models import (
     Entity,
     Group,
     Location,
+    PangoLineage,
     PathogenGenome,
     PhyloRun,
     Sample,
     UploadedPathogenGenome,
 )
 from aspen.database.models.workflow import WorkflowStatusType
+from aspen.util.lineage import expand_lineage_wildcards
 from aspen.workflows.nextstrain_run.build_config import TemplateBuilder
 
 METADATA_CSV_FIELDS = [
@@ -67,6 +70,12 @@ METADATA_CSV_FIELDS = [
     "selected_fh", "--selected", type=click.File("w", lazy=False), required=True
 )
 @click.option("metadata_fh", "--metadata", type=click.File("w"), required=True)
+@click.option(
+    "resolved_template_args_fh",
+    "--resolved-template-args",
+    type=click.File("w"),
+    required=True,
+)
 @click.option("builds_file_fh", "--builds-file", type=click.File("w"), required=True)
 @click.option(
     "--reset-status",
@@ -82,6 +91,7 @@ def cli(
     selected_fh: io.TextIOWrapper,
     metadata_fh: io.TextIOWrapper,
     builds_file_fh: io.TextIOWrapper,
+    resolved_template_args_fh: IO[str],
     reset_status: bool,
     test: bool,
     builds_file_only: bool,
@@ -97,6 +107,7 @@ def cli(
         sequences_fh,
         selected_fh,
         metadata_fh,
+        resolved_template_args_fh,
         builds_file_fh,
         reset_status,
     )
@@ -135,6 +146,7 @@ def export_run_config(
     sequences_fh: io.TextIOBase,
     selected_fh: io.TextIOBase,
     metadata_fh: io.TextIOBase,
+    resolved_template_args_fh: IO[str],
     builds_file_fh: io.TextIOBase,
     reset_status: bool = False,
 ):
@@ -180,6 +192,8 @@ def export_run_config(
         resolved_template_args = resolve_template_args(
             session, phylo_run.template_args, group
         )
+        # Keep a record of what they resolved to. Make permanent in `save.py`
+        save_resolved_template_args(resolved_template_args_fh, resolved_template_args)
 
         builder: TemplateBuilder = TemplateBuilder(
             phylo_run.tree_type,
@@ -236,19 +250,39 @@ def get_phylo_run(session, phylo_run_id):
     return phylo_run
 
 
+def resolve_filter_pango_lineages(
+    session: Session, template_args: Dict[str, Any]
+) -> Optional[List[str]]:
+    """Takes raw lineage filter, expands it. Helper for `resolve_template_args`
+
+    User can specify the lineages they want a tree build to filter on and are
+    able to use wildcards and some other, non-pango lineages as part of that.
+    Downstream needs Pango-only lineages. This handles using the originally
+    provided `filter_pango_lineages` arg and converting it. If arg was not
+    present in original template_args, returns None instead.
+    """
+    lineage_list = template_args.get("filter_pango_lineages")
+    if lineage_list is None:  # short-circuit if template arg was not present
+        return None
+    all_lineages_query = sa.select(PangoLineage.lineage)
+    # Utility that does expansion depends on having set of all lineages.
+    all_lineages = set(session.execute(all_lineages_query).scalars().all())
+    return expand_lineage_wildcards(all_lineages, lineage_list)
+
+
 def resolve_template_args(
     session: Session, template_args: Dict[str, Any], group: Group
 ) -> Dict[str, Any]:
     """Takes raw template_args and interprets them so ready for downstream use.
 
-    Some of the raw args from upstream (eg, `location_id`) need to resolved
+    Some of the raw args from upstream (eg, `location_id`) need to be resolved
     into something usable downstream. There's no definite line between args
     that can stay "raw" and those that need to be interpreted. Generally, it's
     if it needs (A) to involve database usage or (B) to make a clearer version
     of the arg for eventual display to user (eg, in the trees table).
     """
     # We do not pass thru any template_args that get special interpretation
-    NON_PASSTHRU_ARGS = ["location_id"]
+    NON_PASSTHRU_ARGS = ["location_id", "filter_pango_lineages"]
 
     # Handle location. If custom set, use that, otherwise use group's default.
     resolved_location = group.default_tree_location
@@ -258,12 +292,43 @@ def resolve_template_args(
             session.query(Location).filter(Location.id == custom_location_id).one()
         )
 
+    resolved_filter_pango_lineages = resolve_filter_pango_lineages(
+        session, template_args
+    )
+
     # Avoid mutating original template_args; resolved args handled special.
     resolved_template_args = {
         key: template_args[key] for key in template_args if key not in NON_PASSTHRU_ARGS
     }
     resolved_template_args["location"] = resolved_location
+    if resolved_filter_pango_lineages:  # only use lineages if we had any
+        resolved_template_args["filter_pango_lineages"] = resolved_filter_pango_lineages
+
     return resolved_template_args
+
+
+def save_resolved_template_args(
+    resolved_template_args_fh: IO[str], resolved_template_args: Dict[str, Any]
+):
+    """Writes a JSON version of resolved template args to disk.
+
+    Intent is that we want to keep a permanent record of what the template args
+    resolved to as part of saving out a tree after its creation. Since save
+    step happens in different script `save.py`, we write them to disk here,
+    then that script loads them in before permamently recording that info."""
+    # Some of the resolved args are not directly serializable (eg, objects).
+    # We do special handling of them so we can serialize them to JSON.
+    NON_SERIALIZABLE_ARGS = ["location"]
+    json_ready_dict = {
+        key: resolved_template_args[key]
+        for key in resolved_template_args
+        if key not in NON_SERIALIZABLE_ARGS
+    }
+    # `location` is a DB object, so we manually dump to dict before JSON output
+    tree_location = resolved_template_args["location"]
+    json_ready_dict["location"] = tree_location.to_dict()
+
+    json.dump(json_ready_dict, resolved_template_args_fh)
 
 
 def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
