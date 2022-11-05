@@ -217,11 +217,9 @@ jobs:
           - dockerfile: src/backend/Dockerfile.pangolin
             context: ./src/backend/
             name: genepi-pangolin
-          # TODO [Vince]: Disabling build of QC image until ready for use.
-          # (Was creating issues with failing tests and infra problems)
-          # - dockerfile: src/backend/Dockerfile.lineage_qc
-          #   context: ./src/backend/
-          #   name: genepi-lineage-qc
+          - dockerfile: src/backend/Dockerfile.lineage_qc
+            context: ./src/backend/
+            name: genepi-lineage-qc
           - dockerfile: src/backend/Dockerfile
             context: ./src/backend/
             name: genepi-backend
