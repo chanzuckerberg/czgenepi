@@ -119,9 +119,6 @@ export default function StaticTable({
   let errorSortedMetadata: [string, Metadata][] = [];
   if (metadata !== null) {
     errorSortedMetadata = Object.entries(metadata)
-      .map(([sampleId, sampleMetadata]) => {
-        return [sampleId, sampleMetadata] as [string, Metadata];
-      })
       .sort((a, b) => {
         const aErrorSortValue = validationErrors[a[0]] == null ? 1 : 0;
         const bErrorSortValue = validationErrors[b[0]] == null ? 1 : 0;
