@@ -1,5 +1,5 @@
 import { Icon, Tooltip, TooltipTable } from "czifui";
-import { SyntheticEvent, useMemo, useState } from "react";
+import { SyntheticEvent, useState } from "react";
 import {
   AnalyticsTreeDetailsView,
   EVENT_TYPES,
@@ -10,9 +10,8 @@ import { TREE_STATUS } from "src/common/constants/types";
 import { useGroupInfo } from "src/common/queries/groups";
 import {
   foldInLocationName,
-  useNamedLocations,
+  useNamedLocationsById,
 } from "src/common/queries/locations";
-import { reduceObjectArrayToLookupDict } from "src/common/utils/dataTransforms";
 import NextstrainConfirmationModal from "../NextstrainConfirmationModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
 import {
@@ -34,7 +33,10 @@ interface Props {
 const getDateRangeString = (item: PhyloRun): string => {
   // NOTE: The start date default is covid-specific. We will need to update for
   // other pathogens
+  // Unless otherwise specified, we use all Covid samples. The first covid sample
+  // that we have is from 2019-12-23.
   const startDate = item.templateArgs?.filterStartDate || "2019-12-23";
+  // If no end date is specified, the last day is the day the tree was created
   const endDate =
     item.templateArgs?.filterEndDate || item.startedDate.slice(0, 10);
 
@@ -47,18 +49,9 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
   const treeId = phyloTree?.id;
   const userName = user?.name;
   const isDisabled = status !== TREE_STATUS.Completed || !treeId;
-  const { data: namedLocationsData } = useNamedLocations();
+  const { data: namedLocationsById } = useNamedLocationsById();
 
   const { data: groupInfo } = useGroupInfo();
-  const { namedLocationsById } = useMemo(() => {
-    if (!namedLocationsData) return {};
-    return {
-      namedLocationsById: reduceObjectArrayToLookupDict(
-        namedLocationsData.namedLocations,
-        "id"
-      ),
-    };
-  }, [namedLocationsData]);
 
   const getLocationName = () => {
     const templateLocationId = item.templateArgs?.locationId;
@@ -67,10 +60,7 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
     // tree was created with the default location, we don't need to wait
     // for the namedLocations to return. However, if the groupInfo hasn't
     // come back yet, the location will be an empty string.
-    if (
-      !templateLocationId ||
-      templateLocationId === groupInfo?.location.id.toString()
-    )
+    if (!templateLocationId || templateLocationId === groupInfo?.location.id)
       return groupInfo?.location
         ? foldInLocationName(groupInfo?.location).name
         : "";
@@ -78,7 +68,7 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
     // the group location here because it is incorrect. Instead, we show
     // nothing until the data is ready.
     if (!namedLocationsById) return "";
-    return namedLocationsById[templateLocationId].name;
+    return namedLocationsById.namedLocationsById[templateLocationId].name;
   };
 
   const handleClickOpen = () => {

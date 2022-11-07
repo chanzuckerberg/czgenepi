@@ -55,7 +55,7 @@ interface TemplateArgs {
   filterPangoLineages?: Array<string>;
   filterStartDate?: string;
   filterEndDate?: string;
-  locationId?: string;
+  locationId?: number;
 }
 
 /**
