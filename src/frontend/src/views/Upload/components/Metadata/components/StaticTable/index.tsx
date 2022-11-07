@@ -121,22 +121,18 @@ export default function StaticTable({
   // Sort entries by error status, then by sampleId
   let errorSortedMetadata: [string, Metadata][] = [];
   if (metadata !== null) {
-    errorSortedMetadata = Object.entries(metadata)
-      .map(([sampleId, sampleMetadata]) => {
-        return [sampleId, sampleMetadata] as [string, Metadata];
-      })
-      .sort((a, b) => {
-        const aErrorSortValue = validationErrors[a[0]] == null ? 1 : 0;
-        const bErrorSortValue = validationErrors[b[0]] == null ? 1 : 0;
-        if (aErrorSortValue == bErrorSortValue) {
-          return a[0].localeCompare(b[0]);
-        } else if (aErrorSortValue < bErrorSortValue) {
-          return -1;
-        } else if (aErrorSortValue > bErrorSortValue) {
-          return 1;
-        }
-        return 0;
-      });
+    errorSortedMetadata = Object.entries(metadata).sort((a, b) => {
+      const aErrorSortValue = validationErrors[a[0]] == null ? 1 : 0;
+      const bErrorSortValue = validationErrors[b[0]] == null ? 1 : 0;
+      if (aErrorSortValue == bErrorSortValue) {
+        return a[0].localeCompare(b[0]);
+      } else if (aErrorSortValue < bErrorSortValue) {
+        return -1;
+      } else if (aErrorSortValue > bErrorSortValue) {
+        return 1;
+      }
+      return 0;
+    });
   }
 
   return (

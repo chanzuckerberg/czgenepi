@@ -1,3 +1,4 @@
+// TODO-TR (mlila): delete this after samples table refactor
 /* eslint-disable react/display-name */
 import { UNDEFINED_TEXT } from "../components/library/data_table";
 

@@ -21,7 +21,6 @@ from aspen.api.schemas.phylo_runs import (
 )
 from aspen.api.settings import APISettings
 from aspen.api.utils import (
-    expand_lineage_wildcards,
     get_matching_gisaid_ids,
     get_matching_gisaid_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
@@ -129,14 +128,15 @@ async def kick_off_phylo_run(
             if not value:
                 continue  # Skip this field
             if "date" in key:
+                # Pydantic ingests as datetime.date, flip back to serialize
                 value = value.strftime("%Y-%m-%d")
-            if key == "filter_pango_lineages":
-                value = await expand_lineage_wildcards(db, value)
             if key == "location_id":
                 # Verify it's a real location before starting workflow with it
                 location = await Location.get_by_id(db, value)
                 if location is None:
                     raise ex.BadRequestException(f"location_id {value} not found")
+            # Any other key from TemplateArgsRequest schema with a non-falsey
+            # value is passed along as-is. (eg, filter_pango_lineages)
             template_args[key] = value
 
     workflow: PhyloRun = PhyloRun(
