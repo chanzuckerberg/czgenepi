@@ -1,36 +1,86 @@
-import { map } from "lodash";
+import { DefaultMenuSelectOption } from "czifui";
+import { compact, map, uniq } from "lodash";
 import { useEffect, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
+import { IdMap } from "src/common/utils/dataTransforms";
+import { FilterPanel } from "src/components/FilterPanel";
+import { SearchBar } from "src/components/Table/components/SearchBar";
+import { StyledView } from "../../style";
+import { DataNavigation } from "../DataNavigation";
+import { SamplesTable } from "./components/SamplesTable";
+import { Flex } from "./style";
 
 const SamplesView = (): JSX.Element => {
   // initialize state
-  const [isDataLoading, setIsDataLoading] = useState(false);
+  // TODO-TR (mlilia): types
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState<boolean>(true);
+  const [activeFilterCount, setActiveFilterCount] = useState<number>(0);
+  const [dataFilterFunc, setDataFilterFunc] = useState<any>();
+  const [lineages, setLineages] = useState<DefaultMenuSelectOption[]>([]);
+  // filters rows for current search query
+  const [searchResults, setSearchResults] = useState<IdMap<Sample>>({});
+  // rows that are actually shown in the table
+  const [displayedRows, setDisplayedRows] = useState<IdMap<Sample>>({});
 
   // load sample data from server
-  const sampleResponse = useSampleInfo();
-  const { data: samples, isLoading, isFetching } = sampleResponse;
+  const { data: samples, isFetching, isLoading } = useSampleInfo();
 
-  // determine whether we should show loading ui or interactive ui
+  // only display rows that match the current search and the current filters
   useEffect(() => {
-    setIsDataLoading(true);
+    const hasSearchFilteredRows = Object.keys(searchResults).length > 0;
+    if (!hasSearchFilteredRows) {
+      setDisplayedRows({});
+      return;
+    }
 
-    if (isLoading || isFetching) return;
+    if (!dataFilterFunc) {
+      setDisplayedRows(searchResults);
+      return;
+    }
 
-    setIsDataLoading(false);
-  }, [isLoading, isFetching]);
+    const filteredRows = dataFilterFunc(searchResults);
+    setDisplayedRows(filteredRows);
+  }, [searchResults, dataFilterFunc]);
 
-  if (isDataLoading) {
-    return <div>Loading ...</div>;
-  }
+  // update list of lineages to use in the filter panel on the left side of the screen
+  useEffect(() => {
+    const newLineages = uniq(compact(map(samples, (d) => d.lineage?.lineage)))
+      .sort()
+      .map((name) => ({ name }));
+
+    setLineages(newLineages);
+  }, [samples]);
+
+  const toggleFilterPanel = () => {
+    setIsFilterPanelOpen(!isFilterPanelOpen);
+  };
 
   return (
-    <>
+    <StyledView>
       <HeadAppTitle subTitle="Samples" />
-      {map(samples, (s) => (
-        <div>{s.publicId}</div>
-      ))}
-    </>
+      <DataNavigation
+        shouldShowSampleFilterToggle
+        activeFilterCount={activeFilterCount}
+        toggleFilterPanel={toggleFilterPanel}
+      />
+      <Flex>
+        <FilterPanel
+          lineages={lineages}
+          isOpen={isFilterPanelOpen}
+          setActiveFilterCount={setActiveFilterCount}
+          setDataFilterFunc={setDataFilterFunc}
+          data-test-id="menu-item-sample-count"
+        />
+        <div>
+          <SearchBar tableData={samples} onSearchComplete={setSearchResults} />
+          <SamplesTable
+            isLoading={isLoading || isFetching}
+            data={displayedRows}
+          />
+        </div>
+      </Flex>
+    </StyledView>
   );
 };
 

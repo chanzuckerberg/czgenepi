@@ -4,7 +4,9 @@ interface Transform {
   method: (inputs: any[]) => any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
+// TODO-TR (mlila): remove this type
 interface DataCategory {
+  count?: number;
   data: SampleMapType | TreeMapType;
   defaultSortKey: string[];
   headers: Header[];

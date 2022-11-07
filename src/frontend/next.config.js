@@ -112,10 +112,14 @@ module.exports = {
             svgoConfig: {
               plugins: [
                 {
-                  prefixIds: {
+                  name: "prefixIds",
+                  params: {
                     prefix: false,
                   },
-                  removeHiddenElems: {
+                },
+                {
+                  name: "removeHiddenElems",
+                  params: {
                     opacity0: false,
                   },
                 },

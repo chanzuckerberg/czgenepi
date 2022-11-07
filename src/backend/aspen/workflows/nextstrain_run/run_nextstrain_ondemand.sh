@@ -39,6 +39,9 @@ mkdir -p /ncov/my_profiles/aspen /ncov/results
 ncov_git_rev=$(cd /ncov && git rev-parse HEAD)
 echo "${ncov_git_rev}" >| "/tmp/ncov_git_rev"
 
+# We use a file to pass from `export.py` to `save.py` before writing them to DB
+RESOLVED_TEMPLATE_ARGS_SAVEFILE=/tmp/resolved_template_args.json
+
 cp /usr/src/app/aspen/workflows/nextstrain_run/nextstrain_profile/* /ncov/my_profiles/aspen/
 
 # dump the sequences, metadata, and builds.yaml for a run out to disk.
@@ -48,6 +51,7 @@ aligned_gisaid_location=$(
            --sequences /ncov/data/sequences_aspen.fasta     \
            --metadata /ncov/data/metadata_aspen.tsv         \
            --selected /ncov/data/include.txt                       \
+           --resolved-template-args "${RESOLVED_TEMPLATE_ARGS_SAVEFILE}" \
            --builds-file /ncov/my_profiles/aspen/builds.yaml       \
            --reset-status \
 )
@@ -72,7 +76,7 @@ aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .meta
 $aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" /ncov/results/
 $aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" /ncov/results/
 
-# run snakemake, if run fails export the logs from snakemake and ncov to s3 
+# run snakemake, if run fails export the logs from snakemake and ncov to s3
 (cd /ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || { $aws s3 cp /ncov/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /ncov/logs/ "${s3_prefix}/logs/ncov/" --recursive ; }
 
 # upload the tree to S3. The variable key is created to use later
@@ -95,4 +99,5 @@ python3 /usr/src/app/aspen/workflows/nextstrain_run/save.py                 \
     --phylo-run-id "${WORKFLOW_ID}"                                         \
     --bucket "${aspen_s3_db_bucket}"                                        \
     --key "${key}"                                                          \
+    --resolved-template-args "${RESOLVED_TEMPLATE_ARGS_SAVEFILE}"           \
     --tree-path /ncov/auspice/ncov_aspen.json                                \

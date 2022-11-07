@@ -1,3 +1,5 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
+import { Banner } from "czifui";
 import { Fragment, useState } from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
@@ -6,6 +8,8 @@ import HeaderLogo from "src/common/images/gen-epi-logo.svg";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import UserMenu from "../RightNav/components/UserMenu";
 import {
   Bar,
@@ -33,6 +37,12 @@ import {
  */
 export default function StaticPageNavBar(): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const flag = useTreatments([USER_FEATURE_FLAGS.multi_pathogen]);
+  const isMultiPathogenFlagOn = isUserFlagOn(
+    flag,
+    USER_FEATURE_FLAGS.multi_pathogen
+  );
 
   function toggleMobileNav() {
     setMenuOpen(!menuOpen);
@@ -112,6 +122,12 @@ export default function StaticPageNavBar(): JSX.Element {
 
   return (
     <HeaderContainer data-test-id="navbar-landing">
+      {isMultiPathogenFlagOn && (
+        <Banner
+          sdsType="primary"
+          text="CZ GEN EPI now supports multiple pathogens."
+        />
+      )}
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>
           <HeaderLogoContainer href={userInfo ? ROUTES.DATA : ROUTES.HOMEPAGE}>

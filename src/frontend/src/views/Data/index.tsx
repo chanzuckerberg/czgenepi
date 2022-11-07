@@ -19,7 +19,7 @@ import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
-import { FilterPanelToggle } from "./components/FilterPanelToggle";
+import { FilterPanelToggle } from "./components/DataNavigation/FilterPanelToggle";
 import { SamplesView } from "./components/SamplesView";
 import { TreesView } from "./components/TreesView";
 import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
@@ -244,19 +244,6 @@ const Data: FunctionComponent = () => {
 
   return (
     <Container>
-      <HeadAppTitle subTitle={subTitle} />
-
-      <Navigation data-test-id="menu-items">
-        {viewName === VIEWNAME.SAMPLES && (
-          <FilterPanelToggle
-            activeFilterCount={activeFilterCount}
-            onClick={() => {
-              setShouldShowFilters(!shouldShowFilters);
-            }}
-          />
-        )}
-        <StyledMenu>{dataJSX.menuItems}</StyledMenu>
-      </Navigation>
       <View>
         {viewName === VIEWNAME.SAMPLES && <SamplesView />}
         {viewName === VIEWNAME.TREES && <TreesView />}
