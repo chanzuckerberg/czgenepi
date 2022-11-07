@@ -1,5 +1,6 @@
 import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
 import { useEffect, useCallback, useState } from "react";
+import { Tooltip } from "czifui";
 import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { Props as CommonProps } from "../../../common/types";
@@ -12,8 +13,6 @@ import {
   StyledTableCell,
   StyledTableContainer,
   StyledTableRow,
-  StyledBodyTooltip,
-  StyledHeaderTooltip,
 } from "./style";
 import { B } from "src/common/styles/basicStyle";
 import {
@@ -141,7 +140,7 @@ export default function StaticTable({
         <MuiTable stickyHeader>
           <TableHead>
             <StyledTableRow>
-              <StyledHeaderTooltip
+              <Tooltip
                 title={
                   <>
                     <B>Sample Name (from FASTA):</B> ID of the sample, extracted
@@ -150,15 +149,15 @@ export default function StaticTable({
                 }
                 placement="bottom"
                 sdsStyle="light"
-                arrow={true}
+                arrow
               >
                 <StyledTableCell>
                   <IdColumn>
                     {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId}
                   </IdColumn>
                 </StyledTableCell>
-              </StyledHeaderTooltip>
-              <StyledHeaderTooltip
+              </Tooltip>
+              <Tooltip
                 title={
                   <>
                     <B>Private ID:</B> ID your group uses internally for the
@@ -167,13 +166,13 @@ export default function StaticTable({
                 }
                 placement="bottom"
                 sdsStyle="light"
-                arrow={true}
+                arrow
               >
                 <StyledTableCell>
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId}
                 </StyledTableCell>
-              </StyledHeaderTooltip>
-              <StyledHeaderTooltip
+              </Tooltip>
+              <Tooltip
                 title={
                   <>
                     <B>GISAID ID (Public ID):</B> ID of the sample as it appears
@@ -182,13 +181,13 @@ export default function StaticTable({
                 }
                 placement="bottom"
                 sdsStyle="light"
-                arrow={true}
+                arrow
               >
                 <StyledTableCell>
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.publicId}
                 </StyledTableCell>
-              </StyledHeaderTooltip>
-              <StyledHeaderTooltip
+              </Tooltip>
+              <Tooltip
                 title={
                   <>
                     <B>Collection Date:</B> The date the sample was collected
@@ -197,13 +196,13 @@ export default function StaticTable({
                 }
                 placement="bottom"
                 sdsStyle="light"
-                arrow={true}
+                arrow
               >
                 <StyledTableCell>
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionDate}
                 </StyledTableCell>
-              </StyledHeaderTooltip>
-              <StyledHeaderTooltip
+              </Tooltip>
+              <Tooltip
                 title={
                   <>
                     <B>Collection Location:</B> The location where sample
@@ -213,13 +212,13 @@ export default function StaticTable({
                 }
                 placement="bottom"
                 sdsStyle="light"
-                arrow={true}
+                arrow
               >
                 <StyledTableCell>
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionLocation}
                 </StyledTableCell>
-              </StyledHeaderTooltip>
-              <StyledHeaderTooltip
+              </Tooltip>
+              <Tooltip
                 title={
                   <>
                     <B>Sequencing Date:</B> Date on which the sample was
@@ -228,13 +227,13 @@ export default function StaticTable({
                 }
                 placement="bottom"
                 sdsStyle="light"
-                arrow={true}
+                arrow
               >
                 <StyledTableCell>
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate}
                 </StyledTableCell>
-              </StyledHeaderTooltip>
-              <StyledHeaderTooltip
+              </Tooltip>
+              <Tooltip
                 title={
                   <>
                     <B>Sample is Private:</B> If private, your sample will not
@@ -243,19 +242,17 @@ export default function StaticTable({
                 }
                 placement="bottom"
                 sdsStyle="light"
-                arrow={true}
+                arrow
               >
                 <PrivateTableCell align="center">
                   {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.keepPrivate}
                 </PrivateTableCell>
-              </StyledHeaderTooltip>
+              </Tooltip>
             </StyledTableRow>
           </TableHead>
           {metadata && (
-            <StyledBodyTooltip
-              title={
-                "Import metadata into this table by uploading a TSV or CSV. Download the metadata template above to get started."
-              }
+            <Tooltip
+              title="Import metadata into this table by uploading a TSV or CSV. Download the metadata template above to get started."
               placement="bottom-start"
               sdsStyle="light"
               arrow={false}
@@ -273,7 +270,7 @@ export default function StaticTable({
                   );
                 })}
               </TableBody>
-            </StyledBodyTooltip>
+            </Tooltip>
           )}
         </MuiTable>
       </StyledTableContainer>
