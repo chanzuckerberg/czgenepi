@@ -2,6 +2,7 @@ import { Icon } from "czifui";
 import { memo } from "react";
 import { getNameFromCollectionLocation } from "src/common/utils/locationUtils";
 import { Metadata } from "src/components/WebformTable/common/types";
+import { ValidationErrorRecord } from "../..";
 import {
   Id,
   PrivateContent,
@@ -9,14 +10,23 @@ import {
   StyledLockIconWrapper,
   StyledTableCell,
   StyledTableRow,
+  StyledAlertText,
+  StyledExclamationMark,
 } from "./style";
+
+const NO_CONTENT_FALLBACK = "--";
 
 interface Props {
   id: string;
   metadata: Metadata;
+  validationError: ValidationErrorRecord | null;
 }
 
-export default memo(function Row({ id, metadata }: Props): JSX.Element {
+export default memo(function Row({
+  id,
+  metadata,
+  validationError,
+}: Props): JSX.Element {
   const {
     privateId,
     collectionDate,
@@ -26,21 +36,53 @@ export default memo(function Row({ id, metadata }: Props): JSX.Element {
     publicId,
   } = metadata;
 
+  const validatedCellData: Record<
+    string,
+    React.ReactElement | string | undefined
+  > = {
+    privateId: privateId || NO_CONTENT_FALLBACK,
+    collectionDate: collectionDate || NO_CONTENT_FALLBACK,
+    collectionLocation:
+      getNameFromCollectionLocation(collectionLocation) || NO_CONTENT_FALLBACK,
+    sequencingDate: sequencingDate || NO_CONTENT_FALLBACK,
+  };
+
+  if (validationError != null) {
+    Object.entries(validationError).forEach(([key, message]) => {
+      // The validation error for a location is for an id,
+      // which is internal and not something a user would know about.
+      // The only case in which the field does not validate is if the
+      // value is missing entirely.
+      if (key == "collectionLocation") {
+        message = "Required";
+      }
+      validatedCellData[key] = (
+        <>
+          <p>{validatedCellData[key]}</p>
+          <StyledAlertText>
+            <StyledExclamationMark
+              sdsIcon="exclamationMarkCircle"
+              sdsSize="s"
+              sdsType="static"
+            />{" "}
+            {message}
+          </StyledAlertText>
+        </>
+      );
+    });
+  }
+
   return (
-    <StyledTableRow component="div">
-      <StyledTableCell component="div">
+    <StyledTableRow>
+      <StyledTableCell>
         <Id>{id}</Id>
       </StyledTableCell>
-      <StyledTableCell component="div">{privateId}</StyledTableCell>
-      <StyledTableCell component="div">{publicId || "--"}</StyledTableCell>
-      <StyledTableCell component="div">{collectionDate}</StyledTableCell>
-      <StyledTableCell component="div">
-        {getNameFromCollectionLocation(collectionLocation)}
-      </StyledTableCell>
-      <StyledTableCell component="div">
-        {sequencingDate || "--"}
-      </StyledTableCell>
-      <PrivateTableCell align="center" component="div">
+      <StyledTableCell>{validatedCellData.privateId}</StyledTableCell>
+      <StyledTableCell>{publicId || "--"}</StyledTableCell>
+      <StyledTableCell>{validatedCellData.collectionDate}</StyledTableCell>
+      <StyledTableCell>{validatedCellData.collectionLocation}</StyledTableCell>
+      <StyledTableCell>{validatedCellData.sequencingDate}</StyledTableCell>
+      <PrivateTableCell align="center">
         {keepPrivate ? (
           <PrivateContent>
             <StyledLockIconWrapper>
