@@ -1,5 +1,5 @@
 import { Divider } from "@mui/material";
-import { IconButton } from "./components/IconButton";
+import { IconButton } from "../IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import {

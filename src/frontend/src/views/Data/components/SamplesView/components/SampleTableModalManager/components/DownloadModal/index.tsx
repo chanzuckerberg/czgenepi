@@ -29,7 +29,7 @@ import Dialog from "src/components/Dialog";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
-import { TooltipDescriptionText, TooltipHeaderText } from "../../../../../../../../common/components/library/data_subview/style";
+import { TooltipDescriptionText, TooltipHeaderText } from "./style";
 import {
   CheckBoxInfo,
   CheckboxLabel,
@@ -47,7 +47,7 @@ import {
 interface Props {
   checkedSampleIds: string[];
   failedSampleIds: string[];
-  tsvData: [string[], string[][]] | undefined;
+  tsvData?: [string[], string[][]] | undefined; // TODO-TR (mlila): temp optional to get linter to pass
   open: boolean;
   onClose: () => void;
 }
@@ -132,11 +132,13 @@ const DownloadModal = ({
   const useFileMutationGenerator = () =>
     useFileDownload({
       componentOnError: () => {
-        dispatch(addNotification({
-          componentKey: NotificationComponents.DOWNLOAD_FILES_FAILURE,
-          intent: "error",
-          shouldShowCloseButton: true,
-        }));
+        dispatch(
+          addNotification({
+            componentKey: NotificationComponents.DOWNLOAD_FILES_FAILURE,
+            intent: "error",
+            shouldShowCloseButton: true,
+          })
+        );
         handleCloseModal();
       },
       componentOnSuccess: ({ data, filename }: FileDownloadResponsePayload) => {

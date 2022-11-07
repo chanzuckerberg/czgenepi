@@ -5,7 +5,7 @@ import {
   fontHeaderXs,
   getColors,
   getFontWeights,
-  getSpaces
+  getSpaces,
 } from "czifui";
 
 export const StyledWrapper = styled.div`

@@ -3,7 +3,7 @@ import { MouseEventHandler, useState } from "react";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
 import { StyledText } from "src/views/Data/components/TreeActionMenu/components/MoreActionsMenu/style";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
-import { IconButton } from "../IconButton";
+import { IconButton } from "../../../IconButton";
 import { StyledEditIconWrapper, StyledTrashIconWrapper } from "./style";
 
 interface Props {

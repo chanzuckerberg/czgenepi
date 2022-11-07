@@ -22,7 +22,7 @@ import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 interface Props {
   data: IdMap<Sample> | undefined;
   isLoading: boolean;
-  setCheckedSamples(samples): void;
+  setCheckedSamples(samples: Sample[]): void;
 }
 
 const columns: ColumnDef<Sample, any>[] = [

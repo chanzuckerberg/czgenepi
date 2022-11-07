@@ -1,7 +1,7 @@
 import { Menu, MenuItem, Tooltip } from "czifui";
 import { MouseEventHandler, useState } from "react";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
-import { IconButton } from "../IconButton";
+import { IconButton } from "../../../IconButton";
 
 interface Props {
   openNSTreeModal: () => void;

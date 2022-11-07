@@ -96,7 +96,6 @@ const EditSamplesConfirmationModal = ({
   const numSamplesCantEdit = checkedSamples.length - userEditableSamples.length;
 
   useEffect(() => {
-    console.log(checkedSamples);
     const samplesToEdit = checkedSamples.filter(
       (sample) => sample.submittingGroup?.id === currentGroup?.id
     );

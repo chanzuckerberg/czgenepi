@@ -140,3 +140,18 @@ export const StyledCheckbox = styled(Checkbox)`
     }
   }
 `;
+
+export const TooltipHeaderText = styled.div`
+  color: white;
+  text-align: center;
+`;
+
+export const TooltipDescriptionText = styled.div`
+  text-align: center;
+  ${(props: CommonThemeProps) => {
+    const colors = getColors(props);
+    return `
+      color: ${colors?.gray[400]};
+  `;
+  }}
+`;
