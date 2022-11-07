@@ -22,6 +22,7 @@ import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 interface Props {
   data: IdMap<Sample> | undefined;
   isLoading: boolean;
+  setCheckedSamples(samples): void;
 }
 
 const columns: ColumnDef<Sample, any>[] = [
@@ -113,7 +114,11 @@ const columns: ColumnDef<Sample, any>[] = [
   },
 ];
 
-const SamplesTable = ({ data, isLoading }: Props): JSX.Element => {
+const SamplesTable = ({
+  data,
+  isLoading,
+  setCheckedSamples,
+}: Props): JSX.Element => {
   const [samples, setSamples] = useState<Sample[]>([]);
   // TODO-TR (mlila): type?
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
@@ -135,6 +140,14 @@ const SamplesTable = ({ data, isLoading }: Props): JSX.Element => {
     },
     onRowSelectionChange: setRowSelection,
   });
+
+  useEffect(() => {
+    const newCheckedSamples = table
+      .getSelectedRowModel()
+      .rows.map((r) => r.original);
+
+    setCheckedSamples(newCheckedSamples);
+  }, [rowSelection]);
 
   if (isLoading) {
     return <div>Loading ...</div>;
