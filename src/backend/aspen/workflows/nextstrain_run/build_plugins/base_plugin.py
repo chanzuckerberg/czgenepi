@@ -16,7 +16,7 @@ class BaseConfigPlugin:
         self.template_args = template_args
         self.template = None
         self.tree_build_level = "location"
-        # Set self.num_county_sequences, self.num_sequences, etc.
+        # Set self.num_sequences, self.run_start_datetime, etc.
         for k, v in kwargs.items():
             setattr(self, k, v)
 
