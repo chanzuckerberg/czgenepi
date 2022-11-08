@@ -96,12 +96,26 @@ const API_KEY_TO_TYPE: Record<string, string> = {
 function convert<U extends APIResponse, T extends U[keyof U]>(
   entry: Record<string, JSONPrimitive>,
   keyMap: Map<string, string | number> | null,
-  key: keyof U
+  key: keyof U,
+  keySubMap?: Map<string, Map<string, string>>
 ): T {
   const converted = jsonToType<T>(entry, keyMap);
   // key should always be a string anyways. no funky business please.
   converted.type = API_KEY_TO_TYPE[String(key)];
   // ^^^ FIXME (Vince) Does this get used anywhere? What was original purpose?
+
+  // If we end up with deeper nested objects, this could be recursive instead.
+  if (keySubMap) {
+    const convertedKeys = Object.keys(converted);
+    convertedKeys.forEach((convertedKey) => {
+      if (keySubMap.has(convertedKey)) {
+        converted[convertedKey] = jsonToType<T>(
+          converted[convertedKey],
+          keySubMap.get(convertedKey) || null
+        );
+      }
+    });
+  }
 
   return converted;
 }
@@ -122,7 +136,8 @@ function convert<U extends APIResponse, T extends U[keyof U]>(
 export async function apiResponse<T extends APIResponse>(
   keys: (keyof T)[],
   mappings: (Map<string, string | number> | null)[],
-  endpoint: string
+  endpoint: string,
+  subMappings?: Map<string, Map<string, string>>[]
 ): Promise<T> {
   const response = await fetch(ENV.API_URL + endpoint, DEFAULT_FETCH_OPTIONS);
 
@@ -136,13 +151,14 @@ export async function apiResponse<T extends APIResponse>(
     type keyType = T[typeof key];
     const typeData = result[key];
     const keyMap = mappings[index];
+    const keySubMap = subMappings && subMappings[index];
     let resultData: keyType | keyType[];
     if (typeData instanceof Array) {
       resultData = typeData.map((entry: Record<string, JSONPrimitive>) =>
-        convert<T, keyType>(entry, keyMap, key)
+        convert<T, keyType>(entry, keyMap, key, keySubMap)
       );
     } else {
-      resultData = convert<T, keyType>(typeData, keyMap, key);
+      resultData = convert<T, keyType>(typeData, keyMap, key, keySubMap);
     }
     return [key, resultData];
   });
@@ -229,13 +245,26 @@ const PHYLO_RUN_MAP = new Map<string, keyof PhyloRun>([
   ["end_datetime", "endDate"],
   ["phylo_tree", "phyloTree"],
   ["start_datetime", "startedDate"],
+  ["template_args", "templateArgs"],
   ["tree_type", "treeType"],
   ["workflow_id", "workflowId"],
   ["workflow_status", "status"],
 ]);
+
+const TEMPLATE_ARGS_MAP = new Map<string, keyof TemplateArgs>([
+  ["filter_pango_lineages", "filterPangoLineages"],
+  ["filter_start_date", "filterStartDate"],
+  ["filter_end_date", "filterEndDate"],
+  ["location_id", "locationId"],
+]);
+
+const PHYLO_RUN_SUBMAP = new Map<string, Map<string, string>>();
+PHYLO_RUN_SUBMAP.set("templateArgs", TEMPLATE_ARGS_MAP);
+
 export const fetchPhyloRuns = (): Promise<PhyloRunResponse> =>
   apiResponse<PhyloRunResponse>(
     ["phylo_runs"],
     [PHYLO_RUN_MAP],
-    generateOrgSpecificUrl(ORG_API.PHYLO_RUNS)
+    generateOrgSpecificUrl(ORG_API.PHYLO_RUNS),
+    [PHYLO_RUN_SUBMAP]
   );
