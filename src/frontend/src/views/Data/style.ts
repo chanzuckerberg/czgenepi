@@ -162,7 +162,6 @@ export const View = styled.div`
   This is needed to ensure the div doesn't disappear
   when the viewport height is too short */
   height: calc(100% - 74px);
-  width: calc(100% - 14px);
   display: flex;
 `;
 
@@ -194,4 +193,9 @@ export const StyledMenuItem = styled.li`
       margin: 0 ${spaces?.m}px;
     `;
   }}
+`;
+
+export const StyledView = styled.div`
+  display: flex;
+  flex-direction: column;
 `;

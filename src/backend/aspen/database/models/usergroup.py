@@ -53,7 +53,7 @@ class Group(idbase, DictMixin):  # type: ignore
     default_tree_location_id = Column(
         Integer,
         ForeignKey(Location.id),
-        nullable=True,
+        nullable=False,
     )
     default_tree_location = relationship("Location")  # type: ignore
 
