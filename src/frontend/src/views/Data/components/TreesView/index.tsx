@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { HeadAppTitle } from "src/common/components";
+import { TreeCreateHelpLink } from "src/common/components/library/data_subview/components/TreeCreateHelpLink";
 import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { SearchBar } from "src/components/Table/components/SearchBar";
 import { StyledView } from "../../style";
 import { DataNavigation } from "../DataNavigation";
 import { TreesTable } from "./components/TreesTable";
+import { Flex } from "./style";
 
 const TreesView = (): JSX.Element => {
   const [displayedRows, setDisplayedRows] = useState<IdMap<PhyloRun>>({});
@@ -19,7 +21,13 @@ const TreesView = (): JSX.Element => {
       <HeadAppTitle subTitle="Trees" />
       <DataNavigation />
       <div>
-        <SearchBar tableData={phyloRuns} onSearchComplete={setDisplayedRows} />
+        <Flex>
+          <SearchBar
+            tableData={phyloRuns}
+            onSearchComplete={setDisplayedRows}
+          />
+          <TreeCreateHelpLink />
+        </Flex>
         <TreesTable isLoading={isLoading || isFetching} data={displayedRows} />
       </div>
     </StyledView>
