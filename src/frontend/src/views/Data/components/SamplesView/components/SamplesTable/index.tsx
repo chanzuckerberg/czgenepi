@@ -142,6 +142,8 @@ const SamplesTable = ({
   });
 
   useEffect(() => {
+    // for each selected row in the table, map the react-table internal row to the data (Sample)
+    // originally passed into the row
     const newCheckedSamples = table
       .getSelectedRowModel()
       .rows.map((r) => r.original);
