@@ -45,4 +45,4 @@ jobs:
           python3 -m pip install miniwdl
           cat /etc/hosts || true
           curl -vvv "http://localstack.genepinet.localdev:4566/" || true
-          # make pipeline-test-gisaid
+          make pipeline-test-gisaid
