@@ -15,6 +15,8 @@ interface Props {
   isLoading: boolean;
 }
 
+// TODO-TR (mlila): set fallback cell values when, eg, tree name not defined
+
 // TODO-TR (mlila): create a default cell & col def
 const columns: ColumnDef<PhyloRun, any>[] = [
   {
