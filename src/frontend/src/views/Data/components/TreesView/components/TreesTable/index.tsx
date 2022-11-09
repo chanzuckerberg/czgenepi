@@ -1,8 +1,8 @@
-import { CellBasic, CellHeader, Table, TableHeader, TableRow } from "czifui";
+import { CellBasic, Table, TableHeader, TableRow } from "czifui";
 import {
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
@@ -14,18 +14,35 @@ interface Props {
   isLoading: boolean;
 }
 
-const columnHelper = createColumnHelper<PhyloRun>();
-
-const columns = [
-  columnHelper.accessor("name", {
-    header: "Tree Name",
-  }),
-  columnHelper.accessor("startedDate", {
-    header: "Creation Date",
-  }),
-  columnHelper.accessor("treeType", {
-    header: "Tree Type",
-  }),
+// TODO-TR (mlila): create a default cell & col def
+const columns: ColumnDef<PhyloRun, any>[] = [
+  {
+    id: "name",
+    accessorKey: "name",
+    header: ({ header }) => (
+      <SortableHeader header={header}>Tree Name</SortableHeader>
+    ),
+    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    enableSorting: true,
+  },
+  {
+    id: "startedDate",
+    accessorKey: "startedDate",
+    header: ({ header }) => (
+      <SortableHeader header={header}>Creation Date</SortableHeader>
+    ),
+    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    enableSorting: true,
+  },
+  {
+    id: "treeType",
+    accessorKey: "treeType",
+    header: ({ header }) => (
+      <SortableHeader header={header}>Tree Type</SortableHeader>
+    ),
+    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    enableSorting: true,
+  },
 ];
 
 const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
@@ -42,43 +59,31 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
     data: phyloRuns,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   if (isLoading) {
     return <div>Loading ...</div>;
   }
 
+  // TODO-TR (mlila): pull out common structure from samples table
   return (
     <Table>
       <TableHeader>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <>
-            {headerGroup.headers.map((header) => (
-              <CellHeader key={header.id} horizontalAlign="left">
-                {header.isPlaceholder
-                  ? ""
-                  : (flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    ) as string)}
-              </CellHeader>
-            ))}
-          </>
-        ))}
+        {table
+          .getLeafHeaders()
+          .map((header) =>
+            flexRender(header.column.columnDef.header, header.getContext())
+          )}
       </TableHeader>
       <tbody>
         {table.getRowModel().rows.map((row) => (
           <TableRow key={row.id}>
-            {row.getVisibleCells().map((cell) => {
-              return (
-                <CellBasic
-                  horizontalAlign="left"
-                  shouldShowTooltipOnHover={false}
-                  key={cell.id}
-                  primaryText={cell.getValue() as string} // TODO-TR (mlila): type assertion
-                ></CellBasic>
-              );
-            })}
+            {row
+              .getVisibleCells()
+              .map((cell) =>
+                flexRender(cell.column.columnDef.cell, cell.getContext())
+              )}
           </TableRow>
         ))}
       </tbody>
