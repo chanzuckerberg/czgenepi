@@ -28,6 +28,7 @@ import {
   StyledUpdatedDate,
   Title,
   TitleWrapper,
+  VerticalLine,
   Wrapper,
 } from "./style";
 interface Props {
@@ -131,8 +132,9 @@ export default function ImportFile({
             sdsStyle="minimal"
             onClick={handleInstructionsClick}
           >
-            {isInstructionsShown ? "HIDE" : "SHOW"} INSTRUCTIONS
+            {isInstructionsShown ? "LESS" : "MORE"} INFO
           </StyledButton>
+          <VerticalLine />
           <SampleUploadDownloadTemplate
             headers={templateHeaders}
             rows={templateRows}

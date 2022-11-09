@@ -1,6 +1,10 @@
 import styled from "@emotion/styled";
 import { Callout, CommonThemeProps, getColors, getSpaces } from "czifui";
 
+export const SemiBold = styled.span`
+  font-weight: 600;
+`;
+
 export function marginBottom(props: CommonThemeProps): string {
   const spaces = getSpaces(props);
 
