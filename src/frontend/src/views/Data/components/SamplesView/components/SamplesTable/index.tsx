@@ -33,7 +33,7 @@ interface SortableProps {
   children: ReactNode & string;
 }
 
-const SortableHeader = ({ header, children }: SortableProps) => {
+export const SortableHeader = ({ header, children }: SortableProps) => {
   const { getCanSort, getIsSorted, getToggleSortingHandler } = header.column;
 
   const sortable = getCanSort();

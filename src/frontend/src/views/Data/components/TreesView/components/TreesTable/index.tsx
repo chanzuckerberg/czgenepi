@@ -9,6 +9,7 @@ import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
 import { useEffect, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
+import { SortableHeader } from "../../../SamplesView/components/SamplesTable";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
