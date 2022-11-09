@@ -1,4 +1,11 @@
-import { CellBasic, Table, TableHeader, TableRow } from "czifui";
+import {
+  CellBasic,
+  CellComponent,
+  CellHeader,
+  Table,
+  TableHeader,
+  TableRow,
+} from "czifui";
 import {
   flexRender,
   getCoreRowModel,
@@ -9,11 +16,31 @@ import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
 import { useEffect, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
+import { TreeActionMenu } from "./components/TreeActionMenu";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
   isLoading: boolean;
 }
+
+const SortableHeader = ({ header, children }: SortableProps) => {
+  const { getCanSort, getIsSorted, getToggleSortingHandler } = header.column;
+
+  const sortable = getCanSort();
+  const sortDirection = getIsSorted() || undefined;
+  const handler = getToggleSortingHandler();
+
+  return (
+    <CellHeader
+      onClick={handler}
+      direction={sortDirection}
+      active={Boolean(sortDirection)}
+      hideSortIcon={!sortable}
+    >
+      {children}
+    </CellHeader>
+  );
+};
 
 // TODO-TR (mlila): set fallback cell values when, eg, tree name not defined
 
@@ -47,6 +74,14 @@ const columns: ColumnDef<PhyloRun, any>[] = [
     ),
     cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
     enableSorting: true,
+  },
+  {
+    id: "action",
+    cell: ({ row }) => (
+      <CellComponent>
+        <TreeActionMenu item={row.original} />
+      </CellComponent>
+    ),
   },
 ];
 

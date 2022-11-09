@@ -25,12 +25,13 @@ const MoreActionsMenu = ({
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const currentGroup = getCurrentGroupFromUserInfo(userInfo);
-  const { group, status } = item;
+  const { group, name, status } = item;
 
   const isAutoBuild = group?.name === "";
   const isTreeInUserOrg = currentGroup?.name === group?.name;
   const canUserDeleteTree = isAutoBuild || isTreeInUserOrg;
-  // FIXME: allow users to edit/delete FAILED runs once phylotrees V2 endpoint has been updated to better reflect tree status
+  // TODO: allow users to edit/delete FAILED runs once phylotrees V2 endpoint has been updated
+  // TODO: to better reflect tree status
   const isDisabled = status === TREE_STATUS.Started || !canUserDeleteTree;
 
   let tooltipText = "More Actions";
@@ -63,8 +64,7 @@ const MoreActionsMenu = ({
       >
         <span>
           <ButtonIcon
-            // TODO: it would be helpful for this to indicate which tree it's for
-            aria-label="more actions"
+            aria-label={`more actions for ${name}`}
             disabled={isDisabled}
             onClick={handleClick}
             sdsSize="small"
