@@ -44,7 +44,8 @@ locals {
 
   # Workflow images
   pangolin_image   = join(":", [local.secret["ecrs"]["pangolin"]["url"], lookup(var.image_tags, "pangolin", var.image_tag)])
-  lineage_qc_image = join(":", [local.secret["ecrs"]["lineage-qc"]["url"], lookup(var.image_tags, "lineage-qc", var.image_tag)])
+  # TODO Fix `lineage-qc` vs `lineage_qc` mismatch between here and infra repo
+  # lineage_qc_image = join(":", [local.secret["ecrs"]["lineage-qc"]["url"], lookup(var.image_tags, "lineage-qc", var.image_tag)])
   nextstrain_image = join(":", [local.secret["ecrs"]["nextstrain"]["url"], lookup(var.image_tags, "nextstrain", var.image_tag)])
   gisaid_image     = join(":", [local.secret["ecrs"]["gisaid"]["url"], lookup(var.image_tags, "gisaid", var.image_tag)])
 

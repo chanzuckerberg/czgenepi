@@ -4,7 +4,14 @@ import {
   TableRow,
   TableRowProps as MuiTableRowProps,
 } from "@mui/material";
-import { CommonThemeProps, fontHeaderS, getColors, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontBodyXxxs,
+  fontHeaderS,
+  getColors,
+  getSpaces,
+  Icon,
+} from "czifui";
 import { rightMarginXxs } from "src/common/styles/iconStyle";
 
 export const Id = styled.p`
@@ -25,9 +32,7 @@ export const Id = styled.p`
   }}
 `;
 
-interface TableRowProps extends MuiTableRowProps, CommonThemeProps {
-  component: "div";
-}
+interface TableRowProps extends MuiTableRowProps, CommonThemeProps {}
 
 export const StyledTableRow = styled(TableRow)`
   &:nth-of-type(even) {
@@ -77,4 +82,32 @@ export const PrivateContent = styled.div`
 
 export const StyledLockIconWrapper = styled.div`
   ${rightMarginXxs}
+`;
+
+export const StyledAlertText = styled.p`
+  vertical-align: middle;
+  ${fontBodyXxxs}
+
+  ${(props: CommonThemeProps) => {
+    const colors = getColors(props);
+
+    return `
+      color: ${colors?.error[500]};
+      padding: 0;
+    `;
+  }}
+`;
+
+export const StyledExclamationMark = styled(Icon)`
+  vertical-align: middle;
+
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    const colors = getColors(props);
+
+    return `
+      margin: 0 ${spaces?.xxs}px ${spaces?.xxs}px ${spaces?.xxs}px;
+      fill: ${colors?.error[500]};
+    `;
+  }}
 `;

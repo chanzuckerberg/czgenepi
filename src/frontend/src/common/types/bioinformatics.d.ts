@@ -51,6 +51,13 @@ interface Tree {
   id: number;
 }
 
+interface TemplateArgs {
+  filterPangoLineages?: Array<string>;
+  filterStartDate?: string;
+  filterEndDate?: string;
+  locationId?: number;
+}
+
 /**
  * A phylo run actually differs from a phylo tree.
  * A run is generated any time we make an attempt to make a tree, but not all runs have trees
@@ -65,6 +72,7 @@ interface PhyloRun extends BioinformaticsType {
   startedDate: string;
   workflowId: string;
   status: TREE_STATUS;
+  templateArgs: TemplateArgs;
   downloadLinkIdStylePrivateIdentifiers?: string;
   downloadLinkIdStylePublicIdentifiers?: string;
   user: {

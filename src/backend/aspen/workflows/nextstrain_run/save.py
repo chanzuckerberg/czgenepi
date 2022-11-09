@@ -1,7 +1,7 @@
 import datetime
 import io
 import json
-from typing import MutableSequence, Set
+from typing import IO, MutableSequence, Set
 
 import click
 from sqlalchemy.orm import joinedload
@@ -33,6 +33,13 @@ from aspen.phylo_tree.identifiers import get_names_from_tree
 @click.option("--phylo-run-id", type=int, required=True)
 @click.option("--bucket", type=str, required=True)
 @click.option("--key", type=str, required=True)
+@click.option(
+    "resolved_template_args_fh",
+    "--resolved-template-args",
+    type=click.File("r"),
+    required=True,
+    help="JSON file containing resolved template args from setup process",
+)
 @click.option("--tree-path", type=click.File("r"), required=True)
 @click.option("--test", type=bool, is_flag=True)
 def cli(
@@ -44,13 +51,16 @@ def cli(
     phylo_run_id: int,
     bucket: str,
     key: str,
+    resolved_template_args_fh: IO[str],
     tree_path: io.TextIOBase,
     test: bool,
 ):
     if test:
         print("Success!")
         return
+
     end_time_datetime = datetime.datetime.fromtimestamp(end_time)
+    resolved_template_args = json.load(resolved_template_args_fh)
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
@@ -102,6 +112,7 @@ def cli(
             group=phylo_run.group,
             tree_type=phylo_run.tree_type,
             pathogen=phylo_run.pathogen,
+            resolved_template_args=resolved_template_args,
         )
 
         # update the run object with the metadata about the run.

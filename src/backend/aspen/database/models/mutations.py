@@ -9,7 +9,7 @@ from aspen.database.models.base import idbase
 class SampleMutation(idbase):  # type: ignore
     __tablename__ = "sample_mutations"
 
-    sample_id = Column(Integer, ForeignKey("samples.id"), nullable=False)
+    sample_id = Column(Integer, ForeignKey("samples.id"), nullable=False, unique=True)
     sample = relationship("Sample", back_populates="mutations")  # type: ignore
 
     # nucleotides
