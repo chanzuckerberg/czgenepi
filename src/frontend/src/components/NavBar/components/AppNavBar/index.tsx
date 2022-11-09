@@ -1,3 +1,4 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon } from "czifui";
 import Link from "next/link";
 import { MouseEventHandler, useState } from "react";
@@ -5,6 +6,8 @@ import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { HiddenLabel } from "src/common/styles/accessibility";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { InviteModal } from "src/views/GroupMembersPage/components/MembersTab/components/InviteModal";
 import RightNav from "../RightNav";
 import { GroupDetailsDropdown } from "./components/GroupDetailsDropdown";
@@ -32,6 +35,12 @@ const AppNavBar = (): JSX.Element => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const { data: userInfo } = useUserInfo();
 
+  const flag = useTreatments([USER_FEATURE_FLAGS.multi_pathogen]);
+  const isMultiPathogenFlagOn = isUserFlagOn(
+    flag,
+    USER_FEATURE_FLAGS.multi_pathogen
+  );
+
   const group = getCurrentGroupFromUserInfo(userInfo);
   const route = userInfo ? ROUTES.DATA : ROUTES.HOMEPAGE;
 
@@ -52,7 +61,12 @@ const AppNavBar = (): JSX.Element => {
             <Logo data-test-id="logo" aria-hidden="true" />
           </LogoAnchor>
         </Link>
-        <PathogenTabs />
+        {isMultiPathogenFlagOn && (
+          <>
+            <Separator />
+            <PathogenTabs />
+          </>
+        )}
         {name && (
           <>
             <Separator />
