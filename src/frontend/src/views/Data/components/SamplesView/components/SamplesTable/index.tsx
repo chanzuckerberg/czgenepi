@@ -209,15 +209,6 @@ const columns: ColumnDef<Sample, any>[] = [
     cell: DefaultCell,
   },
   {
-    id: "lineage",
-    accessorKey: "lineage",
-    header: ({ header }) => (
-      <SortableHeader header={header}>Lineage</SortableHeader>
-    ),
-    cell: DefaultCell,
-    enableSorting: true,
-  },
-  {
     id: "gisaid",
     accessorKey: "gisaid",
     header: ({ header }) => (
