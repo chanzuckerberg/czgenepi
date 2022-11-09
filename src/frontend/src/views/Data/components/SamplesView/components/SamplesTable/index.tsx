@@ -29,11 +29,11 @@ interface Props {
 
 // TODO-TR (mlila): move this header component into its own file
 interface SortableProps {
-  header: Header<Sample, any>;
+  header: Header<any, any>;
   children: ReactNode & string;
 }
 
-const SortableHeader = ({ header, children }: SortableProps) => {
+export const SortableHeader = ({ header, children }: SortableProps) => {
   const { getCanSort, getIsSorted, getToggleSortingHandler } = header.column;
 
   const sortable = getCanSort();
