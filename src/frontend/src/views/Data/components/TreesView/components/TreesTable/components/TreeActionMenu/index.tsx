@@ -25,7 +25,6 @@ interface Props {
   // TODO-TR (mlila): value can be removed after table refactor
   value: string;
   item: PhyloRun;
-  userInfo: User;
   onDeleteTreeModalOpen?(t: PhyloRun): void;
   onEditTreeModalOpen?(t: PhyloRun): void;
 }
@@ -36,7 +35,6 @@ const TreeActionMenu = ({
   item,
   onDeleteTreeModalOpen,
   onEditTreeModalOpen,
-  userInfo,
 }: Props): JSX.Element => {
   const flag = useTreatments([USER_FEATURE_FLAGS.galago_integration]);
   const isGalagoIntegrationFlagOn = isUserFlagOn(
@@ -65,7 +63,6 @@ const TreeActionMenu = ({
           item={item}
           onDeleteTreeModalOpen={onDeleteTreeModalOpen}
           onEditTreeModalOpen={onEditTreeModalOpen}
-          userInfo={userInfo}
         />
       </StyledActionWrapper>
     </StyledTreeActionMenu>

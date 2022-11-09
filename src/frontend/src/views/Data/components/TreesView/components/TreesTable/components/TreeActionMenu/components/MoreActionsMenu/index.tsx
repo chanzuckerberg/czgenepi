@@ -1,6 +1,7 @@
 import { ButtonIcon, Icon, Menu, MenuItem, Tooltip } from "czifui";
 import { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
+import { useUserInfo } from "src/common/queries/auth";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import {
@@ -13,17 +14,16 @@ interface Props {
   item: PhyloRun;
   onDeleteTreeModalOpen(t: PhyloRun): void;
   onEditTreeModalOpen(t: PhyloRun): void;
-  userInfo: User;
 }
 
 const MoreActionsMenu = ({
   item,
   onDeleteTreeModalOpen,
   onEditTreeModalOpen,
-  userInfo,
 }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
+  const { data: userInfo } = useUserInfo();
   const currentGroup = getCurrentGroupFromUserInfo(userInfo);
   const { group, name, status } = item;
 
