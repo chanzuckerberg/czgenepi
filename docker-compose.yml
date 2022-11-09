@@ -161,7 +161,7 @@ services:
       context: src/backend/
       dockerfile: Dockerfile.gisaid
       cache_from:
-        - "${DOCKER_REPO}genepi-gisaid:branch-trunk"
+        - "${DOCKER_REPO}genepi-gisaid:branch-jgadling-test-dns"
       args:
         - BUILDKIT_INLINE_CACHE=1
         - HAPPY_COMMIT

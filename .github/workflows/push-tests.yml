@@ -44,5 +44,8 @@ jobs:
           make local-init LOCALDEV_PROFILE=gisaid
           python3 -m pip install miniwdl
           cat /etc/hosts || true
+          docker network ls
           curl -vvv "http://localstack.genepinet.localdev:4566/" || true
+          docker tag ${{ secrets.ECR_REPO }}/genepi-gisaid:latest ${{ secrets.ECR_REPO }}/genepi-gisaid:branch-jgadling-test-dns
+          docker push ${{ secrets.ECR_REPO }}/genepi-gisaid:branch-jgadling-test-dns
           make pipeline-test-gisaid
