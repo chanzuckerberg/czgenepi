@@ -32,6 +32,7 @@ services:
         - "${DOCKER_REPO}genepi-frontend:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
+        - BUILDKIT_PROGRESS=plain
         - HAPPY_COMMIT
         - HAPPY_BRANCH
     restart: always
@@ -164,6 +165,7 @@ services:
         - "${DOCKER_REPO}genepi-gisaid:branch-jgadling-test-dns"
       args:
         - BUILDKIT_INLINE_CACHE=1
+        - BUILDKIT_PROGRESS=plain
         - HAPPY_COMMIT
         - HAPPY_BRANCH
     command: [ "true" ]
@@ -190,6 +192,7 @@ services:
         - "${DOCKER_REPO}genepi-pangolin:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
+        - BUILDKIT_PROGRESS=plain
     environment:
       - AWS_REGION=us-west-2
       - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
@@ -220,6 +223,7 @@ services:
         - "${DOCKER_REPO}genepi-lineage-qc:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
+        - BUILDKIT_PROGRESS=plain
     environment:
       - AWS_REGION=us-west-2
       - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
@@ -250,6 +254,7 @@ services:
         - "${DOCKER_REPO}genepi-nextstrain:branch-trunk"
       args:
         - BUILDKIT_INLINE_CACHE=1
+        - BUILDKIT_PROGRESS=plain
     environment:
       - AWS_REGION=us-west-2
       - AWS_ACCESS_KEY_ID=dev_access_key_id
