@@ -10,12 +10,14 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
+  Header,
   RowSelectionState,
   useReactTable,
 } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 
 // TODO-TR (mlila): types
@@ -23,6 +25,31 @@ interface Props {
   data: IdMap<Sample> | undefined;
   isLoading: boolean;
 }
+
+// TODO-TR (mlila): move this header component into its own file
+interface SortableProps {
+  header: Header<Sample, any>;
+  children: ReactNode & string;
+}
+
+const SortableHeader = ({ header, children }: SortableProps) => {
+  const { getCanSort, getIsSorted, getToggleSortingHandler } = header.column;
+
+  const sortable = getCanSort();
+  const sortDirection = getIsSorted() || undefined;
+  const handler = getToggleSortingHandler();
+
+  return (
+    <CellHeader
+      onClick={handler}
+      direction={sortDirection}
+      active={Boolean(sortDirection)}
+      hideSortIcon={!sortable}
+    >
+      {children}
+    </CellHeader>
+  );
+};
 
 const columns: ColumnDef<Sample, any>[] = [
   {
@@ -58,58 +85,82 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "privateId",
     accessorKey: "privateId",
-    header: () => <CellHeader>Private ID</CellHeader>,
+    header: ({ header }) => (
+      <SortableHeader header={header}>Private ID</SortableHeader>
+    ),
     cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    enableSorting: true,
   },
   {
     id: "publicId",
     accessorKey: "publicId",
-    header: () => <CellHeader>Public ID</CellHeader>,
+    header: ({ header }) => (
+      <SortableHeader header={header}>Public ID</SortableHeader>
+    ),
     cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    enableSorting: true,
   },
   {
     id: "collectionDate",
     accessorKey: "collectionDate",
-    header: () => <CellHeader>Collection Date</CellHeader>,
+    header: ({ header }) => (
+      <SortableHeader header={header}>Collection Date</SortableHeader>
+    ),
     cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    enableSorting: true,
   },
   {
     id: "lineage",
     accessorKey: "lineage",
-    header: () => <CellHeader>Lineage</CellHeader>,
+    header: ({ header }) => (
+      <SortableHeader header={header}>Lineage</SortableHeader>
+    ),
     cell: ({ getValue }) => {
       const { lineage } = getValue();
       return <CellBasic primaryText={lineage} />;
     },
+    enableSorting: true,
   },
   {
     id: "uploadDate",
     accessorKey: "uploadDate",
-    header: () => <CellHeader>Upload Date</CellHeader>,
+    header: ({ header }) => (
+      <SortableHeader header={header}>Upload Date</SortableHeader>
+    ),
     cell: ({ getValue }) => (
       <CellBasic primaryText={datetimeWithTzToLocalDate(getValue())} />
     ),
+    enableSorting: true,
   },
   {
     id: "collectionLocation",
     accessorKey: "collectionLocation",
-    header: () => <CellHeader>Collection Location</CellHeader>,
+    header: ({ header }) => (
+      <SortableHeader header={header}>Collection Location</SortableHeader>
+    ),
     cell: ({ getValue }) => <CellBasic primaryText={getValue().location} />,
+    enableSorting: true,
   },
   {
     id: "sequencingDate",
     accessorKey: "sequencingDate",
-    header: () => <CellHeader>Sequencing Date</CellHeader>,
+    header: ({ header }) => (
+      <SortableHeader header={header}>Sequencing Date</SortableHeader>
+    ),
     cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    enableSorting: true,
   },
   {
     id: "gisaid",
     accessorKey: "gisaid",
-    header: () => <CellHeader>GISAID</CellHeader>,
+    header: ({ header }) => (
+      <SortableHeader header={header}>GISAID</SortableHeader>
+    ),
     cell: ({ getValue }) => {
       const { status } = getValue();
       return <CellBasic primaryText={status} />;
     },
+    enableSorting: true,
   },
 ];
 
@@ -130,6 +181,7 @@ const SamplesTable = ({ data, isLoading }: Props): JSX.Element => {
     columns,
     enableMultiRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     state: {
       rowSelection,
     },
