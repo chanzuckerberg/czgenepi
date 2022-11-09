@@ -42,13 +42,20 @@ jobs:
           # Build gisaid image
           # docker buildx build --cache-from=type=registry,ref=${{ secrets.ECR_REPO }}/genepi-backend:branch-trunk -t ${{ secrets.ECR_REPO }}/genepi-gisaid:latest -f src/backend/Dockerfile.gisaid src/backend
           make local-init LOCALDEV_PROFILE=gisaid
+          echo
+          echo === DEBUG BELOW ===
+          echo
           python3 -m pip install miniwdl
-          cat /etc/hosts || true
+          miniwdl --version
+          cat /etc/hosts
           docker network ls
           docker network inspect genepinet
           curl -vvv "http://localstack.genepinet.localdev:4566/" || true
-          docker tag ${{ secrets.ECR_REPO }}/genepi-gisaid:latest ${{ secrets.ECR_REPO }}/genepi-gisaid:branch-jgadling-test-dns
-          docker tag ${{ secrets.ECR_REPO }}/genepi-backend:latest ${{ secrets.ECR_REPO }}/genepi-backend:branch-jgadling-test-dns
-          docker push ${{ secrets.ECR_REPO }}/genepi-gisaid:branch-jgadling-test-dns
-          docker push ${{ secrets.ECR_REPO }}/genepi-backend:branch-jgadling-test-dns
+          echo
+          echo === RUN MINIWDL ===
+          echo
           make pipeline-test-gisaid
+          #docker tag ${{ secrets.ECR_REPO }}/genepi-gisaid:latest ${{ secrets.ECR_REPO }}/genepi-gisaid:branch-jgadling-test-dns
+          #docker tag ${{ secrets.ECR_REPO }}/genepi-backend:latest ${{ secrets.ECR_REPO }}/genepi-backend:branch-jgadling-test-dns
+          #docker push ${{ secrets.ECR_REPO }}/genepi-gisaid:branch-jgadling-test-dns
+          #docker push ${{ secrets.ECR_REPO }}/genepi-backend:branch-jgadling-test-dns
