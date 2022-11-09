@@ -3,10 +3,12 @@ import { compact, map, uniq } from "lodash";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import {
   IdMap,
   reduceObjectArrayToLookupDict,
@@ -79,7 +81,8 @@ const Data: FunctionComponent = () => {
   const router = useRouter();
   const { asPath: currentPath } = router;
 
-  const sampleResponse = useSampleInfo();
+  const pathogen = useSelector(selectCurrentPathogen);
+  const sampleResponse = useSampleInfo(pathogen);
   const PhyloRunResponse = usePhyloRunInfo();
   const {
     data: sampleData,

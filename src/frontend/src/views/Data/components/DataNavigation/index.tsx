@@ -1,8 +1,10 @@
 import { Tab, Tabs } from "czifui";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import { FilterPanelToggle } from "./FilterPanelToggle";
 import { Navigation } from "./style";
@@ -33,7 +35,8 @@ const DataNavigation = ({
   const router = useRouter();
   const { asPath: currentPath } = router;
 
-  const { data: samples } = useSampleInfo();
+  const pathogen = useSelector(selectCurrentPathogen);
+  const { data: samples } = useSampleInfo(pathogen);
   const { data: phyloRuns } = usePhyloRunInfo();
 
   // Configure tabs that are shown on the data page. One tab per view.
