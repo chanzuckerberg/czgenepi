@@ -14,7 +14,7 @@ import { createTableCellRenderer } from "src/common/utils";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
 import { LineageTooltip } from "./components/LineageTooltip";
-import { TreeActionMenu } from "./components/TreeActionMenu";
+import { TreeActionMenu } from "./components/TreesView/components/TreesTable/components/TreeActionMenu";
 import TreeTableNameCell from "./components/TreeTableNameCell";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
 import {
