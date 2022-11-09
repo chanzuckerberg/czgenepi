@@ -1,19 +1,18 @@
-// TODO_TR (mlila): delete this file after table refactor complete
 import { Menu, MenuItem, Tooltip } from "czifui";
 import { MouseEventHandler, useState } from "react";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
-import { IconButton } from "../IconButton";
+import { IconButton } from "../../../IconButton";
 
 interface Props {
-  handleCreateNSTreeOpen: () => void;
-  handleCreateUsherTreeOpen: () => void;
+  openNSTreeModal: () => void;
+  openUsherModal: () => void;
   isMenuDisabled: boolean;
   isUsherDisabled: boolean;
 }
 
 const TreeSelectionMenu = ({
-  handleCreateNSTreeOpen,
-  handleCreateUsherTreeOpen,
+  openNSTreeModal,
+  openUsherModal,
   isMenuDisabled,
   isUsherDisabled,
 }: Props): JSX.Element => {
@@ -28,12 +27,12 @@ const TreeSelectionMenu = ({
   };
 
   const handleClickNS = () => {
-    handleCreateNSTreeOpen();
+    openNSTreeModal();
     handleClose();
   };
 
   const handleClickUsher = () => {
-    handleCreateUsherTreeOpen();
+    openUsherModal();
     handleClose();
   };
 

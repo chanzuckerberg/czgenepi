@@ -9,11 +9,18 @@ import { SearchBar } from "src/components/Table/components/SearchBar";
 import { StyledView } from "../../style";
 import { DataNavigation } from "../DataNavigation";
 import { SamplesTable } from "./components/SamplesTable";
+import { SampleTableModalManager } from "./components/SampleTableModalManager";
 import { Flex } from "./style";
 
 const SamplesView = (): JSX.Element => {
   // initialize state
   // TODO-TR (mlilia): types
+
+  // TODO-TR (mlila): consider restructuring table, modalmanager, and view to better manage
+  // TODO             checked sample state
+
+  // TODO-TR: when samples are cleared after closing a modal, the UI doesn't update
+  const [checkedSamples, setCheckedSamples] = useState<Sample[]>([]);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState<boolean>(true);
   const [activeFilterCount, setActiveFilterCount] = useState<number>(0);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -73,10 +80,20 @@ const SamplesView = (): JSX.Element => {
           data-test-id="menu-item-sample-count"
         />
         <div>
-          <SearchBar tableData={samples} onSearchComplete={setSearchResults} />
+          <Flex>
+            <SearchBar
+              tableData={samples}
+              onSearchComplete={setSearchResults}
+            />
+            <SampleTableModalManager
+              checkedSamples={checkedSamples}
+              clearCheckedSamples={() => setCheckedSamples([])}
+            />
+          </Flex>
           <SamplesTable
             isLoading={isLoading || isFetching}
             data={displayedRows}
+            setCheckedSamples={setCheckedSamples}
           />
         </div>
       </Flex>

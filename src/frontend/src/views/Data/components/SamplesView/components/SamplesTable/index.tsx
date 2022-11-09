@@ -24,6 +24,7 @@ import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 interface Props {
   data: IdMap<Sample> | undefined;
   isLoading: boolean;
+  setCheckedSamples(samples: Sample[]): void;
 }
 
 // TODO-TR (mlila): move this header component into its own file
@@ -164,7 +165,11 @@ const columns: ColumnDef<Sample, any>[] = [
   },
 ];
 
-const SamplesTable = ({ data, isLoading }: Props): JSX.Element => {
+const SamplesTable = ({
+  data,
+  isLoading,
+  setCheckedSamples,
+}: Props): JSX.Element => {
   const [samples, setSamples] = useState<Sample[]>([]);
   // TODO-TR (mlila): type?
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
@@ -187,6 +192,16 @@ const SamplesTable = ({ data, isLoading }: Props): JSX.Element => {
     },
     onRowSelectionChange: setRowSelection,
   });
+
+  useEffect(() => {
+    // for each selected row in the table, map the react-table internal row to the data (Sample)
+    // originally passed into the row
+    const newCheckedSamples = table
+      .getSelectedRowModel()
+      .rows.map((r) => r.original);
+
+    setCheckedSamples(newCheckedSamples);
+  }, [rowSelection]);
 
   if (isLoading) {
     return <div>Loading ...</div>;
