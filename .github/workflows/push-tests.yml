@@ -48,5 +48,7 @@ jobs:
           docker network inspect genepinet
           curl -vvv "http://localstack.genepinet.localdev:4566/" || true
           docker tag ${{ secrets.ECR_REPO }}/genepi-gisaid:latest ${{ secrets.ECR_REPO }}/genepi-gisaid:branch-jgadling-test-dns
+          docker tag ${{ secrets.ECR_REPO }}/genepi-backend:latest ${{ secrets.ECR_REPO }}/genepi-backend:branch-jgadling-test-dns
           docker push ${{ secrets.ECR_REPO }}/genepi-gisaid:branch-jgadling-test-dns
+          docker push ${{ secrets.ECR_REPO }}/genepi-backend:branch-jgadling-test-dns
           make pipeline-test-gisaid
