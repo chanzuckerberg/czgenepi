@@ -1,4 +1,3 @@
-// TODO_TR (mlila): delete this file after table refactor complete
 import { isEmpty } from "lodash";
 import { useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
@@ -28,10 +27,6 @@ const DeleteSamplesConfirmationModal = ({
   const { data: userInfo } = useUserInfo();
   const currentGroup = getCurrentGroupFromUserInfo(userInfo);
 
-  const samplesToDelete = checkedSamples
-    .filter((sample) => sample.submittingGroup?.name === currentGroup?.name)
-    .map((sample) => sample.id);
-
   const deleteSampleMutation = useDeleteSamples({
     componentOnError: () => {
       dispatch(
@@ -57,6 +52,12 @@ const DeleteSamplesConfirmationModal = ({
       );
     },
   });
+
+  if (!open) return null;
+
+  const samplesToDelete = checkedSamples
+    .filter((sample) => sample.submittingGroup?.name === currentGroup?.name)
+    .map((sample) => sample.id);
 
   const onDelete = () => {
     setNumDeletedSamples(samplesToDelete.length);
