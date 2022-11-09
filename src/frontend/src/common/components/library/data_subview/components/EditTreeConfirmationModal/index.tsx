@@ -62,7 +62,7 @@ export const EditTreeConfirmationModal = ({
     onClose();
   };
 
-  if (!phyloRun) return null;
+  if (!phyloRun || !open) return null;
 
   const { id } = phyloRun;
 

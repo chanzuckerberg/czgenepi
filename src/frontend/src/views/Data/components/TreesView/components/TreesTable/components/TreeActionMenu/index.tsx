@@ -42,6 +42,12 @@ const TreeActionMenu = ({
     USER_FEATURE_FLAGS.galago_integration
   );
 
+  const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
+  const usesTableRefactor = isUserFlagOn(
+    tableRefactorFlag,
+    USER_FEATURE_FLAGS.table_refactor
+  );
+
   return (
     <StyledTreeActionMenu
       role="group"
@@ -59,11 +65,14 @@ const TreeActionMenu = ({
         <TreeTableDownloadMenu item={item} />
       </StyledActionWrapper>
       <StyledActionWrapper>
-        <MoreActionsMenu
-          item={item}
-          onDeleteTreeModalOpen={onDeleteTreeModalOpen}
-          onEditTreeModalOpen={onEditTreeModalOpen}
-        />
+        {usesTableRefactor && <MoreActionsMenu item={item} />}
+        {!usesTableRefactor && (
+          <MoreActionsMenu
+            item={item}
+            onDeleteTreeModalOpen={onDeleteTreeModalOpen}
+            onEditTreeModalOpen={onEditTreeModalOpen}
+          />
+        )}
       </StyledActionWrapper>
     </StyledTreeActionMenu>
   );
