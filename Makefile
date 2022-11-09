@@ -265,8 +265,7 @@ pipeline-test-gisaid:
 	export MINIWDL_CFG=miniwdl.cfg; \
 	cd src/backend/pipeline_tests; \
 	cat test_data/gisaid_pipeline_inputs.json | envsubst > test_inputs.json; \
-	miniwdl run --cfg miniwdl.cfg --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env BOTO_ENDPOINT_URL --input test_inputs.json --verbose -o output.json ../../../.happy/terraform/modules/sfn_config/gisaid.wdl
-	$(docker_compose) run --no-deps --rm backend make pipeline-test-gisaid
+	miniwdl run --cfg ./miniwdl.cfg --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env BOTO_ENDPOINT_URL --input test_inputs.json --verbose -o output.json ../../../.happy/terraform/modules/sfn_config/gisaid.wdl
 
 
 ### WDL ###################################################
