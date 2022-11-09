@@ -1,5 +1,6 @@
 import { CellBasic, Table, TableHeader, TableRow } from "czifui";
 import {
+  ColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
