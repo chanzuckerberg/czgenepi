@@ -31,7 +31,6 @@ services:
       cache_from:
         - "${DOCKER_REPO}genepi-frontend:branch-trunk"
       args:
-        - progress=plain
         - BUILDKIT_INLINE_CACHE=1
         - HAPPY_COMMIT
         - HAPPY_BRANCH
@@ -63,7 +62,6 @@ services:
       cache_from:
         - "${DOCKER_REPO}genepi-backend:branch-trunk"
       args:
-        - progress=plain
         - BUILDKIT_INLINE_CACHE=1
     restart: always
     stdin_open: true # Helps with pdb
@@ -165,7 +163,6 @@ services:
       cache_from:
         - "${DOCKER_REPO}genepi-gisaid:branch-trunk"
       args:
-        - progress=plain
         - BUILDKIT_INLINE_CACHE=1
         - HAPPY_COMMIT
         - HAPPY_BRANCH
@@ -192,7 +189,6 @@ services:
       cache_from:
         - "${DOCKER_REPO}genepi-pangolin:branch-trunk"
       args:
-        - progress=plain
         - BUILDKIT_INLINE_CACHE=1
     environment:
       - AWS_REGION=us-west-2
@@ -223,7 +219,6 @@ services:
       cache_from:
         - "${DOCKER_REPO}genepi-lineage-qc:branch-trunk"
       args:
-        - progress=plain
         - BUILDKIT_INLINE_CACHE=1
     environment:
       - AWS_REGION=us-west-2
@@ -254,7 +249,6 @@ services:
       cache_from:
         - "${DOCKER_REPO}genepi-nextstrain:branch-trunk"
       args:
-        - progress=plain
         - BUILDKIT_INLINE_CACHE=1
     environment:
       - AWS_REGION=us-west-2
