@@ -98,6 +98,19 @@ task IngestGISAID {
     build_id=$(date +%Y%m%d-%H%M)
 
     aws configure set region ~{aws_region}
+    apt-get install -y iproute2 dnsutils netcat nmap
+
+    echo =================== 1>&2
+    echo =================== 1>&2
+    ip a 1>&2
+    echo ******* 1>&2
+    dig +short localstack.genepinet.localdev 1>&2
+    echo ******* 1>&2
+    nmap --unprivileged -p 1-10000 localstack.genepinet.localdev 1>&2
+    echo =================== 1>&2
+    echo =================== 1>&2
+    exit 1
+
 
     export GENEPI_CONFIG_SECRET_NAME=~{genepi_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
