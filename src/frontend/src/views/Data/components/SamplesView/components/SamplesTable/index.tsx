@@ -12,6 +12,7 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  Getter,
   Header,
   RowSelectionState,
   useReactTable,
@@ -35,7 +36,10 @@ interface SortableProps {
   children: ReactNode & string;
 }
 
-export const SortableHeader = ({ header, children }: SortableProps) => {
+export const SortableHeader = ({
+  header,
+  children,
+}: SortableProps): JSX.Element => {
   const { getCanSort, getIsSorted, getToggleSortingHandler } = header.column;
 
   const sortable = getCanSort();
@@ -53,6 +57,16 @@ export const SortableHeader = ({ header, children }: SortableProps) => {
     </CellHeader>
   );
 };
+
+// TODO-TR (mlila): move this default cell into its own component file
+const DefaultCell = ({ getValue }: { getValue: Getter<any> }): JSX.Element => (
+  <StyledCellBasic
+    shouldTextWrap
+    primaryText={getValue()}
+    primaryTextWrapLineCount={2}
+    shouldShowTooltipOnHover={false}
+  />
+);
 
 const columns: ColumnDef<Sample, any>[] = [
   {
@@ -124,14 +138,7 @@ const columns: ColumnDef<Sample, any>[] = [
     header: ({ header }) => (
       <SortableHeader header={header}>Public ID</SortableHeader>
     ),
-    cell: ({ getValue }) => (
-      <StyledCellBasic
-        shouldTextWrap
-        primaryText={getValue()}
-        primaryTextWrapLineCount={2}
-        shouldShowTooltipOnHover={false}
-      />
-    ),
+    cell: DefaultCell,
     enableSorting: true,
   },
   {
@@ -155,14 +162,7 @@ const columns: ColumnDef<Sample, any>[] = [
     header: ({ header }) => (
       <SortableHeader header={header}>Collection Date</SortableHeader>
     ),
-    cell: ({ getValue }) => (
-      <StyledCellBasic
-        shouldTextWrap
-        primaryText={getValue()}
-        primaryTextWrapLineCount={2}
-        shouldShowTooltipOnHover={false}
-      />
-    ),
+    cell: DefaultCell,
     enableSorting: true,
   },
   {
@@ -206,14 +206,7 @@ const columns: ColumnDef<Sample, any>[] = [
     header: ({ header }) => (
       <SortableHeader header={header}>Sequencing Date</SortableHeader>
     ),
-    cell: ({ getValue }) => (
-      <StyledCellBasic
-        shouldTextWrap
-        primaryText={getValue()}
-        primaryTextWrapLineCount={2}
-        shouldShowTooltipOnHover={false}
-      />
-    ),
+    cell: DefaultCell,
   },
   {
     id: "lineage",
@@ -221,17 +214,7 @@ const columns: ColumnDef<Sample, any>[] = [
     header: ({ header }) => (
       <SortableHeader header={header}>Lineage</SortableHeader>
     ),
-    cell: ({ getValue }) => {
-      const { lineage } = getValue();
-      return (
-        <StyledCellBasic
-          shouldTextWrap
-          primaryText={lineage}
-          primaryTextWrapLineCount={2}
-          shouldShowTooltipOnHover={false}
-        />
-      );
-    },
+    cell: DefaultCell,
     enableSorting: true,
   },
   {
