@@ -37,7 +37,7 @@ const DataNavigation = ({
 
   const pathogen = useSelector(selectCurrentPathogen);
   const { data: samples } = useSampleInfo(pathogen);
-  const { data: phyloRuns } = usePhyloRunInfo();
+  const { data: phyloRuns } = usePhyloRunInfo(pathogen);
 
   // Configure tabs that are shown on the data page. One tab per view.
   // TODO-TR (mlila): types

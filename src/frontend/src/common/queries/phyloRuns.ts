@@ -13,6 +13,7 @@ import {
   PhyloRunResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
+import { Pathogen } from "../redux/types";
 import {
   getCapitalCaseTreeType,
   getDownloadLinks,
@@ -43,14 +44,18 @@ export const USE_PHYLO_RUN_INFO = {
  * custom hook to automatically expire tree info when needed
  * such as when trees are deleted
  */
-export function usePhyloRunInfo(): UseQueryResult<PhyloRunResponse, unknown> {
-  return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
+export function usePhyloRunInfo(
+  pathogen: Pathogen
+): UseQueryResult<PhyloRunResponse, unknown> {
+  return useQuery([USE_PHYLO_RUN_INFO, pathogen], fetchPhyloRuns, {
     retry: false,
   });
 }
 
-export function useNewPhyloRunInfo(): UseQueryResult<IdMap<PhyloRun>, unknown> {
-  return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
+export function useNewPhyloRunInfo(
+  pathogen: Pathogen
+): UseQueryResult<IdMap<PhyloRun>, unknown> {
+  return useQuery([USE_PHYLO_RUN_INFO, pathogen], fetchPhyloRuns, {
     retry: false,
     select: mapPhyloRuns,
   });

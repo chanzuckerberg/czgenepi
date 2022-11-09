@@ -83,7 +83,7 @@ const Data: FunctionComponent = () => {
 
   const pathogen = useSelector(selectCurrentPathogen);
   const sampleResponse = useSampleInfo(pathogen);
-  const PhyloRunResponse = usePhyloRunInfo();
+  const PhyloRunResponse = usePhyloRunInfo(pathogen);
   const {
     data: sampleData,
     isLoading: isSampleInfoLoading,
