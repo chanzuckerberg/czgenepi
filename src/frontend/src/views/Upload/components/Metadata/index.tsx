@@ -5,7 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { setApplyAllValueToPrevMetadata } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/utils";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import { EMPTY_OBJECT } from "src/common/constants/empty";
+import { EMPTY_OBJECT, noop } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
 import { isUserFlagOn } from "src/components/Split";
@@ -17,6 +17,7 @@ import {
   WARNING_CODE,
 } from "src/components/WebformTable/common/types";
 import Progress from "../common/Progress";
+import { B } from "src/common/styles/basicStyle";
 import {
   ButtonWrapper,
   Content,
@@ -26,6 +27,7 @@ import {
   Subtitle,
   Title,
 } from "../common/style";
+import { StyledCallout } from "./style";
 import { Props } from "../common/types";
 import { initSampleMetadata } from "../common/utils";
 import ImportFile from "./components/ImportFile";
@@ -132,6 +134,13 @@ export default function Metadata({
         <Progress step="2" />
       </Header>
       <Content>
+        {useStaticMetadataTable && (
+          <StyledCallout intent="info" autoDismiss={false} onClose={noop}>
+            <B>Notice something different about this page?</B> When uploading
+            100 or more samples, metadata must be imported from a TSV or CSV.
+            Download the metadata template below.
+          </StyledCallout>
+        )}
         <StyledInstructions
           title="Sample Privacy & Sharing"
           items={[
@@ -153,7 +162,11 @@ export default function Metadata({
         />
 
         {useStaticMetadataTable && (
-          <StaticTable metadata={metadata} setIsValid={setIsValid} />
+          <StaticTable
+            metadata={metadata}
+            setIsValid={setIsValid}
+            hasImportedMetadataFile={hasImportedMetadataFile}
+          />
         )}
 
         {!useStaticMetadataTable && (

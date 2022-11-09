@@ -6,6 +6,7 @@ import {
   getColors,
   getSpaces,
 } from "czifui";
+
 import { TreeRowContent } from "src/common/components/library/data_table/style";
 import {
   iconFillGray,
@@ -66,8 +67,13 @@ export const StyledTreeCreator = styled.div`
     return `
       color: ${colors?.gray[500]};
       margin-top: ${spaces?.xxxs}px;
+      height: ${spaces?.l}px;
     `;
   }}
+`;
+
+export const StyledDetailsTooltipTarget = styled.p`
+  cursor: pointer;
 `;
 
 export const StyledTreeIconWrapper = styled.div`
@@ -80,3 +86,22 @@ export const StyledTreeIconWrapper = styled.div`
     `;
   }}
 `;
+
+export const popperPropsSx = {
+  sx: {
+    "& .MuiTooltip-tooltip": {
+      width: "350px",
+      maxWidth: "none !important",
+    },
+    "& .MuiTable-root": {
+      borderCollapse: "separate",
+      borderSpacing: "8px",
+    },
+    "& .MuiTableRow-root": {
+      verticalAlign: "top",
+    },
+    "& .MuiTableCell-root": {
+      width: "25%",
+    },
+  },
+};

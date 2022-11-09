@@ -1,36 +1,36 @@
-import { map } from "lodash";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { HeadAppTitle } from "src/common/components";
+import { TreeCreateHelpLink } from "src/common/components/library/data_subview/components/TreeCreateHelpLink";
 import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
+import { IdMap } from "src/common/utils/dataTransforms";
+import { SearchBar } from "src/components/Table/components/SearchBar";
+import { StyledView } from "../../style";
+import { DataNavigation } from "../DataNavigation";
+import { TreesTable } from "./components/TreesTable";
+import { Flex } from "./style";
 
 const TreesView = (): JSX.Element => {
-  // initialize state
-  const [isDataLoading, setIsDataLoading] = useState(false);
+  const [displayedRows, setDisplayedRows] = useState<IdMap<PhyloRun>>({});
 
   // load tree data from server
   const phyloRunResponse = usePhyloRunInfo();
   const { data: phyloRuns, isLoading, isFetching } = phyloRunResponse;
 
-  // determine whether we should show loading ui or interactive ui
-  useEffect(() => {
-    setIsDataLoading(true);
-
-    if (isLoading || isFetching) return;
-
-    setIsDataLoading(false);
-  }, [isLoading, isFetching]);
-
-  if (isDataLoading) {
-    return <div>Loading ...</div>;
-  }
-
   return (
-    <>
+    <StyledView>
       <HeadAppTitle subTitle="Trees" />
-      {map(phyloRuns, (r) => (
-        <div>{r.id}</div>
-      ))}
-    </>
+      <DataNavigation />
+      <div>
+        <Flex>
+          <SearchBar
+            tableData={phyloRuns}
+            onSearchComplete={setDisplayedRows}
+          />
+          <TreeCreateHelpLink />
+        </Flex>
+        <TreesTable isLoading={isLoading || isFetching} data={displayedRows} />
+      </div>
+    </StyledView>
   );
 };
 

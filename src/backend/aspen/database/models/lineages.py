@@ -10,6 +10,7 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import base, idbase
@@ -102,16 +103,16 @@ class SampleLineage(idbase):  # type: ignore
     )
     lineage_software_version = Column(String, nullable=False)
     lineage = Column(String, nullable=False)
-    lineage_probability = Column(Float, nullable=False)
-    raw_lineage_output = Column(String, nullable=True)
+    lineage_probability = Column(Float, nullable=True)
+    raw_lineage_output = Column(JSONB, nullable=True)
 
 
 class SampleQCMetric(idbase):  # type: ignore
     __tablename__ = "sample_qc_metrics"
 
-    sample_id = Column(Integer, ForeignKey("samples.id"))
+    sample_id = Column(Integer, ForeignKey("samples.id"), unique=True)
     sample = relationship("Sample", back_populates="qc_metrics")  # type: ignore
     qc_score = Column(String, nullable=False, unique=True)
     qc_software_version = Column(String, nullable=False)
     qc_status = Column(String, nullable=False)
-    raw_qc_output = Column(String, nullable=True)
+    raw_qc_output = Column(JSONB, nullable=True)
