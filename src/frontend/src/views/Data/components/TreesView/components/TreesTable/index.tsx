@@ -8,6 +8,7 @@ import {
 import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
 import { useEffect, useState } from "react";
+import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
@@ -31,7 +32,9 @@ const columns: ColumnDef<PhyloRun, any>[] = [
     header: ({ header }) => (
       <SortableHeader header={header}>Creation Date</SortableHeader>
     ),
-    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    cell: ({ getValue }) => (
+      <CellBasic primaryText={datetimeWithTzToLocalDate(getValue())} />
+    ),
     enableSorting: true,
   },
   {
