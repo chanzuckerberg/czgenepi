@@ -61,7 +61,7 @@ services:
     build:
       context: src/backend
       cache_from:
-        - "${DOCKER_REPO}genepi-backend:branch-trunk"
+        - "${DOCKER_REPO}genepi-backend:jgadling-test-dns"
       args:
         - BUILDKIT_INLINE_CACHE=1
     restart: always
