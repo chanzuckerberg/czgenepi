@@ -1,7 +1,8 @@
 import {
-  CellBasic,
+  CellComponent,
   CellHeader,
   Checkbox,
+  Icon,
   Table,
   TableHeader,
   TableRow,
@@ -11,6 +12,7 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  Getter,
   Header,
   RowSelectionState,
   useReactTable,
@@ -19,6 +21,7 @@ import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
 import { ReactNode, useEffect, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
+import { StyledCellBasic, StyledPrivateId } from "./style";
 
 // TODO-TR (mlila): types
 interface Props {
@@ -33,7 +36,10 @@ interface SortableProps {
   children: ReactNode & string;
 }
 
-export const SortableHeader = ({ header, children }: SortableProps) => {
+export const SortableHeader = ({
+  header,
+  children,
+}: SortableProps): JSX.Element => {
   const { getCanSort, getIsSorted, getToggleSortingHandler } = header.column;
 
   const sortable = getCanSort();
@@ -52,16 +58,26 @@ export const SortableHeader = ({ header, children }: SortableProps) => {
   );
 };
 
+// TODO-TR (mlila): move this default cell into its own component file
+const DefaultCell = ({ getValue }: { getValue: Getter<any> }): JSX.Element => (
+  <StyledCellBasic
+    shouldTextWrap
+    primaryText={getValue()}
+    primaryTextWrapLineCount={2}
+    shouldShowTooltipOnHover={false}
+  />
+);
+
 const columns: ColumnDef<Sample, any>[] = [
   {
     id: "select",
+    size: 50,
     header: ({ table }) => {
       const {
         getIsAllRowsSelected,
         getIsSomeRowsSelected,
         getToggleAllRowsSelectedHandler,
       } = table;
-
       const isChecked = getIsAllRowsSelected();
       const isIndeterminate = getIsSomeRowsSelected();
       const checkboxStage = isChecked
@@ -72,7 +88,11 @@ const columns: ColumnDef<Sample, any>[] = [
 
       const onChange = getToggleAllRowsSelectedHandler();
 
-      return <Checkbox stage={checkboxStage} onChange={onChange} />;
+      return (
+        <CellComponent>
+          <Checkbox stage={checkboxStage} onChange={onChange} />
+        </CellComponent>
+      );
     },
     cell: ({ row }) => {
       const { getIsSelected, getToggleSelectedHandler } = row;
@@ -80,16 +100,36 @@ const columns: ColumnDef<Sample, any>[] = [
       const checkboxStage = getIsSelected() ? "checked" : "unchecked";
       const onChange = getToggleSelectedHandler();
 
-      return <Checkbox stage={checkboxStage} onChange={onChange} />;
+      return (
+        <CellComponent>
+          <Checkbox stage={checkboxStage} onChange={onChange} />
+        </CellComponent>
+      );
     },
   },
   {
     id: "privateId",
     accessorKey: "privateId",
+    minSize: 350,
     header: ({ header }) => (
       <SortableHeader header={header}>Private ID</SortableHeader>
     ),
-    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    cell: ({ getValue, row }) => {
+      const uploader = row?.original?.uploadedBy.name;
+      return (
+        <StyledPrivateId
+          primaryText={getValue()}
+          secondaryText={uploader}
+          shouldTextWrap
+          primaryTextWrapLineCount={1}
+          icon={<Icon sdsIcon="flaskPublic" sdsSize="xl" sdsType="static" />}
+          tooltipProps={{
+            sdsStyle: "light",
+            arrow: false,
+          }}
+        />
+      );
+    },
     enableSorting: true,
   },
   {
@@ -98,8 +138,23 @@ const columns: ColumnDef<Sample, any>[] = [
     header: ({ header }) => (
       <SortableHeader header={header}>Public ID</SortableHeader>
     ),
-    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    cell: DefaultCell,
     enableSorting: true,
+  },
+  {
+    id: "uploadDate",
+    accessorKey: "uploadDate",
+    header: ({ header }) => (
+      <SortableHeader header={header}>Upload Date</SortableHeader>
+    ),
+    cell: ({ getValue }) => (
+      <StyledCellBasic
+        shouldTextWrap
+        primaryText={datetimeWithTzToLocalDate(getValue())}
+        primaryTextWrapLineCount={2}
+        shouldShowTooltipOnHover={false}
+      />
+    ),
   },
   {
     id: "collectionDate",
@@ -107,7 +162,7 @@ const columns: ColumnDef<Sample, any>[] = [
     header: ({ header }) => (
       <SortableHeader header={header}>Collection Date</SortableHeader>
     ),
-    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    cell: DefaultCell,
     enableSorting: true,
   },
   {
@@ -118,19 +173,15 @@ const columns: ColumnDef<Sample, any>[] = [
     ),
     cell: ({ getValue }) => {
       const { lineage } = getValue();
-      return <CellBasic primaryText={lineage} />;
+      return (
+        <StyledCellBasic
+          shouldTextWrap
+          primaryText={lineage}
+          primaryTextWrapLineCount={2}
+          shouldShowTooltipOnHover={false}
+        />
+      );
     },
-    enableSorting: true,
-  },
-  {
-    id: "uploadDate",
-    accessorKey: "uploadDate",
-    header: ({ header }) => (
-      <SortableHeader header={header}>Upload Date</SortableHeader>
-    ),
-    cell: ({ getValue }) => (
-      <CellBasic primaryText={datetimeWithTzToLocalDate(getValue())} />
-    ),
     enableSorting: true,
   },
   {
@@ -139,7 +190,14 @@ const columns: ColumnDef<Sample, any>[] = [
     header: ({ header }) => (
       <SortableHeader header={header}>Collection Location</SortableHeader>
     ),
-    cell: ({ getValue }) => <CellBasic primaryText={getValue().location} />,
+    cell: ({ getValue }) => (
+      <StyledCellBasic
+        shouldTextWrap
+        primaryText={getValue().location}
+        primaryTextWrapLineCount={2}
+        shouldShowTooltipOnHover={false}
+      />
+    ),
     enableSorting: true,
   },
   {
@@ -148,8 +206,7 @@ const columns: ColumnDef<Sample, any>[] = [
     header: ({ header }) => (
       <SortableHeader header={header}>Sequencing Date</SortableHeader>
     ),
-    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
-    enableSorting: true,
+    cell: DefaultCell,
   },
   {
     id: "gisaid",
@@ -158,8 +215,14 @@ const columns: ColumnDef<Sample, any>[] = [
       <SortableHeader header={header}>GISAID</SortableHeader>
     ),
     cell: ({ getValue }) => {
-      const { status } = getValue();
-      return <CellBasic primaryText={status} />;
+      const { gisaid_id, status } = getValue();
+      return (
+        <StyledCellBasic
+          primaryText={status}
+          secondaryText={gisaid_id}
+          shouldShowTooltipOnHover={false}
+        />
+      );
     },
     enableSorting: true,
   },
@@ -183,6 +246,9 @@ const SamplesTable = ({
 
   const table = useReactTable({
     data: samples,
+    defaultColumn: {
+      minSize: 50,
+    },
     columns,
     enableMultiRowSelection: true,
     getCoreRowModel: getCoreRowModel(),

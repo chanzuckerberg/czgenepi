@@ -10,7 +10,7 @@ import { StyledView } from "../../style";
 import { DataNavigation } from "../DataNavigation";
 import { SamplesTable } from "./components/SamplesTable";
 import { SampleTableModalManager } from "./components/SampleTableModalManager";
-import { Flex } from "./style";
+import { Flex, MaxWidth, StyledActionBar } from "./style";
 
 const SamplesView = (): JSX.Element => {
   // initialize state
@@ -79,8 +79,8 @@ const SamplesView = (): JSX.Element => {
           setDataFilterFunc={setDataFilterFunc}
           data-test-id="menu-item-sample-count"
         />
-        <div>
-          <Flex>
+        <MaxWidth>
+          <StyledActionBar>
             <SearchBar
               tableData={samples}
               onSearchComplete={setSearchResults}
@@ -89,13 +89,13 @@ const SamplesView = (): JSX.Element => {
               checkedSamples={checkedSamples}
               clearCheckedSamples={() => setCheckedSamples([])}
             />
-          </Flex>
+          </StyledActionBar>
           <SamplesTable
             isLoading={isLoading || isFetching}
             data={displayedRows}
             setCheckedSamples={setCheckedSamples}
           />
-        </div>
+        </MaxWidth>
       </Flex>
     </StyledView>
   );
