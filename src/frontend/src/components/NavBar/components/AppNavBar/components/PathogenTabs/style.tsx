@@ -8,28 +8,16 @@ import {
   getPalette,
   getSpaces,
 } from "czifui";
+import { accessibleFocusBorder } from "src/common/styles/accessibility";
 
 export const StyledTabs = styled(Tabs)`
   align-items: center;
+  ${accessibleFocusBorder}
 
   ${(props: CommonThemeProps) => {
-    const colors = getColors(props);
     const palette = getPalette(props);
 
     return `
-      // color: ${colors?.gray[400]};
-      // &:hover, :focus {
-      //   color: ${palette?.common?.white};
-      // }
-      // & .Mui-selected {
-      //   color: ${palette?.common?.white};
-      //   &:hover, :focus {
-      //     color: ${colors?.gray[400]};
-      //   }
-      // }
-
-
-
       & .MuiTabs-indicator {
         background-color: ${palette?.common?.white};
       }
@@ -53,19 +41,7 @@ export const StyledTab = styled(Tab)`
       margin-right: ${spaces?.xl}px;
       font-weight: ${fontWeights?.semibold};
       color: ${colors?.gray[400]};
-      &:hover, :focus {
-        color: ${palette?.common?.white};
-      }
-
-      &.Mui-selected {
-        color: ${palette?.common?.white};
-
-        &:hover {
-          color: ${palette?.common?.white};
-        }
-      }
-
-      &:active {
+      &:hover, &:focus, &:active, &.Mui-selected {
         color: ${palette?.common?.white};
       }
     `;
