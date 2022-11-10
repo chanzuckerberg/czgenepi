@@ -163,6 +163,7 @@ export const View = styled.div`
   when the viewport height is too short */
   height: calc(100% - 74px);
   display: flex;
+  width: 100%;
 `;
 
 export const StyledCount = styled.div`
@@ -198,4 +199,5 @@ export const StyledMenuItem = styled.li`
 export const StyledView = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
 `;
