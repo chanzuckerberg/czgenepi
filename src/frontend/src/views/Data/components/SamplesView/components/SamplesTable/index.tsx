@@ -115,14 +115,22 @@ const columns: ColumnDef<Sample, any>[] = [
       <SortableHeader header={header}>Private ID</SortableHeader>
     ),
     cell: ({ getValue, row }) => {
-      const uploader = row?.original?.uploadedBy.name;
+      const { uploadedBy, private: isPrivate } = row?.original;
+      const uploader = uploadedBy?.name;
+
       return (
         <StyledPrivateId
           primaryText={getValue()}
           secondaryText={uploader}
           shouldTextWrap
           primaryTextWrapLineCount={1}
-          icon={<Icon sdsIcon="flaskPublic" sdsSize="xl" sdsType="static" />}
+          icon={
+            <Icon
+              sdsIcon={isPrivate ? "flaskPrivate" : "flaskPublic"}
+              sdsSize="xl"
+              sdsType="static"
+            />
+          }
           tooltipProps={{
             sdsStyle: "light",
             arrow: false,
