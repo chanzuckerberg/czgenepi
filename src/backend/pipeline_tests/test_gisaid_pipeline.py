@@ -4,8 +4,6 @@ import sqlalchemy as sa
 
 from aspen.database.models import (
     AlignedRepositoryData,
-    GisaidMetadata,
-    Location,
     Pathogen,
     PublicRepository,
     PublicRepositoryMetadata,
