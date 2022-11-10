@@ -1,13 +1,11 @@
 """
 Writes out a FASTA for the sample PK ids specified by file.
 
-Approach here is pretty much a copy of what's in workflows/pangolin/export.py
-Main tweak is that everything is based on the primary key ID of the sample
-instead of using private/public identifiers because we want a clear,
-unambiguous ID when working across multiple groups simultaneously.
+Core approach here is a copy of what's in workflows/pangolin/export.py.
 """
 import io
-from typing import Iterable
+import json
+from typing import IO, Iterable, Optional
 
 import click
 from sqlalchemy.orm import joinedload
@@ -19,15 +17,19 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Sample, UploadedPathogenGenome
+from aspen.database.models import Pathogen, Sample, UploadedPathogenGenome
 
 
 @click.command("export")
 @click.option("sample_ids_fh", "--sample-ids-file", type=click.File("r"), required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
+@click.option(
+    "pathogen_info_fh", "--pathogen-info-file", type=click.File("w"), required=True
+)
 def cli(
     sample_ids_fh: io.TextIOBase,
     sequences_fh: io.TextIOBase,
+    pathogen_info_fh: IO[str],
 ):
     """
     Writes out a FASTA for the specified samples.
@@ -37,10 +39,10 @@ def cli(
         NOTE Resulting FASTA will have its id lines (>) be those primary keys,
         so anything that consumes these downstream results will be referring
         to samples by PK, not by private/public identifier.
+    - pathogen_info_fh: Write out pathogen info for later use in workflow
     """
     sample_ids: list[int] = [int(id_line) for id_line in sample_ids_fh]
     print("Fetching and writing FASTA for sample ids:", sample_ids)
-
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
         all_samples: Iterable[Sample] = (
@@ -53,9 +55,16 @@ def cli(
             )
         )
 
+        # Should pick it up as we run through samples. If missing at end, raise
+        pathogen_of_all_samples: Optional[Pathogen] = None
         for sample in all_samples:
-            uploaded_pathogen_genome = sample.uploaded_pathogen_genome
 
+            pathogen = sample.pathogen
+            if pathogen_of_all_samples is None:
+                pathogen_of_all_samples = pathogen
+            # TODO Ensure consistent pathogen across all samples, raise if not
+
+            uploaded_pathogen_genome = sample.uploaded_pathogen_genome
             # Samples _should_ always have uploaded_pathogen_genome with
             # sequence data on them in theory, but if it's missing, blow up.
             if uploaded_pathogen_genome is None:
@@ -74,6 +83,24 @@ def cli(
             sequences_fh.write(f">{sample.id}\n")  # type: ignore
             sequences_fh.write(stripped_sequence)
             sequences_fh.write("\n")
+
+        print("Finished writing FASTA for samples.")
+        if pathogen_of_all_samples is None:
+            raise ValueError("No pathogen data available for samples")
+        save_pathogen_info(pathogen_info_fh, pathogen_of_all_samples)
+
+
+def save_pathogen_info(pathogen_info_fh: IO[str], pathogen: Pathogen):
+    """Write a JSON of important pathogen info for use later in workflow."""
+    pathogen_info = {
+        "pathogen_slug": pathogen.slug,
+        # Not all pathogens have a dataset once we get to generalized case.
+        # When that happens, will be None/null
+        "nextclade_dataset_name": pathogen.nextclade_dataset_name,
+    }
+    # Make it available in logs for debugging ease
+    print("Info about pathogen in these samples:", pathogen_info)
+    json.dump(pathogen_info, pathogen_info_fh)
 
 
 if __name__ == "__main__":

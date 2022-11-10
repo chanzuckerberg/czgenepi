@@ -4,12 +4,11 @@
 set -Eeuxo pipefail
 shopt -s inherit_errexit  # no silent breaking
 
-# export sequences
-cp /usr/src/app/aspen/workflows/pangolin/export.py .
-/usr/local/bin/python3.10 export.py \
+# Pull sequences from DB and write them out. Capture other necessary info too.
+/usr/local/bin/python3.10 /usr/src/app/aspen/workflows/nextclade/prep_samples.py \
   --sample-ids-file $SAMPLE_IDS_FILE \
   --sequences sequences.fasta \
-  --fasta-identifier-type public_identifier
+  --pathogen-info-file pathogen_info.json
 
 # run nextclade
 nextclade dataset get --name $NEXTCLADE_DATASET_NAME --output-dir output/bundle
