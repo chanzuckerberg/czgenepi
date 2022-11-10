@@ -1,5 +1,11 @@
 import styled from "@emotion/styled";
-import { CommonThemeProps, fontHeaderXs, getColors, getFontWeights, getSpaces } from "czifui";
+import {
+  CommonThemeProps,
+  fontHeaderXs,
+  getColors,
+  getFontWeights,
+  getSpaces,
+} from "czifui";
 import { SampleUploadDownloadTemplate } from "src/components/DownloadMetadataTemplate";
 
 export const SemiBold = styled.span`

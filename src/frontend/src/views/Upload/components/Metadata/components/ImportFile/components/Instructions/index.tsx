@@ -15,9 +15,7 @@ export default function Instructions({ headers, rows }: Props): JSX.Element {
         <ListItem fontSize="xs">
           <SemiBold>
             Please refer to the{" "}
-            <NewTabLink
-              href="https://help.czgenepi.org/hc/en-us/articles/6160372401172-Uploading-data#step3"
-            >
+            <NewTabLink href="https://help.czgenepi.org/hc/en-us/articles/6160372401172-Uploading-data#step3">
               Upload and Updating Metadata
             </NewTabLink>{" "}
             help documentation for detailed instructions on setting up your file
