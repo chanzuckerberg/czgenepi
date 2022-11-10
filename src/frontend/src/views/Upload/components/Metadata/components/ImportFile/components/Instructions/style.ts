@@ -13,7 +13,7 @@ export const SemiBold = styled.span`
     const fontWeights = getFontWeights(props);
 
     return `
-      font-weight: ${fontWeights?.semibold}
+      font-weight: ${fontWeights?.semibold};
     `;
   }}
 `;
