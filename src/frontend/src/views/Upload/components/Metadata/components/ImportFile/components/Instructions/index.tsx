@@ -16,9 +16,7 @@ export default function Instructions({ headers, rows }: Props): JSX.Element {
           <SemiBold>
             Please refer to the{" "}
             <NewTabLink
-              href={
-                "https://help.czgenepi.org/hc/en-us/articles/6160372401172-Uploading-data#step3"
-              }
+              href="https://help.czgenepi.org/hc/en-us/articles/6160372401172-Uploading-data#step3"
             >
               Upload and Updating Metadata
             </NewTabLink>{" "}

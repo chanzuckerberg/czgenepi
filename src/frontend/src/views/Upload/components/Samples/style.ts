@@ -4,13 +4,20 @@ import {
   CommonThemeProps,
   fontCapsXxs,
   getColors,
+  getFontWeights,
   getSpaces,
 } from "czifui";
 import FilePicker from "src/components/FilePicker";
 import { marginBottom } from "../common/style";
 
 export const SemiBold = styled.span`
-  font-weight: 600;
+  ${(props: CommonThemeProps) => {
+    const fontWeights = getFontWeights(props);
+
+    return `
+      font-weight: ${fontWeights?.semibold}
+    `;
+  }}
 `;
 
 export const StyledButton = styled(Button)`
