@@ -89,19 +89,13 @@ export const StyledButton = styled(Button)`
 `;
 
 export const VerticalLine = styled.div`
-  height: 100%;
-  width: 1px;
-  margin: 0;
-
-  &:before {
-    content: "\\00a0";
-  }
+  height: 28px;
 
   ${(props: CommonThemeProps) => {
     const colors = getColors(props);
 
     return `
-      background-color: ${colors?.gray[400]};
+      border-right: 1px solid ${colors?.gray[400]};
     `;
   }}
 `;
