@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { CommonThemeProps, getColors, getSpaces } from "czifui";
+import { CommonThemeProps, getColors, getSpaces, Tabs } from "czifui";
 
 export const Navigation = styled.div`
   display: flex;
@@ -11,6 +11,15 @@ export const Navigation = styled.div`
 
     return `
       border-bottom: ${spaces?.xxs}px solid ${colors?.gray[200]};
+    `;
+  }}
+`;
+
+export const StyledTabs = styled(Tabs)`
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-bottom: ${spaces?.l}px;
     `;
   }}
 `;
