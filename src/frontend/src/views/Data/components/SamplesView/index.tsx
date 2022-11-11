@@ -1,10 +1,8 @@
 import { DefaultMenuSelectOption } from "czifui";
 import { compact, map, uniq } from "lodash";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { HeadAppTitle } from "src/common/components";
 import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
-import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { FilterPanel } from "src/components/FilterPanel";
 import { SearchBar } from "src/components/Table/components/SearchBar";
@@ -26,8 +24,7 @@ const SamplesView = (): JSX.Element => {
   const [displayedRows, setDisplayedRows] = useState<IdMap<Sample>>({});
 
   // load sample data from server
-  const pathogen = useSelector(selectCurrentPathogen);
-  const { data: samples, isFetching, isLoading } = useSampleInfo(pathogen);
+  const { data: samples, isFetching, isLoading } = useSampleInfo();
 
   // only display rows that match the current search and the current filters
   useEffect(() => {
