@@ -24,7 +24,7 @@ const fetchLineages = (): Promise<LineagesResponse> => {
   return getBackendApiJson(API.PANGO_LINEAGES);
 };
 
-const USE_LINEAGES_INFO_QUERY_KEY = {
+export const USE_LINEAGES_INFO_QUERY_KEY = {
   entities: [ENTITIES.LINEAGES_INFO],
   id: "lineagesInfo",
 };
