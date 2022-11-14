@@ -9,12 +9,12 @@ import Error from "src/views/Upload/components/Metadata/components/ImportFile/co
 import Success from "src/views/Upload/components/Metadata/components/ImportFile/components/Alerts/Success";
 import {
   ErrorBadFormatData,
+  ErrorMissingData,
   WarningAbsentSample,
   WarningAbsentSampleEdit,
   WarningAutoCorrect,
   WarningExtraneousEntry,
   WarningExtraneousEntrySampleEdit,
-  WarningMissingData,
   WarningMissingDataEdit,
 } from "src/views/Upload/components/Metadata/components/ImportFile/components/Alerts/warnings";
 import {
@@ -114,9 +114,7 @@ export default function ImportFileWarnings({
         )}
 
       {metadataUploadType == MetadataUploadTypeOption.Upload &&
-        !isEmpty(missingData) && (
-          <WarningMissingData missingData={missingData} />
-        )}
+        !isEmpty(missingData) && <ErrorMissingData missingData={missingData} />}
 
       {metadataUploadType == MetadataUploadTypeOption.Edit &&
         !isEmpty(missingData) && (
