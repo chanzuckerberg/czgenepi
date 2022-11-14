@@ -1,3 +1,4 @@
+// TODO_TR (mlila): delete this file after table refactor complete
 import { isEmpty } from "lodash";
 import { useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";

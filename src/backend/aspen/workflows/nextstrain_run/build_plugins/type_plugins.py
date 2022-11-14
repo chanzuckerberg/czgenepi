@@ -40,9 +40,10 @@ class TreeTypePlugin(BaseConfigPlugin):
         build["subsampling_scheme"] = self.subsampling_scheme
 
         # Update the tree's title with build type, location and date range.
-        if (self.template_args.get("filter_start_date") is not None) and (
-            self.template_args.get("filter_end_date") is not None
-        ):
+        # We always provide some form of end date in the title.
+        end_date = self._get_formatted_tree_end_date()
+        # We base format of title on whether we have a `filter_start_date`
+        if self.template_args.get("filter_start_date") is not None:
             title_template = "{tree_type} tree for samples collected in {location} between {start_date} and {end_date}"
             build["title"] = title_template.format(
                 tree_type=self.subsampling_scheme.title(),
@@ -50,21 +51,49 @@ class TreeTypePlugin(BaseConfigPlugin):
                 start_date=dateparser.parse(
                     self.template_args.get("filter_start_date")
                 ).strftime("%Y-%m-%d"),
-                end_date=dateparser.parse(
-                    self.template_args.get("filter_end_date")
-                ).strftime("%Y-%m-%d"),
+                end_date=end_date,
             )
         else:
-            title_template = "{tree_type} tree for samples collected in {location}"
+            title_template = "{tree_type} tree for samples collected in {location} up until {end_date}"
             build["title"] = title_template.format(
                 tree_type=self.subsampling_scheme.title(),
                 location=", ".join(location_values),
+                end_date=end_date,
             )
 
         config["files"]["description"] = config["files"]["description"].format(
             tree_type=self.subsampling_scheme.lower()
         )
         config["priorities"]["crowding_penalty"] = self.crowding_penalty
+
+    def _get_formatted_tree_end_date(self):
+        """Returns appropriate YYYY-MM-DD for tree's end date or "--" if none.
+
+        For tree titles, we want to always have an end date to display. If
+        the tree had a `filter_end_date` arg, we can use that. However, if no
+        filter arg was given for the end date, we use the implicit end date of
+        when the tree build was kicked off (from PhyloRun.start_datetime), as
+        the tree build process can only use samples up to the moment in time
+        when it was kicked off, so it's an implicit end date to samples.
+
+        If there is no date available at all, we return "--" as an absolute
+        fall back. PhyloRun.start_datetime is not actually guaranteed at the DB
+        level, but all our code that creates runs always provides one (as of
+        Nov 2022, every single run has a start_datetime). The fall back is
+        provided just to code defensively in case something weird ever happens.
+        """
+        formatted_end_date = "--"  # safe default, should never happen
+        filter_end_date = self.template_args.get("filter_end_date")
+        if filter_end_date is not None:
+            formatted_end_date = dateparser.parse(filter_end_date).strftime("%Y-%m-%d")
+        else:
+            # `run_start_datetime` is a `context` kwarg, so not guaranteed
+            run_start_datetime = getattr(self, "run_start_datetime", None)
+            if run_start_datetime is not None:
+                formatted_end_date = run_start_datetime.strftime("%Y-%m-%d")
+            else:
+                print("WARNING -- Run missing a start_datetime. Default to '--'")
+        return formatted_end_date
 
     def update_config(self, config):
         self._update_config_params(config)

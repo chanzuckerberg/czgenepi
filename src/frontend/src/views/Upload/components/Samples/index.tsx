@@ -1,5 +1,6 @@
 import { Button, Icon } from "czifui";
 import Link from "next/link";
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { HeadAppTitle } from "src/common/components";
@@ -7,6 +8,8 @@ import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import AlertAccordion from "src/components/AlertAccordion";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import Progress from "../common/Progress";
 import {
   ButtonWrapper,
@@ -47,12 +50,22 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
   const [isLoadingFile, setIsLoadingFile] = useState(false);
   const [tooManySamples, setTooManySamples] = useState(false);
 
+  const flag = useTreatments([USER_FEATURE_FLAGS.static_metadata_table]);
+  const isStaticMetadataTableFlagOn = isUserFlagOn(
+    flag,
+    USER_FEATURE_FLAGS.static_metadata_table
+  );
+
   useEffect(() => {
     if (samples) {
       const counts = getUploadCounts(samples);
       setSampleCount(counts.sampleCount);
       setFileCount(counts.fileCount);
-      setTooManySamples(Object.keys(samples).length > 500);
+      let tooManySamples = Object.keys(samples).length > 500;
+      if (isStaticMetadataTableFlagOn) {
+        tooManySamples = false;
+      }
+      setTooManySamples(tooManySamples);
     }
   }, [samples]);
 
@@ -106,7 +119,8 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
               <SemiBold>
                 Do not include any PII in the Sample name or file name.
               </SemiBold>{" "}
-              Your sample name should be the sample&apos;s Private ID.
+              By default, your sample name will be used as the sample Private
+              ID.
             </span>,
             <span key="2">{acceptedFormats}</span>,
             <span key="3">
@@ -114,9 +128,6 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
               contain letters from the English alphabet (A-Z, upper and lower
               case), numbers (0-9), periods (.), hyphens (-), underscores (_),
               spaces ( ), and forward slashes (/).
-            </span>,
-            <span key="4">
-              The maximum number of samples accommodated per upload is 500.
             </span>,
           ]}
         />

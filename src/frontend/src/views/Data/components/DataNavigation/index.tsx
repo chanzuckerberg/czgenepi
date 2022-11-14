@@ -1,11 +1,11 @@
-import { Tab, Tabs } from "czifui";
+import { Tab } from "czifui";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
 import { FilterPanelToggle } from "./FilterPanelToggle";
-import { Navigation } from "./style";
+import { Navigation, StyledTabs } from "./style";
 
 // either all the props for sample filter panel are passed
 // or no props are passed
@@ -78,7 +78,7 @@ const DataNavigation = ({
           onClick={toggleFilterPanel}
         />
       )}
-      <Tabs value={currentTab} sdsSize="large" onChange={handleTabClick}>
+      <StyledTabs value={currentTab} sdsSize="large" onChange={handleTabClick}>
         {tabData.map((tab) => (
           <Tab
             key={tab.to}
@@ -88,7 +88,7 @@ const DataNavigation = ({
             data-test-id={`menu-item-${tab.to}`}
           />
         ))}
-      </Tabs>
+      </StyledTabs>
     </Navigation>
   );
 };

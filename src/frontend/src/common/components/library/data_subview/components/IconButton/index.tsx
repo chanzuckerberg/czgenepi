@@ -1,3 +1,4 @@
+// TODO_TR (mlila): delete this file after table refactor complete
 import type { IconNameToSizes } from "czifui";
 import { ButtonIcon as LibButtonIcon, Icon, Tooltip } from "czifui";
 import { FunctionComponent, MouseEventHandler, useState } from "react";

@@ -40,6 +40,9 @@ export enum EVENT_TYPES {
   // the selected samples. User can add more metadata to overlay on tree view.
   TREE_DOWNLOAD_SELECTED_SAMPLES_TEMPLATE = "TREE_DOWNLOAD_SELECTED_SAMPLES_TEMPLATE",
 
+  // User hovered over the "Details" for a tree
+  TREE_DETAILS_VIEW = "TREE_DETAILS_VIEW",
+
   // User has either just entered or changed pages in the process of uploading
   // samples. See event data docs for info on how to tell the difference.
   // NOTE: There is no event for user leaving the Upload flow in the middle.
@@ -185,6 +188,11 @@ export type AnalyticsTreeDownloadTreeFile = {
   // User can download tree with samples using either their Private IDs or
   // their Public IDs.
   sample_id_type: "PRIVATE" | "PUBLIC";
+};
+
+/** EVENT_TYPES.TREE_DETAILS_VIEW */
+export type AnalyticsTreeDetailsView = {
+  tree_id: number | null;
 };
 
 /** EVENT_TYPES.TREE_DOWNLOAD_SELECTED_SAMPLES_TEMPLATE */

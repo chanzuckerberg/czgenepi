@@ -1,3 +1,4 @@
+// TODO_TR (mlila): delete this file after table refactor complete
 import styled from "@emotion/styled";
 import {
   iconFillBlack,

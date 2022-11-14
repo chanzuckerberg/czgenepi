@@ -1,54 +1,241 @@
-import { CellBasic, CellHeader, Table, TableHeader, TableRow } from "czifui";
 import {
-  createColumnHelper,
+  CellComponent,
+  CellHeader,
+  Checkbox,
+  Icon,
+  Table,
+  TableHeader,
+  TableRow,
+} from "czifui";
+import {
+  ColumnDef,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
+  Getter,
+  Header,
+  RowSelectionState,
   useReactTable,
 } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
+import { StyledCellBasic, StyledPrivateId } from "./style";
 
 // TODO-TR (mlila): types
 interface Props {
   data: IdMap<Sample> | undefined;
   isLoading: boolean;
+  setCheckedSamples(samples: Sample[]): void;
 }
 
-const columnHelper = createColumnHelper<Sample>();
+// TODO-TR (mlila): move this header component into its own file
+interface SortableProps {
+  header: Header<any, any>;
+  children: ReactNode & string;
+}
 
-const columns = [
-  columnHelper.accessor("privateId", {
-    header: "Private ID",
-  }),
-  columnHelper.accessor("publicId", {
-    header: "Public ID",
-  }),
-  columnHelper.accessor("collectionDate", {
-    header: "Collection Date",
-  }),
-  columnHelper.accessor((obj) => JSON.stringify(obj.lineage), {
+export const SortableHeader = ({
+  header,
+  children,
+}: SortableProps): JSX.Element => {
+  const { getCanSort, getIsSorted, getToggleSortingHandler } = header.column;
+
+  const sortable = getCanSort();
+  const sortDirection = getIsSorted() || undefined;
+  const handler = getToggleSortingHandler();
+
+  return (
+    <CellHeader
+      onClick={handler}
+      direction={sortDirection}
+      active={Boolean(sortDirection)}
+      hideSortIcon={!sortable}
+    >
+      {children}
+    </CellHeader>
+  );
+};
+
+// TODO-TR (mlila): move this default cell into its own component file
+const DefaultCell = ({ getValue }: { getValue: Getter<any> }): JSX.Element => (
+  <StyledCellBasic
+    shouldTextWrap
+    primaryText={getValue()}
+    primaryTextWrapLineCount={2}
+    shouldShowTooltipOnHover={false}
+  />
+);
+
+const columns: ColumnDef<Sample, any>[] = [
+  {
+    id: "select",
+    size: 50,
+    header: ({ table }) => {
+      const {
+        getIsAllRowsSelected,
+        getIsSomeRowsSelected,
+        getToggleAllRowsSelectedHandler,
+      } = table;
+      const isChecked = getIsAllRowsSelected();
+      const isIndeterminate = getIsSomeRowsSelected();
+      const checkboxStage = isChecked
+        ? "checked"
+        : isIndeterminate
+        ? "indeterminate"
+        : "unchecked";
+
+      const onChange = getToggleAllRowsSelectedHandler();
+
+      return (
+        <CellComponent>
+          <Checkbox stage={checkboxStage} onChange={onChange} />
+        </CellComponent>
+      );
+    },
+    cell: ({ row }) => {
+      const { getIsSelected, getToggleSelectedHandler } = row;
+
+      const checkboxStage = getIsSelected() ? "checked" : "unchecked";
+      const onChange = getToggleSelectedHandler();
+
+      return (
+        <CellComponent>
+          <Checkbox stage={checkboxStage} onChange={onChange} />
+        </CellComponent>
+      );
+    },
+  },
+  {
+    id: "privateId",
+    accessorKey: "privateId",
+    minSize: 350,
+    header: ({ header }) => (
+      <SortableHeader header={header}>Private ID</SortableHeader>
+    ),
+    cell: ({ getValue, row }) => {
+      const uploader = row?.original?.uploadedBy.name;
+      return (
+        <StyledPrivateId
+          primaryText={getValue()}
+          secondaryText={uploader}
+          shouldTextWrap
+          primaryTextWrapLineCount={1}
+          icon={<Icon sdsIcon="flaskPublic" sdsSize="xl" sdsType="static" />}
+          tooltipProps={{
+            sdsStyle: "light",
+            arrow: false,
+          }}
+        />
+      );
+    },
+    enableSorting: true,
+  },
+  {
+    id: "publicId",
+    accessorKey: "publicId",
+    header: ({ header }) => (
+      <SortableHeader header={header}>Public ID</SortableHeader>
+    ),
+    cell: DefaultCell,
+    enableSorting: true,
+  },
+  {
+    id: "uploadDate",
+    accessorKey: "uploadDate",
+    header: ({ header }) => (
+      <SortableHeader header={header}>Upload Date</SortableHeader>
+    ),
+    cell: ({ getValue }) => (
+      <StyledCellBasic
+        shouldTextWrap
+        primaryText={datetimeWithTzToLocalDate(getValue())}
+        primaryTextWrapLineCount={2}
+        shouldShowTooltipOnHover={false}
+      />
+    ),
+  },
+  {
+    id: "collectionDate",
+    accessorKey: "collectionDate",
+    header: ({ header }) => (
+      <SortableHeader header={header}>Collection Date</SortableHeader>
+    ),
+    cell: DefaultCell,
+    enableSorting: true,
+  },
+  {
     id: "lineage",
-    header: "Lineage",
-  }),
-  columnHelper.accessor("uploadDate", {
-    header: "Upload Date",
-  }),
-  columnHelper.accessor((obj) => JSON.stringify(obj.collectionLocation), {
+    accessorKey: "lineage",
+    header: ({ header }) => (
+      <SortableHeader header={header}>Lineage</SortableHeader>
+    ),
+    cell: ({ getValue }) => {
+      const { lineage } = getValue();
+      return (
+        <StyledCellBasic
+          shouldTextWrap
+          primaryText={lineage}
+          primaryTextWrapLineCount={2}
+          shouldShowTooltipOnHover={false}
+        />
+      );
+    },
+    enableSorting: true,
+  },
+  {
     id: "collectionLocation",
-    header: "Collection Location",
-  }),
-  columnHelper.accessor("sequencingDate", {
-    header: "Sequencing Date",
-  }),
-  columnHelper.accessor((obj) => JSON.stringify(obj.gisaid), {
+    accessorKey: "collectionLocation",
+    header: ({ header }) => (
+      <SortableHeader header={header}>Collection Location</SortableHeader>
+    ),
+    cell: ({ getValue }) => (
+      <StyledCellBasic
+        shouldTextWrap
+        primaryText={getValue().location}
+        primaryTextWrapLineCount={2}
+        shouldShowTooltipOnHover={false}
+      />
+    ),
+    enableSorting: true,
+  },
+  {
+    id: "sequencingDate",
+    accessorKey: "sequencingDate",
+    header: ({ header }) => (
+      <SortableHeader header={header}>Sequencing Date</SortableHeader>
+    ),
+    cell: DefaultCell,
+  },
+  {
     id: "gisaid",
-    header: "GISAID",
-  }),
+    accessorKey: "gisaid",
+    header: ({ header }) => (
+      <SortableHeader header={header}>GISAID</SortableHeader>
+    ),
+    cell: ({ getValue }) => {
+      const { gisaid_id, status } = getValue();
+      return (
+        <StyledCellBasic
+          primaryText={status}
+          secondaryText={gisaid_id}
+          shouldShowTooltipOnHover={false}
+        />
+      );
+    },
+    enableSorting: true,
+  },
 ];
 
-const SamplesTable = ({ data, isLoading }: Props): JSX.Element => {
+const SamplesTable = ({
+  data,
+  isLoading,
+  setCheckedSamples,
+}: Props): JSX.Element => {
   const [samples, setSamples] = useState<Sample[]>([]);
+  // TODO-TR (mlila): type?
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   useEffect(() => {
     if (!data) return;
@@ -59,9 +246,28 @@ const SamplesTable = ({ data, isLoading }: Props): JSX.Element => {
 
   const table = useReactTable({
     data: samples,
+    defaultColumn: {
+      minSize: 50,
+    },
     columns,
+    enableMultiRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      rowSelection,
+    },
+    onRowSelectionChange: setRowSelection,
   });
+
+  useEffect(() => {
+    // for each selected row in the table, map the react-table internal row to the data (Sample)
+    // originally passed into the row
+    const newCheckedSamples = table
+      .getSelectedRowModel()
+      .rows.map((r) => r.original);
+
+    setCheckedSamples(newCheckedSamples);
+  }, [rowSelection]);
 
   if (isLoading) {
     return <div>Loading ...</div>;
@@ -70,34 +276,20 @@ const SamplesTable = ({ data, isLoading }: Props): JSX.Element => {
   return (
     <Table>
       <TableHeader>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <>
-            {headerGroup.headers.map((header) => (
-              <CellHeader key={header.id} horizontalAlign="left">
-                {header.isPlaceholder
-                  ? ""
-                  : (flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    ) as string)}
-              </CellHeader>
-            ))}
-          </>
-        ))}
+        {table
+          .getLeafHeaders()
+          .map((header) =>
+            flexRender(header.column.columnDef.header, header.getContext())
+          )}
       </TableHeader>
       <tbody>
         {table.getRowModel().rows.map((row) => (
           <TableRow key={row.id}>
-            {row.getVisibleCells().map((cell) => {
-              return (
-                <CellBasic
-                  horizontalAlign="left"
-                  shouldShowTooltipOnHover={false}
-                  key={cell.id}
-                  primaryText={cell.getValue() as string} // TODO-TR (mlila): type assertion
-                ></CellBasic>
-              );
-            })}
+            {row
+              .getVisibleCells()
+              .map((cell) =>
+                flexRender(cell.column.columnDef.cell, cell.getContext())
+              )}
           </TableRow>
         ))}
       </tbody>

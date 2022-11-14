@@ -44,7 +44,8 @@ locals {
 
   # Workflow images
   pangolin_image   = join(":", [local.secret["ecrs"]["pangolin"]["url"], lookup(var.image_tags, "pangolin", var.image_tag)])
-  lineage_qc_image = join(":", [local.secret["ecrs"]["lineage-qc"]["url"], lookup(var.image_tags, "lineage-qc", var.image_tag)])
+  # TODO Fix `lineage-qc` vs `lineage_qc` mismatch between here and infra repo
+  # lineage_qc_image = join(":", [local.secret["ecrs"]["lineage-qc"]["url"], lookup(var.image_tags, "lineage-qc", var.image_tag)])
   nextstrain_image = join(":", [local.secret["ecrs"]["nextstrain"]["url"], lookup(var.image_tags, "nextstrain", var.image_tag)])
   gisaid_image     = join(":", [local.secret["ecrs"]["gisaid"]["url"], lookup(var.image_tags, "gisaid", var.image_tag)])
 
@@ -183,8 +184,8 @@ module gisaid_sfn_config {
   app_name = "gisaid-sfn"
   image    = local.gisaid_image
   # This job is actually constrained by *DISK SPACE* and swipe currently only supports NVME-mounted storage
-  # so we're requesting more vcpu's than necessary in order to bump the instance size to: 2 x 900 NVMe SSD
-  memory   = 384000
+  # so we're requesting more vcpu's than necessary in order to bump the instance size to: 4 x 600 NVMe SSD
+  memory   = 512000
   wdl_path = "workflows/gisaid.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
