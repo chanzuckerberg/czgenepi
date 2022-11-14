@@ -29,7 +29,6 @@ from aspen.database.models import (
     Sample,
     UploadedPathogenGenome,
 )
-from aspen.database.models.repository_workflows import AlignedRepositoryData
 from aspen.database.models.workflow import WorkflowStatusType
 from aspen.util.lineage import expand_lineage_wildcards
 from aspen.workflows.nextstrain_run.build_config import TemplateBuilder
