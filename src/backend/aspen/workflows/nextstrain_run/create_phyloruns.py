@@ -20,6 +20,7 @@ from aspen.database.models import (
     Group,
     Pathogen,
     PhyloRun,
+    Sample,
     TreeType,
     User,
     Workflow,
@@ -121,10 +122,14 @@ def launch_all(pathogen):
         for group in all_groups:
             schedule_expression = group.tree_parameters.get("schedule_expression", None)
             # Make sure the number of samples collected in the past 12 weeks is > 0
-            filter_interval_samples_count_query = sa.select(func.count(Sample)).where(
-                Sample.submitting_group_id == group.id,
-                func.current_date() - Sample.collection_date
-                < FILTER_START_INTERVAL_DAYS,
+            filter_interval_samples_count_query = (
+                sa.select(func.count())
+                .select_from(Sample)
+                .where(
+                    Sample.submitting_group_id == group.id,
+                    func.current_date() - Sample.collection_date
+                    < FILTER_START_INTERVAL_DAYS,
+                )
             )
             filter_interval_samples_count: int = (
                 db.execute(filter_interval_samples_count_query).scalars().one()
