@@ -1,7 +1,6 @@
 import styled from "@emotion/styled";
 import {
   Button,
-  Checkbox,
   CommonThemeProps,
   fontBodyM,
   fontBodyS,
@@ -11,6 +10,7 @@ import {
   getColors,
   getFontWeights,
   getSpaces,
+  InputCheckbox,
 } from "czifui";
 
 export const Header = styled.div`
@@ -131,7 +131,7 @@ export const DownloadTypeInfo = styled.div`
   width: 400px;
 `;
 
-export const StyledCheckbox = styled(Checkbox)`
+export const StyledCheckbox = styled(InputCheckbox)`
   padding-top: 0px;
   &:hover {
     background-color: transparent;

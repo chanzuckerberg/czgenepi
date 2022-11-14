@@ -1,13 +1,4 @@
 import {
-  CellComponent,
-  CellHeader,
-  Checkbox,
-  Icon,
-  Table,
-  TableHeader,
-  TableRow,
-} from "czifui";
-import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
@@ -17,9 +8,18 @@ import {
   RowSelectionState,
   useReactTable,
 } from "@tanstack/react-table";
-import { IdMap } from "src/common/utils/dataTransforms";
+import {
+  CellComponent,
+  CellHeader,
+  Icon,
+  InputCheckbox,
+  Table,
+  TableHeader,
+  TableRow,
+} from "czifui";
 import { map } from "lodash";
 import { ReactNode, useEffect, useState } from "react";
+import { IdMap } from "src/common/utils/dataTransforms";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { StyledCellBasic, StyledPrivateId } from "./style";
 
@@ -90,7 +90,7 @@ const columns: ColumnDef<Sample, any>[] = [
 
       return (
         <CellComponent>
-          <Checkbox stage={checkboxStage} onChange={onChange} />
+          <InputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellComponent>
       );
     },
@@ -102,7 +102,7 @@ const columns: ColumnDef<Sample, any>[] = [
 
       return (
         <CellComponent>
-          <Checkbox stage={checkboxStage} onChange={onChange} />
+          <InputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellComponent>
       );
     },

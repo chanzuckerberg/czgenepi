@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 import {
   Button,
   Callout,
-  Checkbox,
+  InputCheckbox,
   CommonThemeProps,
   fontBodyM,
   fontBodyS,
@@ -132,7 +132,7 @@ export const DownloadTypeInfo = styled.div`
   width: 400px;
 `;
 
-export const StyledCheckbox = styled(Checkbox)`
+export const StyledCheckbox = styled(InputCheckbox)`
   padding-top: 0px;
   &:hover {
     background-color: transparent;

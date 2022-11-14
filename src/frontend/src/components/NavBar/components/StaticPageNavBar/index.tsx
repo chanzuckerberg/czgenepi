@@ -1,5 +1,5 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
-import { Banner } from "czifui";
+import { Banner, Link } from "czifui";
 import { Fragment, useState } from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
@@ -123,10 +123,15 @@ export default function StaticPageNavBar(): JSX.Element {
   return (
     <HeaderContainer data-test-id="navbar-landing">
       {isMultiPathogenFlagOn && (
-        <Banner
-          sdsType="primary"
-          text="CZ GEN EPI now supports multiple pathogens."
-        />
+        <Banner sdsType="primary">
+          CZ GEN EPI now supports multiple pathogens. &nbsp;
+          <Link
+            href="https://help.czgenepi.org/hc/en-us/articles/7082825141012-Which-pathogens-can-I-investigate-through-CZ-GEN-EPI-"
+            sdsStyle="dashed"
+          >
+            Learn More.
+          </Link>
+        </Banner>
       )}
       <HeaderMaxWidthContainer>
         <HeaderTopContainer>

@@ -1,10 +1,10 @@
 import styled from "@emotion/styled";
 import {
-  Checkbox,
   CommonThemeProps,
   fontHeaderXs,
   getColors,
   getSpaces,
+  InputCheckbox,
 } from "czifui";
 
 export const TableRow = styled.div`
@@ -65,7 +65,7 @@ export const TreeRowContent = styled.div`
   }}
 `;
 
-export const RowCheckbox = styled(Checkbox)`
+export const RowCheckbox = styled(InputCheckbox)`
   padding-right: 0px;
   &:hover {
     background-color: transparent;
