@@ -97,43 +97,34 @@ task IngestGISAID {
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
 
-
     aws configure set region ~{aws_region}
 
     export GENEPI_CONFIG_SECRET_NAME=~{genepi_config_secret_name}
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
+    source /usr/src/app/aspen/workflows/wdl_setup.sh
 
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
     aspen_creation_rev=$COMMIT_SHA
 
     # fetch genepi config
-    genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
-    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
     sequences_key="raw_gisaid_dump/${build_id}/gisaid.ndjson.zst"
 
     # fetch the gisaid dataset and transform it.
-    gisaid_credentials=$(aws secretsmanager get-secret-value --secret-id gisaid-download-credentials --query SecretString --output text)
-    gisaid_username=$(echo "${gisaid_credentials}" | jq -r .username)
-    gisaid_password=$(echo "${gisaid_credentials}" | jq -r .password)
-
     wget "~{gisaid_ndjson_url}" --user "${gisaid_username}" --password "${gisaid_password}" --continue --tries=2 -O gisaid_dump.fasta.bz2
     bunzip2 gisaid_dump.fasta.bz2 
     zstdmt gisaid_dump.fasta -o sequences.fasta.zst
     rm gisaid_dump.fasta
 
-    aws s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    ${aws} s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
 
     end_time=$(date +%s)
 
     # create the objects
     python3 /usr/src/app/aspen/workflows/ingest_gisaid/save.py       \
-            --aspen-workflow-rev "${aspen_workflow_rev}"             \
-            --aspen-creation-rev "${aspen_creation_rev}"             \
             --start-time "${start_time}"                             \
-            --end-time "${end_time}"                                 \
             --gisaid-s3-bucket "${aspen_s3_db_bucket}"               \
             --gisaid-s3-key "${sequences_key}" > entity_id
     >>>
@@ -169,21 +160,14 @@ task TransformGISAID {
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
+    source /usr/src/app/aspen/workflows/wdl_setup.sh
 
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
     aspen_creation_rev=$COMMIT_SHA
 
-    # fetch aspen config
-    set +x  # don't echo secrets
-    echo "* set \$genepi_config (not printing value because contains secrets)"
-    genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
-    echo "* set \$aspen_s3_db_bucket"
-    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
-    set -x
-
     # get the bucket/key from the object id
-    raw_gisaid_location=$(python3 /usr/src/app/aspen/workflows/transform_gisaid/lookup_raw_gisaid_object.py --raw-gisaid-object-id "~{raw_gisaid_object_id}")
+    raw_gisaid_location=$(python3 /usr/src/app/aspen/workflows/transform_gisaid/lookup_raw_download_object.py --raw-download-object-id "~{raw_gisaid_object_id}")
     raw_gisaid_s3_bucket=$(echo "${raw_gisaid_location}" | jq -r .bucket)
     raw_gisaid_s3_key=$(echo "${raw_gisaid_location}" | jq -r .key)
 
@@ -198,7 +182,7 @@ task TransformGISAID {
        /ncov-ingest/source-data/gisaid_geoLocationRules.tsv
 
     # decompress the gisaid dataset and transform it.
-    aws s3 cp --no-progress "s3://${raw_gisaid_s3_bucket}/${raw_gisaid_s3_key}" - | zstdmt -d > gisaid.ndjson
+    ${aws} s3 cp --no-progress "s3://${raw_gisaid_s3_bucket}/${raw_gisaid_s3_key}" - | zstdmt -d > gisaid.ndjson
     /ncov-ingest/bin/transform-gisaid     \
         gisaid.ndjson                     \
         --output-metadata metadata.tsv    \
@@ -210,8 +194,8 @@ task TransformGISAID {
     # upload the files to S3
     sequences_key="processed_gisaid_dump/${build_id}/sequences.fasta.zst"
     metadata_key="processed_gisaid_dump/${build_id}/metadata.tsv"
-    aws s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
-    aws s3 cp metadata.tsv "s3://${aspen_s3_db_bucket}/${metadata_key}"
+    ${aws} s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    ${aws} s3 cp metadata.tsv "s3://${aspen_s3_db_bucket}/${metadata_key}"
     end_time=$(date +%s)
 
     # create the objects
@@ -258,17 +242,10 @@ task AlignGISAID {
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
-
-    # fetch aspen config
-    set +x  # don't echo secrets
-    echo "* set \$genepi_config (not printing value because contains secrets)"
-    genepi_config="$(aws secretsmanager get-secret-value --secret-id ~{genepi_config_secret_name} --query SecretString --output text)"
-    echo "* set \$aspen_s3_db_bucket"
-    aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
-    set -x
+    source /usr/src/app/aspen/workflows/wdl_setup.sh
 
     # get the bucket/key from the object id
-    processed_gisaid_location=$(python3 /usr/src/app/aspen/workflows/align_gisaid/lookup_processed_gisaid_object.py --processed-gisaid-object-id "~{processed_gisaid_object_id}")
+    processed_gisaid_location=$(python3 /usr/src/app/aspen/workflows/align_gisaid/lookup_processed_repo_data_object.py --processed-object-id "~{processed_gisaid_object_id}")
     processed_gisaid_s3_bucket=$(echo "${processed_gisaid_location}" | jq -r .bucket)
     processed_gisaid_sequences_s3_key=$(echo "${processed_gisaid_location}" | jq -r .sequences_key)
     processed_gisaid_metadata_s3_key=$(echo "${processed_gisaid_location}" | jq -r .metadata_key)
@@ -281,12 +258,12 @@ task AlignGISAID {
     ncov_git_rev=$(git -C /ncov rev-parse HEAD)
 
     # fetch the gisaid dataset
-    aws s3 cp --no-progress "s3://${processed_gisaid_s3_bucket}/${processed_gisaid_sequences_s3_key}" - | zstdmt -d > /ncov/data/sequences.fasta
-    aws s3 cp --no-progress "s3://${processed_gisaid_s3_bucket}/${processed_gisaid_metadata_s3_key}" /ncov/data/metadata.tsv
+    ${aws} s3 cp --no-progress "s3://${processed_gisaid_s3_bucket}/${processed_gisaid_sequences_s3_key}" - | zstdmt -d > /ncov/data/sequences.fasta
+    ${aws} s3 cp --no-progress "s3://${processed_gisaid_s3_bucket}/${processed_gisaid_metadata_s3_key}" /ncov/data/metadata.tsv
     mkdir /ncov/my_profiles/align_gisaid/
     cp /usr/src/app/aspen/workflows/align_gisaid/{builds.yaml,config.yaml} /ncov/my_profiles/align_gisaid/
     # run snakemake, if run fails export the logs from snakemake and ncov to s3 
-    (cd /ncov && snakemake --printshellcmds results/aligned_gisaid.fasta.xz results/sanitized_metadata_gisaid.tsv.xz --profile my_profiles/align_gisaid) || { aws s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/snakemake/" --recursive ; aws s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/ncov/" --recursive ; }
+    (cd /ncov && snakemake --printshellcmds results/aligned_gisaid.fasta.xz results/sanitized_metadata_gisaid.tsv.xz --profile my_profiles/align_gisaid) || { ${aws} s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/snakemake/" --recursive ; ${aws} s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/ncov/" --recursive ; }
 
     mv /ncov/.snakemake/log/*.snakemake.log /ncov/logs/align_gisaid.txt .
     unxz -k /ncov/results/sanitized_metadata_gisaid.tsv.xz  # make an unzipped version for ImportGISAID. The zipped version goes to S3
@@ -295,8 +272,8 @@ task AlignGISAID {
     # upload the files to S3
     sequences_key="aligned_gisaid_dump/${build_id}/aligned_gisaid.fasta.xz"
     metadata_key="aligned_gisaid_dump/${build_id}/sanitized_metadata_gisaid.tsv.xz"
-    aws s3 cp /ncov/results/aligned_gisaid.fasta.xz "s3://${aspen_s3_db_bucket}/${sequences_key}"
-    aws s3 cp /ncov/results/sanitized_metadata_gisaid.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
+    ${aws} s3 cp /ncov/results/aligned_gisaid.fasta.xz "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    ${aws} s3 cp /ncov/results/sanitized_metadata_gisaid.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
 
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA

@@ -254,6 +254,20 @@ backend-%: .env.ecr  ## Run make commands in a NEW backend container. See src/ba
 frontend-%: .env.ecr ## Run make commands in the frontend container (src/frontend/Makefile)
 	$(docker_compose) run -e CI=true --no-deps --rm frontend make $(subst frontend-,,$@)
 
+### PIPELINE TESTS ###################################################
+.PHONY: pipeline-test-gisaid
+pipeline-test-gisaid:
+	source .env.ecr; \
+	export DOCKER_REPO; \
+	export BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566; \
+	export AWS_ACCESS_KEY_ID=NONCE; \
+	export AWS_SECRET_ACCESS_KEY=NONCE; \
+	export MINIWDL_CFG=miniwdl.cfg; \
+	cd src/backend/pipeline_tests; \
+	cat test_data/gisaid_pipeline_inputs.json | envsubst > test_inputs.json; \
+	miniwdl run --cfg miniwdl.cfg --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env BOTO_ENDPOINT_URL --input test_inputs.json --verbose -o output.json ../../../.happy/terraform/modules/sfn_config/gisaid.wdl
+	$(docker_compose) run --no-deps --rm backend make pipeline-test-gisaid
+
 
 ### WDL ###################################################
 .PHONY: wdl-lint
@@ -265,3 +279,9 @@ wdl-lint:
 .PHONY: tf-lint
 tf-lint:
 	set -e; for i in $$(find .happy/terraform/envs ! -path .happy/terraform/envs -type d -maxdepth 1); do echo $${i}; pushd $${i}; terraform init; terraform validate; tflint --module; popd; done
+
+### GitHub Actions ###################################################
+.PHONY: gha-setup
+gha-setup:
+	docker swarm init
+	echo "DOCKER_REPO=${DOCKER_REPO}" > .env.ecr
