@@ -3,7 +3,6 @@ import {
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
-  Getter,
   RowSelectionState,
   useReactTable,
 } from "@tanstack/react-table";
@@ -17,10 +16,10 @@ import {
 } from "czifui";
 import { map } from "lodash";
 import { useEffect, useState } from "react";
-import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "../../../LineageTooltip";
+import { DefaultCell } from "./components/DefaultCell";
 import { SortableHeader } from "./components/SortableHeader";
 import { StyledCellBasic, StyledPrivateId } from "./style";
 
@@ -29,16 +28,6 @@ interface Props {
   isLoading: boolean;
   setCheckedSamples(samples: Sample[]): void;
 }
-
-// TODO-TR (mlila): move this default cell into its own component file
-const DefaultCell = ({ getValue }: { getValue: Getter<any> }): JSX.Element => (
-  <StyledCellBasic
-    shouldTextWrap
-    primaryText={getValue()}
-    primaryTextWrapLineCount={2}
-    shouldShowTooltipOnHover={false}
-  />
-);
 
 const columns: ColumnDef<Sample, any>[] = [
   {
