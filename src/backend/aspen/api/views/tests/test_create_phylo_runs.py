@@ -4,7 +4,6 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.test_infra.models.lineage import pango_lineage_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.repo_metadata import repo_metadata_factory
