@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { HeadAppTitle } from "src/common/components";
-import { TreeCreateHelpLink } from "src/common/components/library/data_subview/components/TreeCreateHelpLink";
 import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { SearchBar } from "src/components/Table/components/SearchBar";
 import { StyledView } from "../../style";
 import { DataNavigation } from "../DataNavigation";
+import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreesTable } from "./components/TreesTable";
 import { Flex } from "./style";
 

@@ -11,7 +11,7 @@ import { EditSamplesConfirmationModal } from "./components/EditSamplesConfirmati
 import { EditTreeConfirmationModal } from "./components/EditTreeConfirmationModal";
 import { IconButton } from "./components/IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
-import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
+import { TreeCreateHelpLink } from "../../../../views/Data/components/TreesView/components/TreeCreateHelpLink";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
 import {
