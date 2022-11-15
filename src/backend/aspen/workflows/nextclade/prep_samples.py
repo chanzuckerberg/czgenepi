@@ -59,6 +59,8 @@ def cli(
         pathogen_of_all_samples: Optional[Pathogen] = None
         for sample in all_samples:
 
+            # `.pathogen` access is lazy, but only accesses once per pathogen
+            # type, so not an N+1 query issue where we need eager load.
             pathogen = sample.pathogen
             if pathogen_of_all_samples is None:
                 pathogen_of_all_samples = pathogen
