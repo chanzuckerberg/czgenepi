@@ -72,7 +72,7 @@ const MoreActionsMenu = ({
     if (usesTableRefactor) {
       setIsEditTreeModalOpen(true);
     } else {
-      onEditTreeModalOpen(item);
+      onEditTreeModalOpen && onEditTreeModalOpen(item);
     }
   };
 
@@ -80,7 +80,7 @@ const MoreActionsMenu = ({
     if (usesTableRefactor) {
       setIsDeleteTreeModalOpen(true);
     } else {
-      onDeleteTreeModalOpen(item);
+      onDeleteTreeModalOpen && onDeleteTreeModalOpen(item);
     }
   };
 
