@@ -1,4 +1,4 @@
-import { Checkbox } from "czifui";
+import { InputCheckbox } from "czifui";
 import { map, pickBy } from "lodash";
 import { useState } from "react";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
@@ -106,7 +106,7 @@ const EditSamplesReviewDialog = ({
     <>
       <Table metadata={metadataWithId} />
       <CheckboxWrapper onClick={() => setChecked(!isChecked)}>
-        <Checkbox stage={isChecked ? "checked" : "unchecked"} />
+        <InputCheckbox stage={isChecked ? "checked" : "unchecked"} />
         <div>
           I agree that the data I am uploading to CZ GEN EPI has been lawfully
           collected and that I have all the necessary consents, permissions, and
