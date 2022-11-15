@@ -1,14 +1,14 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { ButtonIcon, Icon, Menu, MenuItem, Tooltip } from "czifui";
 import { MouseEventHandler, useState } from "react";
-import { DeleteTreeConfirmationModal } from "src/common/components/library/data_subview/components/DeleteTreeConfirmationModal";
-import { EditTreeConfirmationModal } from "src/common/components/library/data_subview/components/EditTreeConfirmationModal";
 import { TREE_STATUS } from "src/common/constants/types";
 import { useUserInfo } from "src/common/queries/auth";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
+import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
+import { EditTreeConfirmationModal } from "./components/EditTreeConfirmationModal";
 import {
   StyledEditIconWrapper,
   StyledText,
