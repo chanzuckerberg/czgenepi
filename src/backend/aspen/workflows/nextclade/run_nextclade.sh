@@ -14,7 +14,7 @@ SEQUENCES_FILE=sequences.fasta
   --sequences "${SEQUENCES_FILE}" \
   --pathogen-info-file "${PATHOGEN_INFO_FILE}"
 
-nextclade_dataset_name=$(jq --raw-output ".nextclade_dataset_name" pathogen_info.json)
+nextclade_dataset_name=$(jq --raw-output ".nextclade_dataset_name" "${PATHOGEN_INFO_FILE}")
 echo "Pulling nextclade reference dataset with name ${nextclade_dataset_name}"
 NEXTCLADE_DATASET_DIR=nextclade_dataset/bundle
 nextclade dataset get \
@@ -29,10 +29,9 @@ nextclade run \
   "${SEQUENCES_FILE}"
 echo "Nextclade run complete"
 
+pathogen_slug=$(jq --raw-output ".pathogen_slug" "${PATHOGEN_INFO_FILE}")
 # save results back to db
-export NEXTCLADE_VERSION=$(nextclade --version)
 /usr/local/bin/python3.10 save.py \
-    --nextclade-csv output/nextclade.csv \
-    --nextclade-version "$NEXTCLADE_VERSION" \
-    --group-name $GROUP_NAME \
-    --pathogen-slug $PATHOGEN_SLUG
+    --nextclade-csv "${NEXTCLADE_OUTPUT_DIR}/nextclade.csv" \
+    --nextclade-version "$(nextclade --version)" \
+    --pathogen-slug "${pathogen_slug}"

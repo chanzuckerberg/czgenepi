@@ -13,7 +13,6 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
-    Group,
     LineageType,
     Sample,
     SampleLineage,
@@ -25,12 +24,10 @@ from aspen.database.models import (
 @click.command("save")
 @click.option("nextclade_fh", "--nextclade-csv", type=click.File("r"), required=True)
 @click.option("nextclade_version", "--nextclade-version", type=str, required=True)
-@click.option("group_name", "--group-name", type=str, required=True)
 @click.option("pathogen_slug", "--pathogen-slug", type=str, required=True)
 def cli(
     nextclade_fh: io.TextIOBase,
     nextclade_version: str,
-    group_name: str,
     pathogen_slug: str,
 ):
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
@@ -38,16 +35,9 @@ def cli(
     with session_scope(interface) as session:
         nextclade_csv: csv.DictReader = csv.DictReader(nextclade_fh, delimiter=";")
         for row in nextclade_csv:
-            sample_q = (
-                sa.select(Sample)
-                .join(Sample.submitting_group)
-                .filter(
-                    and_(
-                        Sample.public_identifier == row["seqName"],
-                        Group.name == group_name,
-                    )
-                )
-            )
+            # For entire workflow, we use sample id primary keys for names.
+            sample_id = int(row["seqName"])
+            sample_q = sa.select(Sample).where(Sample.id == sample_id)
             sample = session.execute(sample_q).scalars().one()
             existing_qc_metric_q = (
                 sa.select(SampleQCMetric)
@@ -123,7 +113,6 @@ def cli(
                 session.add(sample_lineage)
 
         # TODO: commit session after 1000 entries to limit transaction size
-        session.commit()
 
 
 if __name__ == "__main__":
