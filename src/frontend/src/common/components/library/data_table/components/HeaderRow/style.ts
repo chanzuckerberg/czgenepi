@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { Checkbox, CommonThemeProps, getColors, getSpaces } from "czifui";
+import { CommonThemeProps, getColors, getSpaces, InputCheckbox } from "czifui";
 
 interface ExtraProps extends CommonThemeProps {
   shouldShowCheckboxes?: boolean;
@@ -25,7 +25,7 @@ export const StyledHeaderRow = styled("div", {
   }}
 `;
 
-export const HeaderCheckbox = styled(Checkbox)`
+export const HeaderCheckbox = styled(InputCheckbox)`
   padding: 0;
   &:hover {
     background-color: transparent;
