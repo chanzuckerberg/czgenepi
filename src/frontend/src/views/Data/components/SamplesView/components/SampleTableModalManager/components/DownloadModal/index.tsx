@@ -1,4 +1,3 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { Alert, Icon, Link, Tooltip } from "czifui";
 import { useCallback, useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
@@ -27,9 +26,6 @@ import { pluralize } from "src/common/utils/strUtils";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import Dialog from "src/components/Dialog";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
-import { TooltipDescriptionText, TooltipHeaderText } from "./style";
 import {
   CheckBoxInfo,
   CheckboxLabel,
@@ -42,6 +38,8 @@ import {
   StyledCheckbox,
   StyledFileTypeItem,
   Title,
+  TooltipDescriptionText,
+  TooltipHeaderText,
 } from "./style";
 
 interface Props {
@@ -72,9 +70,6 @@ const DownloadModal = ({
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
   const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
-
-  const flag = useTreatments([USER_FEATURE_FLAGS.prep_files]);
-  const isPrepFilesFlagOn = isUserFlagOn(flag, USER_FEATURE_FLAGS.prep_files);
 
   const completedSampleIds = checkedSampleIds.filter(
     (id) => !failedSampleIds.includes(id)
@@ -236,58 +231,56 @@ const DownloadModal = ({
                   </DownloadTypeInfo>
                 </CheckboxLabel>
               </StyledFileTypeItem>
-              {isPrepFilesFlagOn && (
-                <StyledFileTypeItem isSelected={isGisaidSelected}>
-                  <CheckBoxInfo>
-                    <StyledCheckbox
-                      id="download-gisaid-checkbox"
-                      onChange={handleGisaidClick}
-                      stage={isGisaidSelected ? "checked" : "unchecked"}
-                    />
-                  </CheckBoxInfo>
-                  <CheckboxLabel htmlFor="download-gisaid-checkbox">
-                    <DownloadType>GISAID Submission Template </DownloadType>{" "}
-                    (.fasta, .csv)
-                    <DownloadTypeInfo>
-                      Download concatenated consensus genomes and metadata files
-                      formatted to prepare samples for submission to GISAID.{" "}
-                      <Link
-                        href="https://help.czgenepi.org/hc/en-us/articles/8179880474260"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Learn More.
-                      </Link>
-                    </DownloadTypeInfo>
-                  </CheckboxLabel>
-                </StyledFileTypeItem>
-              )}
-              {isPrepFilesFlagOn && (
-                <StyledFileTypeItem isSelected={isGenbankSelected}>
-                  <CheckBoxInfo>
-                    <StyledCheckbox
-                      id="download-genbank-checkbox"
-                      onChange={handleGenbankClick}
-                      stage={isGenbankSelected ? "checked" : "unchecked"}
-                    />
-                  </CheckBoxInfo>
-                  <CheckboxLabel htmlFor="download-genbank-checkbox">
-                    <DownloadType>Genbank Submission Template </DownloadType>{" "}
-                    (.fasta, .tsv)
-                    <DownloadTypeInfo>
-                      Download concatenated consensus genomes and metadata files
-                      formatted to prepare samples for submission to Genbank.{" "}
-                      <Link
-                        href="https://help.czgenepi.org/hc/en-us/articles/8179961027604"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Learn More.
-                      </Link>
-                    </DownloadTypeInfo>
-                  </CheckboxLabel>
-                </StyledFileTypeItem>
-              )}
+
+              <StyledFileTypeItem isSelected={isGisaidSelected}>
+                <CheckBoxInfo>
+                  <StyledCheckbox
+                    id="download-gisaid-checkbox"
+                    onChange={handleGisaidClick}
+                    stage={isGisaidSelected ? "checked" : "unchecked"}
+                  />
+                </CheckBoxInfo>
+                <CheckboxLabel htmlFor="download-gisaid-checkbox">
+                  <DownloadType>GISAID Submission Template </DownloadType>{" "}
+                  (.fasta, .csv)
+                  <DownloadTypeInfo>
+                    Download concatenated consensus genomes and metadata files
+                    formatted to prepare samples for submission to GISAID.{" "}
+                    <Link
+                      href="https://help.czgenepi.org/hc/en-us/articles/8179880474260"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Learn More.
+                    </Link>
+                  </DownloadTypeInfo>
+                </CheckboxLabel>
+              </StyledFileTypeItem>
+
+              <StyledFileTypeItem isSelected={isGenbankSelected}>
+                <CheckBoxInfo>
+                  <StyledCheckbox
+                    id="download-genbank-checkbox"
+                    onChange={handleGenbankClick}
+                    stage={isGenbankSelected ? "checked" : "unchecked"}
+                  />
+                </CheckBoxInfo>
+                <CheckboxLabel htmlFor="download-genbank-checkbox">
+                  <DownloadType>Genbank Submission Template </DownloadType>{" "}
+                  (.fasta, .tsv)
+                  <DownloadTypeInfo>
+                    Download concatenated consensus genomes and metadata files
+                    formatted to prepare samples for submission to Genbank.{" "}
+                    <Link
+                      href="https://help.czgenepi.org/hc/en-us/articles/8179961027604"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Learn More.
+                    </Link>
+                  </DownloadTypeInfo>
+                </CheckboxLabel>
+              </StyledFileTypeItem>
             </Container>
             {failedSampleIds.length > 0 &&
               !isFastaDisabled && ( //ignore alert if fasta is already disabled

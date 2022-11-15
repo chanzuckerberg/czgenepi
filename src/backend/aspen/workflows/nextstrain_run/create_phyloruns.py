@@ -5,6 +5,7 @@ from typing import Any, Dict, MutableSequence
 
 import click
 import sqlalchemy as sa
+from sqlalchemy import func
 
 from aspen.api.settings import CLISettings
 from aspen.config.config import Config
@@ -20,6 +21,7 @@ from aspen.database.models import (
     Pathogen,
     PhyloRun,
     PublicRepository,
+    Sample,
     TreeType,
     User,
     Workflow,
@@ -31,6 +33,9 @@ from aspen.util.swipe import NextstrainScheduledJob
 SCHEDULED_TREE_TYPE = "OVERVIEW"
 
 TEMPLATE_ARGS = {"filter_start_date": "12 weeks ago", "filter_end_date": "now"}
+
+# This needs to match the value for "filter_start_date" in TEMPLATE_ARGS.
+FILTER_START_INTERVAL_DAYS = 12 * 7  # 12 weeks ago
 
 
 def create_phylo_run(
@@ -162,10 +167,25 @@ def launch_all(pathogen):
         )
         for group in all_groups:
             schedule_expression = group.tree_parameters.get("schedule_expression", None)
+            # Make sure the number of samples collected in the past 12 weeks is > 0
+            # Note that in Postgres, date - date = int where the int is
+            # the intervening number of days.
+            filter_interval_samples_count_query = (
+                sa.select(func.count())
+                .select_from(Sample)
+                .where(
+                    Sample.submitting_group_id == group.id,
+                    func.current_date() - Sample.collection_date
+                    < FILTER_START_INTERVAL_DAYS,
+                )
+            )
+            filter_interval_samples_count: int = (
+                db.execute(filter_interval_samples_count_query).scalars().one()
+            )
             if (
                 schedule_expression is None
                 or datetime.date.today().weekday() in schedule_expression
-            ):
+            ) and filter_interval_samples_count > 0:
                 workflow = create_phylo_run(
                     db, group, TEMPLATE_ARGS, tree_type, pathogen_obj, repository
                 )
