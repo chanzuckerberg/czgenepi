@@ -114,6 +114,7 @@ def make_all_test_data(
 
     trees: Sequence[PhyloTree] = make_trees(group, pathogen, samples, n_trees)
     treeless_runs: Collection[PhyloRun] = make_runs_with_no_trees(group, pathogen)
+    async_session.add(pathogen)
     return pathogen, samples, uploaded_pathogen_genomes, trees, treeless_runs
 
 
@@ -234,7 +235,8 @@ async def test_phylo_trees_can_see(
     )
 
     role_objs = await grouprole_factory(async_session, owner_group, viewer_group)
-    async_session.add_all(role_objs)
+    for item in role_objs:
+        async_session.add(item)
     await async_session.commit()
 
     await check_results(http_client, user, viewer_group, pathogen, trees)
