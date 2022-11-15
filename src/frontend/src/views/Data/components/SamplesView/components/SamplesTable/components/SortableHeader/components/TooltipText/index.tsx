@@ -3,19 +3,21 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 export type TooltipTextType = {
   boldText: string;
   regularText: string;
-  link: {
+  link?: {
     href: string;
     linkText: string;
   };
 };
 
 interface TooltipTextProps {
-  tooltipStrings: TooltipTextType;
+  tooltipStrings?: TooltipTextType;
 }
 
 export const TooltipText = ({
   tooltipStrings,
-}: TooltipTextProps): JSX.Element => {
+}: TooltipTextProps): JSX.Element | null => {
+  if (!tooltipStrings) return null;
+
   const { boldText, regularText, link } = tooltipStrings;
   const { href, linkText } = link ?? {};
 

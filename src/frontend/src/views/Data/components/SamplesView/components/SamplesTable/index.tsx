@@ -75,7 +75,6 @@ const columns: ColumnDef<Sample, any>[] = [
     header: ({ header }) => (
       <SortableHeader
         header={header}
-        shouldShowTooltipOnHover
         tooltipStrings={{
           boldText: "Private ID",
           regularText:

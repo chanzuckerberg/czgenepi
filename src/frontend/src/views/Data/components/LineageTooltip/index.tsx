@@ -50,7 +50,7 @@ export const LineageTooltip = ({ children, lineage }: Props): JSX.Element => {
       width="wide"
       data-test-id="lineage-tooltip"
     >
-      {children}
+      <>{children}</>
     </Tooltip>
   );
 };
