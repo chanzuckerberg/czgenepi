@@ -37,7 +37,10 @@ task pangolin_workflow {
     export SAMPLE_IDS_FILE="${HOME}/sample_ids.txt"
 
     cd /usr/src/app/aspen/workflows/pangolin
+    echo "Writing sample ids to file."
+    set +x
     echo "~{sep('\n', samples)}" > $SAMPLE_IDS_FILE
+    set -x
     ./run_pangolin.sh
     >>>
 
