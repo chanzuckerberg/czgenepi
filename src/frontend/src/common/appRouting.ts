@@ -20,7 +20,7 @@ import { canUserViewGroup } from "./utils/userInfo";
 // TODO          replacePathParams. Doing so with only 2 variables feels a little heavy
 // TODO          handed at the moment, though.
 const GROUP_URL_INDICATOR = "groupId";
-const PATHOGEN_URL_INDICATOR = "pathogen";
+export const PATHOGEN_URL_INDICATOR = "pathogen";
 const PATH_INDICATORS = [GROUP_URL_INDICATOR, PATHOGEN_URL_INDICATOR];
 
 const SLASH = "/";
