@@ -10,6 +10,7 @@ export type ActionType<T> = ComplexActionType<T, T>;
 
 export enum Pathogen {
   COVID = "SC2",
+  MONKEY_POX = "MPX",
 }
 
 // export action type for use in reducers and middleware

@@ -19,15 +19,19 @@ type PathogenTrafficFlagConfig = Record<
 const pathogenTrafficFlagConfig: PathogenTrafficFlagConfig = {
   [PATHOGEN_FEATURE_FLAGS.galago_linkout]: {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
+    [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.OFF,
   },
   [PATHOGEN_FEATURE_FLAGS.lineage_filter_enabled]: {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
+    [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.OFF,
   },
   [PATHOGEN_FEATURE_FLAGS.public_repository]: {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
+    [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.OFF,
   },
   [PATHOGEN_FEATURE_FLAGS.usher_linkout]: {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
+    [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.OFF,
   },
 };
 
