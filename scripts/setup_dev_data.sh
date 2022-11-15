@@ -75,6 +75,12 @@ ${local_aws} secretsmanager update-secret --secret-id genepi-config --secret-str
   "AUTH0_MANAGEMENT_DOMAIN": '"${AUTH0_MANAGEMENT_DOMAIN}"'
 }' || true
 
+${local_aws} secretsmanager create-secret --name gisaid-download-credentials &> /dev/null || true
+${local_aws} secretsmanager update-secret --secret-id gisaid-download-credentials --secret-string '{
+  "username": "foo",
+  "password": "bar"
+}' || true
+
 echo "Creating IAM role"
 ${local_aws} iam create-role --role-name sfnrole --assume-role-policy-document '{
   "Version": "2012-10-17",

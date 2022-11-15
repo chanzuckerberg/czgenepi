@@ -1,12 +1,6 @@
+import { CellBasic, CellComponent, Table, TableHeader, TableRow } from "czifui";
 import {
-  CellBasic,
-  CellComponent,
-  CellHeader,
-  Table,
-  TableHeader,
-  TableRow,
-} from "czifui";
-import {
+  ColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
@@ -17,30 +11,12 @@ import { map } from "lodash";
 import { useEffect, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { TreeActionMenu } from "./components/TreeActionMenu";
+import { SortableHeader } from "../../../SamplesView/components/SamplesTable";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
   isLoading: boolean;
 }
-
-const SortableHeader = ({ header, children }: SortableProps) => {
-  const { getCanSort, getIsSorted, getToggleSortingHandler } = header.column;
-
-  const sortable = getCanSort();
-  const sortDirection = getIsSorted() || undefined;
-  const handler = getToggleSortingHandler();
-
-  return (
-    <CellHeader
-      onClick={handler}
-      direction={sortDirection}
-      active={Boolean(sortDirection)}
-      hideSortIcon={!sortable}
-    >
-      {children}
-    </CellHeader>
-  );
-};
 
 // TODO-TR (mlila): set fallback cell values when, eg, tree name not defined
 

@@ -19,7 +19,7 @@ from aspen.database.connection import (
 from aspen.database.models import (
     Accession,
     AccessionType,
-    AlignedGisaidDump,
+    AlignedRepositoryData,
     Entity,
     Group,
     Location,
@@ -102,7 +102,7 @@ def cli(
     if test:
         print("Success!")
         return
-    aligned_gisaid_dump = export_run_config(
+    aligned_repo_data = export_run_config(
         phylo_run_id,
         sequences_fh,
         selected_fh,
@@ -111,7 +111,7 @@ def cli(
         builds_file_fh,
         reset_status,
     )
-    print(json.dumps(aligned_gisaid_dump))
+    print(json.dumps(aligned_repo_data))
 
 
 # For local debugging of our yaml building process.
@@ -167,8 +167,8 @@ def export_run_config(
         county_samples: List[PathogenGenome] = get_county_samples(session, group)
 
         # get the aligned gisaid run info.
-        aligned_gisaid: AlignedGisaidDump = [
-            inp for inp in phylo_run.inputs if isinstance(inp, AlignedGisaidDump)
+        aligned_gisaid: AlignedRepositoryData = [
+            inp for inp in phylo_run.inputs if isinstance(inp, AlignedRepositoryData)
         ][0]
 
         num_sequences = write_sequences_files(
@@ -230,10 +230,10 @@ def get_county_samples(session, group: Group):
 def get_phylo_run(session, phylo_run_id):
     # this allows us to load the secondary tables of a polymorphic type.  In this
     # case, we want to load the inputs of a phylo run, provided the input is of type
-    # `PathogenGenome` and `AlignedGisaidDump`.
+    # `PathogenGenome` and `AlignedRepositoryData`.
     phylo_run_inputs = with_polymorphic(
         Entity,
-        [PathogenGenome, AlignedGisaidDump],
+        [PathogenGenome, AlignedRepositoryData],
         flat=True,
     )
     phylo_run: PhyloRun = (

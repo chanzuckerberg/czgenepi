@@ -1,13 +1,13 @@
 import styled from "@emotion/styled";
 import {
   Button,
-  Checkbox,
   CommonThemeProps,
   fontBodyXs,
   fontHeaderL,
   fontHeaderXs,
   getColors,
   getSpaces,
+  InputCheckbox,
 } from "czifui";
 import { marginBottom } from "../common/style";
 
@@ -20,7 +20,7 @@ export const ContentTitleWrapper = styled.div`
   align-items: center;
 `;
 
-export const StyledCheckbox = styled(Checkbox)`
+export const StyledCheckbox = styled(InputCheckbox)`
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
 

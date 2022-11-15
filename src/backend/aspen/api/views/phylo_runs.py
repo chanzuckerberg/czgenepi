@@ -10,7 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
-from aspen.api.deps import get_db, get_pathogen, get_settings
+from aspen.api.deps import get_db, get_pathogen, get_settings, get_splitio
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
     PhyloRunDeleteResponse,
@@ -27,19 +27,21 @@ from aspen.api.utils import (
     samples_by_identifiers,
 )
 from aspen.database.models import (
-    AlignedGisaidDump,
+    AlignedRepositoryData,
     Group,
     Location,
     Pathogen,
     PathogenGenome,
     PhyloRun,
     PhyloTree,
+    PublicRepository,
     Sample,
     TreeType,
     User,
     Workflow,
     WorkflowStatusType,
 )
+from aspen.util.split import SplitClient
 from aspen.util.swipe import NextstrainJob
 
 router = APIRouter()
@@ -54,6 +56,7 @@ async def kick_off_phylo_run(
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_phylorun")),
     pathogen: Pathogen = Depends(get_pathogen),
+    splitio: SplitClient = Depends(get_splitio),
 ) -> PhyloRunResponse:
 
     # validation happens in input schema
@@ -63,6 +66,12 @@ async def kick_off_phylo_run(
     user_visible_samples_query = await samples_by_identifiers(
         az, pathogen, set(sample_ids)
     )
+
+    preferred_public_db = splitio.get_pathogen_treatment(
+        "PATHOGEN_public_repository", pathogen
+    )
+    public_repository = (await db.execute(sa.select(PublicRepository).filter_by(name=preferred_public_db))).scalars().one()  # type: ignore
+
     user_visible_samples_query = user_visible_samples_query.options(  # type: ignore
         joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     )
@@ -102,16 +111,18 @@ async def kick_off_phylo_run(
     for sample in user_visible_samples:
         pathogen_genomes.append(sample.uploaded_pathogen_genome)
 
-    # 4B - AlignedGisaidDump
-    aligned_gisaid_dump_query = (  # type: ignore
-        sa.select(AlignedGisaidDump)  # type: ignore
-        .join(AlignedGisaidDump.producing_workflow)  # type: ignore
+    # 4B - AlignedRepositoryData
+    aligned_repo_data_query = (  # type: ignore
+        sa.select(AlignedRepositoryData)  # type: ignore
+        .join(AlignedRepositoryData.producing_workflow)  # type: ignore
+        .where(AlignedRepositoryData.pathogen == pathogen)  # type: ignore
+        .where(AlignedRepositoryData.public_repository == public_repository)  # type: ignore
         .order_by(Workflow.end_datetime.desc())  # type: ignore
         .limit(1)  # type: ignore
     )
-    aligned_gisaid_dump = await db.execute(aligned_gisaid_dump_query)
+    aligned_repo_data = await db.execute(aligned_repo_data_query)
     try:
-        aligned_gisaid_dump = aligned_gisaid_dump.scalars().one()
+        aligned_repo_data = aligned_repo_data.scalars().one()
     except NoResultFound:
         sentry_sdk.capture_message(
             "No Aligned Gisaid Dump found! Cannot create PhyloRun!", "fatal"
@@ -153,7 +164,7 @@ async def kick_off_phylo_run(
         outputs=[],  # Make our response schema happy.
     )
     workflow.inputs = list(pathogen_genomes)
-    workflow.inputs.append(aligned_gisaid_dump)
+    workflow.inputs.append(aligned_repo_data)
 
     db.add(workflow)
     await db.commit()

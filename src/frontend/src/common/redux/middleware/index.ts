@@ -4,6 +4,7 @@
  * to learn more about how these functions work.
  */
 
+import { forEach } from "lodash";
 import { AnyAction, Middleware } from "redux";
 import {
   AnalyticsActiveGroupChange,
@@ -15,6 +16,10 @@ import {
 } from "src/common/analytics/methods";
 import { getCurrentUserInfo } from "src/common/queries/auth";
 import { expireAllCaches } from "src/common/queries/groups";
+import { USE_LINEAGES_INFO_QUERY_KEY } from "src/common/queries/lineages";
+import { USE_PHYLO_RUN_INFO } from "src/common/queries/phyloRuns";
+import { queryClient } from "src/common/queries/queryClient";
+import { USE_SAMPLE_INFO } from "src/common/queries/samples";
 import { FALLBACK_GROUP_ID } from "src/common/redux";
 import { setLocalStorage } from "src/common/utils/localStorage";
 import { selectCurrentGroup } from "../selectors";
@@ -56,11 +61,25 @@ export const setGroupMiddleware: Middleware =
     return next(action);
   };
 
+const expirePathogenCaches = async (): Promise<void> => {
+  const queriesToRefetch = [
+    USE_PHYLO_RUN_INFO,
+    USE_SAMPLE_INFO,
+    USE_LINEAGES_INFO_QUERY_KEY,
+  ];
+
+  forEach(queriesToRefetch, async (q) => {
+    await queryClient.invalidateQueries([q]);
+    await queryClient.fetchQuery([q]);
+  });
+};
+
 export const setPathogenMiddleware: Middleware =
   () => (next) => (action: AnyAction) => {
     const { type, payload } = action;
     if (type === CZGEReduxActions.SET_PATHOGEN_ACTION_TYPE) {
       setLocalStorage(ReduxPersistenceTokens.PATHOGEN, payload);
+      expirePathogenCaches();
     }
 
     return next(action);

@@ -1,3 +1,4 @@
+// TODO_TR (mlila): delete this file after table refactor complete
 import { Menu, MenuItem, Tooltip } from "czifui";
 import { MouseEventHandler, useState } from "react";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";

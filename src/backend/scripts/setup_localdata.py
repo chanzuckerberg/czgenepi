@@ -8,16 +8,17 @@ from sqlalchemy.sql.expression import and_
 from aspen.config.docker_compose import DockerComposeConfig
 from aspen.database.connection import get_db_uri, init_db
 from aspen.database.models import (
-    AlignedGisaidDump,
-    GisaidAlignmentWorkflow,
-    GisaidDumpWorkflow,
+    AlignedRepositoryData,
     Group,
     Location,
     Pathogen,
     PhyloRun,
     PhyloTree,
-    ProcessedGisaidDump,
-    RawGisaidDump,
+    ProcessedRepositoryData,
+    PublicRepository,
+    RawRepositoryData,
+    RepositoryAlignmentWorkflow,
+    RepositoryDownloadWorkflow,
     Sample,
     TreeType,
     UploadedPathogenGenome,
@@ -91,6 +92,22 @@ def create_location(session, region, country, division, location):
     session.add(location)
     session.commit()
     return location
+
+
+def create_repositories(session):
+    get_or_create = [{"name": "GISAID"}, {"name": "GenBank"}]
+    repositories = []
+    for record in get_or_create:
+        repo = (
+            session.query(PublicRepository)
+            .where(PublicRepository.name == record["name"])
+            .one_or_none()
+        )
+        if not repo:
+            repo = PublicRepository(name=record["name"])
+            session.add(repo)
+        repositories.append(repo)
+    return repositories
 
 
 def create_pathogens(session):
@@ -169,9 +186,9 @@ def create_run(session, group, pathogen, user, tree_type, status, name=None):
     )
     if run:
         return run
-    aligned_gisaid_dump = (
-        session.query(AlignedGisaidDump)
-        .join(AlignedGisaidDump.producing_workflow)
+    aligned_dump = (
+        session.query(AlignedRepositoryData)
+        .join(AlignedRepositoryData.producing_workflow)
         .order_by(Workflow.end_datetime.desc())
         .first()
     )
@@ -188,7 +205,7 @@ def create_run(session, group, pathogen, user, tree_type, status, name=None):
         tree_type=tree_type,
         user=user,
     )
-    workflow.inputs = [aligned_gisaid_dump]
+    workflow.inputs = [aligned_dump]
     workflow.template_args = {}
 
     session.add(workflow)
@@ -251,70 +268,80 @@ def create_test_trees(session, group, pathogen, user):
         create_tree(session, run)
 
 
-def create_gisaid(session):
-    aligned_workflow = session.query(AlignedGisaidDump).first()
+def create_alignment_entity(session, pathogen, repository):
+    aligned_workflow = session.query(AlignedRepositoryData).first()
     if aligned_workflow:
-        print("Aligned Gisaid Dump already exists")
+        print("Aligned Repository Dump already exists")
         return
-    # Add raw gisaid dump
-    gisaid_s3_bucket = "genepi-gisaid-data"
+    # Add raw repo dump
+    repo_s3_bucket = "genepi-gisaid-data"
     s3_resource = boto3.resource(
         "s3",
         endpoint_url=os.getenv("BOTO_ENDPOINT_URL") or None,
         config=boto3.session.Config(signature_version="s3v4"),
     )
     suffix = datetime.now().isoformat()
-    raw_s3_key = f"raw_gisaid_dump-{suffix}"
+    raw_s3_key = f"raw_repo_dump-{suffix}"
     processed_sequences_s3_key = f"processed_sequences-{suffix}"
     processed_metadata_s3_key = f"processed_metadata-{suffix}"
     aligned_sequences_s3_key = f"aligned_sequences-{suffix}"
     aligned_metadata_s3_key = f"aligned_metadata-{suffix}"
-    raw_gisaid_dump = RawGisaidDump(
+    raw_repo_dump = RawRepositoryData(
+        pathogen=pathogen,
+        public_repository=repository,
         download_date=datetime.now(),
-        s3_bucket=gisaid_s3_bucket,
+        s3_bucket=repo_s3_bucket,
         s3_key=raw_s3_key,
     )
-    session.add(raw_gisaid_dump)
-    s3_resource.Bucket(gisaid_s3_bucket).Object(raw_s3_key).put(Body="")
-    s3_resource.Bucket(gisaid_s3_bucket).Object(processed_sequences_s3_key).put(Body="")
-    s3_resource.Bucket(gisaid_s3_bucket).Object(processed_metadata_s3_key).put(Body="")
-    s3_resource.Bucket(gisaid_s3_bucket).Object(aligned_sequences_s3_key).put(Body="")
-    s3_resource.Bucket(gisaid_s3_bucket).Object(aligned_metadata_s3_key).put(Body="")
+    session.add(raw_repo_dump)
+    s3_resource.Bucket(repo_s3_bucket).Object(raw_s3_key).put(Body="")
+    s3_resource.Bucket(repo_s3_bucket).Object(processed_sequences_s3_key).put(Body="")
+    s3_resource.Bucket(repo_s3_bucket).Object(processed_metadata_s3_key).put(Body="")
+    s3_resource.Bucket(repo_s3_bucket).Object(aligned_sequences_s3_key).put(Body="")
+    s3_resource.Bucket(repo_s3_bucket).Object(aligned_metadata_s3_key).put(Body="")
 
-    # add transformed gisaid dump
-    processed_gisaid_dump = ProcessedGisaidDump(
-        s3_bucket=gisaid_s3_bucket,
+    # add transformed repo dump
+    processed_repo_dump = ProcessedRepositoryData(
+        pathogen=pathogen,
+        public_repository=repository,
+        s3_bucket=repo_s3_bucket,
         sequences_s3_key=processed_sequences_s3_key,
         metadata_s3_key=processed_metadata_s3_key,
     )
-    processed_workflow = GisaidDumpWorkflow(
+    processed_workflow = RepositoryDownloadWorkflow(
+        pathogen=pathogen,
+        public_repository=repository,
         start_datetime=datetime.now(),
         end_datetime=datetime.now(),
         workflow_status=WorkflowStatusType.COMPLETED,
         software_versions={},
     )
 
-    processed_workflow.inputs.append(raw_gisaid_dump)
-    processed_workflow.outputs.append(processed_gisaid_dump)
+    processed_workflow.inputs.append(raw_repo_dump)
+    processed_workflow.outputs.append(processed_repo_dump)
     session.add(processed_workflow)
 
     # Add an aligned dump
-    aligned_gisaid_dump = AlignedGisaidDump(
-        s3_bucket=gisaid_s3_bucket,
+    aligned_repo_dump = AlignedRepositoryData(
+        pathogen=pathogen,
+        public_repository=repository,
+        s3_bucket=repo_s3_bucket,
         sequences_s3_key=aligned_sequences_s3_key,
         metadata_s3_key=aligned_metadata_s3_key,
     )
 
     # attach a workflow
-    aligned_workflow = GisaidAlignmentWorkflow(
+    aligned_workflow = RepositoryAlignmentWorkflow(
+        pathogen=pathogen,
+        public_repository=repository,
         start_datetime=datetime.now(),
         end_datetime=datetime.now(),
         workflow_status=WorkflowStatusType.COMPLETED,
         software_versions={},
     )
 
-    aligned_workflow.inputs.append(processed_gisaid_dump)
-    aligned_workflow.outputs.append(aligned_gisaid_dump)
+    aligned_workflow.inputs.append(processed_repo_dump)
+    aligned_workflow.outputs.append(aligned_repo_dump)
     session.add(aligned_workflow)
 
 
@@ -371,7 +398,10 @@ def upload_tree_files(session):
 
 def create_test_data(engine):
     session = engine.make_session()
-    _ = create_gisaid(session)
+    pathogens = create_pathogens(session)
+    repositories = create_repositories(session)
+    for pathogen in pathogens:
+        _ = create_alignment_entity(session, pathogen, repositories[0])
 
     # Create db rows for our main test user
     location = create_location(
@@ -379,7 +409,6 @@ def create_test_data(engine):
     )
     group = create_test_group(session, "CZI", "CZI", location)
     user = create_test_user(session, "user1@czgenepi.org", group, "User1", "Test User")
-    pathogens = create_pathogens(session)
     for pathogen in pathogens:
         create_samples(session, group, pathogen, user, location, 10, 5)
         create_test_trees(session, group, pathogen, user)

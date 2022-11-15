@@ -1,12 +1,22 @@
 import styled from "@emotion/styled";
 import {
   CommonThemeProps,
-  fontBodyXs,
   fontHeaderXs,
   getColors,
+  getFontWeights,
   getSpaces,
 } from "czifui";
 import { SampleUploadDownloadTemplate } from "src/components/DownloadMetadataTemplate";
+
+export const SemiBold = styled.span`
+  ${(props: CommonThemeProps) => {
+    const fontWeights = getFontWeights(props);
+
+    return `
+      font-weight: ${fontWeights?.semibold};
+    `;
+  }}
+`;
 
 export const Wrapper = styled.div`
   ${(props: CommonThemeProps) => {
@@ -30,12 +40,6 @@ export const Title = styled.div`
       margin-bottom: ${spaces?.xxs}px;
     `;
   }}
-`;
-
-export const ReImportDataItem = styled.p`
-  ${fontBodyXs}
-
-  margin-bottom: 0;
 `;
 
 export const StyleDownloadTemplate = styled(SampleUploadDownloadTemplate)`

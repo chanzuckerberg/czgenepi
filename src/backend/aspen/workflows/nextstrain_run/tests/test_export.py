@@ -19,14 +19,16 @@ from aspen.database.models import (
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory
+from aspen.test_infra.models.repository import random_default_repo_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_multifactory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
-from aspen.test_infra.models.workflow import aligned_gisaid_dump_factory
+from aspen.test_infra.models.workflow import aligned_repo_data_factory
 from aspen.workflows.nextstrain_run.export import export_run_config
 
 
 def create_test_data(
     session,
+    split_client,
     tree_type: TreeType,
     num_county_samples,  # Total # of samples to associate with a group
     num_selected_samples,  # How many of those samples are workflow inputs
@@ -65,6 +67,7 @@ def create_test_data(
             f"{group.division} Test Division",
             f"{group.location} Test City",
         )
+    repository = random_default_repo_factory(split_client)
     pathogen: Optional[Pathogen] = (
         session.query(Pathogen).filter(Pathogen.slug == "SC2").one_or_none()
     )
@@ -81,7 +84,9 @@ def create_test_data(
     )
 
     selected_samples = pathogen_genomes[:num_selected_samples]
-    gisaid_dump = aligned_gisaid_dump_factory(
+    gisaid_dump = aligned_repo_data_factory(
+        pathogen=pathogen,
+        repository=repository,
         sequences_s3_key=f"{group_name}{tree_type.value}",
         metadata_s3_key=f"{group_name}{tree_type.value}",
     ).outputs[0]
@@ -115,7 +120,7 @@ def mock_remote_db_uri(mocker, test_postgres_db_uri):
 
 
 # Make sure the build config is working properly, and our location/group info is populated.
-def test_build_config(mocker, session, postgres_database):
+def test_build_config(mocker, session, split_client, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     for tree_type in [
@@ -123,7 +128,7 @@ def test_build_config(mocker, session, postgres_database):
         TreeType.NON_CONTEXTUALIZED,
         TreeType.TARGETED,
     ]:
-        phylo_run = create_test_data(session, tree_type, 10, 10, 10)
+        phylo_run = create_test_data(session, split_client, tree_type, 10, 10, 10)
         sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
         build = nextstrain_config["builds"]["aspen"]
         assert build["subsampling_scheme"] == tree_type.value
@@ -146,11 +151,11 @@ def test_build_config(mocker, session, postgres_database):
 
 
 # Make sure that configs specific to an Overview tree are working.
-def test_overview_config_no_filters(mocker, session, postgres_database):
+def test_overview_config_no_filters(mocker, session, postgres_database, split_client):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.OVERVIEW
-    phylo_run = create_test_data(session, tree_type, 10, 0, 0)
+    phylo_run = create_test_data(session, split_client, tree_type, 10, 0, 0)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
@@ -171,7 +176,7 @@ def test_overview_config_no_filters(mocker, session, postgres_database):
 
 
 # Make sure that configs specific to an Overview tree are working.
-def test_overview_config_ondemand(mocker, session, postgres_database):
+def test_overview_config_ondemand(mocker, session, postgres_database, split_client):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.OVERVIEW
@@ -180,7 +185,9 @@ def test_overview_config_ondemand(mocker, session, postgres_database):
         "filter_end_date": "10 days ago",
         "filter_pango_lineages": ["AY", "B.1.116"],
     }
-    phylo_run = create_test_data(session, tree_type, 10, 5, 5, template_args=query)
+    phylo_run = create_test_data(
+        session, split_client, tree_type, 10, 5, 5, template_args=query
+    )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
@@ -204,12 +211,18 @@ def test_overview_config_ondemand(mocker, session, postgres_database):
 
 
 # Make sure that configs specific to a Chicago Overview tree are working.
-def test_overview_config_chicago(mocker, session, postgres_database):
+def test_overview_config_chicago(mocker, session, postgres_database, split_client):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.OVERVIEW
     phylo_run = create_test_data(
-        session, tree_type, 10, 0, 0, group_name="Chicago Department of Public Health"
+        session,
+        split_client,
+        tree_type,
+        10,
+        0,
+        0,
+        group_name="Chicago Department of Public Health",
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
@@ -227,11 +240,11 @@ def test_overview_config_chicago(mocker, session, postgres_database):
 
 
 # Make sure that configs specific to a Non-Contextualized tree are working.
-def test_non_contextualized_config(mocker, session, postgres_database):
+def test_non_contextualized_config(mocker, session, postgres_database, split_client):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.NON_CONTEXTUALIZED
-    phylo_run = create_test_data(session, tree_type, 10, 5, 5)
+    phylo_run = create_test_data(session, split_client, tree_type, 10, 5, 5)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
@@ -244,12 +257,13 @@ def test_non_contextualized_config(mocker, session, postgres_database):
 
 
 # Make sure that regionalized configs specific to a Non-Contextualized tree are working.
-def test_non_contextualized_regions(mocker, session, postgres_database):
+def test_non_contextualized_regions(mocker, session, postgres_database, split_client):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.NON_CONTEXTUALIZED
     state_phylo_run = create_test_data(
         session,
+        split_client,
         tree_type,
         10,
         5,
@@ -259,6 +273,7 @@ def test_non_contextualized_regions(mocker, session, postgres_database):
     )
     country_phylo_run = create_test_data(
         session,
+        split_client,
         tree_type,
         10,
         5,
@@ -294,11 +309,11 @@ def test_non_contextualized_regions(mocker, session, postgres_database):
 
 
 # Make sure that configs specific to a Targeted build are working.
-def test_targeted_config_simple(mocker, session, postgres_database):
+def test_targeted_config_simple(mocker, session, postgres_database, split_client):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.TARGETED
-    phylo_run = create_test_data(session, tree_type, 10, 5, 5)
+    phylo_run = create_test_data(session, split_client, tree_type, 10, 5, 5)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
@@ -315,12 +330,13 @@ def test_targeted_config_simple(mocker, session, postgres_database):
 
 
 # Make sure that configs specific to a Targeted build are working.
-def test_targeted_config_regions(mocker, session, postgres_database):
+def test_targeted_config_regions(mocker, session, postgres_database, split_client):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.TARGETED
     state_phylo_run = create_test_data(
         session,
+        split_client,
         tree_type,
         10,
         5,
@@ -330,6 +346,7 @@ def test_targeted_config_regions(mocker, session, postgres_database):
     )
     country_phylo_run = create_test_data(
         session,
+        split_client,
         tree_type,
         10,
         5,
@@ -370,7 +387,7 @@ def test_targeted_config_regions(mocker, session, postgres_database):
 
 
 # Test that we can reset status to STARTED on export.
-def test_reset_status(mocker, session, postgres_database):
+def test_reset_status(mocker, session, postgres_database, split_client):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     test_table = [
@@ -378,7 +395,7 @@ def test_reset_status(mocker, session, postgres_database):
         {"should_reset": True, "result_status": WorkflowStatusType.STARTED},
     ]
     tree_type = TreeType.TARGETED
-    phylo_run = create_test_data(session, tree_type, 200, 110, 10)
+    phylo_run = create_test_data(session, split_client, tree_type, 200, 110, 10)
     for test in test_table:
         phylo_run.workflow_status = WorkflowStatusType.FAILED
         session.commit()
@@ -395,11 +412,11 @@ def test_reset_status(mocker, session, postgres_database):
 
 
 # Make sure that configs specific to a Targeted build are working.
-def test_targeted_config_large(mocker, session, postgres_database):
+def test_targeted_config_large(mocker, session, postgres_database, split_client):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.TARGETED
-    phylo_run = create_test_data(session, tree_type, 200, 110, 10)
+    phylo_run = create_test_data(session, split_client, tree_type, 200, 110, 10)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
@@ -439,12 +456,13 @@ def generate_run(phylo_run_id, reset_status=False):
 
 
 # Make sure that state-level builds are working
-def test_overview_config_division(mocker, session, postgres_database):
+def test_overview_config_division(mocker, session, postgres_database, split_client):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.OVERVIEW
     phylo_run = create_test_data(
         session,
+        split_client,
         tree_type,
         10,
         0,
@@ -466,12 +484,13 @@ def test_overview_config_division(mocker, session, postgres_database):
 
 
 # Make sure that country-level builds are working.
-def test_overview_config_country(mocker, session, postgres_database):
+def test_overview_config_country(mocker, session, postgres_database, split_client):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.OVERVIEW
     phylo_run = create_test_data(
         session,
+        split_client,
         tree_type,
         10,
         0,
