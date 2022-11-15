@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 
-import { ChipProps, Icon, Tooltip } from "czifui";
+import { ChipProps, Icon } from "czifui";
 import {
   defaultSampleCellRenderer,
   defaultTreeCellRenderer,
@@ -78,14 +78,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     );
 
     return hasLineage ? (
-      <Tooltip
-        followCursor
-        title={<LineageTooltip lineage={value as Lineage} />}
-        width="wide"
-        data-test-id="lineage-tooltip"
-      >
-        {Content}
-      </Tooltip>
+      <LineageTooltip lineage={value}>{Content}</LineageTooltip>
     ) : (
       Content
     );
