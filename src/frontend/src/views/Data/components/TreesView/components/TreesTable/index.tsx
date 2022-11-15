@@ -11,6 +11,7 @@ import { map } from "lodash";
 import { useEffect, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { SortableHeader } from "../../../SamplesView/components/SamplesTable/components/SortableHeader";
+import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
@@ -25,19 +26,41 @@ const columns: ColumnDef<PhyloRun, any>[] = [
     id: "name",
     accessorKey: "name",
     header: ({ header }) => (
-      <SortableHeader header={header}>Tree Name</SortableHeader>
+      <SortableHeader
+        header={header}
+        tooltipStrings={{
+          boldText: "Tree Name",
+          regularText:
+            "User-provided tree name. Auto-generated tree builds are named ”Y Contextual“, where Y is your Group Name.",
+        }}
+      >
+        Tree Name
+      </SortableHeader>
     ),
-    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    cell: ({ getValue }) => (
+      <CellBasic shouldShowTooltipOnHover={false} primaryText={getValue()} />
+    ),
     enableSorting: true,
   },
   {
     id: "startedDate",
     accessorKey: "startedDate",
     header: ({ header }) => (
-      <SortableHeader header={header}>Creation Date</SortableHeader>
+      <SortableHeader
+        header={header}
+        tooltipStrings={{
+          boldText: "Creation Date",
+          regularText: "Date on which the tree was generated.",
+        }}
+      >
+        Creation Date
+      </SortableHeader>
     ),
     cell: ({ getValue }) => (
-      <CellBasic primaryText={datetimeWithTzToLocalDate(getValue())} />
+      <CellBasic
+        shouldShowTooltipOnHover={false}
+        primaryText={datetimeWithTzToLocalDate(getValue())}
+      />
     ),
     enableSorting: true,
   },
@@ -45,9 +68,32 @@ const columns: ColumnDef<PhyloRun, any>[] = [
     id: "treeType",
     accessorKey: "treeType",
     header: ({ header }) => (
-      <SortableHeader header={header}>Tree Type</SortableHeader>
+      <SortableHeader
+        header={header}
+        tooltipStrings={{
+          boldText: "Tree Type",
+          link: {
+            href: "https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit?usp=sharing",
+            linkText: "Read our guide to learn more.",
+          },
+          regularText:
+            "CZ Gen Epi-defined profiles for tree building based on primary use case and build settings.",
+        }}
+      >
+        Tree Type
+      </SortableHeader>
     ),
-    cell: ({ getValue }) => <CellBasic primaryText={getValue()} />,
+    cell: ({ getValue }) => {
+      const type = getValue();
+      return (
+        <TreeTypeTooltip value={type}>
+          <CellBasic
+            shouldShowTooltipOnHover={false}
+            primaryText={getValue()}
+          />
+        </TreeTypeTooltip>
+      );
+    },
     enableSorting: true,
   },
 ];

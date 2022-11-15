@@ -30,7 +30,7 @@ export const SortableHeader = ({
       hideSortIcon={!sortable}
       shouldShowTooltipOnHover={shouldShowTooltip}
       tooltipProps={{
-        arrow: false,
+        arrow: true,
         sdsStyle: "light",
         title: <TooltipText tooltipStrings={tooltipStrings} />,
       }}
