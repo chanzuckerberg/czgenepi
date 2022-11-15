@@ -128,18 +128,6 @@ const columns: ColumnDef<Sample, any>[] = [
     cell: DefaultCell,
     enableSorting: true,
   },
-  // {
-  //   id: "CZBFailedGenomeRecovery",
-  //   accessorKey: "CZBFailedGenomeRecovery",
-  //   header: ({ header }) => (
-  //     <SortableHeader header={header}>Quality Score</SortableHeader>
-  //   ),
-  //   cell: ({ getValue }) => {
-  //     const didFail = getValue();
-  //     const label
-  //     return <Tag sdsStyle="rounded" sdsType="primary" color="" />;
-  //   },
-  // },
   {
     id: "uploadDate",
     accessorKey: "uploadDate",
