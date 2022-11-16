@@ -12,7 +12,7 @@ import {
   foldInLocationName,
   useNamedLocationsById,
 } from "src/common/queries/locations";
-import NextstrainConfirmationModal from "../NextstrainConfirmationModal";
+import NextstrainConfirmationModal from "src/views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/OpenInNextstrainButton/components/NextstrainConfirmationModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
 import {
   CellWrapper,

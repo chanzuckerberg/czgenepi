@@ -6,7 +6,7 @@ import {
   getFontWeights,
   getSpaces,
 } from "czifui";
-import { NewTabLink } from "../../../../../../common/components/library/NewTabLink";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 export const StyledDiv = styled.div`
   ${(props: CommonThemeProps) => {
