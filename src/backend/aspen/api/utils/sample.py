@@ -23,6 +23,8 @@ from aspen.database.models import (
     Group,
     Location,
     Pathogen,
+    PathogenRepoConfig,
+    PublicRepository,
     Sample,
     User,
 )
@@ -44,10 +46,27 @@ def apply_pathogen_prefix_to_identifier(
             prefix_to_strip = prefix
     if prefix_to_strip:
         sequence_name = sequence_name.replace(prefix, "")
-    # only add on new prefix if it's not there already
-    if not sequence_name.startswith(pathogen_prefix):
-        sequence_name = pathogen_prefix + "/" + sequence_name
+    sequence_name = pathogen_prefix + "/" + sequence_name
     return sequence_name
+
+
+async def get_public_repository_prefix(pathogen: Pathogen, public_repository_name, db):
+    if public_repository_name:
+        # only get the prefix if we have enough information to proceed
+        prefix = (
+            sa.select(PathogenRepoConfig)  # type: ignore
+            .join(PublicRepository)  # type: ignore
+            .where(  # type: ignore
+                and_(
+                    PathogenRepoConfig.pathogen == pathogen,
+                    PublicRepository.name == public_repository_name,
+                )
+            )
+        )
+        res = await db.execute(prefix)
+        pathogen_repo_config = res.scalars().one_or_none()
+        if pathogen_repo_config:
+            return pathogen_repo_config.prefix
 
 
 async def samples_by_identifiers(

@@ -23,8 +23,8 @@ from aspen.database.models import (
     Entity,
     Group,
     Location,
-    PangoLineage,
     PathogenGenome,
+    PathogenLineage,
     PhyloRun,
     Sample,
     UploadedPathogenGenome,
@@ -191,7 +191,7 @@ def export_run_config(
 
         # Some template args need to be resolved before ready to use.
         resolved_template_args = resolve_template_args(
-            session, phylo_run.template_args, group
+            session, phylo_run.pathogen, phylo_run.template_args, group
         )
         # Keep a record of what they resolved to. Make permanent in `save.py`
         save_resolved_template_args(resolved_template_args_fh, resolved_template_args)
@@ -252,7 +252,7 @@ def get_phylo_run(session, phylo_run_id):
 
 
 def resolve_filter_pango_lineages(
-    session: Session, template_args: Dict[str, Any]
+    session: Session, pathogen: Pathogen, template_args: Dict[str, Any]
 ) -> Optional[List[str]]:
     """Takes raw lineage filter, expands it. Helper for `resolve_template_args`
 
@@ -265,14 +265,16 @@ def resolve_filter_pango_lineages(
     lineage_list = template_args.get("filter_pango_lineages")
     if lineage_list is None:  # short-circuit if template arg was not present
         return None
-    all_lineages_query = sa.select(PangoLineage.lineage)
+    all_lineages_query = sa.select(PathogenLineage.lineage).where(
+        PathogenLineage.pathogen == pathogen
+    )
     # Utility that does expansion depends on having set of all lineages.
     all_lineages = set(session.execute(all_lineages_query).scalars().all())
     return expand_lineage_wildcards(all_lineages, lineage_list)
 
 
 def resolve_template_args(
-    session: Session, template_args: Dict[str, Any], group: Group
+    session: Session, pathogen: Pathogen, template_args: Dict[str, Any], group: Group
 ) -> Dict[str, Any]:
     """Takes raw template_args and interprets them so ready for downstream use.
 
@@ -294,7 +296,7 @@ def resolve_template_args(
         )
 
     resolved_filter_pango_lineages = resolve_filter_pango_lineages(
-        session, template_args
+        session, pathogen, template_args
     )
 
     # Avoid mutating original template_args; resolved args handled special.

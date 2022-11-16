@@ -1,5 +1,5 @@
-from aspen.database.models import PangoLineage
+from aspen.database.models import Pathogen, PathogenLineage
 
 
-def pango_lineage_factory(lineage: str):
-    return PangoLineage(lineage=lineage)
+def pathogen_lineage_factory(lineage: str, pathogen: Pathogen):
+    return PathogenLineage(lineage=lineage, pathogen=pathogen)
