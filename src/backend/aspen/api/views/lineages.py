@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 
 from aspen.api.deps import get_db
 from aspen.api.schemas.lineages import PathogenLineagesResponse
-from aspen.database.models import PathogenLineage
+from aspen.database.models import Pathogen, PathogenLineage
 from aspen.util.lineage import NEXTSTRAIN_LINEAGE_MAP, WHO_LINEAGE_MAP
 
 router = APIRouter()

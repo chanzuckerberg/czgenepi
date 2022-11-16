@@ -23,6 +23,7 @@ from aspen.database.models import (
     Entity,
     Group,
     Location,
+    Pathogen,
     PathogenGenome,
     PathogenLineage,
     PhyloRun,

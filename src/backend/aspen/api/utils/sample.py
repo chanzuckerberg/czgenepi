@@ -46,7 +46,9 @@ def apply_pathogen_prefix_to_identifier(
             prefix_to_strip = prefix
     if prefix_to_strip:
         sequence_name = sequence_name.replace(prefix, "")
-    sequence_name = pathogen_prefix + "/" + sequence_name
+    # only add on new prefix if it's not there already
+    if not sequence_name.startswith(pathogen_prefix):
+        sequence_name = pathogen_prefix + "/" + sequence_name
     return sequence_name
 
 
