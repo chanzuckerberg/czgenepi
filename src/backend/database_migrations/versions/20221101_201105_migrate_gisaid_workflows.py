@@ -50,7 +50,7 @@ def upgrade():
     # Workflows
     op.execute(
         """
-        INSERT INTO aspen.repository_download_workflows (workflow_id, pathogen_id, public_repository_id)
+        INSERT INTO aspen.repository_alignment_workflows (workflow_id, pathogen_id, public_repository_id)
         SELECT gaw.workflow_id, p.id, pr.id from
         aspen.gisaid_alignment_workflows gaw,
         aspen.pathogens p,
