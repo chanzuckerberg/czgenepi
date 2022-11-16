@@ -16,10 +16,12 @@ SEQUENCES_FILE=sequences.fasta
 
 nextclade_dataset_name=$(jq --raw-output ".nextclade_dataset_name" "${PATHOGEN_INFO_FILE}")
 echo "Pulling nextclade reference dataset with name ${nextclade_dataset_name}"
-NEXTCLADE_DATASET_DIR=nextclade_dataset/bundle
+NEXTCLADE_DATASET_DIR=nextclade_dataset_bundle
 nextclade dataset get \
   --name "${nextclade_dataset_name}" \
   --output-dir "${NEXTCLADE_DATASET_DIR}"
+# Inside bundle, this file has info about the bundle we want to capture.
+DATASET_TAG_FILE=tag.json
 
 echo "Starting nextclade run"
 NEXTCLADE_OUTPUT_DIR=output
@@ -33,5 +35,6 @@ pathogen_slug=$(jq --raw-output ".pathogen_slug" "${PATHOGEN_INFO_FILE}")
 # save results back to db
 /usr/local/bin/python3.10 save.py \
     --nextclade-csv "${NEXTCLADE_OUTPUT_DIR}/nextclade.csv" \
+    --nextclade-dataset-tag "${NEXTCLADE_DATASET_DIR}/${DATASET_TAG_FILE}" \
     --nextclade-version "$(nextclade --version)" \
     --pathogen-slug "${pathogen_slug}"
