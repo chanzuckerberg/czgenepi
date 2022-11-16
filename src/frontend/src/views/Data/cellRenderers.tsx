@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 
-import { ChipProps, Icon, Tooltip } from "czifui";
+import { ChipProps, Icon } from "czifui";
 import {
   defaultSampleCellRenderer,
   defaultTreeCellRenderer,
@@ -16,7 +16,7 @@ import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
 import { LineageTooltip } from "./components/LineageTooltip";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import TreeTableNameCell from "./components/TreeTableNameCell";
-import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
+import { TreeTypeTooltip } from "./components/TreesView/components/TreesTable/components/TreeTypeTooltip";
 import {
   CenteredFlexContainer,
   GISAIDCell,
@@ -78,14 +78,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     );
 
     return hasLineage ? (
-      <Tooltip
-        followCursor
-        title={<LineageTooltip lineage={value as Lineage} />}
-        width="wide"
-        data-test-id="lineage-tooltip"
-      >
-        {Content}
-      </Tooltip>
+      <LineageTooltip lineage={value}>{Content}</LineageTooltip>
     ) : (
       Content
     );
