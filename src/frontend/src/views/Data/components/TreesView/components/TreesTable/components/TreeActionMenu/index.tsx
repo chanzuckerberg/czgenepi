@@ -22,11 +22,11 @@ interface Props {
   // no matter what, TypeScript gets angry if we just remove it from Props
   // interface. Instead, we just don't pull the `value` from the passed props
   // because it's not actually useful to us for this component.
-  value: string;
+  // TODO-TR (mlila): value can be removed after table refactor
+  value?: string;
   item: PhyloRun;
-  userInfo: User;
-  onDeleteTreeModalOpen(t: PhyloRun): void;
-  onEditTreeModalOpen(t: PhyloRun): void;
+  onDeleteTreeModalOpen?(t: PhyloRun): void;
+  onEditTreeModalOpen?(t: PhyloRun): void;
 }
 
 const TreeActionMenu = ({
@@ -35,12 +35,17 @@ const TreeActionMenu = ({
   item,
   onDeleteTreeModalOpen,
   onEditTreeModalOpen,
-  userInfo,
 }: Props): JSX.Element => {
   const flag = useTreatments([USER_FEATURE_FLAGS.galago_integration]);
   const isGalagoIntegrationFlagOn = isUserFlagOn(
     flag,
     USER_FEATURE_FLAGS.galago_integration
+  );
+
+  const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
+  const usesTableRefactor = isUserFlagOn(
+    tableRefactorFlag,
+    USER_FEATURE_FLAGS.table_refactor
   );
 
   return (
@@ -60,12 +65,14 @@ const TreeActionMenu = ({
         <TreeTableDownloadMenu item={item} />
       </StyledActionWrapper>
       <StyledActionWrapper>
-        <MoreActionsMenu
-          item={item}
-          onDeleteTreeModalOpen={onDeleteTreeModalOpen}
-          onEditTreeModalOpen={onEditTreeModalOpen}
-          userInfo={userInfo}
-        />
+        {usesTableRefactor && <MoreActionsMenu item={item} />}
+        {!usesTableRefactor && (
+          <MoreActionsMenu
+            item={item}
+            onDeleteTreeModalOpen={onDeleteTreeModalOpen}
+            onEditTreeModalOpen={onEditTreeModalOpen}
+          />
+        )}
       </StyledActionWrapper>
     </StyledTreeActionMenu>
   );

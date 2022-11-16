@@ -1,4 +1,4 @@
-import { CellBasic, Table, TableHeader, TableRow } from "czifui";
+import { CellBasic, CellComponent, Table, TableHeader, TableRow } from "czifui";
 import {
   ColumnDef,
   flexRender,
@@ -10,8 +10,9 @@ import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
 import { useEffect, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
-import { SortableHeader } from "../../../SamplesView/components/SamplesTable/components/SortableHeader";
+import { TreeActionMenu } from "./components/TreeActionMenu";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
+import { SortableHeader } from "../../../SamplesView/components/SamplesTable/components/SortableHeader";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
@@ -95,6 +96,14 @@ const columns: ColumnDef<PhyloRun, any>[] = [
       );
     },
     enableSorting: true,
+  },
+  {
+    id: "action",
+    cell: ({ row }) => (
+      <CellComponent>
+        <TreeActionMenu item={row.original} />
+      </CellComponent>
+    ),
   },
 ];
 

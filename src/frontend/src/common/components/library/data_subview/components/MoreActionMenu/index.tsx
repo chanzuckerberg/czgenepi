@@ -2,7 +2,7 @@
 import { Icon, Menu, MenuItem, Tooltip } from "czifui";
 import { MouseEventHandler, useState } from "react";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
-import { StyledText } from "src/views/Data/components/TreeActionMenu/components/MoreActionsMenu/style";
+import { StyledText } from "src/views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/MoreActionsMenu/style";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../IconButton";
 import { StyledEditIconWrapper, StyledTrashIconWrapper } from "./style";

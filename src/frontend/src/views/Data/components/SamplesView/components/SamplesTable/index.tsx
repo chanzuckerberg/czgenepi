@@ -247,6 +247,7 @@ const columns: ColumnDef<Sample, any>[] = [
       </SortableHeader>
     ),
     cell: DefaultCell,
+    enableSorting: true,
   },
   {
     id: "gisaid",

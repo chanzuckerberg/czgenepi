@@ -39,7 +39,7 @@ const DeleteTreeConfirmationModal = ({
     },
   });
 
-  if (!phyloRun) return null;
+  if (!phyloRun || !open) return null;
 
   const { id, name } = phyloRun;
 
