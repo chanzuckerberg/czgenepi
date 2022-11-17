@@ -10,7 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
-from aspen.api.deps import get_db, get_pathogen, get_settings, get_splitio
+from aspen.api.deps import get_db, get_pathogen, get_public_repository, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
     PhyloRunDeleteResponse,
@@ -21,8 +21,8 @@ from aspen.api.schemas.phylo_runs import (
 )
 from aspen.api.settings import APISettings
 from aspen.api.utils import (
-    get_matching_gisaid_ids,
-    get_matching_gisaid_ids_by_epi_isl,
+    get_matching_repo_ids,
+    get_matching_repo_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
     samples_by_identifiers,
 )
@@ -41,7 +41,6 @@ from aspen.database.models import (
     Workflow,
     WorkflowStatusType,
 )
-from aspen.util.split import SplitClient
 from aspen.util.swipe import NextstrainJob
 
 router = APIRouter()
@@ -56,7 +55,7 @@ async def kick_off_phylo_run(
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_phylorun")),
     pathogen: Pathogen = Depends(get_pathogen),
-    splitio: SplitClient = Depends(get_splitio),
+    public_repository: PublicRepository = Depends(get_public_repository),
 ) -> PhyloRunResponse:
 
     # validation happens in input schema
@@ -66,11 +65,6 @@ async def kick_off_phylo_run(
     user_visible_samples_query = await samples_by_identifiers(
         az, pathogen, set(sample_ids)
     )
-
-    preferred_public_db = splitio.get_pathogen_treatment(
-        "PATHOGEN_public_repository", pathogen
-    )
-    public_repository = (await db.execute(sa.select(PublicRepository).filter_by(name=preferred_public_db))).scalars().one()  # type: ignore
 
     user_visible_samples_query = user_visible_samples_query.options(  # type: ignore
         joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
@@ -84,7 +78,9 @@ async def kick_off_phylo_run(
     )
 
     # See if these missing_sample_ids match any Gisaid IDs
-    gisaid_ids: Set[str] = await get_matching_gisaid_ids(db, missing_sample_ids)
+    gisaid_ids: Set[str] = await get_matching_repo_ids(
+        db, pathogen, public_repository, missing_sample_ids
+    )
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
     missing_sample_ids = missing_sample_ids - gisaid_ids
@@ -92,8 +88,8 @@ async def kick_off_phylo_run(
     # Do the same, but for epi isls
     gisaid_ids_from_isls: Set[str]
     epi_isls: Set[str]
-    gisaid_ids_from_isls, epi_isls = await get_matching_gisaid_ids_by_epi_isl(
-        db, missing_sample_ids
+    gisaid_ids_from_isls, epi_isls = await get_matching_repo_ids_by_epi_isl(
+        db, pathogen, public_repository, missing_sample_ids
     )
     missing_sample_ids -= epi_isls
     gisaid_ids |= gisaid_ids_from_isls

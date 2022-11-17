@@ -1,5 +1,5 @@
 from aspen.api.schemas.base import BaseResponse
 
 
-class PangoLineagesResponse(BaseResponse):
+class PathogenLineagesResponse(BaseResponse):
     lineages: list[str]

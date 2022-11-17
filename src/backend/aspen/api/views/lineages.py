@@ -3,16 +3,17 @@ import re
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from aspen.api.deps import get_db
-from aspen.api.schemas.pango_lineages import PangoLineagesResponse
-from aspen.database.models import PangoLineage
+from aspen.api.schemas.lineages import PathogenLineagesResponse
+from aspen.database.models import Pathogen, PathogenLineage
 from aspen.util.lineage import NEXTSTRAIN_LINEAGE_MAP, WHO_LINEAGE_MAP
 
 router = APIRouter()
 
 
-@router.get("/pango", response_model=PangoLineagesResponse)
+@router.get("/pango", response_model=PathogenLineagesResponse)
 async def list_pango_lineages(db: AsyncSession = Depends(get_db)):
     """Gets all the Pango lineages.
 
@@ -22,7 +23,8 @@ async def list_pango_lineages(db: AsyncSession = Depends(get_db)):
     lineage info. The only real info we have is the names of the lineages,
     so that's all we pull and return.
     """
-    all_lineages_query = sa.select(PangoLineage.lineage)  # type: ignore
+    # This is specifically a *pangolin* lineages endpoint, so hardcode an SC2 filter
+    all_lineages_query = sa.select(PathogenLineage.lineage).options(joinedload(Pathogen)).where(Pathogen.slug == "SC2")  # type: ignore
     result = await db.execute(all_lineages_query)
     all_lineages = set(result.scalars().all())
 

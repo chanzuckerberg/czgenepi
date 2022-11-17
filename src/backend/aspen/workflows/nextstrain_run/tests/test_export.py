@@ -146,7 +146,7 @@ def test_build_config(mocker, session, split_client, postgres_database):
         for row in metadata_reader:
             for key, value in row.items():
                 assert not value.startswith("<aspen.database.models")
-                if key == "gisaid_epi_isl":
+                if key == "isl":
                     assert value.startswith("EPI_ISL_")
 
 

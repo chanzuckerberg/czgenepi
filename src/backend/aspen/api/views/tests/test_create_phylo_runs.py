@@ -4,9 +4,9 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.test_infra.models.gisaid_metadata import gisaid_metadata_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import random_pathogen_factory
+from aspen.test_infra.models.repo_metadata import repo_metadata_factory
 from aspen.test_infra.models.repository import random_default_repo_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -149,7 +149,7 @@ async def test_create_phylo_run_with_invalid_args(
     split_client: SplitClient,
 ):
     """
-    Test phylo tree creation that includes a reference to a GISAID sequence.
+    Test phylo tree creation that includes a reference to a public repository sequence.
     """
     group = group_factory()
     user = await userrole_factory(async_session, group)
@@ -161,10 +161,10 @@ async def test_create_phylo_run_with_invalid_args(
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     repo = random_default_repo_factory(split_client)
     repo_data = aligned_repo_data_factory(pathogen, repo)
-    gisaid_sample = gisaid_metadata_factory()
+    repo_sample = repo_metadata_factory(pathogen, repo)
     async_session.add(group)
     async_session.add(repo_data)
-    async_session.add(gisaid_sample)
+    async_session.add(repo_sample)
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
@@ -185,7 +185,7 @@ async def test_create_phylo_run_with_invalid_args(
     request_body = {
         "name": "test phylorun",
         "tree_type": "overview",
-        "samples": [sample.public_identifier, gisaid_sample.strain],
+        "samples": [sample.public_identifier, repo_sample.strain],
         "template_args": {},
     }
     for args in requests:
@@ -204,7 +204,7 @@ async def test_create_phylo_run_with_template_args(
     split_client: SplitClient,
 ):
     """
-    Test phylo tree creation that includes a reference to a GISAID sequence.
+    Test phylo tree creation that includes a reference to a public repository sequence.
     """
     group = group_factory()
     user = await userrole_factory(async_session, group)
@@ -216,10 +216,10 @@ async def test_create_phylo_run_with_template_args(
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     repo = random_default_repo_factory(split_client)
     repo_data = aligned_repo_data_factory(pathogen, repo)
-    gisaid_sample = gisaid_metadata_factory()
+    repo_sample = repo_metadata_factory(pathogen, repo)
     async_session.add(group)
     async_session.add(repo_data)
-    async_session.add(gisaid_sample)
+    async_session.add(repo_sample)
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
@@ -227,7 +227,7 @@ async def test_create_phylo_run_with_template_args(
         {
             "name": "test phylorun",
             "tree_type": "overview",
-            "samples": [sample.public_identifier, gisaid_sample.strain],
+            "samples": [sample.public_identifier, repo_sample.strain],
             "template_args": {
                 "filter_start_date": "2021-01-20",
                 "filter_end_date": "2022-01-20",
@@ -237,7 +237,7 @@ async def test_create_phylo_run_with_template_args(
         {
             "name": "test phylorun",
             "tree_type": "overview",
-            "samples": [sample.public_identifier, gisaid_sample.strain],
+            "samples": [sample.public_identifier, repo_sample.strain],
             "template_args": {
                 "filter_start_date": "2021-01-20",
             },
@@ -245,7 +245,7 @@ async def test_create_phylo_run_with_template_args(
         {
             "name": "test phylorun",
             "tree_type": "overview",
-            "samples": [sample.public_identifier, gisaid_sample.strain],
+            "samples": [sample.public_identifier, repo_sample.strain],
             "template_args": {
                 "filter_pango_lineages": ["FOO.BAR"],
             },
@@ -272,13 +272,13 @@ async def test_create_phylo_run_with_template_args(
         assert "id" in response
 
 
-async def test_create_phylo_run_with_gisaid_ids(
+async def test_create_phylo_run_with_strain_ids(
     async_session: AsyncSession,
     http_client: AsyncClient,
     split_client: SplitClient,
 ):
     """
-    Test phylo tree creation that includes a reference to a GISAID sequence.
+    Test phylo tree creation that includes a reference to a public repository sequence.
     """
     group = group_factory()
     user = await userrole_factory(async_session, group)
@@ -290,17 +290,17 @@ async def test_create_phylo_run_with_gisaid_ids(
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     repo = random_default_repo_factory(split_client)
     repo_data = aligned_repo_data_factory(pathogen, repo)
-    gisaid_sample = gisaid_metadata_factory()
+    repo_sample = repo_metadata_factory(pathogen, repo)
     async_session.add(group)
     async_session.add(repo_data)
-    async_session.add(gisaid_sample)
+    async_session.add(repo_sample)
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
     data = {
         "name": "test phylorun",
         "tree_type": "non_contextualized",
-        "samples": [sample.public_identifier, gisaid_sample.strain],
+        "samples": [sample.public_identifier, repo_sample.strain],
     }
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
@@ -321,7 +321,7 @@ async def test_create_phylo_run_with_epi_isls(
     split_client: SplitClient,
 ):
     """
-    Test phylo tree creation that includes a reference to a GISAID sequence.
+    Test phylo tree creation that includes a reference to a public repository sequence.
     """
     group = group_factory()
     user = await userrole_factory(async_session, group)
@@ -333,17 +333,17 @@ async def test_create_phylo_run_with_epi_isls(
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     repo = random_default_repo_factory(split_client)
     repo_data = aligned_repo_data_factory(pathogen, repo)
-    gisaid_isl_sample = gisaid_metadata_factory()
+    isl_sample = repo_metadata_factory(pathogen, repo)
     async_session.add(group)
     async_session.add(repo_data)
-    async_session.add(gisaid_isl_sample)
+    async_session.add(isl_sample)
     await async_session.commit()
 
     auth_headers = {"user_id": user.auth0_user_id}
     data = {
         "name": "test phylorun",
         "tree_type": "non_contextualized",
-        "samples": [sample.public_identifier, gisaid_isl_sample.gisaid_epi_isl],
+        "samples": [sample.public_identifier, isl_sample.isl],
     }
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
