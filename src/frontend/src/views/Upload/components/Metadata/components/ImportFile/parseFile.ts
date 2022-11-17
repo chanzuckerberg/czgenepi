@@ -4,11 +4,11 @@ import { store } from "src/common/redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { DATE_REGEX } from "src/components/DateField/constants";
+import { EXAMPLE_SAMPLE_IDS } from "src/components/DownloadMetadataTemplate/common/constants";
 import {
   SampleEditTsvMetadata,
   SampleUploadTsvMetadata,
 } from "src/components/DownloadMetadataTemplate/common/types";
-import { EXAMPLE_SAMPLE_IDS } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import {
   ERROR_CODE,
   SampleIdToMetadata,

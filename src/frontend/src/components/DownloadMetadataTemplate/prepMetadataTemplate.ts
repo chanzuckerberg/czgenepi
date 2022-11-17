@@ -5,14 +5,13 @@ import { store } from "src/common/redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
 import {
+  getEditExampleRows,
   SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
   SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
+  UPLOAD_EXAMPLE_ROWS,
 } from "./common/constants";
 // Should change below whenever there are material changes to upload TSV download
 export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
-
-const DATE_FORMAT = "YYYY-MM-DD";
-const BOOLEAN_FORMAT = "Yes/No";
 
 // If a future pathogen has different headers, we'll need to modify this.
 function getUploadTemplateHeaders(pathogen: Pathogen): string[] {
@@ -26,51 +25,6 @@ function getUploadTemplateHeaders(pathogen: Pathogen): string[] {
     SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].keepPrivate,
   ];
 }
-
-export const EXAMPLE_SAMPLE_IDS = [
-  "Example Sample A",
-  "Example Sample B",
-  "Example Sample C",
-];
-
-export const EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS = [
-  "example private ID A",
-  "example private ID B",
-  "example private ID C",
-];
-
-const EXAMPLE_ROWS = [
-  // Very first example row helps explain usage, but not fully valid.
-  [
-    EXAMPLE_SAMPLE_IDS[0], // sampleId
-    "Private sample name", // privateId
-    "(if available) GISAID ID", // publicId -- here as explainer
-    DATE_FORMAT, // collectionDate -- not valid, here as explainer in template
-    "North America/USA/California/Los Angeles County", // collectionLocation
-    DATE_FORMAT, // sequencingDate -- not valid, here as explainer in template
-    BOOLEAN_FORMAT, // keepPrivate -- not valid, here as explainer in template
-  ],
-  // Subsequent example rows are mostly valid, honest-to-goodness examples...
-  // ... except for the dates. This is to avoid Excel auto "correct".
-  [
-    EXAMPLE_SAMPLE_IDS[1], // sampleId
-    "id101", // privateId
-    "", // publicId -- optional, showing that with blank use
-    DATE_FORMAT, // collectionDate
-    "San Francisco County", // collectionLocation
-    "", // sequencingDate -- optional, showing that with blank use
-    "No", // keepPrivate
-  ],
-  [
-    EXAMPLE_SAMPLE_IDS[2], // sampleId
-    "id102", // privateId
-    "USA/CA-CZB-0001/2021", // publicId
-    DATE_FORMAT, // collectionDate
-    "North America/USA/California/San Francisco County", // collectionLocation
-    DATE_FORMAT, // sequencingDate
-    "No", // keepPrivate
-  ],
-];
 
 const SAMPLE_EDIT_INSTRUCTIONS = [
   ["# Only fill out columns or cells where you want to update the content"],
@@ -88,43 +42,6 @@ function getEditTemplateHeaders(pathogen: Pathogen): string[] {
     SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].collectionLocation,
     SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].sequencingDate,
     SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].keepPrivate,
-  ];
-}
-
-function getEditExampleRows(collectionLocation?: GisaidLocation): string[][] {
-  // return example rows with the countys collectionLocation
-  const exampleCollectionLocation = collectionLocation
-    ? `${collectionLocation.region}/${collectionLocation.country}/${collectionLocation.division}/${collectionLocation.location}`
-    : "North America/USA/Californa/Humboldt County";
-
-  return [
-    [
-      EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS[0], // currentPrivateID
-      "X3421876", // newPrivateID
-      "hCoV-19/USA/demo-17806/2021", // publicId
-      DATE_FORMAT, // collectionDate,
-      exampleCollectionLocation, //collectionLocation
-      DATE_FORMAT, // sequencingDate
-      BOOLEAN_FORMAT, // keepPrivate
-    ],
-    [
-      EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS[1],
-      "SOP292344X", // newPrivateID
-      "hCoV-19/USA/demo-17807/2021", // publicId
-      DATE_FORMAT, // collectionDate,
-      exampleCollectionLocation, //collectionLocation
-      DATE_FORMAT, // sequencingDate
-      BOOLEAN_FORMAT, // keepPrivate
-    ],
-    [
-      EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS[2],
-      "T2348ACT", // newPrivateID
-      "hCoV-19/USA/demo-17808/2021", // publicId
-      DATE_FORMAT, // collectionDate,
-      exampleCollectionLocation, //collectionLocation
-      "Delete", // sequencingDate
-      BOOLEAN_FORMAT, // keepPrivate
-    ],
   ];
 }
 
@@ -177,7 +94,7 @@ export function prepUploadMetadataTemplate(
   const data_rows = getDataRows(sampleIds, EMPTY_DATA_ROW);
   return {
     templateHeaders: TEMPLATE_HEADERS,
-    templateRows: [...EXAMPLE_ROWS, ...data_rows],
+    templateRows: [...UPLOAD_EXAMPLE_ROWS[pathogen], ...data_rows],
   };
 }
 
@@ -196,7 +113,7 @@ export function prepEditMetadataTemplate(
 
   const EMPTY_DATA_ROW = getEmptyDataRows(TEMPLATE_HEADERS_EDIT);
   const data_rows = getDataRows(sampleIds, EMPTY_DATA_ROW);
-  const EXAMPLE_ROWS_EDIT = getEditExampleRows(collectionLocation);
+  const EXAMPLE_ROWS_EDIT = getEditExampleRows(pathogen, collectionLocation);
   return {
     templateInstructionRows: SAMPLE_EDIT_INSTRUCTIONS,
     templateHeaders: TEMPLATE_HEADERS_EDIT,
