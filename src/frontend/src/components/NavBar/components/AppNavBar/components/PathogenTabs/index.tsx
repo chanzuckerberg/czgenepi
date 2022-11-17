@@ -1,9 +1,6 @@
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
-import {
-  GROUP_URL_INDICATOR,
-  PATHOGEN_URL_INDICATOR,
-} from "src/common/appRouting";
+import { useDispatch, useSelector } from "react-redux";
+import { setPathogen } from "src/common/redux/actions";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
 import { ROUTES } from "src/common/routes";
@@ -16,19 +13,12 @@ type PathogenTabEventHandler = (
 
 export const PathogenTabs = (): JSX.Element => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const currentPathogen = useSelector(selectCurrentPathogen);
 
   const handleTabClick: PathogenTabEventHandler = (_, value) => {
-    const currentRoute = router.asPath;
-
-    const groupRegex = new RegExp(`${GROUP_URL_INDICATOR}\\/.*?(\\/|$)`);
-    const groupUrlMatch = currentRoute.match(groupRegex);
-    const groupUrl = groupUrlMatch ? groupUrlMatch[0] : "";
-
-    // When the user changes between pathogens, we always start them on the samples page
-    const newRoute = `${ROUTES.DATA_SAMPLES}/${groupUrl}${PATHOGEN_URL_INDICATOR}/${value}`;
-
-    router.push(newRoute);
+    dispatch(setPathogen(value));
+    router.push(ROUTES.DATA_SAMPLES);
   };
 
   return (
