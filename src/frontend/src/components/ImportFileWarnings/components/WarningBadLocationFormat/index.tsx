@@ -1,4 +1,6 @@
 import { map } from "lodash";
+import { useSelector } from "react-redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
 import AlertAccordion from "src/components/AlertAccordion";
 import { SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
@@ -17,11 +19,13 @@ export interface BadLocationFormatProps {
 }
 
 const MessageBadLocationFormat = ({ badSamples }: BadLocationFormatProps) => {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const tablePreamble =
     "You can update the data in the table below, or update your file and re-import.";
 
   const columnHeaders = [
-    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].currentPrivateID,
     "Data Column",
     "Imported Value",
     "Updated Value",

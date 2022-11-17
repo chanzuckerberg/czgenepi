@@ -1,4 +1,6 @@
 import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
+import { useSelector } from "react-redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import {
   IdColumn,
@@ -16,6 +18,8 @@ interface Props {
 }
 
 const Table = ({ metadata }: Props): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   return (
     <Overflow>
       <form autoComplete="off">
@@ -29,13 +33,19 @@ const Table = ({ metadata }: Props): JSX.Element => {
                   <IdColumn>Private ID</IdColumn>
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.publicId}
+                  {SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].publicId}
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionDate}
+                  {
+                    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen]
+                      .collectionDate
+                  }
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionLocation}
+                  {
+                    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen]
+                      .collectionLocation
+                  }
                 </StyledTableCell>
                 <StyledTableCell component="div">
                   Sequencing Date

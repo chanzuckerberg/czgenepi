@@ -1,30 +1,34 @@
 import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
-import { useEffect, useCallback, useState } from "react";
 import { Tooltip } from "czifui";
-import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
+import { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
-import { Props as CommonProps } from "../../../common/types";
-import { Metadata } from "src/components/WebformTable/common/types";
-import Row from "./components/Row";
-import {
-  IdColumn,
-  PrivateTableCell,
-  Overflow,
-  StyledTableCell,
-  StyledTableContainer,
-  StyledTableRow,
-} from "./style";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
-import {
-  MAX_NAME_LENGTH,
-  VALID_NAME_REGEX,
-} from "src/views/Upload/components/common/constants";
 import {
   DATE_ERROR_MESSAGE,
   DATE_REGEX,
 } from "src/components/DateField/constants";
-import { object, string, number, ValidationError } from "yup";
-import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
+import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
+import {
+  Metadata,
+  SampleIdToMetadata,
+} from "src/components/WebformTable/common/types";
+import {
+  MAX_NAME_LENGTH,
+  VALID_NAME_REGEX,
+} from "src/views/Upload/components/common/constants";
+import { number, object, string, ValidationError } from "yup";
+import { Props as CommonProps } from "../../../common/types";
+import Row from "./components/Row";
+import {
+  IdColumn,
+  Overflow,
+  PrivateTableCell,
+  StyledTableCell,
+  StyledTableContainer,
+  StyledTableRow,
+} from "./style";
 
 interface Props {
   metadata: CommonProps["metadata"];
@@ -63,6 +67,8 @@ export default function StaticTable({
   setIsValid,
   hasImportedMetadataFile,
 }: Props): JSX.Element {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const [validationErrors, setValidationErrors] =
     useState<ValidationErrorMap>(EMPTY_OBJECT);
 
@@ -153,7 +159,7 @@ export default function StaticTable({
               >
                 <StyledTableCell>
                   <IdColumn>
-                    {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId}
+                    {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sampleId}
                   </IdColumn>
                 </StyledTableCell>
               </Tooltip>
@@ -169,7 +175,7 @@ export default function StaticTable({
                 arrow
               >
                 <StyledTableCell>
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].privateId}
                 </StyledTableCell>
               </Tooltip>
               <Tooltip
@@ -184,7 +190,7 @@ export default function StaticTable({
                 arrow
               >
                 <StyledTableCell>
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.publicId}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].publicId}
                 </StyledTableCell>
               </Tooltip>
               <Tooltip
@@ -199,7 +205,10 @@ export default function StaticTable({
                 arrow
               >
                 <StyledTableCell>
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionDate}
+                  {
+                    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen]
+                      .collectionDate
+                  }
                 </StyledTableCell>
               </Tooltip>
               <Tooltip
@@ -215,7 +224,10 @@ export default function StaticTable({
                 arrow
               >
                 <StyledTableCell>
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionLocation}
+                  {
+                    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen]
+                      .collectionLocation
+                  }
                 </StyledTableCell>
               </Tooltip>
               <Tooltip
@@ -230,7 +242,10 @@ export default function StaticTable({
                 arrow
               >
                 <StyledTableCell>
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate}
+                  {
+                    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen]
+                      .sequencingDate
+                  }
                 </StyledTableCell>
               </Tooltip>
               <Tooltip
@@ -245,7 +260,7 @@ export default function StaticTable({
                 arrow
               >
                 <PrivateTableCell align="center">
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.keepPrivate}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].keepPrivate}
                 </PrivateTableCell>
               </Tooltip>
             </StyledTableRow>

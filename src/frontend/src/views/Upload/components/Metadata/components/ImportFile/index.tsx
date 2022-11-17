@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { ParseResult as ParseResultEdit } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { SampleUploadDownloadTemplate } from "src/components/DownloadMetadataTemplate";
 import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
@@ -42,6 +44,7 @@ export default function ImportFile({
   samples,
   stringToLocationFinder,
 }: Props): JSX.Element {
+  const pathogen = useSelector(selectCurrentPathogen);
   const [isInstructionsShown, setIsInstructionsShown] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasImportedFile, setHasImportedFile] = useState(false);
@@ -91,7 +94,10 @@ export default function ImportFile({
   };
 
   const { templateHeaders, templateRows } = useMemo(() => {
-    return prepUploadMetadataTemplate(Object.keys(samples || EMPTY_OBJECT));
+    return prepUploadMetadataTemplate(
+      Object.keys(samples || EMPTY_OBJECT),
+      pathogen
+    );
   }, [samples]);
 
   const handleFiles = async (files: FileList | null) => {
@@ -179,7 +185,7 @@ export default function ImportFile({
         missingData={missingData}
         badFormatData={badFormatData}
         IdColumnNameForWarnings={
-          SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId
+          SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sampleId
         }
         metadataUploadType={MetadataUploadTypeOption.Upload}
         data-test-id="upload-simport-file-warning"

@@ -1,11 +1,16 @@
 import { groupBy, isEmpty, pick } from "lodash";
 import Papa from "papaparse";
-import { HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/common/constants";
+import { getHeadersToSampleEditMetadataKeys } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/common/constants";
+import { store } from "src/common/redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { Pathogen } from "src/common/redux/types";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { DATE_REGEX } from "src/components/DateField/constants";
-import { SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
+import {
+  EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS,
+  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
+} from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleEditTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
-import { EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import { SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS } from "src/components/WebformTable/common/constants";
 import {
   ERROR_CODE,
@@ -55,10 +60,6 @@ interface ParsedRowSampleEditTsv {
   // Note that we don't currently have any breaking errors at row parse level
 }
 
-const SAMPLE_EDIT_METADATA_KEYS_TO_EXTRACT = Object.values(
-  HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS
-);
-
 function warnBadFormatMetadata(
   metadata: SampleEditMetadataWebform
 ): Set<keyof SampleEditMetadataWebform> | null {
@@ -84,10 +85,15 @@ function warnBadFormatMetadata(
   return badFormatMetadata.size ? badFormatMetadata : null;
 }
 
-function getMissingHeaderFields(uploadedHeaders: string[]): Set<string> | null {
+function getMissingHeaderFields(
+  uploadedHeaders: string[],
+  pathogen: Pathogen
+): Set<string> | null {
   const missingFields = new Set<string>();
   if (!uploadedHeaders.includes("currentPrivateID")) {
-    missingFields.add(SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID);
+    missingFields.add(
+      SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].currentPrivateID
+    );
   }
   return missingFields.size !== 0 ? missingFields : null;
 }
@@ -189,6 +195,9 @@ function parseRow(
   stringToLocationFinder: StringToLocationFinder,
   ignoredSampleIds: Set<string>
 ): ParsedRowSampleEditTsv {
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+
   const rowWarnings: ParsedRowSampleEditTsv["rowWarnings"] = new Map();
   // If row has no sampleId, we can't tie it to a sample, so we drop it.
   // Some sampleIds (ie, ones for examples) also signal we should ignore row.
@@ -203,6 +212,10 @@ function parseRow(
     // Ensure that rowMetadata will be sane even if row has no values
     ...EMPTY_METADATA,
   };
+
+  const SAMPLE_EDIT_METADATA_KEYS_TO_EXTRACT = Object.values(
+    getHeadersToSampleEditMetadataKeys(pathogen)
+  );
   // Only extract info we care about from the row. Set `rowMetadata` with it.
   SAMPLE_EDIT_METADATA_KEYS_TO_EXTRACT.forEach((key) => {
     inferMetadata({ key, row, stringToLocationFinder, rowMetadata });
@@ -253,7 +266,12 @@ function parseRow(
  */
 
 function convertHeaderToMetadataKey(headerName: string): string {
-  return HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS[headerName] || headerName;
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+
+  const HEADERS_TO_EDIT_METADATA_KEYS =
+    getHeadersToSampleEditMetadataKeys(pathogen);
+  return HEADERS_TO_EDIT_METADATA_KEYS[headerName] || headerName;
 }
 
 export function parseFileEdit(
@@ -261,6 +279,9 @@ export function parseFileEdit(
   editableSampleIds: Set<string>,
   stringToLocationFinder: StringToLocationFinder
 ): Promise<ParseResult> {
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+
   return new Promise((resolve) => {
     Papa.parse(file, {
       header: true, // Imported file starts with a header row
@@ -282,7 +303,10 @@ export function parseFileEdit(
         >();
         const IGNORED_SAMPLE_IDS = new Set(EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS);
         let hasUnknownFields = false;
-        const missingHeaderFields = getMissingHeaderFields(uploadedHeaders);
+        const missingHeaderFields = getMissingHeaderFields(
+          uploadedHeaders,
+          pathogen
+        );
         const duplicatePublicIds = getDuplicateIds(rows, "publicId");
         const duplicatePrivateIds = getDuplicateIds(rows, "newPrivateID");
         const { extraneousSampleIds, filteredRows } = filterExtraneousSampleIds(
@@ -313,7 +337,7 @@ export function parseFileEdit(
           // We only ingest file's data if user had all expected fields. and if there are no duplicate identifiers in the upload
           // find if any extraneous field data was added in the tsv
           const expectedHeaders = Object.keys(
-            SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS
+            SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen]
           );
           const unknownFields = uploadedHeaders.filter(
             // uploaded field header is allowed to be "" (that means a user deleted a non-required column which is not a blocker)
@@ -342,7 +366,9 @@ export function parseFileEdit(
               rowMetadataNew.privateId = rowMetadataNew["newPrivateID"];
               sampleIdToMetadata[rowPrivateID] = pick(
                 rowMetadataNew,
-                Object.keys(SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS)
+                Object.keys(
+                  SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS[pathogen]
+                )
               ) as SampleEditMetadataWebform;
               // If row had warnings, fold them into the overall warnings.
               // If row had no warnings, forEach is a no-op since no entries.
