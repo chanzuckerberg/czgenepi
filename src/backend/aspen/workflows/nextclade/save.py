@@ -34,10 +34,11 @@ def cli(
     nextclade_version: str,
     pathogen_slug: str,
 ):
-    # TODO add this info into the various kinds of database rows
-    # dataset_info = extract_dataset_info(nextclade_tag_fh)
-    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
+    """TODO DOCME"""
+    # Track info about the dataset that was used to produce results being saved
+    dataset_info = extract_dataset_info(nextclade_tag_fh)
 
+    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
         nextclade_csv: csv.DictReader = csv.DictReader(nextclade_fh, delimiter=";")
         for row in nextclade_csv:
@@ -59,12 +60,18 @@ def cli(
                     qc_status=row["qc.overallStatus"],
                     raw_qc_output={key: value for key, value in row.items()},
                     qc_software_version=nextclade_version,
+                    reference_dataset_name=dataset_info["name"],
+                    reference_sequence_accession=dataset_info["accession"],
+                    reference_dataset_tag=dataset_info["tag"],
                 )
             else:
                 qc_metric.qc_score = row["qc.overallScore"]
                 qc_metric.qc_status = row["qc.overallStatus"]
                 qc_metric.raw_qc_output = {key: value for key, value in row.items()}
                 qc_metric.qc_software_version = nextclade_version
+                qc_metric.reference_dataset_name = dataset_info["name"]
+                qc_metric.reference_sequence_accession = dataset_info["accession"]
+                qc_metric.reference_dataset_tag = dataset_info["tag"]
 
             session.add(qc_metric)
 
@@ -83,6 +90,7 @@ def cli(
                     aa_substitutions=row["aaSubstitutions"],
                     aa_insertions=row["aaInsertions"],
                     aa_deletions=row["aaDeletions"],
+                    reference_sequence_accession=dataset_info["accession"],
                 )
             else:
                 mutation.substitutions = row["substitutions"]
@@ -91,6 +99,7 @@ def cli(
                 mutation.aa_substitutions = row["aaSubstitutions"]
                 mutation.aa_insertions = row["aaInsertions"]
                 mutation.aa_deletions = row["aaDeletions"]
+                mutation.reference_sequence_accession = dataset_info["accession"]
 
             session.add(mutation)
 
@@ -104,18 +113,23 @@ def cli(
                 sample_lineage = (
                     session.execute(existing_sample_lineage_q).scalars().one_or_none()
                 )
-                LineageType.NEXTCLADE
                 if sample_lineage is None:
                     sample_lineage = SampleLineage(
                         sample=sample,
                         lineage_type=LineageType.NEXTCLADE,
                         lineage_software_version=nextclade_version,
                         lineage=row["clade"],
+                        reference_dataset_name=dataset_info["name"],
+                        reference_sequence_accession=dataset_info["accession"],
+                        reference_dataset_tag=dataset_info["tag"],
                     )
                 else:
                     sample_lineage.lineage_type = LineageType.NEXTCLADE
                     sample_lineage.lineage_software_version = nextclade_version
                     sample_lineage.lineage = row["clade"]
+                    sample_lineage.reference_dataset_name = dataset_info["name"]
+                    sample_lineage.reference_sequence_accession = dataset_info["accession"]
+                    sample_lineage.reference_dataset_tag = dataset_info["tag"]
                 session.add(sample_lineage)
 
         # TODO: commit session after 1000 entries to limit transaction size
