@@ -1,4 +1,6 @@
 import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
+import { useSelector } from "react-redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS } from "../../common/constants";
 import {
   IsPrivateTableCell,
@@ -17,6 +19,8 @@ export default function EditTable({
   autocorrectWarnings,
   locations,
 }: TableProps): JSX.Element {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   return (
     <MuiTable component="div" stickyHeader>
       <TableHead component="div">
@@ -24,22 +28,31 @@ export default function EditTable({
         {/* @ts-ignore: spread types error */}
         <StyledTableRow {...({ component: "div" } as unknown)}>
           <StyledTableCell component="div">
-            {SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.privateId}
+            {SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS[pathogen].privateId}
           </StyledTableCell>
           <StyledTableCell component="div">
-            {SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.publicId}
+            {SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS[pathogen].publicId}
           </StyledTableCell>
           <StyledTableCell component="div">
-            {SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.collectionDate}
+            {
+              SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS[pathogen]
+                .collectionDate
+            }
           </StyledTableCell>
           <StyledTableCell component="div">
-            {SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.collectionLocation}
+            {
+              SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS[pathogen]
+                .collectionLocation
+            }
           </StyledTableCell>
           <StyledTableCell component="div">
-            {SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.sequencingDate}
+            {
+              SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS[pathogen]
+                .sequencingDate
+            }
           </StyledTableCell>
           <IsPrivateTableCell align="center" component="div">
-            {SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.keepPrivate}
+            {SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS[pathogen].keepPrivate}
           </IsPrivateTableCell>
         </StyledTableRow>
       </TableHead>

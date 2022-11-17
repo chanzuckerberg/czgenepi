@@ -14,6 +14,19 @@ export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
 const DATE_FORMAT = "YYYY-MM-DD";
 const BOOLEAN_FORMAT = "Yes/No";
 
+// If a future pathogen has different headers, we'll need to modify this.
+function getUploadTemplateHeaders(pathogen: Pathogen): string[] {
+  return [
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sampleId,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].privateId,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].publicId,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].collectionDate,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].collectionLocation,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sequencingDate,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].keepPrivate,
+  ];
+}
+
 export const EXAMPLE_SAMPLE_IDS = [
   "Example Sample A",
   "Example Sample B",
@@ -66,11 +79,23 @@ const SAMPLE_EDIT_INSTRUCTIONS = [
   ["# Save in .tsv .csv or .txt format"],
 ];
 
+function getEditTemplateHeaders(pathogen: Pathogen): string[] {
+  return [
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].currentPrivateID,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].newPrivateID,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].publicId,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].collectionDate,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].collectionLocation,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].sequencingDate,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].keepPrivate,
+  ];
+}
+
 function getEditExampleRows(collectionLocation?: GisaidLocation): string[][] {
   // return example rows with the countys collectionLocation
   const exampleCollectionLocation = collectionLocation
     ? `${collectionLocation.region}/${collectionLocation.country}/${collectionLocation.division}/${collectionLocation.location}`
-    : "North America/USA/Californa/Humbolt County";
+    : "North America/USA/Californa/Humboldt County";
 
   return [
     [
@@ -145,9 +170,8 @@ export function prepUploadMetadataTemplate(
   templateHeaders: string[];
   templateRows: string[][];
 } {
-  const TEMPLATE_HEADERS = Object.values(
-    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen]
-  );
+  const TEMPLATE_HEADERS = getUploadTemplateHeaders(pathogen);
+
   // Most rows in template are just empty rows for user to fill in with data.
   const EMPTY_DATA_ROW = getEmptyDataRows(TEMPLATE_HEADERS);
   const data_rows = getDataRows(sampleIds, EMPTY_DATA_ROW);
@@ -168,9 +192,7 @@ export function prepEditMetadataTemplate(
   const state = store.getState();
   const pathogen = selectCurrentPathogen(state);
 
-  const TEMPLATE_HEADERS_EDIT = Object.values(
-    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen]
-  );
+  const TEMPLATE_HEADERS_EDIT = getEditTemplateHeaders(pathogen);
 
   const EMPTY_DATA_ROW = getEmptyDataRows(TEMPLATE_HEADERS_EDIT);
   const data_rows = getDataRows(sampleIds, EMPTY_DATA_ROW);

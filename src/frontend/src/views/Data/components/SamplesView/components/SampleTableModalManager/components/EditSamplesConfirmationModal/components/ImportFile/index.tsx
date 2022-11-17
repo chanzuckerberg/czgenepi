@@ -1,6 +1,8 @@
 import { isEmpty, pick } from "lodash";
 import { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
 import FilePicker from "src/components/FilePicker";
 import ImportFileWarnings, {
@@ -45,6 +47,7 @@ export default function ImportFile({
   hasImportedMetadataFile,
   onMetadataFileUploaded,
 }: Props): JSX.Element {
+  const pathogen = useSelector(selectCurrentPathogen);
   const [missingFields, setMissingFields] = useState<string[] | null>(null);
   const [autocorrectCount, setAutocorrectCount] = useState<number>(0);
   const [filename, setFilename] = useState("");
@@ -246,7 +249,7 @@ export default function ImportFile({
         hasUnknownDataFields={hasUnknownDataFields}
         badFormatData={badFormatData}
         IdColumnNameForWarnings={
-          SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS.privateId
+          SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS[pathogen].privateId
         }
         metadataUploadType={MetadataUploadTypeOption.Edit}
         data-test-id="upload-import-file-warning"

@@ -1,5 +1,8 @@
 import { pick } from "lodash";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
+import { store } from "src/common/redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { Pathogen } from "src/common/redux/types";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import {
   EMPTY_METADATA,
@@ -13,11 +16,12 @@ import {
 } from "src/components/WebformTable/common/types";
 
 export function structureInitialMetadata(
-  item: Sample
+  item: Sample,
+  pathogen: Pathogen
 ): SampleEditMetadataWebform {
   const i: SampleEditMetadataWebform = pick(
     item,
-    Object.keys(SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS)
+    Object.keys(SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS[pathogen])
   );
   if (i.collectionLocation && typeof i.collectionLocation !== "string") {
     i.collectionLocation.name = stringifyGisaidLocation(i.collectionLocation);
@@ -83,9 +87,12 @@ export function initSampleMetadata(
 export function getInitialMetadata(
   samplesCanEdit: Sample[]
 ): SampleIdToEditMetadataWebform {
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+
   const initialMetadata: SampleIdToEditMetadataWebform = {};
   samplesCanEdit.forEach((item) => {
-    initialMetadata[item.privateId] = structureInitialMetadata(item);
+    initialMetadata[item.privateId] = structureInitialMetadata(item, pathogen);
   });
   return initialMetadata;
 }

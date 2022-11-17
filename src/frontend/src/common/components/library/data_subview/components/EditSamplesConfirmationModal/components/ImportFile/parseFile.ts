@@ -361,7 +361,9 @@ export function parseFileEdit(
               rowMetadataNew.privateId = rowMetadataNew["newPrivateID"];
               sampleIdToMetadata[rowPrivateID] = pick(
                 rowMetadataNew,
-                Object.keys(SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS)
+                Object.keys(
+                  SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS[pathogen]
+                )
               ) as SampleEditMetadataWebform;
               // If row had warnings, fold them into the overall warnings.
               // If row had no warnings, forEach is a no-op since no entries.
