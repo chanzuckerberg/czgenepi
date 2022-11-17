@@ -16,16 +16,13 @@ export const BASE_METADATA_HEADERS = {
   sequencingDate: "Sequencing Date" + OPTIONAL_HEADER_MARKER,
 };
 
-const PRIVATE_ID = "Private ID";
-const SAMPLE_ID = "Sample Name (from FASTA)";
-
 const GENERAL_VIRAL_SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS: Record<
   keyof SampleUploadTsvMetadata,
   string
 > = {
-  privateId: PRIVATE_ID,
+  privateId: "Private ID",
   publicId: "Genbank Accession (GISAID ID)" + OPTIONAL_HEADER_MARKER,
-  sampleId: SAMPLE_ID,
+  sampleId: "Sample Name (from FASTA)",
   ...BASE_METADATA_HEADERS,
 };
 
@@ -33,20 +30,32 @@ export const SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS: PathogenConfigType<
   Record<keyof SampleUploadTsvMetadata, string>
 > = {
   [Pathogen.COVID]: {
-    privateId: PRIVATE_ID,
+    privateId: "Private ID",
     publicId: "GISAID ID (Public ID)" + OPTIONAL_HEADER_MARKER,
-    sampleId: SAMPLE_ID,
+    sampleId: "Sample Name (from FASTA)",
     ...BASE_METADATA_HEADERS,
   },
   [Pathogen.MONKEY_POX]: GENERAL_VIRAL_SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
 };
 
-export const SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: Record<
+const GENERAL_VIRAL_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: Record<
   keyof SampleEditTsvMetadata,
   string
 > = {
   ...BASE_METADATA_HEADERS,
   currentPrivateID: "Current Private ID",
   newPrivateID: "New Private ID" + OPTIONAL_HEADER_MARKER,
-  publicId: "Public ID (GISAID ID)",
+  publicId: "GenBank Accession (Public ID)",
+};
+
+export const SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: PathogenConfigType<
+  Record<keyof SampleEditTsvMetadata, string>
+> = {
+  [Pathogen.COVID]: {
+    ...BASE_METADATA_HEADERS,
+    currentPrivateID: "Current Private ID",
+    newPrivateID: "New Private ID" + OPTIONAL_HEADER_MARKER,
+    publicId: "Public ID (GISAID ID)",
+  },
+  [Pathogen.MONKEY_POX]: GENERAL_VIRAL_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
 };
