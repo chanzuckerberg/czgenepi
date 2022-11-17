@@ -1,5 +1,5 @@
 import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
-import { SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
+import { SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import {
   IdColumn,
   IsPrivateTableCell,
@@ -29,13 +29,13 @@ const Table = ({ metadata }: Props): JSX.Element => {
                   <IdColumn>Private ID</IdColumn>
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.publicId}
+                  {SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.publicId}
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionDate}
+                  {SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionDate}
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionLocation}
+                  {SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionLocation}
                 </StyledTableCell>
                 <StyledTableCell component="div">
                   Sequencing Date

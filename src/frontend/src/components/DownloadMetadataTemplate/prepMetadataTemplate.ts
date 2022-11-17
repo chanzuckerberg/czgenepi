@@ -1,9 +1,10 @@
 /**
  * Generate info for downloadable Sample Upload and Edit Metadata Templates.
  */
+import { Pathogen } from "src/common/redux/types";
 import {
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
   SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
+  SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
 } from "./common/constants";
 // Should change below whenever there are material changes to upload TSV download
 export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
@@ -11,25 +12,17 @@ export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
 const DATE_FORMAT = "YYYY-MM-DD";
 const BOOLEAN_FORMAT = "Yes/No";
 
-const TEMPLATE_HEADERS = [
-  // If position for sampleId changes, update `prepMetadataTemplate` func!
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.publicId,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionDate,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionLocation,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.keepPrivate,
-];
+// If position for sampleId changes, update `prepMetadataTemplate` func!
+// const TEMPLATE_HEADERS = Object.values(SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS);
 
 const TEMPLATE_HEADERS_EDIT = [
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.newPrivateID,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.publicId,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionDate,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionLocation,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.sequencingDate,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.keepPrivate,
+  SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID,
+  SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.newPrivateID,
+  SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.publicId,
+  SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionDate,
+  SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionLocation,
+  SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.sequencingDate,
+  SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.keepPrivate,
 ];
 
 // We also use this elsewhere: if we see one of these uploaded, filter it out.
@@ -157,10 +150,16 @@ function getDataRows(
  * of the time, users will just be able to copy that final example downward for
  * all their data rows since most samples will be their location.
  */
-export function prepUploadMetadataTemplate(sampleIds: string[]): {
+export function prepUploadMetadataTemplate(
+  sampleIds: string[],
+  pathogen: Pathogen
+): {
   templateHeaders: string[];
   templateRows: string[][];
 } {
+  const TEMPLATE_HEADERS = Object.values(
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen]
+  );
   // Most rows in template are just empty rows for user to fill in with data.
   const EMPTY_DATA_ROW = getEmptyDataRows(TEMPLATE_HEADERS);
   const data_rows = getDataRows(sampleIds, EMPTY_DATA_ROW);

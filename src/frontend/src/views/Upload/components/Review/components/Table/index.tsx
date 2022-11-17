@@ -1,4 +1,6 @@
 import { Table as MuiTable, TableBody, TableHead } from "@mui/material";
+import { useSelector } from "react-redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import { Props as CommonProps } from "../../../common/types";
 import Row from "./components/Row";
@@ -16,6 +18,8 @@ interface Props {
 }
 
 export default function Table({ metadata }: Props): JSX.Element {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   return (
     <Overflow>
       <form autoComplete="off">
@@ -27,26 +31,35 @@ export default function Table({ metadata }: Props): JSX.Element {
               <StyledTableRow {...({ component: "div" } as unknown)}>
                 <StyledTableCell component="div">
                   <IdColumn>
-                    {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId}
+                    {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sampleId}
                   </IdColumn>
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].privateId}
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.publicId}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].publicId}
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionDate}
+                  {
+                    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen]
+                      .collectionDate
+                  }
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionLocation}
+                  {
+                    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen]
+                      .collectionLocation
+                  }
                 </StyledTableCell>
                 <StyledTableCell component="div">
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate}
+                  {
+                    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen]
+                      .sequencingDate
+                  }
                 </StyledTableCell>
                 <IsPrivateTableCell align="center" component="div">
-                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.keepPrivate}
+                  {SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].keepPrivate}
                 </IsPrivateTableCell>
               </StyledTableRow>
             </TableHead>

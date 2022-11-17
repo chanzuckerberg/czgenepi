@@ -1,4 +1,7 @@
+import { useSelector } from "react-redux";
 import { SampleEditIdToWarningMessages } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { Pathogen } from "src/common/redux/types";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
@@ -49,10 +52,14 @@ interface PropsExtraneousEntry {
   extraneousSampleIds: string[];
 }
 function MessageExtraneousEntry({ extraneousSampleIds }: PropsExtraneousEntry) {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const tablePreamble =
     "The following sample IDs in the metadata file " +
     "do not match any sample IDs imported in the previous step.";
-  const columnHeaders = [SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId];
+  const columnHeaders = [
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sampleId,
+  ];
   const rows = extraneousSampleIds.map((sampleId) => [sampleId]);
   return (
     <ProblemTable
@@ -136,10 +143,14 @@ interface PropsAbsentSample {
   absentSampleIds: string[];
 }
 function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const tablePreamble =
     "The following sample IDs were imported in the " +
     "previous step but did not match any sample IDs in the metadata file.";
-  const columnHeaders = [SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId];
+  const columnHeaders = [
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sampleId,
+  ];
   const rows = absentSampleIds.map((sampleId) => [sampleId]);
   return (
     <ProblemTable
@@ -216,14 +227,16 @@ interface PropsMissingData {
   missingData: SampleIdToWarningMessages | SampleEditIdToWarningMessages;
 }
 function MessageMissingData({ missingData }: PropsMissingData) {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const tablePreamble =
     "You can add the required data in the table below, " +
     "or update your file and re-import.";
   const columnHeaders = [
-    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sampleId,
     "Missing Data",
   ];
-  const rows = getSampleIdsWithMissingData(missingData);
+  const rows = getSampleIdsWithMissingData(missingData, pathogen);
   return (
     <ProblemTable
       tablePreamble={tablePreamble}
@@ -233,12 +246,16 @@ function MessageMissingData({ missingData }: PropsMissingData) {
   );
 }
 
-function getSampleIdsWithMissingData(missingData: SampleIdToWarningMessages) {
+function getSampleIdsWithMissingData(
+  missingData: SampleIdToWarningMessages,
+  pathogen: Pathogen
+) {
   const idsMissingData = Object.keys(missingData);
   return idsMissingData.map((sampleId) => {
     const missingHeaders = Array.from(
       missingData[sampleId],
-      (missingKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[missingKey]
+      (missingKey) =>
+        SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen][missingKey]
     );
     const missingDataDescription = missingHeaders.join(", ");
     return [sampleId, missingDataDescription];
@@ -246,14 +263,16 @@ function getSampleIdsWithMissingData(missingData: SampleIdToWarningMessages) {
 }
 
 function MessageMissingDataEdit({ missingData }: PropsMissingData) {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const tablePreamble =
     "You can add the required data in the table below, " +
     "or update your file and re-import.";
   const columnHeaders = [
-    "Sample " + SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId,
+    "Sample " + SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].privateId,
     "Missing Data",
   ];
-  const rows = getSampleIdsWithMissingData(missingData);
+  const rows = getSampleIdsWithMissingData(missingData, pathogen);
   return (
     <ProblemTable
       tablePreamble={tablePreamble}
@@ -331,6 +350,8 @@ function MessageBadFormatData({
   badFormatData,
   IdColumnNameForWarnings,
 }: PropsBadFormatData) {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const tablePreamble = BadFormatDataTablePreamble;
   const columnHeaders = [
     IdColumnNameForWarnings,
@@ -340,7 +361,8 @@ function MessageBadFormatData({
   const rows = idsBadFormatData.map((sampleId) => {
     const badFormatRawHeaders = Array.from(
       badFormatData[sampleId],
-      (badFormatKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[badFormatKey]
+      (badFormatKey) =>
+        SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen][badFormatKey]
     );
     // Some headers say "optional" in them: we don't put that in description
     const badFormatPrettyHeaders = badFormatRawHeaders.map((header) => {

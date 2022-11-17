@@ -1,12 +1,12 @@
 import { Pathogen } from "src/common/redux/types";
-import { PathogenStringsType } from "src/common/types/strings";
+import { PathogenConfigType } from "src/common/types/strings";
 
 interface UploadSamplesStrings {
   header: string;
   acceptedFormats: string;
 }
 
-export const pathogenStrings: PathogenStringsType<UploadSamplesStrings> = {
+export const pathogenStrings: PathogenConfigType<UploadSamplesStrings> = {
   [Pathogen.COVID]: {
     header: "Select SARS-CoV-2 Consensus Genome Files",
     acceptedFormats:

@@ -3,7 +3,7 @@ import Papa from "papaparse";
 import { HEADERS_TO_SAMPLE_EDIT_METADATA_KEYS } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/common/constants";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { DATE_REGEX } from "src/components/DateField/constants";
-import { SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
+import { SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleEditTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
 import { EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS } from "src/components/DownloadMetadataTemplate/prepMetadataTemplate";
 import { SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS } from "src/components/WebformTable/common/constants";
@@ -87,7 +87,9 @@ function warnBadFormatMetadata(
 function getMissingHeaderFields(uploadedHeaders: string[]): Set<string> | null {
   const missingFields = new Set<string>();
   if (!uploadedHeaders.includes("currentPrivateID")) {
-    missingFields.add(SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID);
+    missingFields.add(
+      SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID
+    );
   }
   return missingFields.size !== 0 ? missingFields : null;
 }
@@ -313,7 +315,7 @@ export function parseFileEdit(
           // We only ingest file's data if user had all expected fields. and if there are no duplicate identifiers in the upload
           // find if any extraneous field data was added in the tsv
           const expectedHeaders = Object.keys(
-            SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS
+            SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS
           );
           const unknownFields = uploadedHeaders.filter(
             // uploaded field header is allowed to be "" (that means a user deleted a non-required column which is not a blocker)

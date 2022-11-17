@@ -1,5 +1,5 @@
 import { Pathogen } from "src/common/redux/types";
-import { PathogenStringsType } from "src/common/types/strings";
+import { PathogenConfigType } from "src/common/types/strings";
 
 interface RadioLabelStrings {
   nonContextualizedBestFor: string;
@@ -15,7 +15,7 @@ interface RadioLabelStrings {
   targetedGoodFor: string;
 }
 
-export const pathogenStrings: PathogenStringsType<RadioLabelStrings> = {
+export const pathogenStrings: PathogenConfigType<RadioLabelStrings> = {
   [Pathogen.COVID]: {
     nonContextualizedBestFor:
       "Best for uncovering sampling bias in your own sampling effort.",

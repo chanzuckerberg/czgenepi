@@ -1,4 +1,5 @@
 import { Dictionary, invert } from "lodash";
+import { Pathogen } from "src/common/redux/types";
 import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleUploadTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
 
@@ -6,9 +7,12 @@ import { SampleUploadTsvMetadata } from "src/components/DownloadMetadataTemplate
 // Note: there is a distinction between "real" `collectionLocation` internally
 // in app (it's an object) and user-submitted collectionLocation via metadata
 // upload (it's a string). The file parser will handle this conversion.
-export const HEADERS_TO_METADATA_KEYS = invert(
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS
-) as Dictionary<keyof SampleUploadTsvMetadata>;
+export const getHeadersToMetadataKeys = (
+  pathogen: Pathogen
+): Dictionary<keyof SampleUploadTsvMetadata> => {
+  const keysToHeaders = SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen];
+  return invert(keysToHeaders) as Dictionary<keyof SampleUploadTsvMetadata>;
+};
 
 export const NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS: Record<
   string,

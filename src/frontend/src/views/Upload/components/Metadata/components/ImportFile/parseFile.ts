@@ -1,5 +1,7 @@
 import { Dictionary } from "lodash";
 import Papa from "papaparse";
+import { store } from "src/common/redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
 import { DATE_REGEX } from "src/components/DateField/constants";
 import {
@@ -15,7 +17,7 @@ import {
 import {
   EMPTY_METADATA,
   FORBIDDEN_NAME_CHARACTERS_REGEX,
-  HEADERS_TO_METADATA_KEYS,
+  getHeadersToMetadataKeys,
   MAX_NAME_LENGTH,
   NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS,
 } from "../../../common/constants";
@@ -66,6 +68,11 @@ interface ParsedRow {
 // If header is unrecognized, leaves it alone (useful for warnings, etc).
 // User can also use Nextstrain header defaults as an alias
 function convertHeaderToMetadataKey(headerName: string): string {
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+
+  const HEADERS_TO_METADATA_KEYS = getHeadersToMetadataKeys(pathogen);
+
   if (headerName in HEADERS_TO_METADATA_KEYS) {
     return HEADERS_TO_METADATA_KEYS[headerName];
   } else if (headerName in NEXTSTRAIN_FORMAT_HEADERS_TO_METADATA_KEYS) {
@@ -135,10 +142,6 @@ function hasUnknownHeaderFields(
 function convertYesNoToBool(value: string): boolean {
   return value.toUpperCase() === "YES";
 }
-
-// We use the values of HEADERS_TO_METADATA_KEYS to future proof in case
-// it drifts from flipped METADATA_KEYS_TO_HEADERS due to later changes.
-const METADATA_KEYS_TO_EXTRACT = Object.values(HEADERS_TO_METADATA_KEYS);
 
 /**
  * Produce warnings for missing required metadata. If none, return null.
@@ -268,6 +271,9 @@ function parseRow(
   stringToLocationFinder: StringToLocationFinder,
   ignoredSampleIds: Set<string>
 ): ParsedRow {
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+
   const rowWarnings: ParsedRow["rowWarnings"] = new Map();
   // If row has no sampleId, we can't tie it to a sample, so we drop it.
   // Some sampleIds (ie, ones for examples) also signal we should ignore row.
@@ -282,7 +288,11 @@ function parseRow(
     // Ensure that rowMetadata will be sane even if row has no values
     ...EMPTY_METADATA,
   };
-
+  // We use the values of HEADERS_TO_METADATA_KEYS to future proof in case
+  // it drifts from flipped METADATA_KEYS_TO_HEADERS due to later changes.
+  const METADATA_KEYS_TO_EXTRACT = Object.values(
+    getHeadersToMetadataKeys(pathogen)
+  );
   // Only extract info we care about from the row. Set `rowMetadata` with it.
   METADATA_KEYS_TO_EXTRACT.forEach((key) => {
     inferMetadata({ row, key, rowMetadata, stringToLocationFinder });
@@ -350,6 +360,11 @@ export function parseFile(
         data: rows,
         meta: papaParseMeta,
       }: Papa.ParseResult<Record<string, string>>) => {
+        const state = store.getState();
+        const pathogen = selectCurrentPathogen(state);
+
+        const HEADERS_TO_METADATA_KEYS = getHeadersToMetadataKeys(pathogen);
+
         const uploadedHeaders = papaParseMeta.fields as string[]; // available b/c `header: true`
         if (uploadedHeaders.includes("strain")) {
           // User is using the nextstrain metadata template headers, populate privateId and sampleId with strain

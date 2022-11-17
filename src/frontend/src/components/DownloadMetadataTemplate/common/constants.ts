@@ -1,3 +1,5 @@
+import { Pathogen } from "src/common/redux/types";
+import { PathogenConfigType } from "src/common/types/strings";
 import { SampleEditTsvMetadata, SampleUploadTsvMetadata } from "./types";
 
 // Some columns are for optional data. Below string is added to end of the
@@ -14,17 +16,32 @@ export const BASE_METADATA_HEADERS = {
   sequencingDate: "Sequencing Date" + OPTIONAL_HEADER_MARKER,
 };
 
-export const SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS: Record<
+const PRIVATE_ID = "Private ID";
+const SAMPLE_ID = "Sample Name (from FASTA)";
+
+const GENERAL_VIRAL_SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS: Record<
   keyof SampleUploadTsvMetadata,
   string
 > = {
+  privateId: PRIVATE_ID,
+  publicId: "Genbank Accession (GISAID ID)" + OPTIONAL_HEADER_MARKER,
+  sampleId: SAMPLE_ID,
   ...BASE_METADATA_HEADERS,
-  privateId: "Private ID",
-  publicId: "GISAID ID (Public ID)" + OPTIONAL_HEADER_MARKER,
-  sampleId: "Sample Name (from FASTA)",
 };
 
-export const SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: Record<
+export const SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS: PathogenConfigType<
+  Record<keyof SampleUploadTsvMetadata, string>
+> = {
+  [Pathogen.COVID]: {
+    privateId: PRIVATE_ID,
+    publicId: "GISAID ID (Public ID)" + OPTIONAL_HEADER_MARKER,
+    sampleId: SAMPLE_ID,
+    ...BASE_METADATA_HEADERS,
+  },
+  [Pathogen.MONKEY_POX]: GENERAL_VIRAL_SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
+};
+
+export const SC2_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: Record<
   keyof SampleEditTsvMetadata,
   string
 > = {
