@@ -8,6 +8,8 @@ import {
 } from "@tanstack/react-table";
 import {
   CellComponent,
+  CellHeader,
+  Chip,
   Icon,
   InputCheckbox,
   Table,
@@ -50,9 +52,9 @@ const columns: ColumnDef<Sample, any>[] = [
       const onChange = getToggleAllRowsSelectedHandler();
 
       return (
-        <CellComponent>
+        <CellHeader>
           <InputCheckbox stage={checkboxStage} onChange={onChange} />
-        </CellComponent>
+        </CellHeader>
       );
     },
     cell: ({ row }) => {
@@ -127,6 +129,35 @@ const columns: ColumnDef<Sample, any>[] = [
     ),
     cell: DefaultCell,
     enableSorting: true,
+  },
+  {
+    id: "qualityControl",
+    accessorKey: "CZBFailedGenomeRecovery",
+    header: ({ header }) => (
+      <SortableHeader
+        header={header}
+        tooltipStrings={{
+          boldText: "Quality Score",
+          regularText:
+            "Overall QC score from Nextclade which considers genome completion and screens for potential contamination and sequencing or bioinformatics errors.",
+        }}
+      >
+        Quality Score
+      </SortableHeader>
+    ),
+    cell: ({ getValue }) => {
+      const didFailRecovery = getValue();
+      return (
+        <CellComponent>
+          <Chip
+            data-test-id="row-sample-status"
+            size="small"
+            label={didFailRecovery ? "failed" : "complete"}
+            status={didFailRecovery ? "error" : "success"}
+          />
+        </CellComponent>
+      );
+    },
   },
   {
     id: "uploadDate",

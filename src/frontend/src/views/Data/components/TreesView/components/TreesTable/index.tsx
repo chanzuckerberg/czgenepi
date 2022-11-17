@@ -1,4 +1,4 @@
-import { CellBasic, CellComponent, Table, TableHeader, TableRow } from "czifui";
+import { CellBasic, CellComponent, CellHeader, Table, TableHeader, TableRow } from "czifui";
 import {
   ColumnDef,
   flexRender,
@@ -99,6 +99,7 @@ const columns: ColumnDef<PhyloRun, any>[] = [
   },
   {
     id: "action",
+    header: () => <CellHeader></CellHeader>,
     cell: ({ row }) => (
       <CellComponent>
         <TreeActionMenu item={row.original} />
