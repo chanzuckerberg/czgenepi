@@ -19,7 +19,7 @@ import { canUserViewGroup } from "./utils/userInfo";
 // TODO          to enumerate conditional statements in setCurrentWorkspacePath and
 // TODO          replacePathParams. Doing so with only 2 variables feels a little heavy
 // TODO          handed at the moment, though.
-const GROUP_URL_INDICATOR = "groupId";
+export const GROUP_URL_INDICATOR = "groupId";
 export const PATHOGEN_URL_INDICATOR = "pathogen";
 const PATH_INDICATORS = [GROUP_URL_INDICATOR, PATHOGEN_URL_INDICATOR];
 
