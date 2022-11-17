@@ -106,13 +106,33 @@ class SampleLineage(idbase):  # type: ignore
     lineage_probability = Column(Float, nullable=True)
     raw_lineage_output = Column(JSONB, nullable=True)
 
+    # For Nextclade, we need to track the underlying reference data bundle
+    # that was involved to know how the lineage call was made.
+    # TODO FIXME: Lots of table/row duplication here. _Probably_ better to
+    # normalize it as a single entry somewhere and then reference that.
+    # Evaluate later -- because of how we use this, not hard to change later.
+    # Search this to find all instances: §NextcladeTagDuplicationTODO
+    reference_dataset_name = Column(String, nullable=True)
+    reference_sequence_accession = Column(String, nullable=True)
+    reference_dataset_tag = Column(String, nullable=True)
+
 
 class SampleQCMetric(idbase):  # type: ignore
     __tablename__ = "sample_qc_metrics"
 
     sample_id = Column(Integer, ForeignKey("samples.id"), unique=True)
     sample = relationship("Sample", back_populates="qc_metrics")  # type: ignore
-    qc_score = Column(String, nullable=False, unique=True)
+    qc_score = Column(String, nullable=False)
     qc_software_version = Column(String, nullable=False)
     qc_status = Column(String, nullable=False)
     raw_qc_output = Column(JSONB, nullable=True)
+
+    # For Nextclade, we need to track the underlying reference data bundle
+    # that was involved to know how the QC score was made.
+    # TODO FIXME: Lots of table/row duplication here. _Probably_ better to
+    # normalize it as a single entry somewhere and then reference that.
+    # Evaluate later -- because of how we use this, not hard to change later.
+    # Search this to find all instances: §NextcladeTagDuplicationTODO
+    reference_dataset_name = Column(String, nullable=True)
+    reference_sequence_accession = Column(String, nullable=True)
+    reference_dataset_tag = Column(String, nullable=True)

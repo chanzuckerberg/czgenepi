@@ -135,13 +135,13 @@ def extract_dataset_info(nextclade_tag_fh: IO[str]) -> Dict[str, str]:
             (Note, a given pathogen can have multiple of these with different
             meaning. For example, "sars-cov-2-no-recomb" also pertains to the
             same pathogen, but focuses the dataset on different aspects.)
-        - reference: The underlying reference genome's name, eg "MN908947"
+        - accession: The underlying reference genome's id, eg "MN908947"
         - tag: The version of overall dataset bundle, eg "2022-11-15T12:00:00Z"
     """
     nextclade_tag = json.load(nextclade_tag_fh)
     return {
         "name": nextclade_tag["name"],
-        "reference": nextclade_tag["reference"]["accession"],
+        "accession": nextclade_tag["reference"]["accession"],
         "tag": nextclade_tag["tag"],
     }
 
