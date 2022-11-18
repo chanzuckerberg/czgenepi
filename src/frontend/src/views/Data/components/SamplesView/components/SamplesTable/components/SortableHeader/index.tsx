@@ -1,12 +1,13 @@
 import { Header } from "@tanstack/react-table";
 import { CellHeader } from "czifui";
-import { ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 import { TooltipText, TooltipTextType } from "./components/TooltipText";
 
 interface SortableProps {
   header: Header<any, any>;
   children: ReactNode & string;
   tooltipStrings?: TooltipTextType;
+  style?: CSSProperties;
 }
 
 export const SortableHeader = ({

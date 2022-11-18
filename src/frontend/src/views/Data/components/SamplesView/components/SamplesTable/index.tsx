@@ -33,7 +33,7 @@ interface Props {
 }
 
 // TODO-TR (mlila): move somewhere more generic
-export const generateWidthStyles = (column: Column<Sample, any>) => {
+export const generateWidthStyles = (column: Column<any, any>) => {
   return {
     width: `${column.getSize()}px`,
   };
@@ -61,6 +61,7 @@ const columns: ColumnDef<Sample, any>[] = [
 
       return (
         <CellHeader hideSortIcon style={generateWidthStyles(column)}>
+          {/* @ts-expect-error remove line when types fixed in sds */}
           <InputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellHeader>
       );

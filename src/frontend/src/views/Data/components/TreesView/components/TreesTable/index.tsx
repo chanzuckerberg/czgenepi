@@ -1,4 +1,4 @@
-import { CellComponent, CellHeader, Chip, Table, TableHeader, Tag } from "czifui";
+import { CellComponent, CellHeader, Table, TableHeader } from "czifui";
 import {
   ColumnDef,
   flexRender,
@@ -117,7 +117,11 @@ const columns: ColumnDef<PhyloRun, any>[] = [
   {
     id: "action",
     size: 160,
-    header: ({ column }) => <CellHeader style={generateWidthStyles(column)} />,
+    header: ({ column }) => (
+      <CellHeader style={generateWidthStyles(column)} hideSortIcon>
+        {" "}
+      </CellHeader>
+    ),
     cell: ({ row }) => (
       <CellComponent>
         <TreeActionMenu item={row.original} />

@@ -28,8 +28,9 @@ import {
   StyledTreeIconWrapper,
 } from "./style";
 
+// TODO-TR: remove `value` and rename `item` after table refactor
 interface Props {
-  value: string;
+  value?: string;
   item: PhyloRun;
 }
 
