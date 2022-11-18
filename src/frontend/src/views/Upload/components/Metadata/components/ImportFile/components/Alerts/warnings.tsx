@@ -12,6 +12,7 @@ import {
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { ProblemTable } from "./common/ProblemTable";
 
+const ERROR_SEVERITY = "error";
 const WARNING_SEVERITY = "warning";
 
 /**
@@ -282,7 +283,7 @@ function MessageMissingDataEdit({ missingData }: PropsMissingData) {
   );
 }
 
-export function WarningMissingData({
+export function ErrorMissingData({
   missingData,
 }: PropsMissingData): JSX.Element {
   const count = Object.keys(missingData).length;
@@ -295,7 +296,7 @@ export function WarningMissingData({
     <AlertAccordion
       title={<B>{title}</B>}
       collapseContent={<MessageMissingData missingData={missingData} />}
-      intent={WARNING_SEVERITY}
+      intent={ERROR_SEVERITY}
     />
   );
 }
@@ -400,7 +401,7 @@ export function ErrorBadFormatData({
           IdColumnNameForWarnings={IdColumnNameForWarnings}
         />
       }
-      intent="error"
+      intent={ERROR_SEVERITY}
     />
   );
 }
