@@ -1,9 +1,17 @@
-import { CellBasic, CellComponent, CellHeader, Table, TableHeader, TableRow } from "czifui";
+import {
+  CellBasic,
+  CellComponent,
+  CellHeader,
+  Table,
+  TableHeader,
+  TableRow,
+} from "czifui";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
@@ -110,6 +118,12 @@ const columns: ColumnDef<PhyloRun, any>[] = [
 
 const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
   const [phyloRuns, setPhyloRuns] = useState<PhyloRun[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: "startedDate",
+      desc: true,
+    },
+  ]);
 
   useEffect(() => {
     if (!data) return;
@@ -123,6 +137,10 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
   });
 
   if (isLoading) {
