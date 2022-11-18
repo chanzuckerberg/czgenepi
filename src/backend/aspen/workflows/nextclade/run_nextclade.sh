@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Environmental vars required for script to run
+# (Either set by WDL for on-demand_or by orchestrating process for scheduled.)
+# SAMPLE_IDS_FILENAME
+#   Samples to run Nextclade against and save results for.
+#   Plain text file of sample PK ids, one per line.
+#   All samples must be for the same pathogen, no pathogen mixing here.
+
 # TODO: fix pipefail flags to be informative
 set -Eeuxo pipefail
 shopt -s inherit_errexit  # no silent breaking
@@ -10,7 +17,7 @@ PATHOGEN_INFO_FILE=pathogen_info.json
 # Pull sequences from DB and write them out. Capture other necessary info too.
 SEQUENCES_FILE=sequences.fasta
 /usr/local/bin/python3.10 /usr/src/app/aspen/workflows/nextclade/prep_samples.py \
-  --sample-ids-file "${SAMPLE_IDS_FILE}" \
+  --sample-ids-file "${SAMPLE_IDS_FILENAME}" \
   --sequences "${SEQUENCES_FILE}" \
   --pathogen-info-file "${PATHOGEN_INFO_FILE}"
 
