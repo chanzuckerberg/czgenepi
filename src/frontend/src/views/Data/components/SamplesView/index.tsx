@@ -6,7 +6,6 @@ import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { FilterPanel } from "src/components/FilterPanel";
 import { SearchBar } from "src/components/Table/components/SearchBar";
-import { StyledView } from "../../style";
 import { DataNavigation } from "../DataNavigation";
 import { SamplesTable } from "./components/SamplesTable";
 import { SampleTableModalManager } from "./components/SampleTableModalManager";
@@ -64,7 +63,7 @@ const SamplesView = (): JSX.Element => {
   };
 
   return (
-    <StyledView>
+    <>
       <HeadAppTitle subTitle="Samples" />
       <DataNavigation
         shouldShowSampleFilterToggle
@@ -97,7 +96,7 @@ const SamplesView = (): JSX.Element => {
           />
         </MaxWidth>
       </Flex>
-    </StyledView>
+    </>
   );
 };
 

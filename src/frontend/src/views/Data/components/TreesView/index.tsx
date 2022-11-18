@@ -3,7 +3,6 @@ import { HeadAppTitle } from "src/common/components";
 import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { SearchBar } from "src/components/Table/components/SearchBar";
-import { StyledView } from "../../style";
 import { DataNavigation } from "../DataNavigation";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
 import { TreesTable } from "./components/TreesTable";
@@ -17,7 +16,7 @@ const TreesView = (): JSX.Element => {
   const { data: phyloRuns, isLoading, isFetching } = phyloRunResponse;
 
   return (
-    <StyledView>
+    <>
       <HeadAppTitle subTitle="Trees" />
       <DataNavigation />
       <div>
@@ -30,7 +29,7 @@ const TreesView = (): JSX.Element => {
         </Flex>
         <TreesTable isLoading={isLoading || isFetching} data={displayedRows} />
       </div>
-    </StyledView>
+    </>
   );
 };
 

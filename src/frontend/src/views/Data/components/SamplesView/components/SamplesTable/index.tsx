@@ -296,6 +296,7 @@ const columns: ColumnDef<Sample, any>[] = [
     enableSorting: true,
   },
   {
+    // TODO-TR (mlila): check the secondary text displays properly
     id: "gisaid",
     accessorKey: "gisaid",
     header: ({ header, column }) => (
@@ -346,6 +347,7 @@ const SamplesTable = ({
     setSamples(newSamples);
   }, [data]);
 
+  // TODO-TR (mlila): add virtualization
   const table = useReactTable({
     data: samples,
     defaultColumn: {
