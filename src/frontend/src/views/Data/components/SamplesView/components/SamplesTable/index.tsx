@@ -1,9 +1,11 @@
 import {
+  Column,
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   RowSelectionState,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import {
@@ -14,7 +16,6 @@ import {
   InputCheckbox,
   Table,
   TableHeader,
-  TableRow,
 } from "czifui";
 import { map } from "lodash";
 import { useEffect, useState } from "react";
@@ -23,7 +24,7 @@ import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "../../../LineageTooltip";
 import { DefaultCell } from "./components/DefaultCell";
 import { SortableHeader } from "./components/SortableHeader";
-import { StyledCellBasic, StyledPrivateId } from "./style";
+import { StyledCellBasic, StyledPrivateId, StyledTableRow } from "./style";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -31,11 +32,17 @@ interface Props {
   setCheckedSamples(samples: Sample[]): void;
 }
 
+const generateWidthStyles = (column: Column<Sample, any>) => {
+  return {
+    width: `${column.getSize()}px`,
+  };
+};
+
 const columns: ColumnDef<Sample, any>[] = [
   {
     id: "select",
-    size: 50,
-    header: ({ table }) => {
+    size: 35,
+    header: ({ table, column }) => {
       const {
         getIsAllRowsSelected,
         getIsSomeRowsSelected,
@@ -52,7 +59,7 @@ const columns: ColumnDef<Sample, any>[] = [
       const onChange = getToggleAllRowsSelectedHandler();
 
       return (
-        <CellHeader>
+        <CellHeader hideSortIcon style={generateWidthStyles(column)}>
           <InputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellHeader>
       );
@@ -73,10 +80,11 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "privateId",
     accessorKey: "privateId",
-    minSize: 350,
-    header: ({ header }) => (
+    size: 250,
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Private ID",
           regularText:
@@ -115,9 +123,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "publicId",
     accessorKey: "publicId",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Public ID",
           regularText:
@@ -133,9 +142,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "qualityControl",
     accessorKey: "CZBFailedGenomeRecovery",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Quality Score",
           regularText:
@@ -162,9 +172,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "uploadDate",
     accessorKey: "uploadDate",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Upload Date",
           regularText: "Date on which the sample was uploaded to CZ Gen Epi.",
@@ -185,9 +196,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "collectionDate",
     accessorKey: "collectionDate",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Collection Date",
           regularText:
@@ -203,9 +215,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "lineage",
     accessorKey: "lineage",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Lineage",
           link: {
@@ -241,9 +254,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "collectionLocation",
     accessorKey: "collectionLocation",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Collection Location",
           regularText:
@@ -266,9 +280,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "sequencingDate",
     accessorKey: "sequencingDate",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Sequencing Date",
           regularText: "User-provided date on which the sample was sequenced.",
@@ -283,9 +298,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "gisaid",
     accessorKey: "gisaid",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "GISAID Status",
           regularText:
@@ -316,6 +332,12 @@ const SamplesTable = ({
 }: Props): JSX.Element => {
   const [samples, setSamples] = useState<Sample[]>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: "uploadDate",
+      desc: true,
+    },
+  ]);
 
   useEffect(() => {
     if (!data) return;
@@ -335,8 +357,10 @@ const SamplesTable = ({
     getSortedRowModel: getSortedRowModel(),
     state: {
       rowSelection,
+      sorting,
     },
     onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
   });
 
   useEffect(() => {
