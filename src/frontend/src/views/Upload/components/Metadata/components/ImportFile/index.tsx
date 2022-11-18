@@ -24,6 +24,7 @@ import {
   ParseResult as ParseResultUpload,
   SampleIdToWarningMessages as SampleIdToWarningMessagesUpload,
 } from "./parseFile";
+import { importFilePathogenStrings } from "./strings";
 import {
   IntroWrapper,
   StyledButton,
@@ -146,7 +147,7 @@ export default function ImportFile({
             rows={templateRows}
           >
             <StyledButton sdsType="secondary" sdsStyle="minimal">
-              Download Metadata Template (TSV)
+              {importFilePathogenStrings[pathogen].templateName}
             </StyledButton>
           </SampleUploadDownloadTemplate>
           <StyledUpdatedDate>Updated {TEMPLATE_UPDATED_DATE}</StyledUpdatedDate>

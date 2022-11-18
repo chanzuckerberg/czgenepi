@@ -12,10 +12,9 @@ export const pathogenStrings: PathogenConfigType<UploadSamplesStrings> = {
     acceptedFormats:
       "Accepted file formats: fasta (.fa or .fasta), fasta.gz (.fa.gz), fasta.zip, plain text (.txt)",
   },
-  // TODO: (ehoops) - these are just copy pasta to appease typescript. Copy changes have their own ticket.
   [Pathogen.MONKEY_POX]: {
-    header: "Select SARS-CoV-2 Consensus Genome Files",
+    header: "Select Monkeypox Consensus Genome Files",
     acceptedFormats:
-      "Accepted file formats: fasta (.fa or .fasta), fasta.gz (.fa.gz), fasta.zip, plain text (.txt)",
+      "Accepted file formats: fasta (.fa or .fasta), fasta.gz (.fa.gz), fasta.zip",
   },
 };
