@@ -388,13 +388,13 @@ const SamplesTable = ({
       </TableHeader>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <TableRow key={row.id}>
+          <StyledTableRow key={row.id}>
             {row
               .getVisibleCells()
               .map((cell) =>
                 flexRender(cell.column.columnDef.cell, cell.getContext())
               )}
-          </TableRow>
+          </StyledTableRow>
         ))}
       </tbody>
     </Table>
