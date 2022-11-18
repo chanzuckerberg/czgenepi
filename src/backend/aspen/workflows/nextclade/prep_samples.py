@@ -35,6 +35,7 @@ def cli(
     Writes out a FASTA for the specified samples.
 
     - sample_ids_fh: A file of sample ID primary keys, one ID per line.
+        Each sample must be for the same pathogen (all SARS-CoV-2, etc)
     - sequences_fh: Output file to write FASTA for above samples.
         NOTE Resulting FASTA will have its id lines (>) be those primary keys,
         so anything that consumes these downstream results will be referring
@@ -61,10 +62,19 @@ def cli(
 
             # `.pathogen` access is lazy, but only accesses once per pathogen
             # type, so not an N+1 query issue where we need eager load.
-            pathogen = sample.pathogen
+            pathogen: Pathogen = sample.pathogen
             if pathogen_of_all_samples is None:
                 pathogen_of_all_samples = pathogen
-            # TODO Ensure consistent pathogen across all samples, raise if not
+            # Safety: ensure all samples are same pathogen before Nextclade run
+            if pathogen != pathogen_of_all_samples:
+                err_msg = (
+                    f"ERROR -- Encountered differing pathogen types in list "
+                    f"of samples. Encountered both {pathogen.slug} and "
+                    f"{pathogen_of_all_samples.slug} in given samples. There "
+                    f"may also be others, this is just first difference found."
+                )
+                print(err_msg)
+                raise RuntimeError("Samples given are not all same pathogen")
 
             uploaded_pathogen_genome = sample.uploaded_pathogen_genome
             # Samples _should_ always have uploaded_pathogen_genome with

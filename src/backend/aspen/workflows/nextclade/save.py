@@ -38,7 +38,7 @@ def cli(
     nextclade_version: str,
     pathogen_slug: str,
 ):
-    """TODO DOCME"""
+    """Go through results from nextclade run, save to DB for each sample."""
     # Track info about the dataset that was used to produce results being saved
     dataset_info = extract_dataset_info(nextclade_tag_fh)
 
