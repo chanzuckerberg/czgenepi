@@ -32,7 +32,8 @@ interface Props {
   setCheckedSamples(samples: Sample[]): void;
 }
 
-const generateWidthStyles = (column: Column<Sample, any>) => {
+// TODO-TR (mlila): move somewhere more generic
+export const generateWidthStyles = (column: Column<Sample, any>) => {
   return {
     width: `${column.getSize()}px`,
   };

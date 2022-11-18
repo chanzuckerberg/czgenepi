@@ -14,7 +14,7 @@ export const MaxWidth = styled.div`
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
-      padding: 0 ${spaces?.l}px;
+      padding: ${spaces?.xl}px ${spaces?.l}px;
     `;
   }}
 `;
