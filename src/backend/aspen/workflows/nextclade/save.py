@@ -113,12 +113,14 @@ def cli(
                 sample_lineage = (
                     session.execute(existing_sample_lineage_q).scalars().one_or_none()
                 )
+
+                lineage = get_lineage_from_row(row)
                 if sample_lineage is None:
                     sample_lineage = SampleLineage(
                         sample=sample,
                         lineage_type=LineageType.NEXTCLADE,
                         lineage_software_version=nextclade_version,
-                        lineage=row["clade"],
+                        lineage=lineage,
                         reference_dataset_name=dataset_info["name"],
                         reference_sequence_accession=dataset_info["accession"],
                         reference_dataset_tag=dataset_info["tag"],
@@ -126,7 +128,7 @@ def cli(
                 else:
                     sample_lineage.lineage_type = LineageType.NEXTCLADE
                     sample_lineage.lineage_software_version = nextclade_version
-                    sample_lineage.lineage = row["clade"]
+                    sample_lineage.lineage = lineage
                     sample_lineage.reference_dataset_name = dataset_info["name"]
                     sample_lineage.reference_sequence_accession = dataset_info["accession"]
                     sample_lineage.reference_dataset_tag = dataset_info["tag"]
@@ -158,6 +160,36 @@ def extract_dataset_info(nextclade_tag_fh: IO[str]) -> Dict[str, str]:
         "accession": nextclade_tag["reference"]["accession"],
         "tag": nextclade_tag["tag"],
     }
+
+
+def get_lineage_from_row(nextclade_csv_row: Dict[str, str]) -> str:
+    """Gets lineage value for a sample from the dict of its Nextclade CSV row.
+
+    Background: the `clade` is generally available when looking at the sequence
+    for any pathogen. Finer-grained lineage detail was not really common
+    before SARS-CoV-2. However, newer techniques (ala Pangolin) provide that
+    finer detail, but that detail being available is dependent on there having
+    been tooling developed to handle the specific pathogen. Different pathogens
+    may or may not have that level of detail available. If it's available, we
+    want to use it, but if not, we fall back to coarser-grained `clade`.
+
+    The availability of the `lineage` key specifically is a bit unclear at the
+    moment. Nextclade's documentation does _not_ guarantee its existence:
+        https://docs.nextstrain.org/projects/nextclade/en/latest/user/output-files.html
+    Instead, certain pathogens/clades have additional columns, and those may or
+    may not contain finer-grained lineage info. For Monkeypox specifically, the
+    `lineage` column is provided. It's unclear if this convention will continue
+    to be followed as Nextclade continues to support more pathogens, or if it
+    will be totally dependent on the specific pathogen we run Nextclade on.
+
+    For now, if you're adding support for a new pathogen, you should make sure
+    to run Nextclade against some sequences for that pathogen, inspect the
+    results, and check in with Comp Bio colleagues.
+    """
+    lineage = nextclade_csv_row.get("lineage")
+    if lineage is None:
+        lineage = nextclade_csv_row["clade"]
+    return lineage
 
 
 if __name__ == "__main__":
