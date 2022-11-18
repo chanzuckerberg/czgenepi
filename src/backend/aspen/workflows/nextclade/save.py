@@ -5,7 +5,6 @@ from typing import Dict, IO
 
 import click
 import sqlalchemy as sa
-from sqlalchemy.sql.expression import and_
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -22,13 +21,15 @@ from aspen.database.models import (
     SampleQCMetric,
 )
 
-
 # TODO, create an enum table for below and standard nextclade QC overallStatus
 INVALID_RESULT_STATUS = "invalid"
 
+
 @click.command("save")
 @click.option("nextclade_fh", "--nextclade-csv", type=click.File("r"), required=True)
-@click.option("nextclade_tag_fh", "--nextclade-dataset-tag", type=click.File("r"), required=True)
+@click.option(
+    "nextclade_tag_fh", "--nextclade-dataset-tag", type=click.File("r"), required=True
+)
 @click.option("nextclade_version", "--nextclade-version", type=str, required=True)
 @click.option("pathogen_slug", "--pathogen-slug", type=str, required=True)
 def cli(
@@ -146,7 +147,9 @@ def cli(
                     sample_lineage.lineage_software_version = nextclade_version
                     sample_lineage.lineage = lineage
                     sample_lineage.reference_dataset_name = dataset_info["name"]
-                    sample_lineage.reference_sequence_accession = dataset_info["accession"]
+                    sample_lineage.reference_sequence_accession = dataset_info[
+                        "accession"
+                    ]
                     sample_lineage.reference_dataset_tag = dataset_info["tag"]
                 session.add(sample_lineage)
 
