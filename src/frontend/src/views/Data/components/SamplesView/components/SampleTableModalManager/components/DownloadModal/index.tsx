@@ -65,7 +65,6 @@ const DownloadModal = ({
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
   const tooltipRef = useCallback((node: HTMLElement) => setAnchorEl(node), []);
 
-  const [isFastaDisabled, setFastaDisabled] = useState<boolean>(false);
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
@@ -75,6 +74,7 @@ const DownloadModal = ({
     (id) => !failedSampleIds.includes(id)
   );
   const nCompletedSampleIds = completedSampleIds.length;
+  const isFastaDisabled = nCompletedSampleIds === 0;
 
   useEffect(() => {
     if (tsvData) {
@@ -83,14 +83,6 @@ const DownloadModal = ({
       setTsvRows(Rows);
     }
   }, [tsvData]);
-
-  useEffect(() => {
-    if (nCompletedSampleIds === 0) {
-      setFastaDisabled(true);
-    } else {
-      setFastaDisabled(false);
-    }
-  }, [nCompletedSampleIds, setFastaDisabled]);
 
   const handleMetadataClick = function () {
     setMetadataSelected(!isMetadataSelected);
@@ -137,7 +129,6 @@ const DownloadModal = ({
         handleCloseModal();
       },
       componentOnSuccess: ({ data, filename }: FileDownloadResponsePayload) => {
-        // TODO (mlila): may need to modify behavior here for gisaid/genbank multi-file download
         const link = document.createElement("a");
         link.href = window.URL.createObjectURL(data);
         link.download = filename || "file-download";
@@ -382,7 +373,7 @@ const DownloadModal = ({
         disabled={isButtonDisabled}
         onClick={onClick}
       >
-        {getDownloadButtonText()}
+        {downloadMutation.isLoading ? "Loading" : "Download"}
       </StyledButton>
     );
 
@@ -399,14 +390,6 @@ const DownloadModal = ({
         {downloadButton}
       </CSVLink>
     );
-  }
-
-  function getDownloadButtonText() {
-    if (downloadMutation.isLoading) {
-      return "Loading";
-    } else {
-      return "Download";
-    }
   }
 };
 
