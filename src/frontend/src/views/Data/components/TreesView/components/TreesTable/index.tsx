@@ -20,7 +20,8 @@ import {
   StyledCellBasic,
   StyledTableRow,
 } from "../../../SamplesView/components/SamplesTable/style";
-import TreeTableNameCell from "../../../TreeTableNameCell";
+import TreeTableNameCell from "./components/TreeTableNameCell";
+import { StyledSortableHeader } from "./style";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
@@ -35,8 +36,7 @@ const columns: ColumnDef<PhyloRun, any>[] = [
     id: "name",
     accessorKey: "name",
     header: ({ header }) => (
-      <SortableHeader
-        style={{ width: "auto" }}
+      <StyledSortableHeader
         header={header}
         tooltipStrings={{
           boldText: "Tree Name",
@@ -45,7 +45,7 @@ const columns: ColumnDef<PhyloRun, any>[] = [
         }}
       >
         Tree Name
-      </SortableHeader>
+      </StyledSortableHeader>
     ),
     cell: ({ row }) => (
       <CellComponent>
