@@ -3,7 +3,6 @@ import re
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
 from aspen.api.deps import get_db
 from aspen.api.schemas.lineages import PathogenLineagesResponse
@@ -24,7 +23,7 @@ async def list_pango_lineages(db: AsyncSession = Depends(get_db)):
     so that's all we pull and return.
     """
     # This is specifically a *pangolin* lineages endpoint, so hardcode an SC2 filter
-    all_lineages_query = sa.select(PathogenLineage.lineage).options(joinedload(Pathogen)).where(Pathogen.slug == "SC2")  # type: ignore
+    all_lineages_query = sa.select(PathogenLineage.lineage).join(Pathogen).where(Pathogen.slug == "SC2")  # type: ignore
     result = await db.execute(all_lineages_query)
     all_lineages = set(result.scalars().all())
 
