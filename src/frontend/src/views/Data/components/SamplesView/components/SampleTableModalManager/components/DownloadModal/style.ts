@@ -3,8 +3,11 @@ import {
   CommonThemeProps,
   fontBodyM,
   fontBodyS,
+  fontBodyXs,
+  fontBodyXxs,
   fontHeaderXl,
   getColors,
+  getFontWeights,
   getSpaces,
 } from "czifui";
 
@@ -41,6 +44,23 @@ export const Container = styled.ul`
   display: grid;
   padding: 0;
   margin: 0;
+`;
+
+export const AlertStrong = styled.span`
+  ${fontBodyXs}
+  color: black;
+
+  ${(props: CommonThemeProps) => {
+    const fontWeights = getFontWeights(props);
+    return `
+      font-weight: ${fontWeights?.semibold};
+    `;
+  }}
+`;
+
+export const AlertBody = styled.span`
+  ${fontBodyXxs}
+  width: 400px;
 `;
 
 export const TooltipHeaderText = styled.div`

@@ -12,10 +12,10 @@ import Dialog from "src/components/Dialog";
 import { DownloadButton } from "./components/DownloadButton";
 import { DownloadMenuSelection } from "./components/DownloadMenuSelection";
 import {
+  AlertBody,
+  AlertStrong,
   Container,
   Content,
-  DownloadType,
-  DownloadTypeInfo,
   Header,
   Title,
   TooltipDescriptionText,
@@ -167,16 +167,16 @@ const DownloadModal = ({
             {failedSampleIds.length > 0 &&
               !isFastaDisabled && ( //ignore alert if fasta is already disabled
                 <Alert severity="warning">
-                  <DownloadType>
+                  <AlertStrong>
                     {failedSampleIds.length}{" "}
                     {pluralize("sample", failedSampleIds.length)} will not be
                     included in your Consensus Genome or Submission Template
                     downloads
-                  </DownloadType>
-                  <DownloadTypeInfo>
+                  </AlertStrong>{" "}
+                  <AlertBody>
                     because they failed genome recovery. Failed samples will
                     still be included in your Sample Metadata download.
-                  </DownloadTypeInfo>
+                  </AlertBody>
                 </Alert>
               )}
             <DownloadButton

@@ -12,7 +12,7 @@ import {
 interface Props {
   id: string;
   isChecked: boolean;
-  isDisabled: boolean;
+  isDisabled?: boolean;
   onChange(): void;
   downloadTitle: string;
   fileTypes: string;
