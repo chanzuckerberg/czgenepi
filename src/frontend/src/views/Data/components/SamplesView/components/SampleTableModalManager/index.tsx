@@ -6,7 +6,6 @@ import { EditSamplesConfirmationModal } from "./components/EditSamplesConfirmati
 import { SampleTableActions } from "./components/SampleTableActions";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
 
-// TODO-TR (mlila): types
 interface Props {
   checkedSamples: Sample[];
   clearCheckedSamples(): void;
@@ -69,12 +68,8 @@ const SampleTableModalManager = ({
   return (
     <>
       <DownloadModal
-        checkedSampleIds={checkedSampleIds}
+        checkedSamples={checkedSamples}
         failedSampleIds={failedSampleIds}
-        // TODO-TR (mlila): update tsvDataMap
-        // tsvData={tsvDataMap(
-        //   checkedSampleIds, tableData, headers, subheaders,
-        // )}
         open={isDownloadModalOpen}
         onClose={() => setIsDownloadModalOpen(false)}
       />

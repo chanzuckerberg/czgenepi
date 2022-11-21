@@ -1,6 +1,6 @@
 interface Header {
   text: string;
-  key: string | number;
+  key: string;
   sortKey: string[];
   align?: string;
   tooltip?: {

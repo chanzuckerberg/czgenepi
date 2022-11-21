@@ -9,6 +9,12 @@
 set -Eeuxo pipefail
 shopt -s inherit_errexit
 
+if [ -n "${BOTO_ENDPOINT_URL-}" ]; then
+  export aws="aws --endpoint-url ${BOTO_ENDPOINT_URL}"
+else
+  export aws="aws"
+fi
+
 # Talking to Pangolin folks, they said the best canonical listing of all
 # current lineages is to use their (manually updated) lineage_notes.txt
 # https://github.com/cov-lineages/pango-designation/issues/456
@@ -25,7 +31,7 @@ wget -O $filename $CANONICAL_LINEAGES_LOCATION
 echo "Uploading a backup copy to S3"
 lineages_key="pangolin_lineages/${filename}"
 s3_destination="s3://${ASPEN_S3_DB_BUCKET}/${lineages_key}"
-aws s3 cp $filename $s3_destination
+$aws s3 cp $filename $s3_destination
 
 # Parse lineages file and load into DB
 python3 ./load_lineages.py --lineages-file $filename
