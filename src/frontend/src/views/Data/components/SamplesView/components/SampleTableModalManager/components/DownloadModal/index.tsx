@@ -46,9 +46,10 @@ const DownloadModal = ({
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
   const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
 
-  const completedSampleIds = checkedSamples.filter(
-    (sample) => !failedSampleIds.includes(sample.id)
-  );
+  const completedSampleIds = checkedSamples
+    .filter((sample) => !failedSampleIds.includes(sample.publicId))
+    .map((s) => s.publicId);
+
   const nCompletedSampleIds = completedSampleIds.length;
   const isFastaDisabled = nCompletedSampleIds === 0;
 
@@ -230,7 +231,6 @@ const DownloadModal = ({
               isGenbankSelected={isGenbankSelected}
               isGisaidSelected={isGisaidSelected}
               isMetadataSelected={isMetadataSelected}
-              nCompletedSampleIds={nCompletedSampleIds}
               completedSampleIds={completedSampleIds}
               handleCloseModal={handleCloseModal}
             />

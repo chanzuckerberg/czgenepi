@@ -25,8 +25,7 @@ interface Props {
   isGenbankSelected: boolean;
   isGisaidSelected: boolean;
   isMetadataSelected: boolean;
-  nCompletedSampleIds: boolean;
-  completedSampleIds: boolean;
+  completedSampleIds: string[];
   handleCloseModal(): void;
 }
 
@@ -36,7 +35,6 @@ const DownloadButton = ({
   isGenbankSelected,
   isGisaidSelected,
   isMetadataSelected,
-  nCompletedSampleIds,
   completedSampleIds,
   handleCloseModal,
 }: Props): JSX.Element | null => {
@@ -46,10 +44,7 @@ const DownloadButton = ({
   const [tsvData, setTsvData] = useState<string[][]>([]);
 
   useEffect(() => {
-    const newTsvData = mapTsvData({
-      checkedSamples,
-    });
-
+    const newTsvData = mapTsvData(checkedSamples);
     setTsvData(newTsvData);
   }, [checkedSamples]);
 
@@ -94,7 +89,7 @@ const DownloadButton = ({
         includes_genbank_template: isGenbankSelected,
         includes_gisaid_template: isGisaidSelected,
         includes_sample_metadata: isMetadataSelected,
-        sample_count: nCompletedSampleIds,
+        sample_count: completedSampleIds.length,
         sample_public_ids: JSON.stringify(completedSampleIds),
       }
     );
