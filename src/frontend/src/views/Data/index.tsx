@@ -64,6 +64,7 @@ const transformData = (
 };
 
 const Data: FunctionComponent = () => {
+  // REMOVE dummy additional code to guarantee rdev deploy?
   useProtectedRoute();
 
   const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
