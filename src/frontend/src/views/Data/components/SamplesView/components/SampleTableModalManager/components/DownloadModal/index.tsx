@@ -1,31 +1,15 @@
 import { Alert, Icon, Link, Tooltip } from "czifui";
-import { useCallback, useEffect, useState } from "react";
-import { CSVLink } from "react-csv";
-import {
-  AnalyticsSamplesDownloadFile,
-  EVENT_TYPES,
-} from "src/common/analytics/eventTypes";
-import { analyticsTrackEvent } from "src/common/analytics/methods";
-import { ORG_API } from "src/common/api";
+import { useCallback, useState } from "react";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import { useUserInfo } from "src/common/queries/auth";
-import {
-  FileDownloadResponsePayload,
-  PUBLIC_REPOSITORY_NAME,
-  useFileDownload,
-} from "src/common/queries/samples";
-import { addNotification } from "src/common/redux/actions";
-import { useDispatch } from "src/common/redux/hooks";
 import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
-import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import Dialog from "src/components/Dialog";
-import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
+import { DownloadButton } from "./components/DownloadButton";
 import {
   CheckBoxInfo,
   CheckboxLabel,
@@ -34,7 +18,6 @@ import {
   DownloadType,
   DownloadTypeInfo,
   Header,
-  StyledButton,
   StyledCheckbox,
   StyledFileTypeItem,
   Title,
@@ -43,25 +26,18 @@ import {
 } from "./style";
 
 interface Props {
-  checkedSampleIds: string[];
+  checkedSamples: Sample[];
   failedSampleIds: string[];
-  tsvData?: [string[], string[][]] | undefined; // TODO-TR (mlila): temp optional to get linter to pass
   open: boolean;
   onClose: () => void;
 }
 
 const DownloadModal = ({
-  checkedSampleIds,
+  checkedSamples,
   failedSampleIds,
-  tsvData,
   open,
   onClose,
 }: Props): JSX.Element => {
-  const dispatch = useDispatch();
-  const { data: userInfo } = useUserInfo();
-
-  const [tsvRows, setTsvRows] = useState<string[][]>([]);
-  const [tsvHeaders, setTsvHeaders] = useState<string[]>([]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement>();
   const tooltipRef = useCallback((node: HTMLElement) => setAnchorEl(node), []);
 
@@ -70,19 +46,11 @@ const DownloadModal = ({
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
   const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
 
-  const completedSampleIds = checkedSampleIds.filter(
-    (id) => !failedSampleIds.includes(id)
+  const completedSampleIds = checkedSamples.filter(
+    (sample) => !failedSampleIds.includes(sample.id)
   );
   const nCompletedSampleIds = completedSampleIds.length;
   const isFastaDisabled = nCompletedSampleIds === 0;
-
-  useEffect(() => {
-    if (tsvData) {
-      const [Headers, Rows] = tsvData;
-      setTsvHeaders(Headers);
-      setTsvRows(Rows);
-    }
-  }, [tsvData]);
 
   const handleMetadataClick = function () {
     setMetadataSelected(!isMetadataSelected);
@@ -107,38 +75,6 @@ const DownloadModal = ({
     setGisaidSelected(false);
     onClose();
   };
-
-  // format metadata file name for download file
-  // fasta and template endpoints return the name
-  const currentGroup = getCurrentGroupFromUserInfo(userInfo);
-  const groupName = currentGroup?.name.toLowerCase().replace(/ /g, "_");
-  const downloadDate = new Date().toISOString().slice(0, 10);
-  const separator = "\t";
-  const metadataDownloadName = `${groupName}_sample_metadata_${downloadDate}.tsv`;
-
-  const useFileMutationGenerator = () =>
-    useFileDownload({
-      componentOnError: () => {
-        dispatch(
-          addNotification({
-            componentKey: NotificationComponents.DOWNLOAD_FILES_FAILURE,
-            intent: "error",
-            shouldShowCloseButton: true,
-          })
-        );
-        handleCloseModal();
-      },
-      componentOnSuccess: ({ data, filename }: FileDownloadResponsePayload) => {
-        const link = document.createElement("a");
-        link.href = window.URL.createObjectURL(data);
-        link.download = filename || "file-download";
-        link.click();
-        link.remove();
-        handleCloseModal();
-      },
-    });
-
-  const downloadMutation = useFileMutationGenerator();
 
   const FASTA_DISABLED_TOOLTIP_TEXT = (
     <div>
@@ -165,8 +101,8 @@ const DownloadModal = ({
           </StyledCloseIconButton>
           <Header>Select Download</Header>
           <Title>
-            {checkedSampleIds.length}{" "}
-            {pluralize("Sample", checkedSampleIds.length)} Selected
+            {checkedSamples.length} {pluralize("Sample", checkedSamples.length)}{" "}
+            Selected
           </Title>
         </DialogTitle>
         <DialogContent>
@@ -288,109 +224,22 @@ const DownloadModal = ({
                   </DownloadTypeInfo>
                 </Alert>
               )}
-            {getDownloadButton()}
+            <DownloadButton
+              checkedSamples={checkedSamples}
+              isFastaSelected={isFastaSelected}
+              isGenbankSelected={isGenbankSelected}
+              isGisaidSelected={isGisaidSelected}
+              isMetadataSelected={isMetadataSelected}
+              nCompletedSampleIds={nCompletedSampleIds}
+              completedSampleIds={completedSampleIds}
+              handleCloseModal={handleCloseModal}
+            />
           </Content>
         </DialogContent>
         <DialogActions></DialogActions>
       </Dialog>
     </>
   );
-
-  /**
-   * Handle firing off analytics event when a samples download is initiated.
-   *
-   * Download button kicks off download, but underlying components within it
-   * change depending on if fasta selected and/or if metadata selected.
-   * This function deals with the analytics event for downloads, but need
-   * to ensure it only gets called once, regardless of what combination
-   * of fasta/metadata selection is in place.
-   */
-  function analyticsHandleDownload(): void {
-    analyticsTrackEvent<AnalyticsSamplesDownloadFile>(
-      EVENT_TYPES.SAMPLES_DOWNLOAD_FILE,
-      {
-        includes_consensus_genome: isFastaSelected,
-        includes_genbank_template: isGenbankSelected,
-        includes_gisaid_template: isGisaidSelected,
-        includes_sample_metadata: isMetadataSelected,
-        sample_count: nCompletedSampleIds,
-        sample_public_ids: JSON.stringify(completedSampleIds),
-      }
-    );
-  }
-
-  function getDownloadButton(): JSX.Element | undefined {
-    // button will have different functionality depending on download type selected
-
-    const isButtonDisabled = !(
-      isFastaSelected ||
-      isMetadataSelected ||
-      isGisaidSelected ||
-      isGenbankSelected
-    );
-
-    const onClick = () => {
-      if (isFastaSelected) {
-        downloadMutation.mutate({
-          endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
-          sampleIds: completedSampleIds,
-        });
-      }
-
-      if (isGisaidSelected) {
-        downloadMutation.mutate({
-          endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
-          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
-          sampleIds: completedSampleIds,
-        });
-        downloadMutation.mutate({
-          endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
-          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GISAID,
-          sampleIds: completedSampleIds,
-        });
-      }
-
-      if (isGenbankSelected) {
-        downloadMutation.mutate({
-          endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
-          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
-          sampleIds: completedSampleIds,
-        });
-        downloadMutation.mutate({
-          endpoint: ORG_API.SAMPLES_TEMPLATE_DOWNLOAD,
-          publicRepositoryName: PUBLIC_REPOSITORY_NAME.GENBANK,
-          sampleIds: completedSampleIds,
-        });
-      }
-
-      analyticsHandleDownload();
-    };
-
-    const downloadButton = (
-      <StyledButton
-        sdsType="primary"
-        sdsStyle="rounded"
-        disabled={isButtonDisabled}
-        onClick={onClick}
-      >
-        {downloadMutation.isLoading ? "Loading" : "Download"}
-      </StyledButton>
-    );
-
-    if (!isMetadataSelected) return downloadButton;
-
-    return (
-      <CSVLink
-        data={tsvRows}
-        headers={tsvHeaders}
-        filename={metadataDownloadName}
-        separator={separator}
-        data-test-id="download-tsv-link"
-      >
-        {downloadButton}
-      </CSVLink>
-    );
-  }
 };
 
 export default DownloadModal;

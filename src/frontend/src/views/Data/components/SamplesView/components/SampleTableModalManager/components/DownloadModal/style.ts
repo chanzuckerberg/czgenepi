@@ -116,16 +116,6 @@ export const DownloadType = styled.div`
   }}
 `;
 
-export const StyledButton = styled(Button)`
-  max-width: fit-content;
-  ${(props: CommonThemeProps) => {
-    const spaces = getSpaces(props);
-    return `
-      margin-top: ${spaces?.xxl}px;
-    `;
-  }}
-`;
-
 export const DownloadTypeInfo = styled.div`
   ${fontBodyXxs}
   width: 400px;

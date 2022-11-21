@@ -68,12 +68,8 @@ const SampleTableModalManager = ({
   return (
     <>
       <DownloadModal
-        checkedSampleIds={checkedSampleIds}
+        checkedSamples={checkedSamples}
         failedSampleIds={failedSampleIds}
-        // TODO-TR (mlila): update tsvDataMap
-        // tsvData={tsvDataMap(
-        //   checkedSampleIds, tableData, headers, subheaders,
-        // )}
         open={isDownloadModalOpen}
         onClose={() => setIsDownloadModalOpen(false)}
       />
