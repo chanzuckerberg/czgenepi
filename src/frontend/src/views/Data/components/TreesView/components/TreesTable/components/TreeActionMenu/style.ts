@@ -23,7 +23,7 @@ export const StyledActionWrapper = styled.li`
 export const StyledTreeActionMenu = styled.ul`
   display: flex;
   align-items: center;
-  justify-content: right;
+  justify-content: center;
   width: 150px;
   padding: 0;
 

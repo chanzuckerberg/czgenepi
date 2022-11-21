@@ -31,6 +31,7 @@ import {
   StyledCount,
   StyledMenu,
   StyledMenuItem,
+  StyledView,
   View,
 } from "./style";
 import { PHYLO_RUN_TRANSFORMS } from "./transforms";
@@ -244,10 +245,10 @@ const Data: FunctionComponent = () => {
 
   return (
     <Container>
-      <View>
+      <StyledView>
         {viewName === VIEWNAME.SAMPLES && <SamplesView />}
         {viewName === VIEWNAME.TREES && <TreesView />}
-      </View>
+      </StyledView>
     </Container>
   );
 };
