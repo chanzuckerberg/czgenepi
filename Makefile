@@ -124,6 +124,7 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	$(docker_compose) restart backend
 	$(docker_compose) exec -T backend alembic upgrade head
 	$(docker_compose) exec -T backend python scripts/setup_localdata.py
+	$(docker_compose) exec -e ASPEN_S3_DB_BUCKET=genepi-db-data -w /usr/src/app/aspen/workflows/import_pango_lineages -T backend ./entrypoint.sh
 	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
 
 # Assumes you've already run `make local-init` to configure localstack resources!

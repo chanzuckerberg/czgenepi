@@ -1,18 +1,21 @@
 import {
+  Column,
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   RowSelectionState,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import {
   CellComponent,
+  CellHeader,
+  Chip,
   Icon,
   InputCheckbox,
   Table,
   TableHeader,
-  TableRow,
 } from "czifui";
 import { map } from "lodash";
 import { useEffect, useState } from "react";
@@ -21,7 +24,7 @@ import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "../../../LineageTooltip";
 import { DefaultCell } from "./components/DefaultCell";
 import { SortableHeader } from "./components/SortableHeader";
-import { StyledCellBasic, StyledPrivateId } from "./style";
+import { StyledCellBasic, StyledPrivateId, StyledTableRow } from "./style";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -29,11 +32,18 @@ interface Props {
   setCheckedSamples(samples: Sample[]): void;
 }
 
+// TODO-TR (mlila): move somewhere more generic
+export const generateWidthStyles = (column: Column<any, any>) => {
+  return {
+    width: `${column.getSize()}px`,
+  };
+};
+
 const columns: ColumnDef<Sample, any>[] = [
   {
     id: "select",
-    size: 50,
-    header: ({ table }) => {
+    size: 35,
+    header: ({ table, column }) => {
       const {
         getIsAllRowsSelected,
         getIsSomeRowsSelected,
@@ -50,9 +60,10 @@ const columns: ColumnDef<Sample, any>[] = [
       const onChange = getToggleAllRowsSelectedHandler();
 
       return (
-        <CellComponent>
+        <CellHeader hideSortIcon style={generateWidthStyles(column)}>
+          {/* @ts-expect-error remove line when types fixed in sds */}
           <InputCheckbox stage={checkboxStage} onChange={onChange} />
-        </CellComponent>
+        </CellHeader>
       );
     },
     cell: ({ row }) => {
@@ -71,10 +82,11 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "privateId",
     accessorKey: "privateId",
-    minSize: 350,
-    header: ({ header }) => (
+    size: 250,
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Private ID",
           regularText:
@@ -113,9 +125,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "publicId",
     accessorKey: "publicId",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Public ID",
           regularText:
@@ -129,11 +142,42 @@ const columns: ColumnDef<Sample, any>[] = [
     enableSorting: true,
   },
   {
-    id: "uploadDate",
-    accessorKey: "uploadDate",
-    header: ({ header }) => (
+    id: "qualityControl",
+    accessorKey: "CZBFailedGenomeRecovery",
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
+        tooltipStrings={{
+          boldText: "Quality Score",
+          regularText:
+            "Overall QC score from Nextclade which considers genome completion and screens for potential contamination and sequencing or bioinformatics errors.",
+        }}
+      >
+        Quality Score
+      </SortableHeader>
+    ),
+    cell: ({ getValue }) => {
+      const didFailRecovery = getValue();
+      return (
+        <CellComponent>
+          <Chip
+            data-test-id="row-sample-status"
+            size="small"
+            label={didFailRecovery ? "failed" : "complete"}
+            status={didFailRecovery ? "error" : "success"}
+          />
+        </CellComponent>
+      );
+    },
+  },
+  {
+    id: "uploadDate",
+    accessorKey: "uploadDate",
+    header: ({ header, column }) => (
+      <SortableHeader
+        header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Upload Date",
           regularText: "Date on which the sample was uploaded to CZ Gen Epi.",
@@ -154,9 +198,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "collectionDate",
     accessorKey: "collectionDate",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Collection Date",
           regularText:
@@ -172,9 +217,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "lineage",
     accessorKey: "lineage",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Lineage",
           link: {
@@ -210,9 +256,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "collectionLocation",
     accessorKey: "collectionLocation",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Collection Location",
           regularText:
@@ -235,9 +282,10 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "sequencingDate",
     accessorKey: "sequencingDate",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Sequencing Date",
           regularText: "User-provided date on which the sample was sequenced.",
@@ -250,11 +298,13 @@ const columns: ColumnDef<Sample, any>[] = [
     enableSorting: true,
   },
   {
+    // TODO-TR (mlila): check the secondary text displays properly
     id: "gisaid",
     accessorKey: "gisaid",
-    header: ({ header }) => (
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "GISAID Status",
           regularText:
@@ -285,6 +335,12 @@ const SamplesTable = ({
 }: Props): JSX.Element => {
   const [samples, setSamples] = useState<Sample[]>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: "uploadDate",
+      desc: true,
+    },
+  ]);
 
   useEffect(() => {
     if (!data) return;
@@ -293,6 +349,7 @@ const SamplesTable = ({
     setSamples(newSamples);
   }, [data]);
 
+  // TODO-TR (mlila): add virtualization
   const table = useReactTable({
     data: samples,
     defaultColumn: {
@@ -304,8 +361,10 @@ const SamplesTable = ({
     getSortedRowModel: getSortedRowModel(),
     state: {
       rowSelection,
+      sorting,
     },
     onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
   });
 
   useEffect(() => {
@@ -333,13 +392,13 @@ const SamplesTable = ({
       </TableHeader>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <TableRow key={row.id}>
+          <StyledTableRow key={row.id}>
             {row
               .getVisibleCells()
               .map((cell) =>
                 flexRender(cell.column.columnDef.cell, cell.getContext())
               )}
-          </TableRow>
+          </StyledTableRow>
         ))}
       </tbody>
     </Table>

@@ -1,6 +1,6 @@
-import { InputSearch } from "czifui";
 import { escapeRegExp, filter } from "lodash";
 import { ChangeEvent, useEffect, useState } from "react";
+import { StyledInputSearch } from "./style";
 
 // TODO-TR (mlila): types
 interface Props {
@@ -63,7 +63,7 @@ const SearchBar = ({ onSearchComplete, tableData }: Props): JSX.Element => {
   };
 
   return (
-    <InputSearch
+    <StyledInputSearch
       id="search-samples"
       label="search samples"
       sdsStyle="rounded"

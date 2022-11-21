@@ -19,7 +19,7 @@ export const StyledTabs = styled(Tabs)`
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
-      margin-bottom: ${spaces?.l}px;
+      margin: ${spaces?.l}px;
     `;
   }}
 `;

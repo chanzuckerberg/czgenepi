@@ -1,3 +1,4 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon, Tooltip, TooltipTable } from "czifui";
 import { SyntheticEvent, useState } from "react";
 import {
@@ -12,6 +13,8 @@ import {
   foldInLocationName,
   useNamedLocationsById,
 } from "src/common/queries/locations";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import NextstrainConfirmationModal from "src/views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/OpenInNextstrainButton/components/NextstrainConfirmationModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
 import {
@@ -25,8 +28,9 @@ import {
   StyledTreeIconWrapper,
 } from "./style";
 
+// TODO-TR: remove `value` and rename `item` after table refactor
 interface Props {
-  value: string;
+  value?: string;
   item: PhyloRun;
 }
 
@@ -43,15 +47,21 @@ const getDateRangeString = (item: PhyloRun): string => {
   return `${startDate} to ${endDate}`;
 };
 
-const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
+const TreeTableNameCell = ({ item }: Props): JSX.Element => {
   const [open, setOpen] = useState(false);
-  const { phyloTree, status, user } = item;
+  const { name, phyloTree, status, user } = item;
   const treeId = phyloTree?.id;
   const userName = user?.name;
   const isDisabled = status !== TREE_STATUS.Completed || !treeId;
   const { data: namedLocationsById } = useNamedLocationsById();
 
   const { data: groupInfo } = useGroupInfo();
+
+  const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
+  const usesTableRefactor = isUserFlagOn(
+    tableRefactorFlag,
+    USER_FEATURE_FLAGS.table_refactor
+  );
 
   const getLocationName = () => {
     const templateLocationId = item.templateArgs?.locationId;
@@ -120,14 +130,18 @@ const TreeTableNameCell = ({ value, item }: Props): JSX.Element => {
           treeId={treeId}
         />
       )}
-      <StyledRowContent onClick={handleClickOpen} disabled={isDisabled}>
+      <StyledRowContent
+        onClick={handleClickOpen}
+        disabled={isDisabled}
+        usesTableRefactor={usesTableRefactor}
+      >
         <CellWrapper data-test-id="tree-name-cell">
           <StyledTreeIconWrapper>
             <Icon sdsIcon="treeHorizontal" sdsSize="xl" sdsType="static" />
           </StyledTreeIconWrapper>
           <StyledNameWrapper>
             <span data-test-id="tree-status">
-              {value} <PhyloTreeStatusTag treeStatus={status} />
+              {name || "--"} <PhyloTreeStatusTag treeStatus={status} />
             </span>
             <StyledTreeCreator data-test-id="tree-creator-name">
               <Tooltip

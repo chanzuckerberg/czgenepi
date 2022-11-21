@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { CellBasic, getFontWeights } from "czifui";
+import { CellBasic, getColors, getFontWeights, TableRow } from "czifui";
 
 export const StyledPrivateId = styled(CellBasic)`
   ${(props) => {
@@ -20,6 +20,17 @@ export const StyledCellBasic = styled(CellBasic)`
       span {
         font-weight: ${fontWeights?.semibold};
         word-break: break-word;
+      }
+    `;
+  }}
+`;
+
+export const StyledTableRow = styled(TableRow)`
+  ${(props) => {
+    const colors = getColors(props);
+    return `
+      &:hover {
+        background-color: ${colors?.primary[100]};
       }
     `;
   }}
