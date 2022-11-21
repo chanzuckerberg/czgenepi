@@ -10,6 +10,7 @@ import {
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
 import { DownloadButton } from "./components/DownloadButton";
+import { DownloadMenuSelection } from "./components/DownloadMenuSelection";
 import {
   CheckBoxInfo,
   CheckboxLabel,
@@ -119,96 +120,66 @@ const DownloadModal = ({
                   anchorEl,
                 }}
               >
-                <StyledFileTypeItem
+                <DownloadMenuSelection
+                  id="download-fasta-checkbox"
                   isDisabled={isFastaDisabled}
-                  isSelected={isFastaSelected}
+                  isChecked={isFastaSelected}
+                  onChange={handleFastaClick}
+                  title="Consensus Genome"
+                  fileTypes=".fasta"
                 >
-                  <CheckBoxInfo>
-                    <StyledCheckbox
-                      disabled={isFastaDisabled}
-                      id="download-fasta-checkbox"
-                      onChange={handleFastaClick}
-                      stage={isFastaSelected ? "checked" : "unchecked"}
-                    />
-                  </CheckBoxInfo>
-                  <CheckboxLabel htmlFor="download-fasta-checkbox">
-                    <DownloadType>Consensus Genome</DownloadType>{" "}
-                    <span ref={tooltipRef}>(.fasta)</span>
-                    <DownloadTypeInfo>
-                      Download multiple consensus genomes in a single,
-                      concatenated file
-                    </DownloadTypeInfo>
-                  </CheckboxLabel>
-                </StyledFileTypeItem>
+                  Download multiple consensus genomes in a single concatenated
+                  file.
+                </DownloadMenuSelection>
               </Tooltip>
-              <div style={{ height: "4px" }}></div>
-              <StyledFileTypeItem isSelected={isMetadataSelected}>
-                <CheckBoxInfo>
-                  <StyledCheckbox
-                    id="download-metadata-checkbox"
-                    onChange={handleMetadataClick}
-                    stage={isMetadataSelected ? "checked" : "unchecked"}
-                  />
-                </CheckBoxInfo>
-                <CheckboxLabel htmlFor="download-metadata-checkbox">
-                  <DownloadType>Sample Metadata </DownloadType> (.tsv)
-                  <DownloadTypeInfo>
-                    Sample metadata including Private and Public IDs, Collection
-                    Date, Sequencing Date, Lineage, GISAID Status, and ISL
-                    Accession #.
-                  </DownloadTypeInfo>
-                </CheckboxLabel>
-              </StyledFileTypeItem>
 
-              <StyledFileTypeItem isSelected={isGisaidSelected}>
-                <CheckBoxInfo>
-                  <StyledCheckbox
-                    id="download-gisaid-checkbox"
-                    onChange={handleGisaidClick}
-                    stage={isGisaidSelected ? "checked" : "unchecked"}
-                  />
-                </CheckBoxInfo>
-                <CheckboxLabel htmlFor="download-gisaid-checkbox">
-                  <DownloadType>GISAID Submission Template </DownloadType>{" "}
-                  (.fasta, .csv)
-                  <DownloadTypeInfo>
-                    Download concatenated consensus genomes and metadata files
-                    formatted to prepare samples for submission to GISAID.{" "}
-                    <Link
-                      href="https://help.czgenepi.org/hc/en-us/articles/8179880474260"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Learn More.
-                    </Link>
-                  </DownloadTypeInfo>
-                </CheckboxLabel>
-              </StyledFileTypeItem>
+              <DownloadMenuSelection
+                id="download-metadata-checkbox"
+                isChecked={isMetadataSelected}
+                onChange={handleMetadataClick}
+                title="Sample Metadata"
+                fileTypes=".tsv"
+              >
+                Sample metadata including Private and Public IDs, Collection
+                Date, Sequencing Date, Lineage, GISAID Status, and ISL Accession
+                #.
+              </DownloadMenuSelection>
 
-              <StyledFileTypeItem isSelected={isGenbankSelected}>
-                <CheckBoxInfo>
-                  <StyledCheckbox
-                    id="download-genbank-checkbox"
-                    onChange={handleGenbankClick}
-                    stage={isGenbankSelected ? "checked" : "unchecked"}
-                  />
-                </CheckBoxInfo>
-                <CheckboxLabel htmlFor="download-genbank-checkbox">
-                  <DownloadType>Genbank Submission Template </DownloadType>{" "}
-                  (.fasta, .tsv)
-                  <DownloadTypeInfo>
-                    Download concatenated consensus genomes and metadata files
-                    formatted to prepare samples for submission to Genbank.{" "}
-                    <Link
-                      href="https://help.czgenepi.org/hc/en-us/articles/8179961027604"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Learn More.
-                    </Link>
-                  </DownloadTypeInfo>
-                </CheckboxLabel>
-              </StyledFileTypeItem>
+              <DownloadMenuSelection
+                id="download-gisaid-checkbox"
+                isChecked={isGisaidSelected}
+                onChange={handleGisaidClick}
+                title="GISAID Submission Template"
+                fileTypes=".fasta, .tsv"
+              >
+                Download concatenated consensus genomes and metadata files
+                formatted to prepare samples for submission to GISAID.{" "}
+                <Link
+                  href="https://help.czgenepi.org/hc/en-us/articles/8179880474260"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn More.
+                </Link>
+              </DownloadMenuSelection>
+
+              <DownloadMenuSelection
+                id="download-genbank-checkbox"
+                isChecked={isGenbankSelected}
+                onChange={handleGenbankClick}
+                title="Genbank Submission Template"
+                fileTypes=".fasta, .tsv"
+              >
+                Download concatenated consensus genomes and metadata files
+                formatted to prepare samples for submission to Genbank.{" "}
+                <Link
+                  href="https://help.czgenepi.org/hc/en-us/articles/8179961027604"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Learn More.
+                </Link>
+              </DownloadMenuSelection>
             </Container>
             {failedSampleIds.length > 0 &&
               !isFastaDisabled && ( //ignore alert if fasta is already disabled
