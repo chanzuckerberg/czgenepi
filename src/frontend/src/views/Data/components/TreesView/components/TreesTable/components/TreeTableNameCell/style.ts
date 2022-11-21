@@ -5,6 +5,7 @@ import {
   fontHeaderXs,
   getColors,
   getSpaces,
+  Tooltip,
 } from "czifui";
 import { TreeRowContent } from "src/common/components/library/data_table/style";
 import {
@@ -113,3 +114,12 @@ export const popperPropsSx = {
     },
   },
 };
+
+export const StyledTooltip = styled(Tooltip)`
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-left: ${spaces?.xxs}px;
+    `;
+  }}
+`;

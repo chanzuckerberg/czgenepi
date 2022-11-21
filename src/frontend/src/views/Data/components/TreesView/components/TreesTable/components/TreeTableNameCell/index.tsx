@@ -6,7 +6,6 @@ import {
   EVENT_TYPES,
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
-import { StyledTooltip } from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { TREE_STATUS } from "src/common/constants/types";
 import { useGroupInfo } from "src/common/queries/groups";
 import {
@@ -24,6 +23,7 @@ import {
   StyledInfoIconWrapper,
   StyledNameWrapper,
   StyledRowContent,
+  StyledTooltip,
   StyledTreeCreator,
   StyledTreeIconWrapper,
 } from "./style";

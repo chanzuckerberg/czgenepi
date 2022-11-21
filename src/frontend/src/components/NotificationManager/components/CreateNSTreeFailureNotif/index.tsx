@@ -1,5 +1,5 @@
-import { ContactUsLink } from "src/common/components/library/data_subview/components/ContactUsLink";
 import { B } from "src/common/styles/basicStyle";
+import { ContactUsLink } from "../../../../common/components/library/data_subview/components/ContactUsLink";
 
 export const CreateNSTreeFailureNotif = (): JSX.Element => (
   <>

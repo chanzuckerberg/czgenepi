@@ -15,12 +15,6 @@ import {
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
-import {
-  StyledDialogTitle,
-  StyledTooltip,
-  Title,
-  TreeNameInfoWrapper,
-} from "../../../CreateNSTreeModal/style";
 import { Header } from "../../../DownloadModal/style";
 import { FailedSampleAlert } from "../../../FailedSampleAlert";
 import {
@@ -38,6 +32,10 @@ import {
   StyledSuggestionWrapper,
   StyledTextField,
   StyledWarningIconWrapper,
+  StyledDialogTitle,
+  StyledTooltip,
+  Title,
+  TreeNameInfoWrapper,
 } from "./style";
 
 interface Props {

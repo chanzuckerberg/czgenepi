@@ -6,7 +6,7 @@ import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { RedirectConfirmationModal } from "src/common/components/library/data_subview/components/RedirectConfirmationModal";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import nextstrainLogo from "src/common/images/nextstrain.png";
-import { ConfirmButton } from "src/common/utils/TreeModal/ConfirmButton";
+import { ConfirmButton } from "src/components/ConfirmButton";
 
 interface Props {
   open: boolean;

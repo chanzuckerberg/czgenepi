@@ -1,17 +1,15 @@
 import { Icon } from "czifui";
 import { ChangeEvent, useEffect, useState } from "react";
-import {
-  StyledTextField,
-  TextFieldAlert,
-  TreeNameTooLongAlert,
-} from "src/common/components/library/data_subview/components/CreateNSTreeModal/style";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
 import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
   StyledErrorIconWrapper,
   StyledInstructions,
+  StyledTextField,
+  TextFieldAlert,
   TextInputLabelTitle,
+  TreeNameTooLongAlert,
 } from "./style";
 
 interface Props {

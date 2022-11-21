@@ -3,17 +3,10 @@ import { FunctionComponent, useEffect, useState } from "react";
 import { DataTable } from "src/common/components";
 import { VIEWNAME } from "src/common/constants/types";
 import { SearchBar } from "src/components/Table/components/SearchBar";
-import { CreateNSTreeModal } from "./components/CreateNSTreeModal";
-import { DeleteSamplesConfirmationModal } from "./components/DeleteSamplesConfirmationModal";
-import { DeleteTreeConfirmationModal } from "../../../../views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/MoreActionsMenu/components/DeleteTreeConfirmationModal";
-import DownloadModal from "./components/DownloadModal";
-import { EditSamplesConfirmationModal } from "./components/EditSamplesConfirmationModal";
-import { EditTreeConfirmationModal } from "../../../../views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/MoreActionsMenu/components/EditTreeConfirmationModal";
+import { DeleteTreeConfirmationModal } from "src/views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/MoreActionsMenu/components/DeleteTreeConfirmationModal";
+import { EditTreeConfirmationModal } from "src/views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/MoreActionsMenu/components/EditTreeConfirmationModal";
 import { IconButton } from "./components/IconButton";
-import { MoreActionsMenu } from "./components/MoreActionMenu";
-import { TreeCreateHelpLink } from "../../../../views/Data/components/TreesView/components/TreeCreateHelpLink";
-import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
-import { UsherTreeFlow } from "./components/UsherTreeFlow";
+import { TreeCreateHelpLink } from "src/views/Data/components/TreesView/components/TreeCreateHelpLink";
 import {
   Divider,
   DownloadWrapper,
@@ -25,6 +18,13 @@ import {
   TooltipDescriptionText,
   TooltipHeaderText,
 } from "./style";
+import { TreeSelectionMenu } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/SampleTableActions/components/TreeSelectionMenu";
+import { MoreActionsMenu } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/SampleTableActions/components/MoreActionMenu";
+import DownloadModal from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/DownloadModal";
+import { CreateNSTreeModal } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/CreateNSTreeModal";
+import { UsherTreeFlow } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/UsherTreeFlow";
+import { DeleteSamplesConfirmationModal } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/DeleteSamplesConfirmationModal";
+import { EditSamplesConfirmationModal } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal";
 
 interface Props {
   data?: BioinformaticsMap;
