@@ -1,5 +1,5 @@
 import { B } from "src/common/styles/basicStyle";
-import { ContactUsLink } from "../../../../common/components/library/data_subview/components/ContactUsLink";
+import { ContactUsLink } from "../ContactUsLink";
 
 export const DownloadFilesFailureNotif = (): JSX.Element => (
   <>
