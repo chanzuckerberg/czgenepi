@@ -1,4 +1,5 @@
-import { ReactNode } from "react";
+import { Tooltip } from "czifui";
+import { ReactNode, useState } from "react";
 import {
   CheckBoxInfo,
   CheckboxLabel,
@@ -13,9 +14,10 @@ interface Props {
   isChecked: boolean;
   isDisabled: boolean;
   onChange(): void;
-  title: string;
+  downloadTitle: string;
   fileTypes: string;
   children: ReactNode;
+  tooltipTitle?: ReactNode;
 }
 
 const DownloadMenuSelection = ({
@@ -23,11 +25,14 @@ const DownloadMenuSelection = ({
   isChecked,
   isDisabled,
   onChange,
-  title,
+  downloadTitle,
   fileTypes,
   children,
+  tooltipTitle,
 }: Props): JSX.Element => {
-  return (
+  const [anchorEl, setAnchorEl] = useState<HTMLElement>();
+
+  const menuItem = (
     <StyledFileTypeItem isSelected={isChecked} isDisabled={isDisabled}>
       <CheckBoxInfo>
         <StyledCheckbox
@@ -38,10 +43,29 @@ const DownloadMenuSelection = ({
         />
       </CheckBoxInfo>
       <CheckboxLabel htmlFor={id}>
-        <DownloadType>{title} </DownloadType> ({fileTypes})
+        <span onMouseOver={(e) => setAnchorEl(e.currentTarget)}>
+          <DownloadType>{downloadTitle} </DownloadType> ({fileTypes})
+        </span>
         <DownloadTypeInfo>{children}</DownloadTypeInfo>
       </CheckboxLabel>
     </StyledFileTypeItem>
+  );
+
+  if (!tooltipTitle) return menuItem;
+
+  return (
+    <Tooltip
+      arrow
+      inverted
+      title={tooltipTitle}
+      disableHoverListener={!isDisabled}
+      placement="top"
+      PopperProps={{
+        anchorEl,
+      }}
+    >
+      {menuItem}
+    </Tooltip>
   );
 };
 

@@ -48,7 +48,7 @@ export const StyledFileTypeItem = styled.li`
     const { isDisabled, isSelected } = props;
 
     const backgroundColor = isDisabled
-      ? `${colors?.gray[400]}`
+      ? `${colors?.gray[200]}`
       : isSelected
       ? `${colors?.gray[100]}`
       : "transparent"; // Default to "transparent if not disabled or selected"
@@ -56,7 +56,7 @@ export const StyledFileTypeItem = styled.li`
     return `
       background-color: ${backgroundColor};
       &:hover {
-        background-color: ${colors?.gray[100]};
+        ${!isDisabled && `background-color: ${colors?.gray[100]};`}
       }
       margin-bottom: ${spaces?.xxs}px;
       &:last-child {

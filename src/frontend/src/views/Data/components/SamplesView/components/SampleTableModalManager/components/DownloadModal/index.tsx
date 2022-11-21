@@ -1,5 +1,5 @@
-import { Alert, Icon, Link, Tooltip } from "czifui";
-import { useCallback, useState } from "react";
+import { Alert, Icon, Link } from "czifui";
+import { useState } from "react";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
@@ -12,15 +12,11 @@ import Dialog from "src/components/Dialog";
 import { DownloadButton } from "./components/DownloadButton";
 import { DownloadMenuSelection } from "./components/DownloadMenuSelection";
 import {
-  CheckBoxInfo,
-  CheckboxLabel,
   Container,
   Content,
   DownloadType,
   DownloadTypeInfo,
   Header,
-  StyledCheckbox,
-  StyledFileTypeItem,
   Title,
   TooltipDescriptionText,
   TooltipHeaderText,
@@ -39,9 +35,6 @@ const DownloadModal = ({
   open,
   onClose,
 }: Props): JSX.Element => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement>();
-  const tooltipRef = useCallback((node: HTMLElement) => setAnchorEl(node), []);
-
   const [isFastaSelected, setFastaSelected] = useState<boolean>(false);
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
@@ -110,34 +103,24 @@ const DownloadModal = ({
         <DialogContent>
           <Content data-test-id="modal-content">
             <Container>
-              <Tooltip
-                arrow
-                inverted
-                title={FASTA_DISABLED_TOOLTIP_TEXT}
-                disableHoverListener={!isFastaDisabled}
-                placement="top"
-                PopperProps={{
-                  anchorEl,
-                }}
+              <DownloadMenuSelection
+                id="download-fasta-checkbox"
+                isDisabled={isFastaDisabled}
+                isChecked={isFastaSelected}
+                onChange={handleFastaClick}
+                downloadTitle="Consensus Genome"
+                fileTypes=".fasta"
+                tooltipTitle={FASTA_DISABLED_TOOLTIP_TEXT}
               >
-                <DownloadMenuSelection
-                  id="download-fasta-checkbox"
-                  isDisabled={isFastaDisabled}
-                  isChecked={isFastaSelected}
-                  onChange={handleFastaClick}
-                  title="Consensus Genome"
-                  fileTypes=".fasta"
-                >
-                  Download multiple consensus genomes in a single concatenated
-                  file.
-                </DownloadMenuSelection>
-              </Tooltip>
+                Download multiple consensus genomes in a single concatenated
+                file.
+              </DownloadMenuSelection>
 
               <DownloadMenuSelection
                 id="download-metadata-checkbox"
                 isChecked={isMetadataSelected}
                 onChange={handleMetadataClick}
-                title="Sample Metadata"
+                downloadTitle="Sample Metadata"
                 fileTypes=".tsv"
               >
                 Sample metadata including Private and Public IDs, Collection
@@ -149,7 +132,7 @@ const DownloadModal = ({
                 id="download-gisaid-checkbox"
                 isChecked={isGisaidSelected}
                 onChange={handleGisaidClick}
-                title="GISAID Submission Template"
+                downloadTitle="GISAID Submission Template"
                 fileTypes=".fasta, .tsv"
               >
                 Download concatenated consensus genomes and metadata files
@@ -167,7 +150,7 @@ const DownloadModal = ({
                 id="download-genbank-checkbox"
                 isChecked={isGenbankSelected}
                 onChange={handleGenbankClick}
-                title="Genbank Submission Template"
+                downloadTitle="Genbank Submission Template"
                 fileTypes=".fasta, .tsv"
               >
                 Download concatenated consensus genomes and metadata files
