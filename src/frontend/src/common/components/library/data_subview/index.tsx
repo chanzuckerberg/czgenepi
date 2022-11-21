@@ -5,7 +5,6 @@ import { VIEWNAME } from "src/common/constants/types";
 import { SearchBar } from "src/components/Table/components/SearchBar";
 import { DeleteTreeConfirmationModal } from "src/views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/MoreActionsMenu/components/DeleteTreeConfirmationModal";
 import { EditTreeConfirmationModal } from "src/views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/MoreActionsMenu/components/EditTreeConfirmationModal";
-import { IconButton } from "./components/IconButton";
 import { TreeCreateHelpLink } from "src/views/Data/components/TreesView/components/TreeCreateHelpLink";
 import {
   Divider,
@@ -25,6 +24,7 @@ import { CreateNSTreeModal } from "src/views/Data/components/SamplesView/compone
 import { UsherTreeFlow } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/UsherTreeFlow";
 import { DeleteSamplesConfirmationModal } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/DeleteSamplesConfirmationModal";
 import { EditSamplesConfirmationModal } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal";
+import { IconButton } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/IconButton";
 
 interface Props {
   data?: BioinformaticsMap;
@@ -37,7 +37,7 @@ interface Props {
   dataFilterFunc?: (data: TableItem[]) => TableItem[];
 }
 
-function tsvDataMap(
+export function tsvDataMap(
   checkedSampleIds: string[],
   tableData: TableItem[] | undefined,
   headers: Header[],
@@ -90,7 +90,6 @@ const DataSubview: FunctionComponent<Props> = ({
   data,
   defaultSortKey,
   headers,
-  subheaders,
   isLoading,
   renderer,
   viewName,
@@ -207,8 +206,8 @@ const DataSubview: FunctionComponent<Props> = ({
           <StyledDiv>Selected </StyledDiv>
           <Divider />
           <TreeSelectionMenu
-            handleCreateNSTreeOpen={handleCreateNSTreeOpen}
-            handleCreateUsherTreeOpen={() => setShouldStartUsherFlow(true)}
+            openNSTreeModal={handleCreateNSTreeOpen}
+            openUsherModal={() => setShouldStartUsherFlow(true)}
             isMenuDisabled={hasTooManySamples}
             isUsherDisabled={!hasCheckedSamples}
           />
@@ -241,14 +240,10 @@ const DataSubview: FunctionComponent<Props> = ({
         {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
           <>
             <DownloadModal
-              checkedSampleIds={checkedSampleIds}
-              failedSampleIds={failedSampleIds}
-              tsvData={tsvDataMap(
-                checkedSampleIds,
-                tableData,
-                headers,
-                subheaders
+              checkedSamples={tableData.filter((sample) =>
+                checkedSampleIds.includes(String(sample["publicId"]))
               )}
+              failedSampleIds={failedSampleIds}
               open={isDownloadModalOpen}
               onClose={handleDownloadClose}
             />

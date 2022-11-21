@@ -3,10 +3,10 @@ import {
   EVENT_TYPES,
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
-import { RedirectConfirmationModal } from "src/common/components/library/data_subview/components/RedirectConfirmationModal";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import nextstrainLogo from "src/common/images/nextstrain.png";
-import { ConfirmButton } from "src/components/ConfirmButton";
+import { ConfirmButton } from "src/views/Data/components/ConfirmButton";
+import { RedirectConfirmationModal } from "src/views/Data/components/RedirectConfirmationModal";
 
 interface Props {
   open: boolean;
@@ -47,7 +47,7 @@ const NextstrainConfirmationModal = ({
     <RedirectConfirmationModal
       content={content}
       customConfirmButton={confirmButton}
-      img={nextstrainLogo as unknown as string}
+      img={nextstrainLogo}
       isOpen={open}
       onClose={onClose}
       onConfirm={onClose}

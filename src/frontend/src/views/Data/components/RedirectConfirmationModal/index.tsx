@@ -1,11 +1,11 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import ConfirmDialog from "src/components/ConfirmDialog";
 import { StyledHeader, StyledP } from "./style";
 
 interface Props {
   content: string | JSX.Element;
   footer?: string;
-  img: string;
+  img: string | StaticImageData;
   isOpen: boolean;
   onClose(): void;
   onConfirm(): void;

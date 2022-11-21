@@ -25,6 +25,7 @@ import { LineageTooltip } from "./components/LineageTooltip";
 import { DefaultCell } from "./components/DefaultCell";
 import { SortableHeader } from "./components/SortableHeader";
 import { StyledCellBasic, StyledPrivateId, StyledTableRow } from "./style";
+import { EmptyTable } from "src/views/Data/components/EmptyState";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -378,7 +379,7 @@ const SamplesTable = ({
   }, [rowSelection]);
 
   if (isLoading) {
-    return <div>Loading ...</div>;
+    return <EmptyTable numOfColumns={columns.length} />;
   }
 
   return (

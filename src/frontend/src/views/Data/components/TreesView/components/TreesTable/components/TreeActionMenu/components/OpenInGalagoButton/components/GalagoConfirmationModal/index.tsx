@@ -3,9 +3,9 @@ import {
   EVENT_TYPES,
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
-import { RedirectConfirmationModal } from "src/common/components/library/data_subview/components/RedirectConfirmationModal";
 import galagoLogo from "src/common/images/galago-logo-beta.png";
-import { ConfirmButton } from "src/components/ConfirmButton";
+import { ConfirmButton } from "src/views/Data/components/ConfirmButton";
+import { RedirectConfirmationModal } from "src/views/Data/components/RedirectConfirmationModal";
 
 interface Props {
   open: boolean;
@@ -47,7 +47,7 @@ export const GalagoConfirmationModal = ({
     <RedirectConfirmationModal
       content={content}
       customConfirmButton={confirmButton}
-      img={galagoLogo as unknown as string}
+      img={galagoLogo}
       isOpen={open}
       onClose={onClose}
       onConfirm={onClose}

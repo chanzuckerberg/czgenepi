@@ -47,4 +47,16 @@ function FirstColumn() {
   );
 }
 
-export { EmptyState };
+function EmptyTable(numOfColumns = 0): JSX.Element {
+  return (
+    <>
+      {Array(10)
+        .fill()
+        .map((x, i) => (
+          <EmptyState key={i} numOfColumns={numOfColumns} />
+        ))}
+    </>
+  );
+}
+
+export { EmptyState, EmptyTable };

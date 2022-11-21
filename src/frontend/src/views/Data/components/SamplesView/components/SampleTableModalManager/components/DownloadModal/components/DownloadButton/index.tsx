@@ -1,3 +1,4 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import {
@@ -6,6 +7,7 @@ import {
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { ORG_API } from "src/common/api";
+import { tsvDataMap } from "src/common/components/library/data_subview";
 import { useUserInfo } from "src/common/queries/auth";
 import {
   FileDownloadResponsePayload,
@@ -16,6 +18,9 @@ import { addNotification } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
+import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS } from "src/views/Data/headers";
 import { mapTsvData } from "./mapTsvData";
 import { StyledButton } from "./style";
 
@@ -43,9 +48,30 @@ const DownloadButton = ({
 
   const [tsvData, setTsvData] = useState<string[][]>([]);
 
+  const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
+  const usesTableRefactor = isUserFlagOn(
+    tableRefactorFlag,
+    USER_FEATURE_FLAGS.table_refactor
+  );
+
   useEffect(() => {
-    const newTsvData = mapTsvData(checkedSamples);
-    setTsvData(newTsvData);
+    if (usesTableRefactor) {
+      const newTsvData = mapTsvData(checkedSamples);
+      setTsvData(newTsvData);
+    } else {
+      if (!checkedSamples) return;
+
+      const ids = checkedSamples.map((s) => s.publicId);
+      const data = tsvDataMap(
+        ids,
+        checkedSamples,
+        SAMPLE_HEADERS,
+        SAMPLE_SUBHEADERS
+      );
+
+      const newTsvData = [data[0], ...data[1]];
+      setTsvData(newTsvData);
+    }
   }, [checkedSamples]);
 
   const useFileMutationGenerator = () =>
