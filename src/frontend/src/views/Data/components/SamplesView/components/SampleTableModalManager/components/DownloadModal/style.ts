@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
 import {
-  Button,
   CommonThemeProps,
   fontBodyM,
   fontBodyS,
@@ -112,16 +111,6 @@ export const DownloadType = styled.div`
     const fontWeights = getFontWeights(props);
     return `
       font-weight: ${fontWeights?.semibold};
-    `;
-  }}
-`;
-
-export const StyledButton = styled(Button)`
-  max-width: fit-content;
-  ${(props: CommonThemeProps) => {
-    const spaces = getSpaces(props);
-    return `
-      margin-top: ${spaces?.xxl}px;
     `;
   }}
 `;
