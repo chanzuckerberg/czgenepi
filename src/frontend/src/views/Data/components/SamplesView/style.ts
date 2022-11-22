@@ -5,9 +5,8 @@ export const MaxWidth = styled.div`
   display: flex;
   flex-direction: column;
   max-width: 1300px;
-  max-height: 100%;
   overflow-y: auto;
-  margin: auto;
+  margin: 0 auto;
   flex: 1 1 0;
   min-width: 0;
 
@@ -27,5 +26,6 @@ export const StyledActionBar = styled.div`
 
 export const Flex = styled.div`
   display: flex;
-  height: 100%;
+  flex: 1 1 0;
+  min-height: 0;
 `;
