@@ -74,6 +74,8 @@ class PathogenLineage(base):  # type: ignore
 
 
 class LineageType(enum.Enum):
+    """All tools/types of lineages used to associate samples with lineages."""
+
     PANGOLIN = "PANGOLIN"
     NEXTCLADE = "NEXTCLADE"
 
@@ -117,11 +119,39 @@ class SampleLineage(idbase):  # type: ignore
     reference_dataset_tag = Column(String, nullable=True)
 
 
+class QCMetricCaller(enum.Enum):
+    """All the tools/ways we use to call the QC info over all pathogens.
+
+    Right now we only have one, but over time we think it's likely we'll want
+    to support multiple different tools/ways to get the QC info on a sample
+    and that a sample could have multiple different QCs associated with it,
+    one for each of the various tools that can run on that pathogen type."""
+
+    NEXTCLADE = "NEXTCLADE"
+
+
+_QCMetricCallerTable = enumtables.EnumTable(
+    QCMetricCaller, base, tablename="qc_metric_callers"
+)
+
+
 class SampleQCMetric(idbase):  # type: ignore
     __tablename__ = "sample_qc_metrics"
+    __table_args__ = (
+        UniqueConstraint(
+            "sample_id",
+            "qc_caller",
+        ),
+    )
 
     sample_id = Column(Integer, ForeignKey("samples.id"), unique=True)
     sample = relationship("Sample", back_populates="qc_metrics")  # type: ignore
+    # What tool/method was used to produce this object of QC metrics.
+    qc_caller = Column(
+        Enum(QCMetricCaller),
+        ForeignKey(_QCMetricCallerTable.item_id),
+        nullable=False,
+    )
     qc_score = Column(String, nullable=False)
     qc_software_version = Column(String, nullable=False)
     qc_status = Column(String, nullable=False)
