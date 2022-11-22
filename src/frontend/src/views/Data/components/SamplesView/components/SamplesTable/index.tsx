@@ -1,5 +1,4 @@
 import {
-  Column,
   ColumnDef,
   flexRender,
   getCoreRowModel,
@@ -26,19 +25,13 @@ import { DefaultCell } from "./components/DefaultCell";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
 import { StyledCellBasic, StyledPrivateId, StyledTableRow } from "./style";
 import { EmptyTable } from "src/views/Data/components/EmptyState";
+import { generateWidthStyles } from "src/common/utils";
 
 interface Props {
   data: IdMap<Sample> | undefined;
   isLoading: boolean;
   setCheckedSamples(samples: Sample[]): void;
 }
-
-// TODO-TR (mlila): move somewhere more generic
-export const generateWidthStyles = (column: Column<any, any>) => {
-  return {
-    width: `${column.getSize()}px`,
-  };
-};
 
 const columns: ColumnDef<Sample, any>[] = [
   {

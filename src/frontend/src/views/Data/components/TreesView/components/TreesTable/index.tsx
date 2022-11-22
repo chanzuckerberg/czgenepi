@@ -14,13 +14,13 @@ import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
-import { generateWidthStyles } from "../../../SamplesView/components/SamplesTable";
 import {
   StyledCellBasic,
   StyledTableRow,
 } from "../../../SamplesView/components/SamplesTable/style";
 import TreeTableNameCell from "./components/TreeTableNameCell";
 import { StyledSortableHeader } from "./style";
+import { generateWidthStyles } from "src/common/utils";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
