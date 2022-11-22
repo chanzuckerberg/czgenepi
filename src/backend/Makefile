@@ -60,3 +60,8 @@ remote-db-migrations:
 .PHONY: remote-db-drop
 remote-db-drop:
 	aspen-cli db --remote drop
+
+### PIPELINE TESTING #############################################
+.PHONY: pipeline-test-gisaid
+pipeline-test-gisaid:
+	pytest -vvv pipeline_tests/

@@ -1,6 +1,7 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { API, getBackendApiJson } from "../api";
+import { IdMap, reduceObjectArrayToLookupDict } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 
 export interface LocationsResponse {
@@ -62,6 +63,34 @@ export function useNamedLocations(): UseQueryResult<
     // Using `select` allows it to share cache with other USE_LOCATIONS_INFO_QUERY_KEY,
     // but give a different view on the same data after processed by `select` func.
     select: foldInNamesToLocations,
+    // It's stable, avoid unnecessary re-fetches. More info in `useLocations`
+    staleTime: ONE_HOUR,
+  });
+}
+
+interface NamedLocationsByIdResponse {
+  namedLocationsById: IdMap<NamedGisaidLocation>;
+}
+
+const getNamedLocationsById = (
+  data: LocationsResponse
+): NamedLocationsByIdResponse => {
+  const { locations } = data;
+  const namedLocations = locations.map(foldInLocationName);
+  return {
+    namedLocationsById: reduceObjectArrayToLookupDict(namedLocations, "id"),
+  };
+};
+
+export function useNamedLocationsById(): UseQueryResult<
+  NamedLocationsByIdResponse,
+  unknown
+> {
+  return useQuery([USE_LOCATIONS_INFO_QUERY_KEY], fetchLocations, {
+    retry: false,
+    // Using `select` allows it to share cache with other USE_LOCATIONS_INFO_QUERY_KEY,
+    // but give a different view on the same data after processed by `select` func.
+    select: getNamedLocationsById,
     // It's stable, avoid unnecessary re-fetches. More info in `useLocations`
     staleTime: ONE_HOUR,
   });

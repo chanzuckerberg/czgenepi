@@ -1,4 +1,7 @@
-import { SampleEditIdToWarningMessages } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
+import { useSelector } from "react-redux";
+import { SampleEditIdToWarningMessages } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { Pathogen } from "src/common/redux/types";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import AlertAccordion from "src/components/AlertAccordion";
@@ -9,15 +12,9 @@ import {
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { ProblemTable } from "./common/ProblemTable";
 
+const ERROR_SEVERITY = "error";
 const WARNING_SEVERITY = "warning";
 
-/**
- *  WARNING_CODE.AUTO_CORRECT
- * (Vince -- Jan 28, 2022): Currently unused due to change in when we auto
- * correct. While won't occur right now, there is an upcoming feature for
- * providing notice when parsing uploaded collectionLocation, so leaving
- * this warning component in for now, although will likely need revamp.
- */
 interface PropsAutoCorrect {
   autocorrectedSamplesCount: number;
 }
@@ -49,10 +46,14 @@ interface PropsExtraneousEntry {
   extraneousSampleIds: string[];
 }
 function MessageExtraneousEntry({ extraneousSampleIds }: PropsExtraneousEntry) {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const tablePreamble =
     "The following sample IDs in the metadata file " +
     "do not match any sample IDs imported in the previous step.";
-  const columnHeaders = [SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId];
+  const columnHeaders = [
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sampleId,
+  ];
   const rows = extraneousSampleIds.map((sampleId) => [sampleId]);
   return (
     <ProblemTable
@@ -136,10 +137,14 @@ interface PropsAbsentSample {
   absentSampleIds: string[];
 }
 function MessageAbsentSample({ absentSampleIds }: PropsAbsentSample) {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const tablePreamble =
     "The following sample IDs were imported in the " +
     "previous step but did not match any sample IDs in the metadata file.";
-  const columnHeaders = [SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId];
+  const columnHeaders = [
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sampleId,
+  ];
   const rows = absentSampleIds.map((sampleId) => [sampleId]);
   return (
     <ProblemTable
@@ -216,14 +221,16 @@ interface PropsMissingData {
   missingData: SampleIdToWarningMessages | SampleEditIdToWarningMessages;
 }
 function MessageMissingData({ missingData }: PropsMissingData) {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const tablePreamble =
     "You can add the required data in the table below, " +
     "or update your file and re-import.";
   const columnHeaders = [
-    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sampleId,
     "Missing Data",
   ];
-  const rows = getSampleIdsWithMissingData(missingData);
+  const rows = getSampleIdsWithMissingData(missingData, pathogen);
   return (
     <ProblemTable
       tablePreamble={tablePreamble}
@@ -233,12 +240,16 @@ function MessageMissingData({ missingData }: PropsMissingData) {
   );
 }
 
-function getSampleIdsWithMissingData(missingData: SampleIdToWarningMessages) {
+function getSampleIdsWithMissingData(
+  missingData: SampleIdToWarningMessages,
+  pathogen: Pathogen
+) {
   const idsMissingData = Object.keys(missingData);
   return idsMissingData.map((sampleId) => {
     const missingHeaders = Array.from(
       missingData[sampleId],
-      (missingKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[missingKey]
+      (missingKey) =>
+        SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen][missingKey]
     );
     const missingDataDescription = missingHeaders.join(", ");
     return [sampleId, missingDataDescription];
@@ -246,14 +257,16 @@ function getSampleIdsWithMissingData(missingData: SampleIdToWarningMessages) {
 }
 
 function MessageMissingDataEdit({ missingData }: PropsMissingData) {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const tablePreamble =
     "You can add the required data in the table below, " +
     "or update your file and re-import.";
   const columnHeaders = [
-    "Sample " + SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId,
+    "Sample " + SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].privateId,
     "Missing Data",
   ];
-  const rows = getSampleIdsWithMissingData(missingData);
+  const rows = getSampleIdsWithMissingData(missingData, pathogen);
   return (
     <ProblemTable
       tablePreamble={tablePreamble}
@@ -263,7 +276,7 @@ function MessageMissingDataEdit({ missingData }: PropsMissingData) {
   );
 }
 
-export function WarningMissingData({
+export function ErrorMissingData({
   missingData,
 }: PropsMissingData): JSX.Element {
   const count = Object.keys(missingData).length;
@@ -276,7 +289,7 @@ export function WarningMissingData({
     <AlertAccordion
       title={<B>{title}</B>}
       collapseContent={<MessageMissingData missingData={missingData} />}
-      intent={WARNING_SEVERITY}
+      intent={ERROR_SEVERITY}
     />
   );
 }
@@ -331,6 +344,8 @@ function MessageBadFormatData({
   badFormatData,
   IdColumnNameForWarnings,
 }: PropsBadFormatData) {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const tablePreamble = BadFormatDataTablePreamble;
   const columnHeaders = [
     IdColumnNameForWarnings,
@@ -340,7 +355,8 @@ function MessageBadFormatData({
   const rows = idsBadFormatData.map((sampleId) => {
     const badFormatRawHeaders = Array.from(
       badFormatData[sampleId],
-      (badFormatKey) => SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[badFormatKey]
+      (badFormatKey) =>
+        SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen][badFormatKey]
     );
     // Some headers say "optional" in them: we don't put that in description
     const badFormatPrettyHeaders = badFormatRawHeaders.map((header) => {
@@ -378,7 +394,7 @@ export function ErrorBadFormatData({
           IdColumnNameForWarnings={IdColumnNameForWarnings}
         />
       }
-      intent="error"
+      intent={ERROR_SEVERITY}
     />
   );
 }

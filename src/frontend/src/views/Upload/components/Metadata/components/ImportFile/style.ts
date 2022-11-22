@@ -12,6 +12,14 @@ import {
 
 export const Title = styled.span`
   ${fontHeaderL}
+
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin-right: ${spaces?.s}px;
+    `;
+  }}
 `;
 
 export const TitleWrapper = styled.div`
@@ -76,6 +84,18 @@ export const StyledButton = styled(Button)`
         background-color: ${colors?.primary[200]};
         color: ${colors?.primary[400]};
       }
+    `;
+  }}
+`;
+
+export const VerticalLine = styled.div`
+  height: 28px;
+
+  ${(props: CommonThemeProps) => {
+    const colors = getColors(props);
+
+    return `
+      border-right: 1px solid ${colors?.gray[400]};
     `;
   }}
 `;

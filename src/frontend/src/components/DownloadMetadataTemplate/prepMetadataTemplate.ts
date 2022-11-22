@@ -1,82 +1,30 @@
 /**
  * Generate info for downloadable Sample Upload and Edit Metadata Templates.
  */
+import { store } from "src/common/redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { Pathogen } from "src/common/redux/types";
 import {
+  getEditExampleRows,
   SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
   SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
+  UPLOAD_EXAMPLE_ROWS,
 } from "./common/constants";
 // Should change below whenever there are material changes to upload TSV download
 export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
 
-const DATE_FORMAT = "YYYY-MM-DD";
-const BOOLEAN_FORMAT = "Yes/No";
-
-const TEMPLATE_HEADERS = [
-  // If position for sampleId changes, update `prepMetadataTemplate` func!
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sampleId,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.privateId,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.publicId,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionDate,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.collectionLocation,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.sequencingDate,
-  SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.keepPrivate,
-];
-
-const TEMPLATE_HEADERS_EDIT = [
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.currentPrivateID,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.newPrivateID,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.publicId,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionDate,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.collectionLocation,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.sequencingDate,
-  SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS.keepPrivate,
-];
-
-// We also use this elsewhere: if we see one of these uploaded, filter it out.
-export const EXAMPLE_SAMPLE_IDS = [
-  "Example Sample A",
-  "Example Sample B",
-  "Example Sample C",
-];
-
-export const EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS = [
-  "example private ID A",
-  "example private ID B",
-  "example private ID C",
-];
-
-const EXAMPLE_ROWS = [
-  // Very first example row helps explain usage, but not fully valid.
-  [
-    EXAMPLE_SAMPLE_IDS[0], // sampleId
-    "Private sample name", // privateId
-    "(if available) GISAID ID", // publicId -- here as explainer
-    DATE_FORMAT, // collectionDate -- not valid, here as explainer in template
-    "North America/USA/California/Los Angeles County", // collectionLocation
-    DATE_FORMAT, // sequencingDate -- not valid, here as explainer in template
-    BOOLEAN_FORMAT, // keepPrivate -- not valid, here as explainer in template
-  ],
-  // Subsequent example rows are mostly valid, honest-to-goodness examples...
-  // ... except for the dates. This is to avoid Excel auto "correct".
-  [
-    EXAMPLE_SAMPLE_IDS[1], // sampleId
-    "id101", // privateId
-    "", // publicId -- optional, showing that with blank use
-    DATE_FORMAT, // collectionDate
-    "San Francisco County", // collectionLocation
-    "", // sequencingDate -- optional, showing that with blank use
-    "No", // keepPrivate
-  ],
-  [
-    EXAMPLE_SAMPLE_IDS[2], // sampleId
-    "id102", // privateId
-    "USA/CA-CZB-0001/2021", // publicId
-    DATE_FORMAT, // collectionDate
-    "North America/USA/California/San Francisco County", // collectionLocation
-    DATE_FORMAT, // sequencingDate
-    "No", // keepPrivate
-  ],
-];
+// If a future pathogen has different headers, we'll need to modify this.
+function getUploadTemplateHeaders(pathogen: Pathogen): string[] {
+  return [
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sampleId,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].privateId,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].publicId,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].collectionDate,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].collectionLocation,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].sequencingDate,
+    SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS[pathogen].keepPrivate,
+  ];
+}
 
 const SAMPLE_EDIT_INSTRUCTIONS = [
   ["# Only fill out columns or cells where you want to update the content"],
@@ -85,40 +33,15 @@ const SAMPLE_EDIT_INSTRUCTIONS = [
   ["# Save in .tsv .csv or .txt format"],
 ];
 
-function getEditExampleRows(collectionLocation?: GisaidLocation): string[][] {
-  // return example rows with the countys collectionLocation
-  const exampleCollectionLocation = collectionLocation
-    ? `${collectionLocation.region}/${collectionLocation.country}/${collectionLocation.division}/${collectionLocation.location}`
-    : "North America/USA/Californa/Humbolt County";
-
+function getEditTemplateHeaders(pathogen: Pathogen): string[] {
   return [
-    [
-      EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS[0], // currentPrivateID
-      "X3421876", // newPrivateID
-      "hCoV-19/USA/demo-17806/2021", // publicId
-      DATE_FORMAT, // collectionDate,
-      exampleCollectionLocation, //collectionLocation
-      DATE_FORMAT, // sequencingDate
-      BOOLEAN_FORMAT, // keepPrivate
-    ],
-    [
-      EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS[1],
-      "SOP292344X", // newPrivateID
-      "hCoV-19/USA/demo-17807/2021", // publicId
-      DATE_FORMAT, // collectionDate,
-      exampleCollectionLocation, //collectionLocation
-      DATE_FORMAT, // sequencingDate
-      BOOLEAN_FORMAT, // keepPrivate
-    ],
-    [
-      EXAMPLE_CURRENT_PRIVATE_IDENTIFIERS[2],
-      "T2348ACT", // newPrivateID
-      "hCoV-19/USA/demo-17808/2021", // publicId
-      DATE_FORMAT, // collectionDate,
-      exampleCollectionLocation, //collectionLocation
-      "Delete", // sequencingDate
-      BOOLEAN_FORMAT, // keepPrivate
-    ],
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].currentPrivateID,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].newPrivateID,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].publicId,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].collectionDate,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].collectionLocation,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].sequencingDate,
+    SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS[pathogen].keepPrivate,
   ];
 }
 
@@ -157,16 +80,21 @@ function getDataRows(
  * of the time, users will just be able to copy that final example downward for
  * all their data rows since most samples will be their location.
  */
-export function prepUploadMetadataTemplate(sampleIds: string[]): {
+export function prepUploadMetadataTemplate(
+  sampleIds: string[],
+  pathogen: Pathogen
+): {
   templateHeaders: string[];
   templateRows: string[][];
 } {
+  const TEMPLATE_HEADERS = getUploadTemplateHeaders(pathogen);
+
   // Most rows in template are just empty rows for user to fill in with data.
   const EMPTY_DATA_ROW = getEmptyDataRows(TEMPLATE_HEADERS);
   const data_rows = getDataRows(sampleIds, EMPTY_DATA_ROW);
   return {
     templateHeaders: TEMPLATE_HEADERS,
-    templateRows: [...EXAMPLE_ROWS, ...data_rows],
+    templateRows: [...UPLOAD_EXAMPLE_ROWS[pathogen], ...data_rows],
   };
 }
 
@@ -178,9 +106,14 @@ export function prepEditMetadataTemplate(
   templateHeaders: string[];
   templateRows: string[][];
 } {
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+
+  const TEMPLATE_HEADERS_EDIT = getEditTemplateHeaders(pathogen);
+
   const EMPTY_DATA_ROW = getEmptyDataRows(TEMPLATE_HEADERS_EDIT);
   const data_rows = getDataRows(sampleIds, EMPTY_DATA_ROW);
-  const EXAMPLE_ROWS_EDIT = getEditExampleRows(collectionLocation);
+  const EXAMPLE_ROWS_EDIT = getEditExampleRows(pathogen, collectionLocation);
   return {
     templateInstructionRows: SAMPLE_EDIT_INSTRUCTIONS,
     templateHeaders: TEMPLATE_HEADERS_EDIT,

@@ -19,12 +19,13 @@ from aspen.database.connection import (
 from aspen.database.models import (
     Accession,
     AccessionType,
-    AlignedGisaidDump,
+    AlignedRepositoryData,
     Entity,
     Group,
     Location,
-    PangoLineage,
+    Pathogen,
     PathogenGenome,
+    PathogenLineage,
     PhyloRun,
     Sample,
     UploadedPathogenGenome,
@@ -102,7 +103,7 @@ def cli(
     if test:
         print("Success!")
         return
-    aligned_gisaid_dump = export_run_config(
+    aligned_repo_data = export_run_config(
         phylo_run_id,
         sequences_fh,
         selected_fh,
@@ -111,7 +112,7 @@ def cli(
         builds_file_fh,
         reset_status,
     )
-    print(json.dumps(aligned_gisaid_dump))
+    print(json.dumps(aligned_repo_data))
 
 
 # For local debugging of our yaml building process.
@@ -167,8 +168,8 @@ def export_run_config(
         county_samples: List[PathogenGenome] = get_county_samples(session, group)
 
         # get the aligned gisaid run info.
-        aligned_gisaid: AlignedGisaidDump = [
-            inp for inp in phylo_run.inputs if isinstance(inp, AlignedGisaidDump)
+        aligned_gisaid: AlignedRepositoryData = [
+            inp for inp in phylo_run.inputs if isinstance(inp, AlignedRepositoryData)
         ][0]
 
         num_sequences = write_sequences_files(
@@ -191,7 +192,7 @@ def export_run_config(
 
         # Some template args need to be resolved before ready to use.
         resolved_template_args = resolve_template_args(
-            session, phylo_run.template_args, group
+            session, phylo_run.pathogen, phylo_run.template_args, group
         )
         # Keep a record of what they resolved to. Make permanent in `save.py`
         save_resolved_template_args(resolved_template_args_fh, resolved_template_args)
@@ -230,10 +231,10 @@ def get_county_samples(session, group: Group):
 def get_phylo_run(session, phylo_run_id):
     # this allows us to load the secondary tables of a polymorphic type.  In this
     # case, we want to load the inputs of a phylo run, provided the input is of type
-    # `PathogenGenome` and `AlignedGisaidDump`.
+    # `PathogenGenome` and `AlignedRepositoryData`.
     phylo_run_inputs = with_polymorphic(
         Entity,
-        [PathogenGenome, AlignedGisaidDump],
+        [PathogenGenome, AlignedRepositoryData],
         flat=True,
     )
     phylo_run: PhyloRun = (
@@ -252,7 +253,7 @@ def get_phylo_run(session, phylo_run_id):
 
 
 def resolve_filter_pango_lineages(
-    session: Session, template_args: Dict[str, Any]
+    session: Session, pathogen: Pathogen, template_args: Dict[str, Any]
 ) -> Optional[List[str]]:
     """Takes raw lineage filter, expands it. Helper for `resolve_template_args`
 
@@ -265,14 +266,16 @@ def resolve_filter_pango_lineages(
     lineage_list = template_args.get("filter_pango_lineages")
     if lineage_list is None:  # short-circuit if template arg was not present
         return None
-    all_lineages_query = sa.select(PangoLineage.lineage)
+    all_lineages_query = sa.select(PathogenLineage.lineage).where(
+        PathogenLineage.pathogen == pathogen
+    )
     # Utility that does expansion depends on having set of all lineages.
     all_lineages = set(session.execute(all_lineages_query).scalars().all())
     return expand_lineage_wildcards(all_lineages, lineage_list)
 
 
 def resolve_template_args(
-    session: Session, template_args: Dict[str, Any], group: Group
+    session: Session, pathogen: Pathogen, template_args: Dict[str, Any], group: Group
 ) -> Dict[str, Any]:
     """Takes raw template_args and interprets them so ready for downstream use.
 
@@ -294,7 +297,7 @@ def resolve_template_args(
         )
 
     resolved_filter_pango_lineages = resolve_filter_pango_lineages(
-        session, template_args
+        session, pathogen, template_args
     )
 
     # Avoid mutating original template_args; resolved args handled special.

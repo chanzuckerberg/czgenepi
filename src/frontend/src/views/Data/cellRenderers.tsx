@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 
-import { ChipProps, Icon, Tooltip } from "czifui";
+import { ChipProps, Icon } from "czifui";
 import {
   defaultSampleCellRenderer,
   defaultTreeCellRenderer,
@@ -13,10 +13,10 @@ import {
 import { createTableCellRenderer } from "src/common/utils";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
-import { LineageTooltip } from "./components/LineageTooltip";
-import { TreeActionMenu } from "./components/TreeActionMenu";
-import TreeTableNameCell from "./components/TreeTableNameCell";
-import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
+import { LineageTooltip } from "./components/SamplesView/components/SamplesTable/components/LineageTooltip";
+import { TreeActionMenu } from "./components/TreesView/components/TreesTable/components/TreeActionMenu";
+import TreeTableNameCell from "./components/TreesView/components/TreesTable/components/TreeTableNameCell";
+import { TreeTypeTooltip } from "./components/TreesView/components/TreesTable/components/TreeTypeTooltip";
 import {
   CenteredFlexContainer,
   GISAIDCell,
@@ -78,14 +78,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     );
 
     return hasLineage ? (
-      <Tooltip
-        followCursor
-        title={<LineageTooltip lineage={value as Lineage} />}
-        width="wide"
-        data-test-id="lineage-tooltip"
-      >
-        {Content}
-      </Tooltip>
+      <LineageTooltip lineage={value}>{Content}</LineageTooltip>
     ) : (
       Content
     );
@@ -170,7 +163,6 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   actionMenu: ({
     value,
     item,
-    userInfo,
     onDeleteTreeModalOpen,
     onEditTreeModalOpen,
   }): JSX.Element => {
@@ -178,7 +170,6 @@ const TREE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       <TreeActionMenu
         item={item}
         value={value}
-        userInfo={userInfo}
         onDeleteTreeModalOpen={onDeleteTreeModalOpen}
         onEditTreeModalOpen={onEditTreeModalOpen}
       />

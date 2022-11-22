@@ -10,7 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
-from aspen.api.deps import get_db, get_pathogen, get_settings
+from aspen.api.deps import get_db, get_pathogen, get_public_repository, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
     PhyloRunDeleteResponse,
@@ -21,19 +21,20 @@ from aspen.api.schemas.phylo_runs import (
 )
 from aspen.api.settings import APISettings
 from aspen.api.utils import (
-    get_matching_gisaid_ids,
-    get_matching_gisaid_ids_by_epi_isl,
+    get_matching_repo_ids,
+    get_matching_repo_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
     samples_by_identifiers,
 )
 from aspen.database.models import (
-    AlignedGisaidDump,
+    AlignedRepositoryData,
     Group,
     Location,
     Pathogen,
     PathogenGenome,
     PhyloRun,
     PhyloTree,
+    PublicRepository,
     Sample,
     TreeType,
     User,
@@ -54,6 +55,7 @@ async def kick_off_phylo_run(
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_phylorun")),
     pathogen: Pathogen = Depends(get_pathogen),
+    public_repository: PublicRepository = Depends(get_public_repository),
 ) -> PhyloRunResponse:
 
     # validation happens in input schema
@@ -63,6 +65,7 @@ async def kick_off_phylo_run(
     user_visible_samples_query = await samples_by_identifiers(
         az, pathogen, set(sample_ids)
     )
+
     user_visible_samples_query = user_visible_samples_query.options(  # type: ignore
         joinedload(Sample.uploaded_pathogen_genome, innerjoin=True),
     )
@@ -75,7 +78,9 @@ async def kick_off_phylo_run(
     )
 
     # See if these missing_sample_ids match any Gisaid IDs
-    gisaid_ids: Set[str] = await get_matching_gisaid_ids(db, missing_sample_ids)
+    gisaid_ids: Set[str] = await get_matching_repo_ids(
+        db, pathogen, public_repository, missing_sample_ids
+    )
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
     missing_sample_ids = missing_sample_ids - gisaid_ids
@@ -83,8 +88,8 @@ async def kick_off_phylo_run(
     # Do the same, but for epi isls
     gisaid_ids_from_isls: Set[str]
     epi_isls: Set[str]
-    gisaid_ids_from_isls, epi_isls = await get_matching_gisaid_ids_by_epi_isl(
-        db, missing_sample_ids
+    gisaid_ids_from_isls, epi_isls = await get_matching_repo_ids_by_epi_isl(
+        db, pathogen, public_repository, missing_sample_ids
     )
     missing_sample_ids -= epi_isls
     gisaid_ids |= gisaid_ids_from_isls
@@ -102,16 +107,18 @@ async def kick_off_phylo_run(
     for sample in user_visible_samples:
         pathogen_genomes.append(sample.uploaded_pathogen_genome)
 
-    # 4B - AlignedGisaidDump
-    aligned_gisaid_dump_query = (  # type: ignore
-        sa.select(AlignedGisaidDump)  # type: ignore
-        .join(AlignedGisaidDump.producing_workflow)  # type: ignore
+    # 4B - AlignedRepositoryData
+    aligned_repo_data_query = (  # type: ignore
+        sa.select(AlignedRepositoryData)  # type: ignore
+        .join(AlignedRepositoryData.producing_workflow)  # type: ignore
+        .where(AlignedRepositoryData.pathogen == pathogen)  # type: ignore
+        .where(AlignedRepositoryData.public_repository == public_repository)  # type: ignore
         .order_by(Workflow.end_datetime.desc())  # type: ignore
         .limit(1)  # type: ignore
     )
-    aligned_gisaid_dump = await db.execute(aligned_gisaid_dump_query)
+    aligned_repo_data = await db.execute(aligned_repo_data_query)
     try:
-        aligned_gisaid_dump = aligned_gisaid_dump.scalars().one()
+        aligned_repo_data = aligned_repo_data.scalars().one()
     except NoResultFound:
         sentry_sdk.capture_message(
             "No Aligned Gisaid Dump found! Cannot create PhyloRun!", "fatal"
@@ -153,7 +160,7 @@ async def kick_off_phylo_run(
         outputs=[],  # Make our response schema happy.
     )
     workflow.inputs = list(pathogen_genomes)
-    workflow.inputs.append(aligned_gisaid_dump)
+    workflow.inputs.append(aligned_repo_data)
 
     db.add(workflow)
     await db.commit()

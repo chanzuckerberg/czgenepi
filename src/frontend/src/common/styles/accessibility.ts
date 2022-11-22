@@ -19,7 +19,7 @@ export const srOnly = (): string => {
 
 export const accessibleFocusBorder = (): string => {
   return `
-    &:focus, &:focus-within {
+    &:focus-visible, &:has(:focus-visible) {
       outline: 5px auto Highlight;
       outline: 5px auto -webkit-focus-ring-color;
     }

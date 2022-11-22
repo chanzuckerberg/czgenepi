@@ -18,6 +18,8 @@ import {
   SampleResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
+import { store } from "../redux";
+import { selectCurrentPathogen } from "../redux/selectors";
 import { IdMap, reduceObjectArrayToLookupDict } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
@@ -279,7 +281,9 @@ export const USE_SAMPLE_INFO = {
 };
 
 export function useSampleInfo(): UseQueryResult<SampleResponse, unknown> {
-  return useQuery([USE_SAMPLE_INFO], () => fetchSamples(), {
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+  return useQuery([USE_SAMPLE_INFO, pathogen], () => fetchSamples(), {
     retry: false,
   });
 }

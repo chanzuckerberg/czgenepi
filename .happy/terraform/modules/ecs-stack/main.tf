@@ -183,8 +183,8 @@ module gisaid_sfn_config {
   app_name = "gisaid-sfn"
   image    = local.gisaid_image
   # This job is actually constrained by *DISK SPACE* and swipe currently only supports NVME-mounted storage
-  # so we're requesting more vcpu's than necessary in order to bump the instance size to: 2 x 900 NVMe SSD
-  memory   = 384000
+  # so we're requesting more vcpu's than necessary in order to bump the instance size to: 4 x 600 NVMe SSD
+  memory   = 512000
   wdl_path = "workflows/gisaid.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage

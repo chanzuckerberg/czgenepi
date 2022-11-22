@@ -6,14 +6,20 @@ import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { FilterPanel } from "src/components/FilterPanel";
 import { SearchBar } from "src/components/Table/components/SearchBar";
-import { StyledView } from "../../style";
 import { DataNavigation } from "../DataNavigation";
 import { SamplesTable } from "./components/SamplesTable";
-import { Flex } from "./style";
+import { SampleTableModalManager } from "./components/SampleTableModalManager";
+import { Flex, MaxWidth, StyledActionBar } from "./style";
 
 const SamplesView = (): JSX.Element => {
   // initialize state
   // TODO-TR (mlilia): types
+
+  // TODO-TR (mlila): consider restructuring table, modalmanager, and view to better manage
+  // TODO             checked sample state
+
+  // TODO-TR: when samples are cleared after closing a modal, the UI doesn't update
+  const [checkedSamples, setCheckedSamples] = useState<Sample[]>([]);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState<boolean>(true);
   const [activeFilterCount, setActiveFilterCount] = useState<number>(0);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
@@ -57,7 +63,7 @@ const SamplesView = (): JSX.Element => {
   };
 
   return (
-    <StyledView>
+    <>
       <HeadAppTitle subTitle="Samples" />
       <DataNavigation
         shouldShowSampleFilterToggle
@@ -72,15 +78,25 @@ const SamplesView = (): JSX.Element => {
           setDataFilterFunc={setDataFilterFunc}
           data-test-id="menu-item-sample-count"
         />
-        <div>
-          <SearchBar tableData={samples} onSearchComplete={setSearchResults} />
+        <MaxWidth>
+          <StyledActionBar>
+            <SearchBar
+              tableData={samples}
+              onSearchComplete={setSearchResults}
+            />
+            <SampleTableModalManager
+              checkedSamples={checkedSamples}
+              clearCheckedSamples={() => setCheckedSamples([])}
+            />
+          </StyledActionBar>
           <SamplesTable
             isLoading={isLoading || isFetching}
             data={displayedRows}
+            setCheckedSamples={setCheckedSamples}
           />
-        </div>
+        </MaxWidth>
       </Flex>
-    </StyledView>
+    </>
   );
 };
 

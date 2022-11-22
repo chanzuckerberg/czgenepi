@@ -15,7 +15,7 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import GisaidMetadata, Location
+from aspen.database.models import Location, PublicRepositoryMetadata
 
 
 def save():
@@ -23,27 +23,32 @@ def save():
     interface: SqlAlchemyInterface = init_db(get_db_uri(config))
 
     with session_scope(interface) as session:
-        # Insert all locations from gisaid_metadata
-        gisaid_locations_select = (
+        # Insert all locations from public_repository_metadata
+        metadata_locations_select = (
             sa.select(
-                GisaidMetadata.region,
-                GisaidMetadata.country,
-                GisaidMetadata.division,
-                GisaidMetadata.location,
+                PublicRepositoryMetadata.region,
+                PublicRepositoryMetadata.country,
+                PublicRepositoryMetadata.division,
+                PublicRepositoryMetadata.location,
             )
-            .where(and_(GisaidMetadata.location != "", GisaidMetadata.location != None))
+            .where(
+                and_(
+                    PublicRepositoryMetadata.location != "",
+                    PublicRepositoryMetadata.location != None,
+                )
+            )
             .distinct()
         )
-        gisaid_locations_insert = (
+        metadata_locations_insert = (
             postgresql.insert(Location.__table__)
             .from_select(
-                ["region", "country", "division", "location"], gisaid_locations_select
+                ["region", "country", "division", "location"], metadata_locations_select
             )
             .on_conflict_do_nothing(
                 index_elements=("region", "country", "division", "location")
             )
         )
-        session.execute(gisaid_locations_insert)
+        session.execute(metadata_locations_insert)
 
         # Insert an entry with a null location for every distinct Region/Country/Division combination
         existing_null_location_select = (
@@ -55,14 +60,16 @@ def save():
             session.execute(existing_null_location_select).all()
         )
 
-        gisaid_null_locations_select = sa.select(
-            GisaidMetadata.region,
-            GisaidMetadata.country,
-            GisaidMetadata.division,
+        metadata_null_locations_select = sa.select(
+            PublicRepositoryMetadata.region,
+            PublicRepositoryMetadata.country,
+            PublicRepositoryMetadata.division,
         ).distinct()
-        gisaid_null_locations = set(session.execute(gisaid_null_locations_select).all())
+        metadata_null_locations = set(
+            session.execute(metadata_null_locations_select).all()
+        )
 
-        new_null_locations = gisaid_null_locations - existing_null_locations
+        new_null_locations = metadata_null_locations - existing_null_locations
         new_null_location_values = list(
             map(
                 lambda region_country_division_tuple: {
@@ -91,7 +98,7 @@ def save():
         )
 
         country_level_loc_select = sa.select(
-            GisaidMetadata.region, GisaidMetadata.country
+            PublicRepositoryMetadata.region, PublicRepositoryMetadata.country
         ).distinct()
         country_level_locations = set(session.execute(country_level_loc_select).all())
 

@@ -8,6 +8,7 @@
 *.swo
 **/__pycache__
 **/*.egg-info
+**/.cache/
 
 .tox
 .coverage

@@ -12,7 +12,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
-from aspen.api.deps import get_db, get_pathogen, get_settings
+from aspen.api.deps import get_db, get_pathogen, get_public_repository, get_settings
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
     CreateSampleRequest,
@@ -33,8 +33,8 @@ from aspen.api.utils import (
     collect_submission_information,
     determine_gisaid_status,
     GenBankSubmissionFormTSVStreamer,
-    get_matching_gisaid_ids,
-    get_matching_gisaid_ids_by_epi_isl,
+    get_matching_repo_ids,
+    get_matching_repo_ids_by_epi_isl,
     get_missing_and_found_sample_ids,
     GisaidSubmissionFormCSVStreamer,
     sample_info_to_genbank_rows,
@@ -46,6 +46,7 @@ from aspen.database.models import (
     Group,
     Location,
     Pathogen,
+    PublicRepository,
     Sample,
     UploadedPathogenGenome,
     User,
@@ -220,10 +221,11 @@ async def validate_ids(
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
     pathogen: Pathogen = Depends(get_pathogen),
+    public_repository: PublicRepository = Depends(get_public_repository),
 ) -> ValidateIDsResponse:
 
     """
-    take in a list of identifiers and checks if all identifiers exist as either Sample public or private identifiers, or GisaidMetadata strain names
+    take in a list of identifiers and checks if all identifiers exist as either Sample public or private identifiers, or PublicRepositoryMetadata strain names
 
     returns a response with list of missing identifiers if any, otherwise will return an empty list
     """
@@ -242,14 +244,18 @@ async def validate_ids(
     )
 
     # See if these missing_sample_ids match any Gisaid identifiers
-    gisaid_ids: Set[str] = await get_matching_gisaid_ids(db, missing_sample_ids)
+    gisaid_ids: Set[str] = await get_matching_repo_ids(
+        db, pathogen, public_repository, missing_sample_ids
+    )
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
     missing_sample_ids -= gisaid_ids
 
     # Do the same, but for epi isls
     epi_isls: Set[str]
-    _, epi_isls = await get_matching_gisaid_ids_by_epi_isl(db, missing_sample_ids)
+    _, epi_isls = await get_matching_repo_ids_by_epi_isl(
+        db, pathogen, public_repository, missing_sample_ids
+    )
     missing_sample_ids -= epi_isls
 
     return ValidateIDsResponse(missing_sample_ids=missing_sample_ids)

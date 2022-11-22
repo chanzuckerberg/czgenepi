@@ -119,7 +119,8 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
               <SemiBold>
                 Do not include any PII in the Sample name or file name.
               </SemiBold>{" "}
-              Your sample name should be the sample&apos;s Private ID.
+              By default, your sample name will be used as the sample Private
+              ID.
             </span>,
             <span key="2">{acceptedFormats}</span>,
             <span key="3">
@@ -127,9 +128,6 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
               contain letters from the English alphabet (A-Z, upper and lower
               case), numbers (0-9), periods (.), hyphens (-), underscores (_),
               spaces ( ), and forward slashes (/).
-            </span>,
-            <span key="4">
-              The maximum number of samples accommodated per upload is 500.
             </span>,
           ]}
         />

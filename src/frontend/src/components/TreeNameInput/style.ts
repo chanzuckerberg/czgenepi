@@ -1,8 +1,11 @@
 import styled from "@emotion/styled";
+import { TextField } from "@mui/material";
 import {
   CommonThemeProps,
   fontBodyXs,
+  fontBodyXxxs,
   fontHeaderM,
+  getColors,
   getCorners,
   getFontWeights,
   getSpaces,
@@ -60,6 +63,39 @@ export const StyledErrorIconWrapper = styled.div`
 
     return `
       margin-right: ${spaces?.xs}px;
+    `;
+  }}
+`;
+
+export const StyledTextField = styled(TextField)`
+  color: black;
+  padding: 0px;
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      padding-bottom: ${spaces?.s}px;
+    `;
+  }}
+`;
+
+export const TreeNameTooLongAlert = styled.div`
+  ${fontBodyXxxs}
+  display: flex;
+  align-items: center;
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-top: ${spaces?.xxxs}px;
+      margin-bottom: ${spaces?.xl}px;
+    `;
+  }}
+`;
+
+export const TextFieldAlert = styled.div`
+  ${(props: CommonThemeProps) => {
+    const colors = getColors(props);
+    return `
+      color: ${colors?.error[400]};
     `;
   }}
 `;

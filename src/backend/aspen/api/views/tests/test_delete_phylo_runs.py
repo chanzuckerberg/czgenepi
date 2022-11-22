@@ -8,10 +8,11 @@ from aspen.database.models import Group, PhyloTree, Sample, WorkflowStatusType
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
+from aspen.test_infra.models.repository import random_repo_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
-from aspen.test_infra.models.workflow import aligned_gisaid_dump_factory
+from aspen.test_infra.models.workflow import aligned_repo_data_factory
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -46,6 +47,7 @@ async def test_delete_phylo_run_matrix(
     group = group_factory(name="group1")
     group2 = group_factory(name="group2")
     pathogen = random_pathogen_factory()
+    repository = random_repo_factory()
     user = await userrole_factory(
         async_session, group, auth0_user_id="user1", email="user1"
     )
@@ -56,10 +58,10 @@ async def test_delete_phylo_run_matrix(
         "North America", "USA", "California", "Santa Barbara County"
     )
     sample = sample_factory(group, user, location, pathogen=pathogen)
-    gisaid_dump = aligned_gisaid_dump_factory()
+    repo_data = aligned_repo_data_factory(pathogen, repository)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
-    async_session.add(gisaid_dump)
+    async_session.add(repo_data)
 
     tree1: PhyloTree = make_tree(
         group, [sample], "tree1", status=WorkflowStatusType.COMPLETED

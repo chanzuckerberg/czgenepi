@@ -1,6 +1,7 @@
 import datetime
 
 import click
+import sqlalchemy as sa
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -10,9 +11,11 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
-    AlignedGisaidDump,
-    GisaidAlignmentWorkflow,
-    ProcessedGisaidDump,
+    AlignedRepositoryData,
+    Pathogen,
+    ProcessedRepositoryData,
+    PublicRepository,
+    RepositoryAlignmentWorkflow,
     WorkflowStatusType,
 )
 from aspen.database.models.workflow import SoftwareNames
@@ -29,6 +32,8 @@ from aspen.database.models.workflow import SoftwareNames
 @click.option("--gisaid-s3-bucket", type=str, required=True)
 @click.option("--gisaid-sequences-s3-key", type=str, required=True)
 @click.option("--gisaid-metadata-s3-key", type=str, required=True)
+@click.option("--pathogen", type=str, default="SC2")
+@click.option("--public_repository", type=str, default="GISAID")
 @click.option("--test", type=bool, is_flag=True)
 def cli(
     aspen_workflow_rev: str,
@@ -41,6 +46,8 @@ def cli(
     gisaid_s3_bucket: str,
     gisaid_sequences_s3_key: str,
     gisaid_metadata_s3_key: str,
+    pathogen: str,
+    public_repository: str,
     test: bool,
 ):
     if test:
@@ -51,21 +58,28 @@ def cli(
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
-        processed_gisaid_dump: ProcessedGisaidDump = (
-            session.query(ProcessedGisaidDump)
-            .filter(ProcessedGisaidDump.id == processed_gisaid_object_id)
+        pathogen_obj = session.execute(sa.select(Pathogen).where(Pathogen.slug == pathogen)).scalars().one()  # type: ignore
+        public_repository_obj = session.execute(sa.select(PublicRepository).where(PublicRepository.name == public_repository)).scalars().one()  # type: ignore
+
+        processed_entity: ProcessedRepositoryData = (
+            session.query(ProcessedRepositoryData)
+            .filter(ProcessedRepositoryData.id == processed_gisaid_object_id)
             .one()
         )
 
         # create an output
-        aligned_gisaid_dump = AlignedGisaidDump(
+        aligned_data_entity = AlignedRepositoryData(
+            pathogen=pathogen_obj,
+            public_repository=public_repository_obj,
             s3_bucket=gisaid_s3_bucket,
             sequences_s3_key=gisaid_sequences_s3_key,
             metadata_s3_key=gisaid_metadata_s3_key,
         )
 
         # attach a workflow
-        workflow = GisaidAlignmentWorkflow(
+        workflow = RepositoryAlignmentWorkflow(
+            pathogen=pathogen_obj,
+            public_repository=public_repository_obj,
             start_datetime=start_time_datetime,
             end_datetime=end_time_datetime,
             workflow_status=WorkflowStatusType.COMPLETED,
@@ -77,10 +91,12 @@ def cli(
             },
         )
 
-        workflow.inputs.append(processed_gisaid_dump)
-        workflow.outputs.append(aligned_gisaid_dump)
+        workflow.inputs.append(processed_entity)
+        workflow.outputs.append(aligned_data_entity)
         session.flush()
-        print(aligned_gisaid_dump.entity_id)
+        session.flush()
+
+        print(aligned_data_entity.entity_id)
 
 
 if __name__ == "__main__":
