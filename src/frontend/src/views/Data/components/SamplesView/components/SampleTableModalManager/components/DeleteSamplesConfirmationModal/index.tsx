@@ -23,9 +23,12 @@ const DeleteSamplesConfirmationModal = ({
 }: Props): JSX.Element | null => {
   const dispatch = useDispatch();
 
-  const [numDeletedSamples, setNumDeletedSamples] = useState<number>(0);
   const { data: userInfo } = useUserInfo();
   const currentGroup = getCurrentGroupFromUserInfo(userInfo);
+
+  const samplesToDelete = checkedSamples
+    .filter((sample) => sample.submittingGroup?.name === currentGroup?.name)
+    .map((sample) => sample.id);
 
   const deleteSampleMutation = useDeleteSamples({
     componentOnError: () => {
@@ -39,6 +42,8 @@ const DeleteSamplesConfirmationModal = ({
       );
     },
     componentOnSuccess: () => {
+      const numDeletedSamples = samplesToDelete.length;
+
       dispatch(
         addNotification({
           autoDismiss: true,
@@ -55,12 +60,7 @@ const DeleteSamplesConfirmationModal = ({
 
   if (!open) return null;
 
-  const samplesToDelete = checkedSamples
-    .filter((sample) => sample.submittingGroup?.name === currentGroup?.name)
-    .map((sample) => sample.id);
-
   const onDelete = () => {
-    setNumDeletedSamples(samplesToDelete.length);
     deleteSampleMutation.mutate({
       samplesToDelete,
     });
