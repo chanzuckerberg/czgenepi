@@ -13,8 +13,7 @@ import { useEffect, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
-// TODO-TR (mlila): move the below imports to a generic location
-import { SortableHeader } from "../../../SamplesView/components/SamplesTable/components/SortableHeader";
+import { SortableHeader } from "src/views/Data/components/SortableHeader";
 import { generateWidthStyles } from "../../../SamplesView/components/SamplesTable";
 import {
   StyledCellBasic,
