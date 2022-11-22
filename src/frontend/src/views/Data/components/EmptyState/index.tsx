@@ -47,12 +47,12 @@ function FirstColumn() {
   );
 }
 
-function EmptyTable(numOfColumns = 0): JSX.Element {
+function EmptyTable({ numOfColumns }: Props): JSX.Element {
   return (
     <>
       {Array(10)
-        .fill()
-        .map((x, i) => (
+        .fill(0)
+        .map((_, i) => (
           <EmptyState key={i} numOfColumns={numOfColumns} />
         ))}
     </>

@@ -240,7 +240,7 @@ const DataSubview: FunctionComponent<Props> = ({
         {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
           <>
             <DownloadModal
-              checkedSamples={tableData.filter((sample) =>
+              checkedSamples={(tableData as Sample[]).filter((sample) =>
                 checkedSampleIds.includes(String(sample["publicId"]))
               )}
               failedSampleIds={failedSampleIds}

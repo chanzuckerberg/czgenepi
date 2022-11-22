@@ -69,6 +69,11 @@ const DownloadButton = ({
         SAMPLE_SUBHEADERS
       );
 
+      if (!data || data.length < 1) {
+        setTsvData([]);
+        return;
+      }
+
       const newTsvData = [data[0], ...data[1]];
       setTsvData(newTsvData);
     }

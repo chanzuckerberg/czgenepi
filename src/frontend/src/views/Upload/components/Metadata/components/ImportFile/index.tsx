@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { ParseResult as ParseResultEdit } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { StringToLocationFinder } from "src/common/utils/locationUtils";
@@ -17,6 +16,7 @@ import ImportFileWarnings, {
 } from "src/components/ImportFileWarnings";
 import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
 import { WARNING_CODE } from "src/components/WebformTable/common/types";
+import { ParseResult as ParseResultEdit } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
 import { Props as CommonProps } from "src/views/Upload/components/common/types";
 import Instructions from "./components/Instructions";
 import {
