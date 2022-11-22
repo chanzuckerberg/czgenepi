@@ -14,6 +14,8 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
+    QCMetricCaller,
+    MutationsCaller,
     LineageType,
     Sample,
     SampleLineage,
@@ -66,12 +68,16 @@ def cli(
             existing_qc_metric_q = (
                 sa.select(SampleQCMetric)
                 .join(SampleQCMetric.sample)
-                .filter(SampleQCMetric.sample == sample)
+                .filter(
+                    SampleQCMetric.sample == sample,
+                    SampleQCMetric.qc_caller == QCMetricCaller.NEXTCLADE,
+                    )
             )
             qc_metric = session.execute(existing_qc_metric_q).scalars().one_or_none()
             if qc_metric is None:
                 qc_metric = SampleQCMetric(
                     sample=sample,
+                    qc_caller=QCMetricCaller.NEXTCLADE,
                     qc_score=qc_score,
                     qc_status=qc_status,
                     raw_qc_output={key: value for key, value in row.items()},
@@ -95,12 +101,17 @@ def cli(
                 existing_mutation_q = (
                     sa.select(SampleMutation)
                     .join(SampleMutation.sample)
-                    .filter(SampleMutation.sample == sample)
+                    .filter(
+                        SampleMutation.sample == sample,
+                        SampleMutation.mutations_caller == MutationsCaller.NEXTCLADE,
+                        )
                 )
                 mutation = session.execute(existing_mutation_q).scalars().one_or_none()
+
                 if mutation is None:
                     mutation = SampleMutation(
                         sample=sample,
+                        mutations_caller=MutationsCaller.NEXTCLADE,
                         substitutions=row["substitutions"],
                         insertions=row["insertions"],
                         deletions=row["deletions"],
@@ -127,11 +138,16 @@ def cli(
                 existing_sample_lineage_q = (
                     sa.select(SampleLineage)
                     .join(SampleLineage.sample)
-                    .filter(SampleLineage.sample == sample)
+                    .filter(
+                        SampleLineage.sample == sample,
+                        SampleLineage.lineage_type == LineageType.NEXTCLADE,
+                        )
                 )
+
                 sample_lineage = (
                     session.execute(existing_sample_lineage_q).scalars().one_or_none()
                 )
+
                 if sample_lineage is None:
                     sample_lineage = SampleLineage(
                         sample=sample,
@@ -143,7 +159,6 @@ def cli(
                         reference_dataset_tag=dataset_info["tag"],
                     )
                 else:
-                    sample_lineage.lineage_type = LineageType.NEXTCLADE
                     sample_lineage.lineage_software_version = nextclade_version
                     sample_lineage.lineage = lineage
                     sample_lineage.reference_dataset_name = dataset_info["name"]
