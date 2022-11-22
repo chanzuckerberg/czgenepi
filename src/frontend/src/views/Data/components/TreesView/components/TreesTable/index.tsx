@@ -21,15 +21,13 @@ import {
 import TreeTableNameCell from "./components/TreeTableNameCell";
 import { StyledSortableHeader } from "./style";
 import { generateWidthStyles } from "src/common/utils";
+import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
   isLoading: boolean;
 }
 
-// TODO-TR (mlila): set fallback cell values when, eg, tree name not defined
-
-// TODO-TR (mlila): create a default cell & col def
 const columns: ColumnDef<PhyloRun, any>[] = [
   {
     id: "name",
@@ -147,6 +145,15 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
 
   const table = useReactTable({
     data: phyloRuns,
+    defaultColumn: {
+      cell: ({ getValue }) => (
+        <StyledCellBasic
+          verticalAlign="center"
+          shouldShowTooltipOnHover={false}
+          primaryText={getValue() || NO_CONTENT_FALLBACK}
+        />
+      ),
+    },
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),

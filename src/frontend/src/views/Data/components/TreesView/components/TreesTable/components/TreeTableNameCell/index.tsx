@@ -15,6 +15,7 @@ import {
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import NextstrainConfirmationModal from "src/views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/OpenInNextstrainButton/components/NextstrainConfirmationModal";
+import { NO_CONTENT_FALLBACK } from "src/views/Upload/components/common/constants";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
 import {
   CellWrapper,
@@ -141,7 +142,7 @@ const TreeTableNameCell = ({ item }: Props): JSX.Element => {
           </StyledTreeIconWrapper>
           <StyledNameWrapper>
             <span data-test-id="tree-status">
-              {name || "--"} <PhyloTreeStatusTag treeStatus={status} />
+              {name || NO_CONTENT_FALLBACK} <PhyloTreeStatusTag treeStatus={status} />
             </span>
             <StyledTreeCreator data-test-id="tree-creator-name">
               <Tooltip

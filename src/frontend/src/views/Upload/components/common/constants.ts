@@ -3,6 +3,8 @@ import { Pathogen } from "src/common/redux/types";
 import { SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS } from "src/components/DownloadMetadataTemplate/common/constants";
 import { SampleUploadTsvMetadata } from "src/components/DownloadMetadataTemplate/common/types";
 
+export const NO_CONTENT_FALLBACK = "--";
+
 // When parsing upload of metadata, we use a flipped version of SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS.
 // Note: there is a distinction between "real" `collectionLocation` internally
 // in app (it's an object) and user-submitted collectionLocation via metadata

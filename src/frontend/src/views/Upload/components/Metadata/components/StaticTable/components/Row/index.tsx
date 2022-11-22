@@ -2,6 +2,7 @@ import { Icon } from "czifui";
 import { memo } from "react";
 import { getNameFromCollectionLocation } from "src/common/utils/locationUtils";
 import { Metadata } from "src/components/WebformTable/common/types";
+import { NO_CONTENT_FALLBACK } from "src/views/Upload/components/common/constants";
 import { ValidationErrorRecord } from "../..";
 import {
   Id,
@@ -13,8 +14,6 @@ import {
   StyledAlertText,
   StyledExclamationMark,
 } from "./style";
-
-const NO_CONTENT_FALLBACK = "--";
 
 interface Props {
   id: string;
@@ -78,7 +77,7 @@ export default memo(function Row({
         <Id>{id}</Id>
       </StyledTableCell>
       <StyledTableCell>{validatedCellData.privateId}</StyledTableCell>
-      <StyledTableCell>{publicId || "--"}</StyledTableCell>
+      <StyledTableCell>{publicId || NO_CONTENT_FALLBACK}</StyledTableCell>
       <StyledTableCell>{validatedCellData.collectionDate}</StyledTableCell>
       <StyledTableCell>{validatedCellData.collectionLocation}</StyledTableCell>
       <StyledTableCell>{validatedCellData.sequencingDate}</StyledTableCell>
