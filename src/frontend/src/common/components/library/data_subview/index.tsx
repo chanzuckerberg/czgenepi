@@ -107,8 +107,6 @@ const DataSubview: FunctionComponent<Props> = ({
     useState<boolean>(false);
   const [isEditSampleConfirmationOpen, setEditSampleConfirmationOpen] =
     useState<boolean>(false);
-  // TODO (mlila): when table is refactored, this modal and related state should be moved closer
-  // TODO-TR          to the actions that cause the modal to open (search for TODO-TR)
   const [isDeleteTreeConfirmationOpen, setDeleteTreeConfirmationOpen] =
     useState<boolean>(false);
   const [phyloRunToDelete, setPhyloRunToDelete] = useState<PhyloRun>();

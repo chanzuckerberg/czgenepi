@@ -1,3 +1,5 @@
+import { ROUTES } from "../routes";
+
 interface Transform {
   key: string;
   inputs: string[];
@@ -14,6 +16,6 @@ interface DataCategory {
   renderer?: CustomRenderer;
   subheaders: Record<string, SubHeader[]>;
   text: VIEWNAME;
-  to: string;
+  to: ROUTES;
   transforms?: Transform[];
 }
