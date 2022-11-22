@@ -153,7 +153,7 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
         <StyledCellBasic
           verticalAlign="center"
           shouldShowTooltipOnHover={false}
-          primaryText={getValue() || NO_CONTENT_FALLBACK}
+          primaryText={(getValue() || NO_CONTENT_FALLBACK) as string}
         />
       ),
     },

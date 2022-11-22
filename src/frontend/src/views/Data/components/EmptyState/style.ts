@@ -96,7 +96,7 @@ export const Short = styled.div`
 `;
 
 export const Wrapper = styled.div`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
       margin: ${spaces?.xs}px ${spaces?.xxxs}px;

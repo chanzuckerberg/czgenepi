@@ -142,7 +142,8 @@ const TreeTableNameCell = ({ item }: Props): JSX.Element => {
           </StyledTreeIconWrapper>
           <StyledNameWrapper>
             <span data-test-id="tree-status">
-              {name || NO_CONTENT_FALLBACK} <PhyloTreeStatusTag treeStatus={status} />
+              {name || NO_CONTENT_FALLBACK}
+              <PhyloTreeStatusTag treeStatus={status} />
             </span>
             <StyledTreeCreator data-test-id="tree-creator-name">
               <Tooltip
