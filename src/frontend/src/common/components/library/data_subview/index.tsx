@@ -156,7 +156,6 @@ const DataSubview: FunctionComponent<Props> = ({
     setCheckedSampleIds([]);
   };
 
-  // TODO-TR
   const handleDeleteTreeModalClose = () => {
     setDeleteTreeConfirmationOpen(false);
   };
@@ -306,7 +305,6 @@ const DataSubview: FunctionComponent<Props> = ({
               defaultSortKey={defaultSortKey}
               headers={headers}
               renderer={renderer}
-              // TODO-TR (mlila): handler can be removed when tree delete modal moved
               handleDeleteTreeModalOpen={handleDeleteTreeModalOpen}
               handleEditTreeModalOpen={handleEditTreeModalOpen}
             />
