@@ -30,7 +30,7 @@ const SamplesView = (): JSX.Element => {
   const [displayedRows, setDisplayedRows] = useState<IdMap<Sample>>({});
 
   // load sample data from server
-  const { data: samples, isFetching, isLoading } = useSampleInfo();
+  const { data: samples, isLoading } = useSampleInfo();
 
   // only display rows that match the current search and the current filters
   useEffect(() => {
@@ -90,7 +90,7 @@ const SamplesView = (): JSX.Element => {
             />
           </StyledActionBar>
           <SamplesTable
-            isLoading={isLoading || isFetching}
+            isLoading={isLoading}
             data={displayedRows}
             setCheckedSamples={setCheckedSamples}
           />
