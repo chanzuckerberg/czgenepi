@@ -14,9 +14,9 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
-    QCMetricCaller,
-    MutationsCaller,
     LineageType,
+    MutationsCaller,
+    QCMetricCaller,
     Sample,
     SampleLineage,
     SampleMutation,
@@ -71,7 +71,7 @@ def cli(
                 .filter(
                     SampleQCMetric.sample == sample,
                     SampleQCMetric.qc_caller == QCMetricCaller.NEXTCLADE,
-                    )
+                )
             )
             qc_metric = session.execute(existing_qc_metric_q).scalars().one_or_none()
             if qc_metric is None:
@@ -104,7 +104,7 @@ def cli(
                     .filter(
                         SampleMutation.sample == sample,
                         SampleMutation.mutations_caller == MutationsCaller.NEXTCLADE,
-                        )
+                    )
                 )
                 mutation = session.execute(existing_mutation_q).scalars().one_or_none()
 
@@ -141,7 +141,7 @@ def cli(
                     .filter(
                         SampleLineage.sample == sample,
                         SampleLineage.lineage_type == LineageType.NEXTCLADE,
-                        )
+                    )
                 )
 
                 sample_lineage = (

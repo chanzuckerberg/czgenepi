@@ -5,6 +5,8 @@ from click.testing import CliRunner, Result
 from aspen.database.models import (
     Group,
     LineageType,
+    MutationsCaller,
+    QCMetricCaller,
     Sample,
     SampleLineage,
     SampleMutation,
@@ -68,6 +70,7 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     nextclade_csv: PosixPath = Path(Path(__file__).parent, "data", "nextclade.csv")
+    tag_json: PosixPath = Path(Path(__file__).parent, "data", "tag.json")
 
     runner: CliRunner = CliRunner()
     result: Result = runner.invoke(
@@ -75,10 +78,10 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
         [
             "--nextclade-csv",
             nextclade_csv,
+            "--nextclade-dataset-tag",
+            tag_json,
             "--nextclade-version",
             "v1.1",
-            "--group-name",
-            group.name,
             "--pathogen-slug",
             "MPX",
         ],
@@ -106,6 +109,10 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
     assert qc_metrics.qc_status == "good"
     assert qc_metrics.qc_software_version == "v1.1"
     assert lineage.lineage == "21J (Delta)"
+    # matched against value from test tag.json in test data directory
+    assert qc_metrics.reference_dataset_name == "sars-cov-2"
+    assert qc_metrics.reference_sequence_accession == "MN908947"
+    assert qc_metrics.reference_dataset_tag == "2022-11-15T12:00:00Z"
 
 
 def test_nextclade_save_overwrite(mocker, session, postgres_database):
@@ -114,13 +121,11 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     # create QC metrics, Mutations, and Lineage entries
-    sample = (
-        session.query(Sample)
-        .filter(Sample.public_identifier == "public_identifier_1")
-        .one()
-    )
+    # to simulate pre-existing records that should be overwritten.
+    sample = session.query(Sample).filter(Sample.id == 1).one()
     qc_metrics = SampleQCMetric(
         sample=sample,
+        qc_caller=QCMetricCaller.NEXTCLADE,
         qc_score="1",
         qc_status="mediocre",
         raw_qc_output="",
@@ -128,6 +133,7 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
     )
     mutation = SampleMutation(
         sample=sample,
+        mutations_caller=MutationsCaller.NEXTCLADE,
         substitutions="AA",
         insertions="BB",
         deletions="CC",
@@ -147,6 +153,7 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
     session.add(lineage)
     session.commit()
     nextclade_csv: PosixPath = Path(Path(__file__).parent, "data", "nextclade.csv")
+    tag_json: PosixPath = Path(Path(__file__).parent, "data", "tag.json")
 
     runner: CliRunner = CliRunner()
     result: Result = runner.invoke(
@@ -154,10 +161,10 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
         [
             "--nextclade-csv",
             nextclade_csv,
+            "--nextclade-dataset-tag",
+            tag_json,
             "--nextclade-version",
             "v1.1",
-            "--group-name",
-            group.name,
             "--pathogen-slug",
             "MPX",
         ],
@@ -169,11 +176,7 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
     session.close()
     session.begin()
 
-    sample = (
-        session.query(Sample)
-        .filter(Sample.public_identifier == "public_identifier_1")
-        .one()
-    )
+    sample = session.query(Sample).filter(Sample.id == 1).one()
 
     qc_metrics = (
         session.query(SampleQCMetric).filter(SampleQCMetric.sample == sample).one()
@@ -185,3 +188,7 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
     assert qc_metrics.qc_status == "good"
     assert qc_metrics.qc_software_version == "v1.1"
     assert lineage.lineage == "21J (Delta)"
+    # matched against value from test tag.json in test data directory
+    assert qc_metrics.reference_dataset_name == "sars-cov-2"
+    assert qc_metrics.reference_sequence_accession == "MN908947"
+    assert qc_metrics.reference_dataset_tag == "2022-11-15T12:00:00Z"
