@@ -6,7 +6,7 @@ import {
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { TREE_STATUS } from "src/common/constants/types";
-import { GalagoConfirmationModal } from "src/views/Data/components/GalagoConfirmationModal";
+import { GalagoConfirmationModal } from "./components/GalagoConfirmationModal";
 
 interface Props {
   item: PhyloRun;

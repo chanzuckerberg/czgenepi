@@ -2,7 +2,7 @@ import { isEmpty } from "lodash";
 import {
   ParseResult as ParseResultEdit,
   SampleIdToWarningMessages as SampleIdToWarningMessagesEdit,
-} from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
+} from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
 import { WebformTableTypeOptions as MetadataUploadTypeOption } from "src/components/WebformTable";
 import { ERROR_CODE } from "src/components/WebformTable/common/types";
 import Error from "src/views/Upload/components/Metadata/components/ImportFile/components/Alerts/Error";

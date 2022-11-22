@@ -1,10 +1,9 @@
 import {
-  AnalyticsTreeViewNextstrain,
+  AnalyticsTreeViewGalago,
   EVENT_TYPES,
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
-import { NewTabLink } from "src/common/components/library/NewTabLink";
-import nextstrainLogo from "src/common/images/nextstrain.png";
+import galagoLogo from "src/common/images/galago-logo-beta.png";
 import { ConfirmButton } from "src/views/Data/components/ConfirmButton";
 import { RedirectConfirmationModal } from "src/views/Data/components/RedirectConfirmationModal";
 
@@ -14,7 +13,7 @@ interface Props {
   treeId: number;
 }
 
-const NextstrainConfirmationModal = ({
+export const GalagoConfirmationModal = ({
   open,
   onClose,
   treeId,
@@ -22,19 +21,20 @@ const NextstrainConfirmationModal = ({
   const content = (
     <>
       By clicking “Continue” you agree to send a copy of your tree JSON to
-      Nextstrain’s visualization service. Nextstrain is a separate service from
-      CZ GEN EPI.{" "}
-      <NewTabLink href="https://nextstrain.org/">Learn More</NewTabLink>
+      Galago (Beta), a separate, but related service from CZ GEN EPI. Galago is
+      a serverless web application which runs entirely in the browser. Galago
+      does not store or share your data; however, you may choose to share the
+      URL with others.
     </>
   );
 
   const confirmButton = (
     <ConfirmButton
       treeId={treeId}
-      outgoingDestination="nextstrain"
+      outgoingDestination="galago"
       onClick={() =>
-        analyticsTrackEvent<AnalyticsTreeViewNextstrain>(
-          EVENT_TYPES.TREE_VIEW_NEXTSTRAIN,
+        analyticsTrackEvent<AnalyticsTreeViewGalago>(
+          EVENT_TYPES.TREE_VIEW_GALAGO,
           {
             tree_id: treeId,
           }
@@ -47,7 +47,7 @@ const NextstrainConfirmationModal = ({
     <RedirectConfirmationModal
       content={content}
       customConfirmButton={confirmButton}
-      img={nextstrainLogo}
+      img={galagoLogo}
       isOpen={open}
       onClose={onClose}
       onConfirm={onClose}
@@ -55,5 +55,3 @@ const NextstrainConfirmationModal = ({
     />
   );
 };
-
-export default NextstrainConfirmationModal;

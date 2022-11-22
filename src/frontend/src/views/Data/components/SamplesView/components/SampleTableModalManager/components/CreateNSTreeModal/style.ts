@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { FormControlLabel, Radio, TextField } from "@mui/material";
+import { FormControlLabel, Radio } from "@mui/material";
 import {
   CommonThemeProps,
   fontBodyS,
@@ -134,17 +134,6 @@ export const StyledDialogTitle = styled(DialogTitle)`
   }}
 `;
 
-export const StyledTextField = styled(TextField)`
-  color: black;
-  padding: 0px;
-  ${(props: CommonThemeProps) => {
-    const spaces = getSpaces(props);
-    return `
-      padding-bottom: ${spaces?.s}px;
-    `;
-  }}
-`;
-
 export const FieldTitle = styled.div`
   ${fontHeaderM}
   color: black;
@@ -206,19 +195,6 @@ export const TreeNameInfoWrapper = styled.div`
   }}
 `;
 
-export const TreeNameTooLongAlert = styled.div`
-  ${fontBodyXxxs}
-  display: flex;
-  align-items: center;
-  ${(props: CommonThemeProps) => {
-    const spaces = getSpaces(props);
-    return `
-      margin-top: ${spaces?.xxxs}px;
-      margin-bottom: ${spaces?.xl}px;
-    `;
-  }}
-`;
-
 export const CreateTreeInfo = styled.p`
   ${fontBodyXxs}
   ${(props: CommonThemeProps) => {
@@ -268,15 +244,6 @@ export const StyledTooltip = styled(Tooltip)`
   }}
 `;
 
-export const TextFieldAlert = styled.div`
-  ${(props: CommonThemeProps) => {
-    const colors = getColors(props);
-    return `
-      color: ${colors?.error[400]};
-    `;
-  }}
-`;
-
 interface FormControlProps extends CommonThemeProps {
   checked: boolean;
 }
@@ -309,7 +276,7 @@ export const StyledFooter = styled.div`
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
-      padding: ${spaces?.xl}px ${spaces?.xxl}px ${spaces?.xxl}px; 
+      padding: ${spaces?.xl}px ${spaces?.xxl}px ${spaces?.xxl}px;
     `;
   }}
 `;
