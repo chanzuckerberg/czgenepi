@@ -36,7 +36,8 @@ interface Props {
 const columns: ColumnDef<Sample, any>[] = [
   {
     id: "select",
-    size: 35,
+    size: 40,
+    minSize: 40,
     header: ({ table, column }) => {
       const {
         getIsAllRowsSelected,
@@ -347,7 +348,7 @@ const SamplesTable = ({
   const table = useReactTable({
     data: samples,
     defaultColumn: {
-      minSize: 50,
+      minSize: 150,
     },
     columns,
     enableMultiRowSelection: true,

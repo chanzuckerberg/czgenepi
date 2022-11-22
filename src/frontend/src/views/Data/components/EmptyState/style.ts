@@ -94,3 +94,12 @@ export const Short = styled.div`
   width: 70%;
   height: 9px;
 `;
+
+export const Wrapper = styled.div`
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      margin: ${spaces?.xs}px ${spaces?.xxxs}px;
+    `;
+  }}
+`;
