@@ -32,9 +32,11 @@ const columns: ColumnDef<PhyloRun, any>[] = [
   {
     id: "name",
     accessorKey: "name",
-    header: ({ header }) => (
+    minSize: 350,
+    header: ({ header, column }) => (
       <StyledSortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Tree Name",
           regularText:
@@ -50,6 +52,7 @@ const columns: ColumnDef<PhyloRun, any>[] = [
       </CellComponent>
     ),
     enableSorting: true,
+    sortingFn: "alphanumeric",
   },
   {
     id: "startedDate",
