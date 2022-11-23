@@ -211,11 +211,6 @@ async def test_submission_template_download_genbank_MPX(
     pathogen = random_pathogen_factory(slug="MPX")
     setup_gisaid_and_genbank_repo_configs(async_session, pathogen, "", "hMpxV")
 
-    pangolin_output = {
-        "scorpio_call": "B.1.167",
-        "scorpio_support": "0.775",
-        "qc_status": "pass",
-    }
     # Make multiple samples
     samples: List[Sample] = []
     uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
