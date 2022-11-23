@@ -173,11 +173,11 @@ class GenBankSubmissionFormTSVStreamer(FieldSeparatedStreamer):
         "isolation-source",
         "BioProject",
         "BioSample",
+        "isolation-source",
     ]
 
     preset_fields = {
         "host": "Homo sapiens",
-        "isolation-source": "Nasal/oral swab",
     }
 
     def __init__(self, filename: str, data: Iterable):
