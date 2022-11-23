@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import {
+  Callout,
   CommonThemeProps,
   fontBodyM,
   fontBodyS,
@@ -75,5 +76,15 @@ export const TooltipDescriptionText = styled.div`
     return `
       color: ${colors?.gray[400]};
   `;
+  }}
+`;
+
+export const StyledCallout = styled(Callout)`
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-top: ${spaces?.l}px;
+      width: 100%;
+    `;
   }}
 `;

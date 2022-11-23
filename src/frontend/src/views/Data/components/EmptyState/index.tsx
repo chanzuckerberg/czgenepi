@@ -7,6 +7,7 @@ import {
   Long,
   Short,
   Square,
+  Wrapper,
 } from "./style";
 
 interface Props {
@@ -53,7 +54,9 @@ function EmptyTable({ numOfColumns }: Props): JSX.Element {
       {Array(10)
         .fill(0)
         .map((_, i) => (
-          <EmptyState key={i} numOfColumns={numOfColumns} />
+          <Wrapper key={i}>
+            <EmptyState numOfColumns={numOfColumns} />
+          </Wrapper>
         ))}
     </>
   );

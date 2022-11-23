@@ -7,6 +7,7 @@ import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
+import { DataCategory, Transform } from "src/common/types/data";
 import {
   IdMap,
   reduceObjectArrayToLookupDict,

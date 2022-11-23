@@ -17,6 +17,7 @@ import {
   Container,
   Content,
   Header,
+  StyledCallout,
   Title,
   TooltipDescriptionText,
   TooltipHeaderText,
@@ -179,6 +180,13 @@ const DownloadModal = ({
                   </AlertBody>
                 </Alert>
               )}
+            {isGisaidSelected && checkedSamples.length > 1000 && (
+              <StyledCallout intent="warning">
+                The number of samples selected exceeds GISAID’s upload limit of
+                1000 samples. To avoid an error while submitting to GISIAD, we
+                recommend splitting your download into smaller batches.
+              </StyledCallout>
+            )}
             <DownloadButton
               checkedSamples={checkedSamples}
               isFastaSelected={isFastaSelected}
