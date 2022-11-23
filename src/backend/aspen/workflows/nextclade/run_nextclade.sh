@@ -40,7 +40,7 @@ echo "Nextclade run complete"
 
 pathogen_slug=$(jq --raw-output ".pathogen_slug" "${PATHOGEN_INFO_FILE}")
 # save results back to db
-/usr/local/bin/python3.10 save.py \
+/usr/local/bin/python3.10 /usr/src/app/aspen/workflows/nextclade/save.py \
     --nextclade-csv "${NEXTCLADE_OUTPUT_DIR}/nextclade.csv" \
     --nextclade-dataset-tag "${NEXTCLADE_DATASET_DIR}/${DATASET_TAG_FILE}" \
     --nextclade-version "$(nextclade --version)" \
