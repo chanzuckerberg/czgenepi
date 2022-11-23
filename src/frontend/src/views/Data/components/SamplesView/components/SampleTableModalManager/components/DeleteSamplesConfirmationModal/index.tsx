@@ -1,5 +1,4 @@
 import { isEmpty } from "lodash";
-import { useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { useDeleteSamples } from "src/common/queries/samples";
 import { addNotification } from "src/common/redux/actions";
