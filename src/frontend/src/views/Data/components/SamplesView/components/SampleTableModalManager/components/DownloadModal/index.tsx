@@ -43,7 +43,7 @@ const DownloadModal = ({
   const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
   const state = store.getState();
   const pathogen = selectCurrentPathogen(state);
-  const isGisaidTemplateEnabled = pathogen === "SC2" ? true : false;
+  const isGisaidTemplateEnabled = pathogen ===Pathogen.COVID;
 
   const completedSampleIds = checkedSamples
     .filter((sample) => !failedSampleIds.includes(sample.publicId))
