@@ -209,9 +209,7 @@ async def test_submission_template_download_genbank_MPX(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen = random_pathogen_factory(slug="MPX")
-    setup_gisaid_and_genbank_repo_configs(
-        async_session, pathogen, "", "hMpxV"
-    )
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen, "", "hMpxV")
 
     pangolin_output = {
         "scorpio_call": "B.1.167",
@@ -235,7 +233,7 @@ async def test_submission_template_download_genbank_MPX(
         )
         uploaded_pathogen_genomes.append(
             uploaded_pathogen_genome_factory(
-                samples[i] #, pangolin_output=pangolin_output
+                samples[i]  # , pangolin_output=pangolin_output
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
@@ -267,10 +265,7 @@ async def test_submission_template_download_genbank_MPX(
     assert set(tsvreader.fieldnames) == set(GenBankSubmissionFormTSVStreamer.fields)  # type: ignore
     row_count = 0
     for row in tsvreader:
-        assert (
-            row["Sequence_ID"]
-            == f"hMpxV/{samples[row_count].public_identifier}"
-        )
+        assert row["Sequence_ID"] == f"hMpxV/{samples[row_count].public_identifier}"
         assert row["collection-date"] == samples[row_count].collection_date.strftime(
             "%Y-%m-%d"
         )
@@ -278,7 +273,6 @@ async def test_submission_template_download_genbank_MPX(
         assert row["isolation-source"] == "clinical"
         row_count += 1
     assert row_count == len(samples)
-
 
 
 async def test_submission_template_prefix_stripping(

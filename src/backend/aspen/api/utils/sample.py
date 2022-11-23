@@ -293,7 +293,9 @@ def sample_info_to_gisaid_rows(
 
 
 def sample_info_to_genbank_rows(
-    submission_information: List[Dict[str, Any]], pathogen_prefix: str, pathogen_slug: str
+    submission_information: List[Dict[str, Any]],
+    pathogen_prefix: str,
+    pathogen_slug: str,
 ) -> List[Dict[str, str]]:
     genbank_metadata_rows = []
     for sample_info in submission_information:
@@ -309,9 +311,9 @@ def sample_info_to_genbank_rows(
                 sample_info["public_identifier"], pathogen_prefix
             ),
         }
-        if pathogen_slug == "SC2": 
+        if pathogen_slug == "SC2":
             metadata_row["isolation-source"] = "Nasal/oral swab"
-        else: 
+        else:
             metadata_row["isolation-source"] = "clinical"
         genbank_metadata_rows.append(metadata_row)
     return genbank_metadata_rows
