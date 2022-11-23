@@ -1,8 +1,11 @@
 import { Alert, Icon, Link } from "czifui";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { Pathogen } from "src/common/redux/types";
 import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
@@ -40,6 +43,8 @@ const DownloadModal = ({
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
   const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
+  const pathogen = useSelector(selectCurrentPathogen);
+  const isGisaidTemplateEnabled = pathogen === Pathogen.COVID;
 
   const completedSampleIds = checkedSamples
     .filter((sample) => !failedSampleIds.includes(sample.publicId))
@@ -128,25 +133,25 @@ const DownloadModal = ({
                 Date, Sequencing Date, Lineage, GISAID Status, and ISL Accession
                 #.
               </DownloadMenuSelection>
-
-              <DownloadMenuSelection
-                id="download-gisaid-checkbox"
-                isChecked={isGisaidSelected}
-                onChange={handleGisaidClick}
-                downloadTitle="GISAID Submission Template"
-                fileTypes=".fasta, .tsv"
-              >
-                Download concatenated consensus genomes and metadata files
-                formatted to prepare samples for submission to GISAID.{" "}
-                <Link
-                  href="https://help.czgenepi.org/hc/en-us/articles/8179880474260"
-                  target="_blank"
-                  rel="noreferrer"
+              {isGisaidTemplateEnabled && (
+                <DownloadMenuSelection
+                  id="download-gisaid-checkbox"
+                  isChecked={isGisaidSelected}
+                  onChange={handleGisaidClick}
+                  downloadTitle="GISAID Submission Template"
+                  fileTypes=".fasta, .tsv"
                 >
-                  Learn More.
-                </Link>
-              </DownloadMenuSelection>
-
+                  Download concatenated consensus genomes and metadata files
+                  formatted to prepare samples for submission to GISAID.{" "}
+                  <Link
+                    href="https://help.czgenepi.org/hc/en-us/articles/8179880474260"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Learn More.
+                  </Link>
+                </DownloadMenuSelection>
+              )}
               <DownloadMenuSelection
                 id="download-genbank-checkbox"
                 isChecked={isGenbankSelected}
