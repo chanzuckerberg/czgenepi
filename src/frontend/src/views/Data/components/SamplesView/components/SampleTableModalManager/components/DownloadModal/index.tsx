@@ -1,10 +1,11 @@
 import { Alert, Icon, Link } from "czifui";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import { store } from "src/common/redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { Pathogen } from "src/common/redux/types";
 import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
@@ -41,9 +42,8 @@ const DownloadModal = ({
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
   const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
-  const state = store.getState();
-  const pathogen = selectCurrentPathogen(state);
-  const isGisaidTemplateEnabled = pathogen ===Pathogen.COVID;
+  const pathogen = useSelector(selectCurrentPathogen);
+  const isGisaidTemplateEnabled = pathogen === Pathogen.COVID;
 
   const completedSampleIds = checkedSamples
     .filter((sample) => !failedSampleIds.includes(sample.publicId))
