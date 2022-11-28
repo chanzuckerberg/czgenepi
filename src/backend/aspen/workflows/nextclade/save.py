@@ -58,11 +58,7 @@ def cli(
             qc_score = row["qc.overallScore"]
             qc_status = row["qc.overallStatus"]
             if not is_result_valid:
-                # HACK Setting `qc_score` to empty string is a bit of an abuse.
-                # DB has that field as a non-nullable string, but Nextclade's
-                # qc.overallScore is actually a number. We store CSV text of
-                # that number, so this is a compromise to indicate no result.
-                qc_score = ""
+                qc_score = None
                 qc_status = INVALID_RESULT_STATUS
 
             existing_qc_metric_q = (
