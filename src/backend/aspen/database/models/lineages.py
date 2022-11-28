@@ -152,7 +152,8 @@ class SampleQCMetric(idbase):  # type: ignore
         ForeignKey(_QCMetricCallerTable.item_id),
         nullable=False,
     )
-    qc_score = Column(String, nullable=False)
+    # If a QC call comes back invalid for a sample, `qc_score` is set to NULL
+    qc_score = Column(String, nullable=True)
     qc_software_version = Column(String, nullable=False)
     qc_status = Column(String, nullable=False)
     raw_qc_output = Column(JSONB, nullable=True)
