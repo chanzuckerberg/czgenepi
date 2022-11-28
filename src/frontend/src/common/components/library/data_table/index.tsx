@@ -259,7 +259,6 @@ export const DataTable: FunctionComponent<Props> = ({
   const sampleRow = (item: TableItem): React.ReactNode => {
     return headers.map((header, index) => {
       const value = item[header.key];
-      // TODO-TR this can be removed when delete tree modal is moved
       const onDeleteTreeModalOpen = isSampleTable
         ? noop
         : handleDeleteTreeModalOpen;

@@ -13,31 +13,30 @@ import { useEffect, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
-// TODO-TR (mlila): move the below imports to a generic location
-import { SortableHeader } from "../../../SamplesView/components/SamplesTable/components/SortableHeader";
-import { generateWidthStyles } from "../../../SamplesView/components/SamplesTable";
+import { SortableHeader } from "src/views/Data/components/SortableHeader";
 import {
   StyledCellBasic,
   StyledTableRow,
 } from "../../../SamplesView/components/SamplesTable/style";
 import TreeTableNameCell from "./components/TreeTableNameCell";
 import { StyledSortableHeader } from "./style";
+import { generateWidthStyles } from "src/common/utils";
+import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
   isLoading: boolean;
 }
 
-// TODO-TR (mlila): set fallback cell values when, eg, tree name not defined
-
-// TODO-TR (mlila): create a default cell & col def
 const columns: ColumnDef<PhyloRun, any>[] = [
   {
     id: "name",
     accessorKey: "name",
-    header: ({ header }) => (
+    minSize: 350,
+    header: ({ header, column }) => (
       <StyledSortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Tree Name",
           regularText:
@@ -53,6 +52,7 @@ const columns: ColumnDef<PhyloRun, any>[] = [
       </CellComponent>
     ),
     enableSorting: true,
+    sortingFn: "alphanumeric",
   },
   {
     id: "startedDate",
@@ -148,6 +148,15 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
 
   const table = useReactTable({
     data: phyloRuns,
+    defaultColumn: {
+      cell: ({ getValue }) => (
+        <StyledCellBasic
+          verticalAlign="center"
+          shouldShowTooltipOnHover={false}
+          primaryText={(getValue() || NO_CONTENT_FALLBACK) as string}
+        />
+      ),
+    },
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),

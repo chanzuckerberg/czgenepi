@@ -14,7 +14,7 @@ const TreesView = (): JSX.Element => {
 
   // load tree data from server
   const phyloRunResponse = usePhyloRunInfo();
-  const { data: phyloRuns, isLoading, isFetching } = phyloRunResponse;
+  const { data: phyloRuns, isLoading } = phyloRunResponse;
 
   return (
     <>
@@ -28,7 +28,7 @@ const TreesView = (): JSX.Element => {
           />
           <TreeCreateHelpLink />
         </Flex>
-        <TreesTable isLoading={isLoading || isFetching} data={displayedRows} />
+        <TreesTable isLoading={isLoading} data={displayedRows} />
       </MaxWidth>
     </>
   );

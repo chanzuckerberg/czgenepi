@@ -1,7 +1,8 @@
-// TODO-TR (mlila): delete this after samples table refactor
-/* eslint-disable react/display-name */
+import { Column } from "@tanstack/react-table";
+import { CSSProperties } from "react";
 import { UNDEFINED_TEXT } from "../components/library/data_table";
 
+// TODO-TR (mlila): delete this after samples table refactor
 export function createTableCellRenderer(
   customRenderers: Record<string, CellRenderer>,
   defaultRenderer: CellRenderer
@@ -30,3 +31,11 @@ export function createTableCellRenderer(
     });
   };
 }
+
+export const generateWidthStyles = (
+  column: Column<any, any>
+): CSSProperties => {
+  return {
+    width: `${column.getSize()}px`,
+  };
+};

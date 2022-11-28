@@ -1,4 +1,5 @@
 import { Getter } from "@tanstack/react-table";
+import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 import { StyledCellBasic } from "../../style";
 
 // * This file should not be changed unless you intend the change the basic default behavior
@@ -12,7 +13,7 @@ interface DefaultCellProps {
 export const DefaultCell = ({ getValue }: DefaultCellProps): JSX.Element => (
   <StyledCellBasic
     shouldTextWrap
-    primaryText={getValue()}
+    primaryText={getValue() || NO_CONTENT_FALLBACK}
     primaryTextWrapLineCount={2}
     shouldShowTooltipOnHover={false}
   />
