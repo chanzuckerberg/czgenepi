@@ -6,6 +6,7 @@ workflow lineage_qc_ondemand {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
+        String pathogen_slug
         Array[Int] sample_ids
     }
 
@@ -15,6 +16,7 @@ workflow lineage_qc_ondemand {
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
+        pathogen_slug = pathogen_slug,
         sample_ids = sample_ids,
     }
 }
@@ -25,6 +27,7 @@ task lineage_qc_ondemand_workflow {
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
+        String pathogen_slug
         Array[Int] sample_ids
     }
 
@@ -46,6 +49,7 @@ task lineage_qc_ondemand_workflow {
     mkdir "${WORKING_DIR}"
     cd "${WORKING_DIR}"
 
+    export PATHOGEN_SLUG="~{pathogen_slug}"
     export SAMPLE_IDS_FILENAME="sample_ids.txt"
     # While `sample_ids` is Array[Int], WDL auto coerces to strings, as we want
     echo "~{sep('\n', sample_ids)}" > $SAMPLE_IDS_FILENAME
