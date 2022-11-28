@@ -8,6 +8,7 @@ import json
 from typing import IO, Iterable, Optional
 
 import click
+import sqlalchemy as sa
 from sqlalchemy.orm import joinedload
 
 from aspen.config.config import Config
@@ -21,12 +22,14 @@ from aspen.database.models import Pathogen, Sample, UploadedPathogenGenome
 
 
 @click.command("export")
+@click.option("pathogen_slug", "--pathogen-slug", type=str, required=True)
 @click.option("sample_ids_fh", "--sample-ids-file", type=click.File("r"), required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
 @click.option(
     "pathogen_info_fh", "--pathogen-info-file", type=click.File("w"), required=True
 )
 def cli(
+    pathogen_slug: str,
     sample_ids_fh: io.TextIOBase,
     sequences_fh: io.TextIOBase,
     pathogen_info_fh: IO[str],
@@ -34,8 +37,10 @@ def cli(
     """
     Writes out a FASTA for the specified samples.
 
+    - pathogen_slug: Pathogen.slug for pathogen we are running Nextclade on
     - sample_ids_fh: A file of sample ID primary keys, one ID per line.
         Each sample must be for the same pathogen (all SARS-CoV-2, etc)
+        and match against whatever `pathogen_slug` is.
     - sequences_fh: Output file to write FASTA for above samples.
         NOTE Resulting FASTA will have its id lines (>) be those primary keys,
         so anything that consumes these downstream results will be referring
@@ -43,9 +48,17 @@ def cli(
     - pathogen_info_fh: Write out pathogen info for later use in workflow
     """
     sample_ids: list[int] = [int(id_line) for id_line in sample_ids_fh]
-    print("Fetching and writing FASTA for sample ids:", sample_ids)
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
+        print(f"Getting pathogen data for {pathogen_slug}")
+        target_pathogen_query: Pathogen = (
+            sa.select(Pathogen).filter(Pathogen.slug == pathogen_slug)
+        )
+        target_pathogen = session.execute(target_pathogen_query).scalars().one()
+        save_pathogen_info(pathogen_info_fh, target_pathogen)
+
+        print("Fetching and writing FASTA for sample ids:", sample_ids)
+        # TODO update to SQLAlchemyV2 syntax
         all_samples: Iterable[Sample] = (
             session.query(Sample)
             .filter(Sample.id.in_(sample_ids))
@@ -56,25 +69,17 @@ def cli(
             )
         )
 
-        # Should pick it up as we run through samples. If missing at end, raise
-        pathogen_of_all_samples: Optional[Pathogen] = None
         for sample in all_samples:
-
-            # `.pathogen` access is lazy, but only accesses once per pathogen
-            # type, so not an N+1 query issue where we need eager load.
-            pathogen: Pathogen = sample.pathogen
-            if pathogen_of_all_samples is None:
-                pathogen_of_all_samples = pathogen
-            # Safety: ensure all samples are same pathogen before Nextclade run
-            if pathogen != pathogen_of_all_samples:
+            # Ensure all samples are expected pathogen before Nextclade run
+            if sample.pathogen_id != target_pathogen.id:
                 err_msg = (
-                    f"ERROR -- Encountered differing pathogen types in list "
-                    f"of samples. Encountered both {pathogen.slug} and "
-                    f"{pathogen_of_all_samples.slug} in given samples. There "
+                    f"ERROR -- Encountered unexpected pathogen in samples. "
+                    f"Expected Pathogen.slug {pathogen_slug}, but encountered "
+                    f"{sample.pathogen.slug} in given samples. There "
                     f"may also be others, this is just first difference found."
                 )
                 print(err_msg)
-                raise RuntimeError("Samples given are not all same pathogen")
+                raise RuntimeError("Samples do not match target pathogen")
 
             uploaded_pathogen_genome = sample.uploaded_pathogen_genome
             # Samples _should_ always have uploaded_pathogen_genome with
@@ -97,10 +102,6 @@ def cli(
             sequences_fh.write("\n")
 
         print("Finished writing FASTA for samples.")
-        if pathogen_of_all_samples is None:
-            raise ValueError("No pathogen data available for samples")
-        save_pathogen_info(pathogen_info_fh, pathogen_of_all_samples)
-
 
 def save_pathogen_info(pathogen_info_fh: IO[str], pathogen: Pathogen):
     """Write a JSON of important pathogen info for use later in workflow."""
@@ -110,8 +111,6 @@ def save_pathogen_info(pathogen_info_fh: IO[str], pathogen: Pathogen):
         # When that happens, will be None/null
         "nextclade_dataset_name": pathogen.nextclade_dataset_name,
     }
-    # Make it available in logs for debugging ease
-    print("Info about pathogen in these samples:", pathogen_info)
     json.dump(pathogen_info, pathogen_info_fh)
 
 
