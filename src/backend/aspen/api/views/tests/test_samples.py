@@ -17,6 +17,8 @@ from aspen.database.models import (
     Sample,
     UploadedPathogenGenome,
     User,
+    SampleLineage,
+    SampleQCMetric
 )
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import pathogen_factory, random_pathogen_factory
@@ -29,6 +31,8 @@ from aspen.test_infra.models.usergroup import (
     grouprole_factory,
     userrole_factory,
 )
+from aspen.test_infra.models.lineage import sample_lineage_factory
+from aspen.test_infra.models.sample_qc_metrics import sample_qc_metrics_factory
 from aspen.util.split import SplitClient
 
 # All test coroutines will be treated as marked.
@@ -59,6 +63,8 @@ async def test_samples_list(
     # Make multiple samples
     samples: List[Sample] = []
     uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
+    qc_metrics: List[SampleQCMetric] = []
+    sample_lineages: List[SampleLineage] = []
     for i in range(4):
         pathogen = sc2 if i < 2 else mpx
         samples.append(
@@ -77,6 +83,10 @@ async def test_samples_list(
                 samples[i], pangolin_output=pangolin_output
             )
         )
+        qc_metrics.append(
+            sample_qc_metrics_factory(samples[i], qc_score=f"{i}")
+        )
+        sample_lineages.append(sample_lineage_factory(samples[i]))
 
     async_session.add(group)
     await async_session.commit()
@@ -137,6 +147,7 @@ async def test_samples_list(
                     "pathogen": pathogen_data,
                     "private_identifier": samples[i].private_identifier,
                     "public_identifier": samples[i].public_identifier,
+                    "uploaded_by": {"id": user.id, "name": user.name},
                     "upload_date": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genomes[i].upload_date
                     ),
@@ -159,7 +170,13 @@ async def test_samples_list(
                         "id": group.id,
                         "name": group.name,
                     },
-                    "uploaded_by": {"id": user.id, "name": user.name},
+                    "qc_metrics": [
+                        {'id': qc_metrics[i].id, 'qc_score': qc_metrics[i].qc_score, 'qc_software_version': qc_metrics[i].qc_software_version, 'qc_status': qc_metrics[i].qc_status}
+                    ],
+                    "lineages": [
+                        {'id': sample_lineages[i].id, 'lineage_type': sample_lineages[i].lineage_type.value, 'lineage': sample_lineages[i].lineage, 'lineage_software_version': sample_lineages[i].lineage_software_version, 'lineage_probability': sample_lineages[i].lineage_probability, 'raw_lineage_output': sample_lineages[i].raw_lineage_output}
+                    ],
+                    
                 }
                 for i in params["id_range"]  # type: ignore
             ]
@@ -238,6 +255,8 @@ async def test_samples_view_gisaid_rejected(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }
@@ -308,6 +327,8 @@ async def test_samples_view_gisaid_no_info(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }
@@ -373,6 +394,8 @@ async def test_samples_view_gisaid_not_eligible(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }
@@ -525,6 +548,8 @@ async def test_samples_view_cansee_all(
                 "id": 1,
                 "name": "test",
             },
+            "qc_metrics": [],
+            "lineages": [],
         }
     ]
 
@@ -594,6 +619,8 @@ async def test_samples_view_no_pangolin(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }

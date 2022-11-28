@@ -8,6 +8,7 @@ from aspen.api.schemas.base import BaseRequest, BaseResponse
 from aspen.api.schemas.locations import LocationResponse
 from aspen.api.schemas.pathogens import PathogenResponse
 from aspen.api.utils import format_sample_lineage
+from aspen.database.models import LineageType
 
 SEQUENCE_VALIDATION_REGEX = r"^[WSKMYRVHDBNZNATCGUwskmyrvhdbnznatcgu-]+$"
 
@@ -31,6 +32,14 @@ class SampleLineageResponse(BaseResponse):
     scorpio_support: Optional[float]
     qc_status: Optional[str]
 
+#TODO: make this the main SampleLineagResponse once we've moved away from lineages stored on uploadedpathogengenome class
+class SampleLineageResponse2(BaseResponse):
+    id: int
+    lineage_type: Optional[LineageType]
+    lineage: Optional[str]
+    lineage_software_version: Optional[str]
+    lineage_probability: Optional[float]
+    raw_lineage_output: Optional[dict]
 
 class SampleGroupResponse(BaseResponse):
     class Config:
@@ -38,6 +47,15 @@ class SampleGroupResponse(BaseResponse):
 
     id: int
     name: str
+
+class SampleQCMetricsResponse(BaseResponse):
+    class Config:
+        orm_mode = True
+    
+    id: int
+    qc_score: str
+    qc_software_version: str
+    qc_status: str
 
 
 class SampleUserResponse(BaseResponse):
@@ -93,6 +111,9 @@ class SampleResponse(BaseResponse):
     submitting_group: SampleGroupResponse
     uploaded_by: SampleUserResponse
     upload_date: Optional[datetime.datetime]
+    lineage: SampleLineageResponse
+    lineages: Optional[List[SampleLineageResponse2]]  # TODO: make non optional once tables have been initially populated
+    qc_metrics: Optional[List[SampleQCMetricsResponse]]  # TODO: make non optional once tables have been initially populated
 
 
 class SampleBulkDeleteRequest(BaseRequest):

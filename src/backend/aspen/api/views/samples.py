@@ -75,6 +75,8 @@ async def list_samples(
         selectinload(Sample.collection_location),
         selectinload(Sample.accessions),
         selectinload(Sample.pathogen),
+        selectinload(Sample.lineages),
+        selectinload(Sample.qc_metrics)
     )
     user_visible_samples_query = user_visible_samples_query.filter(
         Sample.pathogen_id == pathogen.id
@@ -84,6 +86,7 @@ async def list_samples(
         user_visible_samples_result.unique().scalars().all()
     )
 
+    
     # populate sample object using pydantic response schema
     result = SamplesResponse(samples=[])
     tot_rows = 0
@@ -96,7 +99,7 @@ async def list_samples(
         # TODO - convert this to an oso check.
         if sample.submitting_group_id == ac.group.id:  # type: ignore
             sample.show_private_identifier = True
-
+        
         sampleinfo = SampleResponse.from_orm(sample)
         result.samples.append(sampleinfo)
     return result
