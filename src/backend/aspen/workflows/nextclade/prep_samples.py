@@ -63,7 +63,7 @@ def cli(
             session.query(Sample)
             .filter(Sample.id.in_(sample_ids))
             .options(
-                joinedload(Sample.uploaded_pathogen_genome).undefer(
+                joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
                     UploadedPathogenGenome.sequence
                 ),
             )
@@ -82,20 +82,6 @@ def cli(
                 raise RuntimeError("Samples do not match target pathogen")
 
             uploaded_pathogen_genome = sample.uploaded_pathogen_genome
-            # Samples _should_ always have uploaded_pathogen_genome with
-            # sequence data on them in theory, but if it's missing, blow up.
-            if uploaded_pathogen_genome is None:
-                err_msg = (
-                    f"ERROR -- Specified sample (id={sample.id}) is missing an "
-                    f"associated uploaded_pathogen_genome. Cannot export FASTA "
-                    f"for that sample. There may be other samples missing "
-                    f"sequence data as well, this is just first encountered."
-                )
-                print(err_msg)
-                raise RuntimeError(
-                    f"sample.id={sample.id} missing genome sequence data"
-                )
-
             stripped_sequence = uploaded_pathogen_genome.get_stripped_sequence()
             sequences_fh.write(f">{sample.id}\n")  # type: ignore
             sequences_fh.write(stripped_sequence)
