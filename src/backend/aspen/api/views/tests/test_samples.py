@@ -15,24 +15,24 @@ from aspen.database.models import (
     Location,
     Pathogen,
     Sample,
+    SampleLineage,
+    SampleQCMetric,
     UploadedPathogenGenome,
     User,
-    SampleLineage,
-    SampleQCMetric
 )
+from aspen.test_infra.models.lineage import sample_lineage_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import pathogen_factory, random_pathogen_factory
 from aspen.test_infra.models.repo_metadata import repo_metadata_factory
 from aspen.test_infra.models.repository import random_default_repo_factory
 from aspen.test_infra.models.sample import sample_factory
+from aspen.test_infra.models.sample_qc_metrics import sample_qc_metrics_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import (
     group_factory,
     grouprole_factory,
     userrole_factory,
 )
-from aspen.test_infra.models.lineage import sample_lineage_factory
-from aspen.test_infra.models.sample_qc_metrics import sample_qc_metrics_factory
 from aspen.util.split import SplitClient
 
 # All test coroutines will be treated as marked.
@@ -83,9 +83,7 @@ async def test_samples_list(
                 samples[i], pangolin_output=pangolin_output
             )
         )
-        qc_metrics.append(
-            sample_qc_metrics_factory(samples[i], qc_score=f"{i}")
-        )
+        qc_metrics.append(sample_qc_metrics_factory(samples[i], qc_score=f"{i}"))
         sample_lineages.append(sample_lineage_factory(samples[i]))
 
     async_session.add(group)
@@ -171,12 +169,27 @@ async def test_samples_list(
                         "name": group.name,
                     },
                     "qc_metrics": [
-                        {'id': qc_metrics[i].id, 'qc_score': qc_metrics[i].qc_score, 'qc_software_version': qc_metrics[i].qc_software_version, 'qc_status': qc_metrics[i].qc_status}
+                        {
+                            "id": qc_metrics[i].id,
+                            "qc_score": qc_metrics[i].qc_score,
+                            "qc_software_version": qc_metrics[i].qc_software_version,
+                            "qc_status": qc_metrics[i].qc_status,
+                        }
                     ],
                     "lineages": [
-                        {'id': sample_lineages[i].id, 'lineage_type': sample_lineages[i].lineage_type.value, 'lineage': sample_lineages[i].lineage, 'lineage_software_version': sample_lineages[i].lineage_software_version, 'lineage_probability': sample_lineages[i].lineage_probability, 'raw_lineage_output': sample_lineages[i].raw_lineage_output}
+                        {
+                            "id": sample_lineages[i].id,
+                            "lineage_type": sample_lineages[i].lineage_type.value,
+                            "lineage": sample_lineages[i].lineage,
+                            "lineage_software_version": sample_lineages[
+                                i
+                            ].lineage_software_version,
+                            "lineage_probability": sample_lineages[
+                                i
+                            ].lineage_probability,
+                            "raw_lineage_output": sample_lineages[i].raw_lineage_output,
+                        }
                     ],
-                    
                 }
                 for i in params["id_range"]  # type: ignore
             ]

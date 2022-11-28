@@ -32,7 +32,8 @@ class SampleLineageResponse(BaseResponse):
     scorpio_support: Optional[float]
     qc_status: Optional[str]
 
-#TODO: make this the main SampleLineagResponse once we've moved away from lineages stored on uploadedpathogengenome class
+
+# TODO: make this the main SampleLineagResponse once we've moved away from lineages stored on uploadedpathogengenome class
 class SampleLineageResponse2(BaseResponse):
     id: int
     lineage_type: Optional[LineageType]
@@ -41,6 +42,7 @@ class SampleLineageResponse2(BaseResponse):
     lineage_probability: Optional[float]
     raw_lineage_output: Optional[dict]
 
+
 class SampleGroupResponse(BaseResponse):
     class Config:
         orm_mode = True
@@ -48,10 +50,11 @@ class SampleGroupResponse(BaseResponse):
     id: int
     name: str
 
+
 class SampleQCMetricsResponse(BaseResponse):
     class Config:
         orm_mode = True
-    
+
     id: int
     qc_score: str
     qc_software_version: str
@@ -112,8 +115,12 @@ class SampleResponse(BaseResponse):
     uploaded_by: SampleUserResponse
     upload_date: Optional[datetime.datetime]
     lineage: SampleLineageResponse
-    lineages: Optional[List[SampleLineageResponse2]]  # TODO: make non optional once tables have been initially populated
-    qc_metrics: Optional[List[SampleQCMetricsResponse]]  # TODO: make non optional once tables have been initially populated
+    lineages: Optional[
+        List[SampleLineageResponse2]
+    ]  # TODO: make non optional once tables have been initially populated
+    qc_metrics: Optional[
+        List[SampleQCMetricsResponse]
+    ]  # TODO: make non optional once tables have been initially populated
 
 
 class SampleBulkDeleteRequest(BaseRequest):
