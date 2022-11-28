@@ -23,6 +23,8 @@ def upgrade():
     )  # on conflict do nothing is because in local dev we already have MPX in the database
 
     op.execute("select nextval('aspen.pathogen_repo_configs_id_seq')")
+    op.execute("select nextval('aspen.pathogen_repo_configs_id_seq')")
+
     op.execute(
         """
         INSERT INTO aspen.pathogen_repo_configs (prefix, public_repository_id, pathogen_id) VALUES
