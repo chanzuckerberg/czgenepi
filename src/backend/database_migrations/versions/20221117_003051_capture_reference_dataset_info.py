@@ -53,20 +53,10 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_column(
-        "sample_qc_metrics", "reference_dataset_tag", schema="aspen"
-    )
-    op.drop_column(
-        "sample_qc_metrics", "reference_sequence_accession", schema="aspen"
-    )
-    op.drop_column(
-        "sample_qc_metrics", "reference_dataset_name", schema="aspen"
-    )
-    op.drop_column(
-        "sample_mutations", "reference_sequence_accession", schema="aspen"
-    )
+    op.drop_column("sample_qc_metrics", "reference_dataset_tag", schema="aspen")
+    op.drop_column("sample_qc_metrics", "reference_sequence_accession", schema="aspen")
+    op.drop_column("sample_qc_metrics", "reference_dataset_name", schema="aspen")
+    op.drop_column("sample_mutations", "reference_sequence_accession", schema="aspen")
     op.drop_column("sample_lineages", "reference_dataset_tag", schema="aspen")
-    op.drop_column(
-        "sample_lineages", "reference_sequence_accession", schema="aspen"
-    )
+    op.drop_column("sample_lineages", "reference_sequence_accession", schema="aspen")
     op.drop_column("sample_lineages", "reference_dataset_name", schema="aspen")
