@@ -5,7 +5,7 @@ Core approach here is a copy of what's in workflows/pangolin/export.py.
 """
 import io
 import json
-from typing import IO, Iterable, Optional
+from typing import IO, Iterable
 
 import click
 import sqlalchemy as sa
@@ -51,8 +51,8 @@ def cli(
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
         print(f"Getting pathogen data for {pathogen_slug}")
-        target_pathogen_query: Pathogen = (
-            sa.select(Pathogen).filter(Pathogen.slug == pathogen_slug)
+        target_pathogen_query: Pathogen = sa.select(Pathogen).filter(
+            Pathogen.slug == pathogen_slug
         )
         target_pathogen = session.execute(target_pathogen_query).scalars().one()
         save_pathogen_info(pathogen_info_fh, target_pathogen)
@@ -81,13 +81,17 @@ def cli(
                 print(err_msg)
                 raise RuntimeError("Samples do not match target pathogen")
 
-            uploaded_pathogen_genome = sample.uploaded_pathogen_genome
+            # joinedload innerjoin=True guarantees us having UPG, never None
+            uploaded_pathogen_genome: UploadedPathogenGenome = (
+                sample.uploaded_pathogen_genome  # type: ignore
+            )
             stripped_sequence = uploaded_pathogen_genome.get_stripped_sequence()
             sequences_fh.write(f">{sample.id}\n")  # type: ignore
             sequences_fh.write(stripped_sequence)
             sequences_fh.write("\n")
 
         print("Finished writing FASTA for samples.")
+
 
 def save_pathogen_info(pathogen_info_fh: IO[str], pathogen: Pathogen):
     """Write a JSON of important pathogen info for use later in workflow."""

@@ -1,7 +1,7 @@
 import csv
 import io
 import json
-from typing import Dict, IO
+from typing import Dict, IO, Optional
 
 import click
 import sqlalchemy as sa
@@ -55,7 +55,7 @@ def cli(
 
             is_result_valid = is_nextclade_result_valid(row)
             # We always record QC info for any sample run, even if invalid.
-            qc_score = row["qc.overallScore"]
+            qc_score: Optional[str] = row["qc.overallScore"]
             qc_status = row["qc.overallStatus"]
             if not is_result_valid:
                 qc_score = None
