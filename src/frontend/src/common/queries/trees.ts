@@ -170,9 +170,12 @@ export function useFastaFetch({
 
 /* get options for usher tree placement */
 export async function getUsherOptions(): Promise<unknown> {
-  const response = await fetch(API_URL + generateOrgSpecificUrl(ORG_API.USHER_TREE_OPTIONS), {
-    ...DEFAULT_FETCH_OPTIONS,
-  });
+  const response = await fetch(
+    API_URL + generateOrgSpecificUrl(ORG_API.USHER_TREE_OPTIONS),
+    {
+      ...DEFAULT_FETCH_OPTIONS,
+    }
+  );
   if (response.ok) return await response.json();
 
   throw Error(`${response.statusText}: ${await response.text()}`);
