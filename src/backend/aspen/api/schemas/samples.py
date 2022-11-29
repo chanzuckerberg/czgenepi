@@ -1,5 +1,7 @@
 import datetime
+from optparse import Option
 from typing import Any, List, Optional
+from aspen.database.models.lineages import QCMetricCaller
 
 from pydantic import constr, validator
 from pydantic.utils import GetterDict
@@ -41,6 +43,9 @@ class SampleLineageResponse2(BaseResponse):
     lineage_software_version: Optional[str]
     lineage_probability: Optional[float]
     raw_lineage_output: Optional[dict]
+    reference_dataset_name: Optional[str]
+    reference_sequence_accession: Optional[str]
+    reference_dataset_tag: Optional[str]
 
 
 class SampleGroupResponse(BaseResponse):
@@ -56,9 +61,14 @@ class SampleQCMetricsResponse(BaseResponse):
         orm_mode = True
 
     id: int
-    qc_score: str
+    qc_score: Optional[str]
     qc_software_version: str
     qc_status: str
+    qc_caller: QCMetricCaller
+    raw_qc_output: Optional[dict]
+    reference_dataset_name: Optional[str]
+    reference_sequence_accession: Optional[str]
+    reference_dataset_tag: Optional[str]
 
 
 class SampleUserResponse(BaseResponse):

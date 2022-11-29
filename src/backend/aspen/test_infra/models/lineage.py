@@ -12,6 +12,9 @@ def sample_lineage_factory(
     lineage="B.1.1",
     lineage_probability=None,
     raw_lineage_output={},
+    reference_dataset_name="",
+    reference_sequence_accession="",
+    reference_dataset_tag=""
 ):
     return SampleLineage(
         sample=sample,
@@ -20,4 +23,7 @@ def sample_lineage_factory(
         lineage=lineage,
         lineage_probability=lineage_probability,
         raw_lineage_output=raw_lineage_output,
+        reference_dataset_name=reference_dataset_name,
+        reference_sequence_accession=reference_sequence_accession,
+        reference_dataset_tag=reference_dataset_tag
     )

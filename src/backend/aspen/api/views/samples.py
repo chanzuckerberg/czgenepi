@@ -98,7 +98,6 @@ async def list_samples(
         # TODO - convert this to an oso check.
         if sample.submitting_group_id == ac.group.id:  # type: ignore
             sample.show_private_identifier = True
-
         sampleinfo = SampleResponse.from_orm(sample)
         result.samples.append(sampleinfo)
     return result
@@ -344,6 +343,8 @@ async def create_samples(
             selectinload(Sample.uploaded_by),
             selectinload(Sample.collection_location),
             selectinload(Sample.accessions),
+            selectinload(Sample.qc_metrics),
+            selectinload(Sample.lineages),
         )
         .filter(Sample.id.in_([sample.id for sample in created_samples]))
         .execution_options(populate_existing=True)

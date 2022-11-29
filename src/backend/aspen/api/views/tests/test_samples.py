@@ -174,6 +174,12 @@ async def test_samples_list(
                             "qc_score": qc_metrics[i].qc_score,
                             "qc_software_version": qc_metrics[i].qc_software_version,
                             "qc_status": qc_metrics[i].qc_status,
+                            "qc_caller": qc_metrics[i].qc_caller.value,
+                            "raw_qc_output": qc_metrics[i].raw_qc_output,
+                            "reference_dataset_name": qc_metrics[i].reference_dataset_name,
+                            "reference_sequence_accession": qc_metrics[i].reference_sequence_accession,
+                            "reference_dataset_tag": qc_metrics[i].reference_dataset_tag,
+
                         }
                     ],
                     "lineages": [
@@ -188,6 +194,9 @@ async def test_samples_list(
                                 i
                             ].lineage_probability,
                             "raw_lineage_output": sample_lineages[i].raw_lineage_output,
+                            "reference_dataset_name" : sample_lineages[i].reference_dataset_name,
+                            "reference_sequence_accession": sample_lineages[i].reference_sequence_accession,
+                            "reference_dataset_tag": sample_lineages[i].reference_dataset_tag,
                         }
                     ],
                 }
