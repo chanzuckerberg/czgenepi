@@ -44,8 +44,7 @@ locals {
 
   # Workflow images
   pangolin_image   = join(":", [local.secret["ecrs"]["pangolin"]["url"], lookup(var.image_tags, "pangolin", var.image_tag)])
-  # TODO Fix `lineage-qc` vs `lineage_qc` mismatch between here and infra repo
-  # lineage_qc_image = join(":", [local.secret["ecrs"]["lineage-qc"]["url"], lookup(var.image_tags, "lineage-qc", var.image_tag)])
+  lineage_qc_image = join(":", [local.secret["ecrs"]["lineage-qc"]["url"], lookup(var.image_tags, "lineage-qc", var.image_tag)])
   nextstrain_image = join(":", [local.secret["ecrs"]["nextstrain"]["url"], lookup(var.image_tags, "nextstrain", var.image_tag)])
   gisaid_image     = join(":", [local.secret["ecrs"]["gisaid"]["url"], lookup(var.image_tags, "gisaid", var.image_tag)])
 
@@ -230,6 +229,48 @@ module pangolin_ondemand_sfn_config {
   image    = local.pangolin_image
   memory   = 16000
   wdl_path = "workflows/pangolin-ondemand.wdl"
+  custom_stack_name     = local.custom_stack_name
+  deployment_stage      = local.deployment_stage
+  remote_dev_prefix     = local.remote_dev_prefix
+  stack_resource_prefix = local.stack_resource_prefix
+  swipe_comms_bucket    = local.swipe_comms_bucket
+  swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = local.swipe_sfn_arn
+  event_role_arn        = local.event_role_arn
+  extra_args            =  {
+    genepi_config_secret_name = local.app_secret_name
+    remote_dev_prefix        = local.remote_dev_prefix
+  }
+}
+
+module lineage_qc_autorun_sfn_config {
+  source   = "../sfn_config"
+  app_name = "lineage-qc-autorun-sfn"
+  image    = local.lineage_qc_image
+  memory   = 16000
+  wdl_path = "workflows/lineage-qc-autorun.wdl"
+  custom_stack_name     = local.custom_stack_name
+  deployment_stage      = local.deployment_stage
+  remote_dev_prefix     = local.remote_dev_prefix
+  stack_resource_prefix = local.stack_resource_prefix
+  swipe_comms_bucket    = local.swipe_comms_bucket
+  swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = local.swipe_sfn_arn
+  # TODO set up a schedule once we decide on one.
+  # schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 23 ? * MON-FRI *)"] : []
+  event_role_arn        = local.event_role_arn
+  extra_args            =  {
+    genepi_config_secret_name = local.app_secret_name
+    remote_dev_prefix        = local.remote_dev_prefix
+  }
+}
+
+module lineage_qc_ondemand_sfn_config {
+  source   = "../sfn_config"
+  app_name = "lineage-qc-ondemand-sfn"
+  image    = local.lineage_qc_image
+  memory   = 16000
+  wdl_path = "workflows/lineage-qc-ondemand.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
   remote_dev_prefix     = local.remote_dev_prefix
