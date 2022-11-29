@@ -432,7 +432,7 @@ async def fill_submission_template(
         tsv_streamer = GisaidSubmissionFormCSVStreamer
     elif request.public_repository_name.lower() == "genbank":
         metadata_rows = sample_info_to_genbank_rows(
-            submission_information, pathogen_repo_config.prefix
+            submission_information, pathogen_repo_config.prefix, pathogen.slug
         )
         metadata_rows.sort(key=lambda row: row.get("Sequence_ID"))  # type: ignore
         filename = get_submission_template_filename("GenBank")
