@@ -4,7 +4,6 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import {
-  API,
   DEFAULT_FETCH_OPTIONS,
   DEFAULT_HEADERS_MUTATION_OPTIONS,
   DEFAULT_POST_OPTIONS,
@@ -171,7 +170,7 @@ export function useFastaFetch({
 
 /* get options for usher tree placement */
 export async function getUsherOptions(): Promise<unknown> {
-  const response = await fetch(API_URL + API.USHER_TREE_OPTIONS, {
+  const response = await fetch(API_URL + generateOrgSpecificUrl(ORG_API.USHER_TREE_OPTIONS), {
     ...DEFAULT_FETCH_OPTIONS,
   });
   if (response.ok) return await response.json();

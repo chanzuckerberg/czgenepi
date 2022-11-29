@@ -123,9 +123,6 @@ def get_app() -> FastAPI:
     _app.include_router(health.router, prefix="/v2/health")
     _app.include_router(auth.router, prefix="/v2/auth")
     _app.include_router(
-        usher.router, prefix="/v2/usher", dependencies=[Depends(get_auth_user)]
-    )
-    _app.include_router(
         lineages.router,
         prefix="/v2/lineages",
         dependencies=[Depends(get_auth_user)],
