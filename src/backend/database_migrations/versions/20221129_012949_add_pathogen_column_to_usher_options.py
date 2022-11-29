@@ -68,7 +68,7 @@ def upgrade():
         """
         INSERT INTO aspen.usher_options(description, value, priority, pathogen_id)
         SELECT
-            '3,167 genomes from INSDC (GenBank/ENA/DDBJ) (2022-11-28)',
+            'Genomes from INSDC (GenBank/ENA/DDBJ)',
             'hgPhyloPlaceData/GCF_014621545.1/mpxv.latest.pb',
             1,
             id
