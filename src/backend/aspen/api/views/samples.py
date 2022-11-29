@@ -118,8 +118,7 @@ async def get_write_samples_by_ids(
         Sample.id.in_(sample_ids)
     )  # type: ignore
     query = query.options(
-        selectinload(Sample.lineages),
-        selectinload(Sample.qc_metrics)
+        selectinload(Sample.lineages), selectinload(Sample.qc_metrics)
     )
     results = await db.execute(query)
     return results.scalars()
