@@ -20,12 +20,16 @@ from aspen.database.models.gisaid_metadata import GisaidMetadata  # noqa: F401
 from aspen.database.models.lineages import (  # noqa: F401
     PangoLineage,
     PathogenLineage,
+    QCMetricCaller,
     SampleLineage,
     SampleQCMetric,
     LineageType,
 )
 from aspen.database.models.locations import Location  # noqa: F401
-from aspen.database.models.mutations import SampleMutation  # noqa: F401
+from aspen.database.models.mutations import (  # noqa: F401
+    MutationsCaller,
+    SampleMutation,
+)
 from aspen.database.models.phylo_tree import (  # noqa: F401
     PhyloRun,
     PhyloTree,
