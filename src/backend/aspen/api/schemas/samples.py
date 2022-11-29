@@ -114,7 +114,6 @@ class SampleResponse(BaseResponse):
     submitting_group: SampleGroupResponse
     uploaded_by: SampleUserResponse
     upload_date: Optional[datetime.datetime]
-    lineage: SampleLineageResponse
     lineages: Optional[
         List[SampleLineageResponse2]
     ]  # TODO: make non optional once tables have been initially populated
