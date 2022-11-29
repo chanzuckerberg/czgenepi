@@ -12,7 +12,7 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Sample
+from aspen.database.models import Pathogen, Sample
 
 
 def check_latest_pangolin_version() -> str:
@@ -25,15 +25,18 @@ def check_latest_pangolin_version() -> str:
     return latest_version
 
 
-def find_samples() -> Collection[str]:
+def find_samples(pathogen: str) -> Collection[str]:
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     most_recent_pango_version: str = check_latest_pangolin_version()
 
     with session_scope(interface) as session:
         # filter for sequences that were run with an older version of pangolin
 
-        all_samples: Collection[Sample] = session.query(Sample).options(
-            joinedload(Sample.uploaded_pathogen_genome)
+        all_samples: Collection[Sample] = (
+            session.query(Sample)
+            .options(joinedload(Sample.uploaded_pathogen_genome))
+            .join(Sample.pathogen)
+            .where(Pathogen.slug == pathogen)
         )
 
         # TODO: update this comparison to be <= most_recent_pango_version
@@ -54,12 +57,13 @@ def find_samples() -> Collection[str]:
 
 @click.command("find_samples")
 @click.option("samples_fh", "--output-file", type=click.File("w"), required=True)
+@click.option("--pathogen", type=str, required=True, default="SC2")
 @click.option("--test", type=bool, is_flag=True)
-def run_command(samples_fh: io.TextIOWrapper, test: bool):
+def run_command(samples_fh: io.TextIOWrapper, pathogen: str, test: bool):
     if test:
         print("Success!")
         return
-    samples = find_samples()
+    samples = find_samples(pathogen)
     for sample_id in samples:
         samples_fh.write(f"{sample_id}\n")
     print(f"{len(samples)} sample ids dumped to {samples_fh.name}")

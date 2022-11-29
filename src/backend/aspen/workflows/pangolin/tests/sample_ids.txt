@@ -1,2 +1,0 @@
-public_identifier_1
-public_identifier_2

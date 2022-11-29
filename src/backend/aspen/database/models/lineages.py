@@ -74,6 +74,8 @@ class PathogenLineage(base):  # type: ignore
 
 
 class LineageType(enum.Enum):
+    """All tools/types of lineages used to associate samples with lineages."""
+
     PANGOLIN = "PANGOLIN"
     NEXTCLADE = "NEXTCLADE"
 
@@ -106,13 +108,62 @@ class SampleLineage(idbase):  # type: ignore
     lineage_probability = Column(Float, nullable=True)
     raw_lineage_output = Column(JSONB, nullable=True)
 
+    # For Nextclade, we need to track the underlying reference data bundle
+    # that was involved to know how the lineage call was made.
+    # TODO FIXME: Lots of table/row duplication here. _Probably_ better to
+    # normalize it as a single entry somewhere and then reference that.
+    # Evaluate later -- because of how we use this, not hard to change later.
+    # Search this to find all instances: §NextcladeTagDuplicationTODO
+    reference_dataset_name = Column(String, nullable=True)
+    reference_sequence_accession = Column(String, nullable=True)
+    reference_dataset_tag = Column(String, nullable=True)
+
+
+class QCMetricCaller(enum.Enum):
+    """All the tools/ways we use to call the QC info over all pathogens.
+
+    Right now we only have one, but over time we think it's likely we'll want
+    to support multiple different tools/ways to get the QC info on a sample
+    and that a sample could have multiple different QCs associated with it,
+    one for each of the various tools that can run on that pathogen type."""
+
+    NEXTCLADE = "NEXTCLADE"
+
+
+_QCMetricCallerTable = enumtables.EnumTable(
+    QCMetricCaller, base, tablename="qc_metric_callers"
+)
+
 
 class SampleQCMetric(idbase):  # type: ignore
     __tablename__ = "sample_qc_metrics"
+    __table_args__ = (
+        UniqueConstraint(
+            "sample_id",
+            "qc_caller",
+        ),
+    )
 
     sample_id = Column(Integer, ForeignKey("samples.id"), unique=True)
     sample = relationship("Sample", back_populates="qc_metrics")  # type: ignore
-    qc_score = Column(String, nullable=False, unique=True)
+    # What tool/method was used to produce this object of QC metrics.
+    qc_caller = Column(
+        Enum(QCMetricCaller),
+        ForeignKey(_QCMetricCallerTable.item_id),
+        nullable=False,
+    )
+    # If a QC call comes back invalid for a sample, `qc_score` is set to NULL
+    qc_score = Column(String, nullable=True)
     qc_software_version = Column(String, nullable=False)
     qc_status = Column(String, nullable=False)
     raw_qc_output = Column(JSONB, nullable=True)
+
+    # For Nextclade, we need to track the underlying reference data bundle
+    # that was involved to know how the QC score was made.
+    # TODO FIXME: Lots of table/row duplication here. _Probably_ better to
+    # normalize it as a single entry somewhere and then reference that.
+    # Evaluate later -- because of how we use this, not hard to change later.
+    # Search this to find all instances: §NextcladeTagDuplicationTODO
+    reference_dataset_name = Column(String, nullable=True)
+    reference_sequence_accession = Column(String, nullable=True)
+    reference_dataset_tag = Column(String, nullable=True)

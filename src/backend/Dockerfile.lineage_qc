@@ -21,8 +21,7 @@ RUN eval "$($HOME/miniconda/bin/conda shell.bash hook)" && conda init
 
 # install nextclade, check it installed correctly
 RUN apt-get --yes install curl
-RUN curl -fsSL "https://github.com/nextstrain/nextclade/releases/latest/download/nextclade-x86_64-unknown-linux-gnu" -o "nextclade" && chmod +x nextclade
-RUN  ln -s /usr/src/app/nextclade /usr/local/bin
+RUN cd /usr/local/bin && curl -fsSL "https://github.com/nextstrain/nextclade/releases/latest/download/nextclade-x86_64-unknown-linux-gnu" -o "nextclade" && chmod +x nextclade
 RUN nextclade --version
 
 # install pangolin
