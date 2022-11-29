@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { SampleEditIdToWarningMessages } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
+import { SampleEditIdToWarningMessages } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal/components/ImportFile/parseFile";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
 import { B } from "src/common/styles/basicStyle";
@@ -12,15 +12,9 @@ import {
 import { SampleIdToWarningMessages } from "../../parseFile";
 import { ProblemTable } from "./common/ProblemTable";
 
+const ERROR_SEVERITY = "error";
 const WARNING_SEVERITY = "warning";
 
-/**
- *  WARNING_CODE.AUTO_CORRECT
- * (Vince -- Jan 28, 2022): Currently unused due to change in when we auto
- * correct. While won't occur right now, there is an upcoming feature for
- * providing notice when parsing uploaded collectionLocation, so leaving
- * this warning component in for now, although will likely need revamp.
- */
 interface PropsAutoCorrect {
   autocorrectedSamplesCount: number;
 }
@@ -282,7 +276,7 @@ function MessageMissingDataEdit({ missingData }: PropsMissingData) {
   );
 }
 
-export function WarningMissingData({
+export function ErrorMissingData({
   missingData,
 }: PropsMissingData): JSX.Element {
   const count = Object.keys(missingData).length;
@@ -295,7 +289,7 @@ export function WarningMissingData({
     <AlertAccordion
       title={<B>{title}</B>}
       collapseContent={<MessageMissingData missingData={missingData} />}
-      intent={WARNING_SEVERITY}
+      intent={ERROR_SEVERITY}
     />
   );
 }
@@ -400,7 +394,7 @@ export function ErrorBadFormatData({
           IdColumnNameForWarnings={IdColumnNameForWarnings}
         />
       }
-      intent="error"
+      intent={ERROR_SEVERITY}
     />
   );
 }

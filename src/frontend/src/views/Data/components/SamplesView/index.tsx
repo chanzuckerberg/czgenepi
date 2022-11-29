@@ -6,7 +6,6 @@ import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { FilterPanel } from "src/components/FilterPanel";
 import { SearchBar } from "src/components/Table/components/SearchBar";
-import { StyledView } from "../../style";
 import { DataNavigation } from "../DataNavigation";
 import { SamplesTable } from "./components/SamplesTable";
 import { SampleTableModalManager } from "./components/SampleTableModalManager";
@@ -31,7 +30,7 @@ const SamplesView = (): JSX.Element => {
   const [displayedRows, setDisplayedRows] = useState<IdMap<Sample>>({});
 
   // load sample data from server
-  const { data: samples, isFetching, isLoading } = useSampleInfo();
+  const { data: samples, isLoading } = useSampleInfo();
 
   // only display rows that match the current search and the current filters
   useEffect(() => {
@@ -64,7 +63,7 @@ const SamplesView = (): JSX.Element => {
   };
 
   return (
-    <StyledView>
+    <>
       <HeadAppTitle subTitle="Samples" />
       <DataNavigation
         shouldShowSampleFilterToggle
@@ -91,13 +90,13 @@ const SamplesView = (): JSX.Element => {
             />
           </StyledActionBar>
           <SamplesTable
-            isLoading={isLoading || isFetching}
+            isLoading={isLoading}
             data={displayedRows}
             setCheckedSamples={setCheckedSamples}
           />
         </MaxWidth>
       </Flex>
-    </StyledView>
+    </>
   );
 };
 

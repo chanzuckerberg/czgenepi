@@ -10,7 +10,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
 import { VIEWNAME } from "src/common/constants/types";
-import { EmptyState } from "../data_subview/components/EmptyState";
+import { EmptyState } from "src/views/Data/components/EmptyState";
 import { HeaderRow } from "./components/HeaderRow";
 import {
   Cell,
@@ -259,7 +259,6 @@ export const DataTable: FunctionComponent<Props> = ({
   const sampleRow = (item: TableItem): React.ReactNode => {
     return headers.map((header, index) => {
       const value = item[header.key];
-      // TODO-TR this can be removed when delete tree modal is moved
       const onDeleteTreeModalOpen = isSampleTable
         ? noop
         : handleDeleteTreeModalOpen;

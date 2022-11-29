@@ -1,11 +1,9 @@
-import { InputSearch } from "czifui";
 import { escapeRegExp, filter } from "lodash";
 import { ChangeEvent, useEffect, useState } from "react";
-
-// TODO-TR (mlila): types
+import { StyledInputSearch } from "./style";
 interface Props {
   onSearchComplete(filteredRows: any): void;
-  tableData: any;
+  tableData?: Record<string, any>;
 }
 
 const SearchBar = ({ onSearchComplete, tableData }: Props): JSX.Element => {
@@ -28,8 +26,7 @@ const SearchBar = ({ onSearchComplete, tableData }: Props): JSX.Element => {
    * @returns true if any data in the row contains the search term. Returns false otherwise.
    */
   const deepTableRowItemSearch = (
-    // TODO-TR (mlila): types
-    tableRowItem: any,
+    tableRowItem: Record<string, any>,
     searchQuery: RegExp
   ): boolean => {
     return Object.values(tableRowItem).some((value) => {
@@ -63,7 +60,7 @@ const SearchBar = ({ onSearchComplete, tableData }: Props): JSX.Element => {
   };
 
   return (
-    <InputSearch
+    <StyledInputSearch
       id="search-samples"
       label="search samples"
       sdsStyle="rounded"

@@ -1,6 +1,5 @@
 import { groupBy, isEmpty, pick } from "lodash";
 import Papa from "papaparse";
-import { getHeadersToSampleEditMetadataKeys } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/components/common/constants";
 import { store } from "src/common/redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
@@ -27,6 +26,7 @@ import {
   inferMetadataType,
   inferValue,
 } from "src/views/Upload/components/Metadata/components/ImportFile/parseFile";
+import { getHeadersToSampleEditMetadataKeys } from "../common/constants";
 
 type MergedSampleEditTsvWebformMetadata = SampleEditTsvMetadata &
   SampleEditMetadataWebform;

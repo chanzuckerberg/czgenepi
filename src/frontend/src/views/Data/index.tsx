@@ -7,6 +7,7 @@ import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
+import { DataCategory, Transform } from "src/common/types/data";
 import {
   IdMap,
   reduceObjectArrayToLookupDict,
@@ -31,6 +32,7 @@ import {
   StyledCount,
   StyledMenu,
   StyledMenuItem,
+  StyledView,
   View,
 } from "./style";
 import { PHYLO_RUN_TRANSFORMS } from "./transforms";
@@ -244,10 +246,10 @@ const Data: FunctionComponent = () => {
 
   return (
     <Container>
-      <View>
+      <StyledView>
         {viewName === VIEWNAME.SAMPLES && <SamplesView />}
         {viewName === VIEWNAME.TREES && <TreesView />}
-      </View>
+      </StyledView>
     </Container>
   );
 };

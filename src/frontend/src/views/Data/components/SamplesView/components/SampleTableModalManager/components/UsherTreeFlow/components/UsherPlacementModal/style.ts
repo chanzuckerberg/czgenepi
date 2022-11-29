@@ -13,19 +13,54 @@ import {
   InputDropdown,
   List,
   ListItem,
+  Tooltip,
 } from "czifui";
+import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
+import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
 import {
   iconFillGrayHoverPrimary,
   iconFillWarning,
 } from "src/common/styles/iconStyle";
-import { StyledDialogContent as DialogContent } from "../../../CreateNSTreeModal/style";
 
 const INPUT_HEIGHT = "34px";
 
-export const StyledDialogContent = styled(DialogContent)`
-  ${(props: CommonThemeProps) => {
+export const Title = styled.span`
+  ${fontBodyS}
+  ${(props) => {
+    const colors = getColors(props);
     const spaces = getSpaces(props);
     return `
+      color: ${colors?.gray[600]};
+      margin-bottom: ${spaces?.l}px;
+    `;
+  }}
+`;
+
+export const StyledDialogTitle = styled(DialogTitle)`
+  flex: 0 0 auto;
+
+  ${(props) => {
+    const spaces = getSpaces(props);
+    return `
+      padding-bottom: ${spaces?.l}px;
+    `;
+  }}
+`;
+
+export const StyledDialogContent = styled(DialogContent)`
+  ${fontBodyS}
+
+  overflow-y: auto;
+  & > div:last-child {
+    margin-bottom: 0;
+  }
+
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    const colors = getColors(props);
+
+    return `
+      color: ${colors?.gray[500]};
       padding-bottom: ${spaces?.xxl}px;
     `;
   }}
@@ -177,4 +212,25 @@ export const Content = styled.div`
 
 export const StyledWarningIconWrapper = styled.div`
   ${iconFillWarning}
+`;
+
+export const TreeNameInfoWrapper = styled.div`
+  display: flex;
+  align-items: center;
+
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-bottom: ${spaces?.s}px;
+    `;
+  }}
+`;
+
+export const StyledTooltip = styled(Tooltip)`
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-left: ${spaces?.xxs}px;
+    `;
+  }}
 `;

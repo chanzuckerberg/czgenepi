@@ -1,6 +1,6 @@
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import usherLogo from "src/common/images/usher.png";
-import { RedirectConfirmationModal } from "../../../RedirectConfirmationModal";
+import { RedirectConfirmationModal } from "src/views/Data/components/RedirectConfirmationModal";
 
 interface Props {
   isOpen: boolean;
@@ -33,7 +33,7 @@ const UsherConfirmationModal = ({
     <div>
       <RedirectConfirmationModal
         content={content}
-        img={usherLogo as unknown as string}
+        img={usherLogo}
         isOpen={isOpen}
         onClose={onClose}
         onConfirm={onConfirm}

@@ -1,9 +1,10 @@
-import { CellBasic, CellComponent, Table, TableHeader, TableRow } from "czifui";
+import { CellComponent, CellHeader, Table, TableHeader } from "czifui";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
@@ -12,23 +13,30 @@ import { useEffect, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
-import { SortableHeader } from "../../../SamplesView/components/SamplesTable/components/SortableHeader";
+import { SortableHeader } from "src/views/Data/components/SortableHeader";
+import {
+  StyledCellBasic,
+  StyledTableRow,
+} from "../../../SamplesView/components/SamplesTable/style";
+import TreeTableNameCell from "./components/TreeTableNameCell";
+import { StyledSortableHeader } from "./style";
+import { generateWidthStyles } from "src/common/utils";
+import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
   isLoading: boolean;
 }
 
-// TODO-TR (mlila): set fallback cell values when, eg, tree name not defined
-
-// TODO-TR (mlila): create a default cell & col def
 const columns: ColumnDef<PhyloRun, any>[] = [
   {
     id: "name",
     accessorKey: "name",
-    header: ({ header }) => (
-      <SortableHeader
+    minSize: 350,
+    header: ({ header, column }) => (
+      <StyledSortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Tree Name",
           regularText:
@@ -36,19 +44,24 @@ const columns: ColumnDef<PhyloRun, any>[] = [
         }}
       >
         Tree Name
-      </SortableHeader>
+      </StyledSortableHeader>
     ),
-    cell: ({ getValue }) => (
-      <CellBasic shouldShowTooltipOnHover={false} primaryText={getValue()} />
+    cell: ({ row }) => (
+      <CellComponent>
+        <TreeTableNameCell item={row.original} />
+      </CellComponent>
     ),
     enableSorting: true,
+    sortingFn: "alphanumeric",
   },
   {
     id: "startedDate",
     accessorKey: "startedDate",
-    header: ({ header }) => (
+    size: 160,
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Creation Date",
           regularText: "Date on which the tree was generated.",
@@ -58,7 +71,8 @@ const columns: ColumnDef<PhyloRun, any>[] = [
       </SortableHeader>
     ),
     cell: ({ getValue }) => (
-      <CellBasic
+      <StyledCellBasic
+        verticalAlign="center"
         shouldShowTooltipOnHover={false}
         primaryText={datetimeWithTzToLocalDate(getValue())}
       />
@@ -68,9 +82,11 @@ const columns: ColumnDef<PhyloRun, any>[] = [
   {
     id: "treeType",
     accessorKey: "treeType",
-    header: ({ header }) => (
+    size: 160,
+    header: ({ header, column }) => (
       <SortableHeader
         header={header}
+        style={generateWidthStyles(column)}
         tooltipStrings={{
           boldText: "Tree Type",
           link: {
@@ -88,7 +104,8 @@ const columns: ColumnDef<PhyloRun, any>[] = [
       const type = getValue();
       return (
         <TreeTypeTooltip value={type}>
-          <CellBasic
+          <StyledCellBasic
+            verticalAlign="center"
             shouldShowTooltipOnHover={false}
             primaryText={getValue()}
           />
@@ -99,6 +116,12 @@ const columns: ColumnDef<PhyloRun, any>[] = [
   },
   {
     id: "action",
+    size: 160,
+    header: ({ column }) => (
+      <CellHeader style={generateWidthStyles(column)} hideSortIcon>
+        {" "}
+      </CellHeader>
+    ),
     cell: ({ row }) => (
       <CellComponent>
         <TreeActionMenu item={row.original} />
@@ -109,6 +132,12 @@ const columns: ColumnDef<PhyloRun, any>[] = [
 
 const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
   const [phyloRuns, setPhyloRuns] = useState<PhyloRun[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: "startedDate",
+      desc: true,
+    },
+  ]);
 
   useEffect(() => {
     if (!data) return;
@@ -119,9 +148,22 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
 
   const table = useReactTable({
     data: phyloRuns,
+    defaultColumn: {
+      cell: ({ getValue }) => (
+        <StyledCellBasic
+          verticalAlign="center"
+          shouldShowTooltipOnHover={false}
+          primaryText={(getValue() || NO_CONTENT_FALLBACK) as string}
+        />
+      ),
+    },
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
   });
 
   if (isLoading) {
@@ -140,13 +182,13 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
       </TableHeader>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <TableRow key={row.id}>
+          <StyledTableRow key={row.id}>
             {row
               .getVisibleCells()
               .map((cell) =>
                 flexRender(cell.column.columnDef.cell, cell.getContext())
               )}
-          </TableRow>
+          </StyledTableRow>
         ))}
       </tbody>
     </Table>

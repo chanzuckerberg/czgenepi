@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 import { ROUTES } from "src/common/routes";
+import { DataCategory } from "src/common/types/data";
 import { FilterPanelToggle } from "./FilterPanelToggle";
 import { Navigation, StyledTabs } from "./style";
 
@@ -27,7 +28,7 @@ const DataNavigation = ({
   shouldShowSampleFilterToggle,
   toggleFilterPanel,
 }: Props): JSX.Element => {
-  const [currentTab, setCurrentTab] = useState<string>(ROUTES.DATA_SAMPLES);
+  const [currentTab, setCurrentTab] = useState<ROUTES>(ROUTES.DATA_SAMPLES);
   const [tabData, setTabData] = useState<Partial<DataCategory>[]>([]);
 
   const router = useRouter();
@@ -37,7 +38,6 @@ const DataNavigation = ({
   const { data: phyloRuns } = usePhyloRunInfo();
 
   // Configure tabs that are shown on the data page. One tab per view.
-  // TODO-TR (mlila): types
   useEffect(() => {
     const newTabData = [
       {

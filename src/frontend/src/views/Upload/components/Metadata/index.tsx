@@ -3,7 +3,7 @@ import { Button, Link } from "czifui";
 import NextLink from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
-import { setApplyAllValueToPrevMetadata } from "src/common/components/library/data_subview/components/EditSamplesConfirmationModal/utils";
+import { setApplyAllValueToPrevMetadata } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal/utils";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT, noop } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
