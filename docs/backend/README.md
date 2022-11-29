@@ -167,8 +167,9 @@ In [3]:
 ```
 
 #### Profiling in code
+We previously had nicer DB profiling in code, but it appears to have broken at some point. In the meantime, if you just need very, very basic profiling, you can just add an `echo=True` argument to whatever runs the ` create_engine()` call and then remove it when you're done. If you need something more complete, you'll probably want to fix the below. Also check out [these docs on SQLAlchemy](https://docs.sqlalchemy.org/en/14/faq/performance.html#query-profiling) for more guidance/context.
 
-The module [`aspen.database.connection`](../../src/backend/aspen/database/connection.py) contains a number of methods to manage the capture of queries issued by sqlalchemy.  `enable_profiling()`/`disable_profiling()` can be used to enable and disable profiling, and `enable_profiling_ctx()` is a [context manager](https://docs.python.org/3/reference/compound_stmts.html#with) that can be used to manage a block of code that requires profiling.
+FIXME (Vince) As of Nov 14, 2022, the following does not appear to work. The code is present, but invoking `enable_profiling`, etc has no effect right now. We should fix that. --- OLD README: The module [`aspen.database.connection`](../../src/backend/aspen/database/connection.py) contains a number of methods to manage the capture of queries issued by sqlalchemy.  `enable_profiling()`/`disable_profiling()` can be used to enable and disable profiling, and `enable_profiling_ctx()` is a [context manager](https://docs.python.org/3/reference/compound_stmts.html#with) that can be used to manage a block of code that requires profiling.
 
 ### Autogeneration of schema migration
 
@@ -200,7 +201,7 @@ Create a new user to the auth0 covidtracker tenet, take note of auth0 user id
       * `select * from groups;`
 
 ## How to use aspencli:
-the cli is useful to call api endpoints through the terminal. To start using the cli you must be logged into rdev, staging, or prod with your aspen system admin account. 
+the cli is useful to call api endpoints through the terminal. To start using the cli you must be logged into rdev, staging, or prod with your aspen system admin account.
 
 Example endpoint call to update public_ids based on private to public id mapping csv file (column headers must be named `private_identifier`,`public_identifier`, no line numbering)
 * `python src/cli/aspencli.py --env <local|staging|prod|rdev> samples update_public_ids --group-id 1 --private-to-public-id-mapping ~/Downloads/test_rename_public_identifiers.csv`

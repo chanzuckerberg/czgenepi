@@ -100,6 +100,31 @@ class UploadedPathogenGenome(PathogenGenome):
     sequencing_depth = Column(Float)
     upload_date = Column(DateTime, nullable=False, server_default=func.now())
 
+    def get_stripped_sequence(self) -> str:
+        """Returns the "stripped" pathogen sequence (what we use in FASTAs).
+
+        The underlying sequence data we retain in the DB is captured as the
+        user gives it to us, including newlines and possibly extra comment/id
+        lines (> or ; prefixed lines). It also may include "filler" characters
+        (N or n) to pad out for missing/corrupted readings. In most cases, when
+        we pull the sequence for a pathogen, we want it as a single line with
+        the >/; lines and Nn characters stripped. This encapsulates that.
+
+        NOTE that the `sequence` column currently will raise an error on load
+        (`raiseload`) to prevent accidentally lazy loading it. If you need
+        sequence data, you'll need to make sure the underlying query is
+        eagerly fetching that data or calling this method will raise an error
+        (just the same as trying to access `sequence` would in that case).
+        """
+        sequence: str = "".join(
+            [
+                line
+                for line in self.sequence.splitlines()
+                if not (line.startswith(">") or line.startswith(";"))
+            ]
+        )
+        return sequence.strip("Nn")
+
 
 class AlignedPathogenGenome(PathogenGenome):
     __tablename__ = "aligned_pathogen_genome"

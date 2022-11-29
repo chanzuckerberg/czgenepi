@@ -1,8 +1,11 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { Button, Icon, InputText, Link } from "czifui";
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useUpdateUserInfo, useUserInfo } from "src/common/queries/auth";
 import { H1, H2, P } from "src/common/styles/basicStyle";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import {
   GrayIconWrapper,
   StyledDivider,
@@ -19,6 +22,13 @@ const UNSAVED_CHANGES_MESSAGE =
 
 export default function Account(): JSX.Element {
   const router = useRouter();
+
+  const flag = useTreatments([USER_FEATURE_FLAGS.internal_user]);
+  const isInternalUserFlagOn = isUserFlagOn(
+    flag,
+    USER_FEATURE_FLAGS.internal_user
+  );
+
   const { data: userInfo } = useUserInfo();
   const { mutate: updateUserInfo } = useUpdateUserInfo();
 
@@ -142,6 +152,12 @@ export default function Account(): JSX.Element {
           onChange={handleNewIdInput}
         />
       </StyledSection>
+      {isInternalUserFlagOn && (
+        <StyledSection>
+          <StyledH3>CZGE Internal User account</StyledH3>
+          <SubText>This section is not shown to external users.</SubText>
+        </StyledSection>
+      )}
     </>
   );
 }

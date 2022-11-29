@@ -18,6 +18,7 @@ export enum SPLIT_SIMPLE_FLAG {
 export enum USER_FEATURE_FLAGS {
   // my_flag_name = "my_flag_name", (<-- format example)
   galago_integration = "galago_integration",
+  internal_user = "internal_user",
   multi_pathogen = "multi_pathogen",
   table_refactor = "table_refactor",
   tree_location_filter = "tree_location_filter",
