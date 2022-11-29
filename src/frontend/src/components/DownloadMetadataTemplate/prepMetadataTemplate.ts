@@ -11,7 +11,7 @@ import {
   UPLOAD_EXAMPLE_ROWS,
 } from "./common/constants";
 // Should change below whenever there are material changes to upload TSV download
-export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
+export const TEMPLATE_UPDATED_DATE = "2022-12-01"; // YYYY-MM-DD
 
 // If a future pathogen has different headers, we'll need to modify this.
 function getUploadTemplateHeaders(pathogen: Pathogen): string[] {

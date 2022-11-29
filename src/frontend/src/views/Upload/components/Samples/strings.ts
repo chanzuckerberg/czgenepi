@@ -13,7 +13,7 @@ export const pathogenStrings: PathogenConfigType<UploadSamplesStrings> = {
       "Accepted file formats: fasta (.fa or .fasta), fasta.gz (.fa.gz), fasta.zip, plain text (.txt)",
   },
   [Pathogen.MONKEY_POX]: {
-    header: "Select Monkeypox Consensus Genome Files",
+    header: "Select Mpox Consensus Genome Files",
     acceptedFormats:
       "Accepted file formats: fasta (.fa or .fasta), fasta.gz (.fa.gz), fasta.zip",
   },
