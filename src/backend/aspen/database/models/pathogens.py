@@ -45,6 +45,7 @@ class Pathogen(idbase):  # type: ignore
     samples = relationship("Sample", back_populates="pathogen")  # type: ignore
     phylo_runs = relationship("PhyloRun", back_populates="pathogen")  # type: ignore
     phylo_trees = relationship("PhyloTree", back_populates="pathogen")  # type: ignore
+    usher_options = relationship("UsherOption", back_populates="pathogen")  # type: ignore
 
     @classmethod
     async def get_by_slug(cls, db: AsyncSession, slug: str) -> Pathogen:

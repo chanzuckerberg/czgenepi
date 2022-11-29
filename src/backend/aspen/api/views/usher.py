@@ -12,11 +12,6 @@ from aspen.database.models import Pathogen, UsherOption
 
 router = APIRouter()
 
-USHER_OPTION_SLUGS = {
-    "SC2": "wuhCor1",
-    "MPX": "mpxv",
-}
-
 
 @router.get("/tree_versions/", response_model=UsherTreeVersionsResponse)
 async def get_tree_versions(
@@ -25,7 +20,7 @@ async def get_tree_versions(
     pathogen: Pathogen = Depends(get_pathogen),
 ) -> UsherTreeVersionsResponse:
     options = await db.execute(
-        sa.select(UsherOption).order_by(UsherOption.priority.asc())  # type: ignore
+        sa.select(UsherOption).where(UsherOption.pathogen == pathogen).order_by(UsherOption.priority.asc())  # type: ignore
     )
     return UsherTreeVersionsResponse(
         usher_options=parse_obj_as(List[UsherTreeVersion], options.scalars().all())

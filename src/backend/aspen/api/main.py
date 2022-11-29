@@ -157,6 +157,7 @@ def get_app() -> FastAPI:
         "phylo_trees": phylo_trees.router,
         "phylo_runs": phylo_runs.router,
         "samples": samples.router,
+        "usher": usher.router,
     }
     for suffix, router in org_routers.items():
         # add pathogen support to endpoints

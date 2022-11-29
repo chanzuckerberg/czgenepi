@@ -30,6 +30,14 @@ def upgrade():
         source_schema="aspen",
         referent_schema="aspen",
     )
+
+    # Replace old priority constraint
+    op.drop_constraint(
+        "uq_usher_options_priority",
+        "usher_options",
+        schema="aspen",
+        type_="unique",
+    )
     op.create_unique_constraint(
         op.f("uq_usher_options_pathogen_id_priority"),
         "usher_options",
