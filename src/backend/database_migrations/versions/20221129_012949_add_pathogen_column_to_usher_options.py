@@ -1,4 +1,4 @@
-"""
+"""add pathogen column to usher options
 
 Create Date: 2022-11-29 01:29:55.912119
 
@@ -9,7 +9,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "20221129_012949"
-down_revision = "20221101_201105"
+down_revision = "20221129_005613"
 branch_labels = None
 depends_on = None
 
@@ -61,6 +61,19 @@ def upgrade():
         existing_type=sa.INTEGER(),
         nullable=False,
         schema="aspen",
+    )
+
+    # Insert MPX option
+    op.execute(
+        """
+        INSERT INTO aspen.usher_options(description, value, priority, pathogen_id)
+        SELECT
+            '3,167 genomes from INSDC (GenBank/ENA/DDBJ) (2022-11-28)',
+            'hgPhyloPlaceData/GCF_014621545.1/mpxv.latest.pb',
+            1,
+            id
+        FROM aspen.pathogens WHERE slug='MPX'
+        """
     )
 
 

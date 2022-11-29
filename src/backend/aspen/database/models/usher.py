@@ -1,5 +1,5 @@
 """Models for handling anything related to UShER"""
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from aspen.database.models.base import idbase
@@ -12,10 +12,17 @@ class UsherOption(idbase, DictMixin):  # type: ignore
 
     __tablename__ = "usher_options"
 
+    __table_args__ = (
+        UniqueConstraint(
+            "pathogen_id",
+            "priority",
+        ),
+    )
+
     description = Column(String, unique=True, nullable=False)
     value = Column(String, unique=True, nullable=False)
     # `priority` is order we display options to user. LOWEST number is max priority.
-    priority = Column(Integer, unique=True)
+    priority = Column(Integer)
     pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
     pathogen: Pathogen = relationship(Pathogen, back_populates="usher_options")  # type: ignore
 
