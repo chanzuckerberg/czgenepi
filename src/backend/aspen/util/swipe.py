@@ -88,3 +88,18 @@ class NextstrainJob(SwipeJob):
 
 class NextstrainScheduledJob(NextstrainJob):
     job_type = "scheduled"
+
+
+class LineageQcJob(SwipeJob):
+    def get_sfn_config(self):
+        return self.settings.AWS_LINEAGE_QC_SFN_PARAMETERS
+
+    def run(self, group: Group, pathogen_slug: str, sample_ids: List[int]):
+        extra_params = {
+            "pathogen_slug": pathogen_slug,
+            "sample_ids": sample_ids,  # sample PK ids
+        }
+        now = datetime.datetime.now()
+        output_suffix = f"/{str(now)}"
+        execution_name = f"{group.prefix}-ondemand-lineage-qc-{str(now)}"
+        return self._start(execution_name, output_suffix, extra_params)
