@@ -70,7 +70,7 @@ export default function RightNav(): JSX.Element {
           </StyledIconWrapper>
         </StyledLink>
       </Tooltip>
-      <UserMenu user={userInfo?.name} />
+      <UserMenu />
     </StyledDiv>
   );
 }

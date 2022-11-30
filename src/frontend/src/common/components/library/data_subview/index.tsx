@@ -26,7 +26,6 @@ import { UsherTreeFlow } from "src/views/Data/components/SamplesView/components/
 import { DeleteSamplesConfirmationModal } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/DeleteSamplesConfirmationModal";
 import { EditSamplesConfirmationModal } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal";
 import { IconButton } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/IconButton";
-import { Link } from "czifui";
 import { ROUTES } from "src/common/routes";
 
 interface Props {

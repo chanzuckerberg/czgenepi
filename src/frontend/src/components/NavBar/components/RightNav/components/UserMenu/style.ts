@@ -7,7 +7,7 @@ import {
   getPalette,
   getSpaces,
 } from "czifui";
-import { iconFillBlack, iconFillWhite } from "src/common/styles/iconStyle";
+import { iconFillWhite } from "src/common/styles/iconStyle";
 
 export const StyledNavButton = styled(Button)`
   ${(props: CommonThemeProps) => {

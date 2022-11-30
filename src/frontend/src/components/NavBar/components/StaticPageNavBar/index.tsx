@@ -80,7 +80,7 @@ export default function StaticPageNavBar(): JSX.Element {
       </MobileNavLink>
     );
 
-    RightNav = <UserMenu user={userInfo.name} />;
+    RightNav = <UserMenu />;
   } else {
     MobileRightNav = (
       <>

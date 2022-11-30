@@ -3,18 +3,9 @@ import { useState } from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
-import {
-  StyledNavButton,
-  StyledNavIconWrapper,
-  UserMenuButton,
-  UserMenuIcon,
-} from "./style";
+import { UserMenuButton } from "./style";
 
-interface UserMenuProps {
-  user: string | undefined;
-}
-
-const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
+const UserMenu = (): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
