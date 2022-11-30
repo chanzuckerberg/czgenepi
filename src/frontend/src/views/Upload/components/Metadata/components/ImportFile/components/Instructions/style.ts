@@ -6,7 +6,6 @@ import {
   getColors,
   getFontWeights,
   getSpaces,
-  ListItem,
 } from "czifui";
 import { P } from "src/common/styles/basicStyle";
 import { SampleUploadDownloadTemplate } from "src/components/DownloadMetadataTemplate";

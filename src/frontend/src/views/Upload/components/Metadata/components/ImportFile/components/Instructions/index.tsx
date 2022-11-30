@@ -1,9 +1,7 @@
 import { List, ListItem } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-import { P } from "src/common/styles/basicStyle";
 import {
   SemiBold,
-  StyledListItem,
   StyleDownloadTemplate,
   StyledP,
   Title,
