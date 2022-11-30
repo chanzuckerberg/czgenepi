@@ -12,7 +12,13 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import AuthContext, get_auth_context, get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
-from aspen.api.deps import get_db, get_pathogen, get_public_repository, get_settings
+from aspen.api.deps import (
+    get_db,
+    get_pathogen,
+    get_pathogen_repo_config,
+    get_public_repository,
+    get_settings,
+)
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
     CreateSampleRequest,
@@ -46,6 +52,7 @@ from aspen.database.models import (
     Group,
     Location,
     Pathogen,
+    PathogenRepoConfig,
     PublicRepository,
     Sample,
     UploadedPathogenGenome,
@@ -200,7 +207,7 @@ async def update_samples(
         # workaround for our response serializer
         sample.show_private_identifier = True
 
-        sample.generate_public_identifier(already_exists=True)
+        sample.generate_public_identifier(pathogen_repo_config.public_identifier_prefix, already_exists=True)
         res.samples.append(SampleResponse.from_orm(sample))
 
     try:
@@ -269,6 +276,7 @@ async def create_samples(
     user: User = Depends(get_auth_user),
     group: Group = Depends(require_group_privilege("create_sample")),
     pathogen: Pathogen = Depends(get_pathogen),
+    pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ) -> SamplesResponse:
 
     duplicates_in_request: Union[
@@ -317,7 +325,7 @@ async def create_samples(
         }
 
         sample: Sample = Sample(**sample_args)
-        sample.generate_public_identifier()
+        sample.generate_public_identifier(pathogen_repo_config.public_identifier_prefix)
         uploaded_pathogen_genome: UploadedPathogenGenome = UploadedPathogenGenome(
             sample=sample,
             sequence=pathogen_genome_input.sequence,
@@ -381,6 +389,7 @@ async def fill_submission_template(
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
     pathogen: Pathogen = Depends(get_pathogen),
+    pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ):
     sample_ids: Set[str] = {item for item in request.sample_ids}
 
