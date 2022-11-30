@@ -1,6 +1,6 @@
 """
 
-Create Date: 2022-11-22 22:26:58.178142
+Create Date: 2022-11-30 22:26:58.178142
 
 """
 import enumtables  # noqa: F401
@@ -16,10 +16,9 @@ depends_on = None
 def upgrade():
     op.execute(
         """
-        INSERT INTO aspen.pathogens (slug, name) VALUES ('HCV', 'Hepatitis C'), ('MPX', 'Monkeypox')
-        ON CONFLICT (slug) DO NOTHING
+        INSERT INTO aspen.pathogens (slug, name) VALUES ('HCV', 'Hepatitis C')
         """
-    )  # on conflict do nothing is because in local dev we already have MPX in the database
+    )
 
     op.execute("select nextval('aspen.pathogen_repo_configs_id_seq')")
     op.execute("select nextval('aspen.pathogen_repo_configs_id_seq')")
