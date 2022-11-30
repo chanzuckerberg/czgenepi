@@ -1,5 +1,5 @@
 import { Pathogen } from "src/common/redux/types";
-import { PathogenConfigType } from "src/common/types/strings";
+import { PathogenConfigType } from "src/common/types/pathogenConfig";
 import {
   BASE_METADATA_HEADERS,
   OPTIONAL_HEADER_MARKER,

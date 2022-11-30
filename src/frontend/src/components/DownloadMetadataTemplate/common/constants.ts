@@ -1,5 +1,5 @@
 import { Pathogen } from "src/common/redux/types";
-import { PathogenConfigType } from "src/common/types/strings";
+import { PathogenConfigType } from "src/common/types/pathogenConfig";
 import { SampleEditTsvMetadata, SampleUploadTsvMetadata } from "./types";
 
 // Some columns are for optional data. Below string is added to end of the
