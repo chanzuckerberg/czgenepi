@@ -4,7 +4,7 @@
 import { store } from "src/common/redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
-import { PathogenConfigType } from "src/common/types/strings";
+import { PathogenConfigType } from "src/common/types/pathogenConfig";
 import {
   getEditExampleRows,
   SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
