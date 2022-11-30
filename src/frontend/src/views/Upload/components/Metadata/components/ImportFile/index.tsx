@@ -150,7 +150,9 @@ export default function ImportFile({
               {importFilePathogenStrings[pathogen].templateName}
             </StyledButton>
           </SampleUploadDownloadTemplate>
-          <StyledUpdatedDate>Updated {TEMPLATE_UPDATED_DATE}</StyledUpdatedDate>
+          <StyledUpdatedDate>
+            Updated {TEMPLATE_UPDATED_DATE[pathogen].updatedDate}
+          </StyledUpdatedDate>
         </TitleWrapper>
 
         {isInstructionsShown && (
