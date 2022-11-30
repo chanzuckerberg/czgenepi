@@ -25,16 +25,6 @@ class SampleGisaidResponse(BaseResponse):
     status: str
 
 
-# class SampleLineageResponse(BaseResponse):
-#     last_updated: Optional[datetime.datetime]
-#     lineage: Optional[str]
-#     confidence: Optional[float]
-#     version: Optional[str]
-#     scorpio_call: Optional[str]
-#     scorpio_support: Optional[float]
-#     qc_status: Optional[str]
-
-
 # TODO: make this the main SampleLineagResponse once we've moved away from lineages stored on uploadedpathogengenome class
 class SampleLineageResponse(BaseResponse):
     id: int

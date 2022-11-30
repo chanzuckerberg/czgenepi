@@ -264,17 +264,6 @@ async def test_samples_view_gisaid_rejected(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-                "lineage": {
-                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                    "confidence": uploaded_pathogen_genome.pangolin_probability,
-                    "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": convert_datetime_to_iso_8601(
-                        uploaded_pathogen_genome.pangolin_last_updated
-                    ),
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -336,17 +325,6 @@ async def test_samples_view_gisaid_no_info(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-                "lineage": {
-                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                    "confidence": uploaded_pathogen_genome.pangolin_probability,
-                    "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": convert_datetime_to_iso_8601(
-                        uploaded_pathogen_genome.pangolin_last_updated
-                    ),
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -405,15 +383,6 @@ async def test_samples_view_gisaid_not_eligible(
                 # failed genome recovery, but for this test it's None because the sample
                 # has no underlying sequenced entity (no uploaded_pathogen_genome).
                 "sequencing_date": None,
-                "lineage": {
-                    "lineage": None,
-                    "confidence": None,
-                    "version": None,
-                    "last_updated": None,
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -550,17 +519,6 @@ async def test_samples_view_cansee_all(
                 uploaded_pathogen_genome.upload_date
             ),
             "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-            "lineage": {
-                "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                "confidence": uploaded_pathogen_genome.pangolin_probability,
-                "version": uploaded_pathogen_genome.pangolin_version,
-                "last_updated": convert_datetime_to_iso_8601(
-                    uploaded_pathogen_genome.pangolin_last_updated
-                ),
-                "scorpio_call": None,
-                "scorpio_support": None,
-                "qc_status": None,
-            },
             "pathogen": {
                 "id": pathogen.id,
                 "slug": pathogen.slug,
@@ -630,15 +588,6 @@ async def test_samples_view_no_pangolin(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-                "lineage": {
-                    "lineage": None,
-                    "confidence": None,
-                    "version": None,
-                    "last_updated": None,
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
