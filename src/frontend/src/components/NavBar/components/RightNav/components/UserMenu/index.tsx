@@ -3,7 +3,12 @@ import { useState } from "react";
 import { API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import { ROUTES } from "src/common/routes";
-import { StyledNavButton, StyledNavIconWrapper } from "./style";
+import {
+  StyledNavButton,
+  StyledNavIconWrapper,
+  UserMenuButton,
+  UserMenuIcon,
+} from "./style";
 
 interface UserMenuProps {
   user: string | undefined;
@@ -30,17 +35,9 @@ const UserMenu = ({ user }: UserMenuProps): JSX.Element => {
 
   return (
     <>
-      <StyledNavButton
-        data-test-id="nav-user-menu"
-        onClick={handleClick}
-        endIcon={
-          <StyledNavIconWrapper>
-            <Icon sdsIcon="chevronDown" sdsSize="xs" sdsType="static" />
-          </StyledNavIconWrapper>
-        }
-      >
-        {user}
-      </StyledNavButton>
+      <UserMenuButton data-test-id="nav-user-menu" onClick={handleClick}>
+        <Icon sdsIcon="person" sdsSize="l" sdsType="static" />
+      </UserMenuButton>
       <Menu
         anchorEl={anchorEl}
         keepMounted

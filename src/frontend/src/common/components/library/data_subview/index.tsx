@@ -226,17 +226,15 @@ const DataSubview: FunctionComponent<Props> = ({
             onEditSelected={() => setEditSampleConfirmationOpen(true)}
             data-test-id="sample-page-more-action-btn"
           />
-          <Link href={ROUTES.UPLOAD_STEP1} passHref>
-            <StyledUploadButton
-              component="a"
-              href="passHref"
-              sdsType="primary"
-              sdsStyle="rounded"
-              data-test-id="upload-btn"
-            >
-              Upload
-            </StyledUploadButton>
-          </Link>
+          <StyledUploadButton
+            component="a"
+            href={ROUTES.UPLOAD_STEP1}
+            sdsType="primary"
+            sdsStyle="rounded"
+            data-test-id="upload-btn"
+          >
+            Upload
+          </StyledUploadButton>
         </DownloadWrapper>
       );
     }
