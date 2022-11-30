@@ -32,7 +32,6 @@ class SampleLineageResponse(BaseResponse):
     lineage: Optional[str]
     lineage_software_version: Optional[str]
     lineage_probability: Optional[float]
-    raw_lineage_output: Optional[dict]
     reference_dataset_name: Optional[str]
     reference_sequence_accession: Optional[str]
     reference_dataset_tag: Optional[str]
@@ -57,7 +56,6 @@ class SampleQCMetricsResponse(BaseResponse):
     qc_software_version: str
     qc_status: str
     qc_caller: QCMetricCaller
-    raw_qc_output: Optional[dict]
     reference_dataset_name: Optional[str]
     reference_sequence_accession: Optional[str]
     reference_dataset_tag: Optional[str]
@@ -107,7 +105,6 @@ class SampleResponse(BaseResponse):
     collection_location: LocationResponse
     czb_failed_genome_recovery: bool
     gisaid: Optional[SampleGisaidResponse]
-    # lineage: Optional[SampleLineageResponse]
     pathogen: Optional[PathogenResponse]
     private: bool
     private_identifier: Optional[str]

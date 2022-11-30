@@ -35,4 +35,26 @@ export type SampleResponseData = {
     id: number;
     name: string;
   };
+  lineages: [
+    id?: number,
+    lineage_type?: string,
+    lineage?: string,
+    lineage_software_version?: string,
+    lineage_probability?: number,
+    reference_dataset_name?: string,
+    reference_sequence_accession?: string,
+    reference_dataset_tag?: string,
+    scorpio_call?: string,
+    scorpio_support?: string
+  ]
+  qc_metrics: [
+    id?: number,
+    qc_score?: string,
+    qc_software_version?: string,
+    qc_status?: string,
+    qc_caller?: string,
+    reference_dataset_name?: string,
+    reference_sequence_accession?: string,
+    reference_dataset_tag?: string
+  ]
 };
