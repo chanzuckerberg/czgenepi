@@ -54,8 +54,11 @@ export default function Instructions({ headers, rows }: Props): JSX.Element {
         <ListItem fontSize="xs">
           <StyledP>
             Column header naming conventions and metadata value formatting must
-            match those found in the TSV template or the Nextstrain defaults.
-            See the help documentation above for more details.
+            match those found in the TSV template or the{" "}
+            <NewTabLink href="https://docs.nextstrain.org/projects/ncov/en/latest/reference/metadata-fields.html">
+              Nextstrain defaults
+            </NewTabLink>
+            . See the help documentation above for more details.
           </StyledP>
         </ListItem>
         <ListItem fontSize="xs">
