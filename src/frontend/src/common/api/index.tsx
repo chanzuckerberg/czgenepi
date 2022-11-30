@@ -7,7 +7,6 @@ export enum API {
   USERDATA = "/v2/users/me",
   LOG_IN = "/v2/auth/login",
   LOG_OUT = "/v2/auth/logout",
-  USHER_TREE_OPTIONS = "/v2/usher/tree_versions/",
   LOCATIONS = "/v2/locations/",
   PANGO_LINEAGES = "/v2/lineages/pango",
   GROUPS = "/v2/groups/",
@@ -23,6 +22,7 @@ export enum ORG_API {
   SAMPLES_FASTA_DOWNLOAD = "sequences/",
   SAMPLES_TEMPLATE_DOWNLOAD = "samples/submission_template",
   GET_FASTA_URL = "sequences/getfastaurl",
+  USHER_TREE_OPTIONS = "usher/tree_versions/",
 }
 
 export const generateOrgSpecificUrl = (path: ORG_API): string => {

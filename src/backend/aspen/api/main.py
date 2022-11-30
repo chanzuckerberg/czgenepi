@@ -123,9 +123,6 @@ def get_app() -> FastAPI:
     _app.include_router(health.router, prefix="/v2/health")
     _app.include_router(auth.router, prefix="/v2/auth")
     _app.include_router(
-        usher.router, prefix="/v2/usher", dependencies=[Depends(get_auth_user)]
-    )
-    _app.include_router(
         lineages.router,
         prefix="/v2/lineages",
         dependencies=[Depends(get_auth_user)],
@@ -157,6 +154,7 @@ def get_app() -> FastAPI:
         "phylo_trees": phylo_trees.router,
         "phylo_runs": phylo_runs.router,
         "samples": samples.router,
+        "usher": usher.router,
     }
     for suffix, router in org_routers.items():
         # add pathogen support to endpoints
