@@ -14,13 +14,13 @@ const KEY_TO_LABELS = {
   qc_status: "QC Status",
   scorpio_call: "Scorpio Call",
   scorpio_support: "Scorpio Support",
-  version: "Version",
+  lineage_software_version: "Version",
 };
 
 const DISPLAY_ORDER: Array<keyof Lineage> = [
   "lineage",
   "qc_status",
-  "version",
+  "lineage_software_version",
   "last_updated",
   "scorpio_call",
   "scorpio_support",

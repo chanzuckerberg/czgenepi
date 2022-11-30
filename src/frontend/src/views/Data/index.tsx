@@ -82,6 +82,7 @@ const Data: FunctionComponent = () => {
   const { asPath: currentPath } = router;
 
   const sampleResponse = useSampleInfo();
+  console.log("sampleResponse", sampleResponse)
   const PhyloRunResponse = usePhyloRunInfo();
   const {
     data: sampleData,

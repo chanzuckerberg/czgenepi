@@ -65,20 +65,25 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     );
   },
   lineage: ({ value }): JSX.Element => {
-    const hasLineage = Boolean(value.version);
+    // for now we're assuming that each sample has only one lineage
+    // SC2 has lineages from Pangolin, other pathogens are assigned lineages from Nextclade
+    // If we start adding multiple lineages per sample we'll need to revisit this logic.
+    const firstLineageValue = value[0];
+    console.log("firstLineage: ", firstLineageValue);
+    const hasLineage = Boolean(firstLineageValue.lineage_software_version);
 
     const Component = hasLineage ? UnderlinedRowContent : RowContent;
 
     const Content = (
       <Component>
         <Cell data-test-id="row-lineage">
-          {value.lineage || "Not Yet Processed"}
+          {firstLineageValue.lineage || "Not Yet Processed"}
         </Cell>
       </Component>
     );
 
     return hasLineage ? (
-      <LineageTooltip lineage={value}>{Content}</LineageTooltip>
+      <LineageTooltip lineage={firstLineageValue}>{Content}</LineageTooltip>
     ) : (
       Content
     );
