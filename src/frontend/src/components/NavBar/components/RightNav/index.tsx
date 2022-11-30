@@ -1,16 +1,9 @@
 import { Tooltip } from "czifui";
-import Link from "next/link";
 import FeedbackIcon from "src/common/icons/feedback.svg";
 import { useUserInfo } from "src/common/queries/auth";
 import { HiddenLabel } from "src/common/styles/accessibility";
-import { ROUTES } from "../../../../common/routes";
 import UserMenu from "./components/UserMenu";
-import {
-  StyledDiv,
-  StyledIconWrapper,
-  StyledLink,
-  UploadButton,
-} from "./style";
+import { StyledDiv, StyledIconWrapper, StyledLink } from "./style";
 
 export default function RightNav(): JSX.Element {
   const { data: userInfo } = useUserInfo();
@@ -18,17 +11,6 @@ export default function RightNav(): JSX.Element {
   function LoggedInNav(): JSX.Element {
     return (
       <StyledDiv>
-        <Link href={ROUTES.UPLOAD_STEP1} passHref>
-          <UploadButton
-            component="a"
-            href="passHref"
-            sdsType="secondary"
-            sdsStyle="rounded"
-            data-test-id="upload-btn"
-          >
-            Upload
-          </UploadButton>
-        </Link>
         <HiddenLabel id="feedback-label">Submit issues or feedback</HiddenLabel>
         <Tooltip
           arrow
