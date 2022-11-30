@@ -142,7 +142,6 @@ export async function apiResponse<T extends APIResponse>(
   const response = await fetch(ENV.API_URL + endpoint, DEFAULT_FETCH_OPTIONS);
 
   const result = await response.json();
-  console.log("result: ", result)
   if (!response.ok) {
     throw result;
   }

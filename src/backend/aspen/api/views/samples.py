@@ -98,7 +98,7 @@ async def list_samples(
         # TODO - convert this to an oso check.
         if sample.submitting_group_id == ac.group.id:  # type: ignore
             sample.show_private_identifier = True
-        print("sample.lineages!!!!!!!!!!", sample.lineages.lineage)
+        # print("sample.lineages!!!!!!!!!!", sample.lineages.lineage)
         sampleinfo = SampleResponse.from_orm(sample)
         result.samples.append(sampleinfo)
     return result

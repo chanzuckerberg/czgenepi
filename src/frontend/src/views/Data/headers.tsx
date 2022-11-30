@@ -30,7 +30,7 @@ export const SAMPLE_HEADERS: Header[] = [
     },
   },
   {
-    key: "lineage",
+    key: "lineages",
     sortKey: ["lineage", "lineage"],
     text: "Lineage",
     tooltip: {
