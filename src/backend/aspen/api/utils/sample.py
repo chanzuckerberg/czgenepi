@@ -212,31 +212,41 @@ def determine_gisaid_status(
     return {"status": "Not Found", "gisaid_id": None}
 
 
-def format_sample_lineage(sample: Sample) -> Dict[str, Any]:
-    pathogen_genome = sample.uploaded_pathogen_genome
+def format_sample_lineage(sample: Sample) -> List[Dict[str, Any]]:
+    pathogen = sample.pathogen
     lineage: Dict[str, Any] = {
         "lineage": None,
-        "confidence": None,
-        "version": None,
-        "last_updated": None,
+        "lineage_type": None,
+        "lineage_software_version": None,
+        "lineage_probability": None,
+        "raw_lineage_output": None,
+        "reference_dataset_name": None,
+        "reference_sequence_accession": None,
+        "reference_dataset_tag": None,
         "scorpio_call": None,
         "scorpio_support": None,
-        "qc_status": None,
     }
-    if pathogen_genome:
-        lineage["lineage"] = pathogen_genome.pangolin_lineage
-        lineage["confidence"] = pathogen_genome.pangolin_probability
-        lineage["version"] = pathogen_genome.pangolin_version
-        lineage["last_updated"] = pathogen_genome.pangolin_last_updated
 
-        # Support looking at pango csv output.
-        pango_output: Dict[str, Any] = pathogen_genome.pangolin_output  # type: ignore
-        lineage["scorpio_call"] = pango_output.get("scorpio_call")
-        lineage["qc_status"] = pango_output.get("qc_status")
-        if pango_output.get("scorpio_support"):
-            lineage["scorpio_support"] = float(pango_output.get("scorpio_support"))  # type: ignore
+    lineages = []
+    for lin in sample.lineages:
+        lineage_response = lineage.copy()
+        lineage_response["id"] = lin.id
+        lineage_response["lineage"] = lin.lineage
+        lineage_response["lineage_type"] = lin.lineage_type
+        lineage_response["lineage_software_version"] = lin.lineage_software_version
+        lineage_response["lineage_probability"] = lin.lineage_probability
+        lineage_response["raw_lineage_output"] = lin.raw_lineage_output
+        lineage_response["reference_dataset_name"] = lin.reference_dataset_name
+        lineage_response["reference_sequence_accession"] = lin.reference_sequence_accession
+        lineage_response["reference_dataset_tag"] = lin.reference_dataset_tag
 
-    return lineage
+        if pathogen.slug == "SC2":
+            lineage_response["scorpio_call"] = lin.raw_lineage_output.get("scorpio_call")
+            lineage_response["scorpio_support"] = lin.raw_lineage_output.get("scorpio_support")
+        
+        lineages.append(lineage_response)
+
+    return lineages
 
 
 def collect_submission_information(

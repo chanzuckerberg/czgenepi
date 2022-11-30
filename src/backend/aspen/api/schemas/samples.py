@@ -25,18 +25,18 @@ class SampleGisaidResponse(BaseResponse):
     status: str
 
 
-class SampleLineageResponse(BaseResponse):
-    last_updated: Optional[datetime.datetime]
-    lineage: Optional[str]
-    confidence: Optional[float]
-    version: Optional[str]
-    scorpio_call: Optional[str]
-    scorpio_support: Optional[float]
-    qc_status: Optional[str]
+# class SampleLineageResponse(BaseResponse):
+#     last_updated: Optional[datetime.datetime]
+#     lineage: Optional[str]
+#     confidence: Optional[float]
+#     version: Optional[str]
+#     scorpio_call: Optional[str]
+#     scorpio_support: Optional[float]
+#     qc_status: Optional[str]
 
 
 # TODO: make this the main SampleLineagResponse once we've moved away from lineages stored on uploadedpathogengenome class
-class SampleLineageResponse2(BaseResponse):
+class SampleLineageResponse(BaseResponse):
     id: int
     lineage_type: Optional[LineageType]
     lineage: Optional[str]
@@ -46,6 +46,8 @@ class SampleLineageResponse2(BaseResponse):
     reference_dataset_name: Optional[str]
     reference_sequence_accession: Optional[str]
     reference_dataset_tag: Optional[str]
+    scorpio_call: Optional[str]
+    scorpio_support: Optional[str]
 
 
 class SampleGroupResponse(BaseResponse):
@@ -91,7 +93,7 @@ class SampleGetterDict(GetterDict):
             if obj.uploaded_pathogen_genome
             else None
         ),
-        "lineage": format_sample_lineage,
+        "lineages": format_sample_lineage,
         "private_identifier": lambda obj: (
             obj.private_identifier if obj.show_private_identifier else None
         ),
@@ -115,7 +117,7 @@ class SampleResponse(BaseResponse):
     collection_location: LocationResponse
     czb_failed_genome_recovery: bool
     gisaid: Optional[SampleGisaidResponse]
-    lineage: Optional[SampleLineageResponse]
+    # lineage: Optional[SampleLineageResponse]
     pathogen: Optional[PathogenResponse]
     private: bool
     private_identifier: Optional[str]
@@ -125,7 +127,7 @@ class SampleResponse(BaseResponse):
     uploaded_by: SampleUserResponse
     upload_date: Optional[datetime.datetime]
     lineages: Optional[
-        List[SampleLineageResponse2]
+        List[SampleLineageResponse]
     ]  # TODO: make non optional once tables have been initially populated
     qc_metrics: Optional[
         List[SampleQCMetricsResponse]

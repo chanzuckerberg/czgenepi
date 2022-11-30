@@ -84,7 +84,10 @@ async def test_samples_list(
             )
         )
         qc_metrics.append(sample_qc_metrics_factory(samples[i], qc_score=f"{i}"))
-        sample_lineages.append(sample_lineage_factory(samples[i]))
+        if pathogen.slug == "SC2":
+            sample_lineages.append(sample_lineage_factory(samples[i], raw_lineage_output=pangolin_output))
+        else:
+            sample_lineages.append(sample_lineage_factory(samples[i]))
 
     async_session.add(group)
     await async_session.commit()
@@ -152,17 +155,17 @@ async def test_samples_list(
                     "sequencing_date": str(
                         uploaded_pathogen_genomes[i].sequencing_date
                     ),
-                    "lineage": {
-                        "lineage": uploaded_pathogen_genomes[i].pangolin_lineage,
-                        "confidence": uploaded_pathogen_genomes[i].pangolin_probability,
-                        "version": uploaded_pathogen_genomes[i].pangolin_version,
-                        "last_updated": convert_datetime_to_iso_8601(
-                            uploaded_pathogen_genomes[i].pangolin_last_updated
-                        ),
-                        "scorpio_call": pangolin_output["scorpio_call"],
-                        "scorpio_support": float(pangolin_output["scorpio_support"]),
-                        "qc_status": pangolin_output["qc_status"],
-                    },
+                    # "lineage": {
+                    #     "lineage": uploaded_pathogen_genomes[i].pangolin_lineage,
+                    #     "confidence": uploaded_pathogen_genomes[i].pangolin_probability,
+                    #     "version": uploaded_pathogen_genomes[i].pangolin_version,
+                    #     "last_updated": convert_datetime_to_iso_8601(
+                    #         uploaded_pathogen_genomes[i].pangolin_last_updated
+                    #     ),
+                    #     "scorpio_call": pangolin_output["scorpio_call"],
+                    #     "scorpio_support": float(pangolin_output["scorpio_support"]),
+                    #     "qc_status": pangolin_output["qc_status"],
+                    # },
                     "private": True,
                     "submitting_group": {
                         "id": group.id,
@@ -197,6 +200,8 @@ async def test_samples_list(
                             "reference_dataset_name" : sample_lineages[i].reference_dataset_name,
                             "reference_sequence_accession": sample_lineages[i].reference_sequence_accession,
                             "reference_dataset_tag": sample_lineages[i].reference_dataset_tag,
+                            "scorpio_call": sample_lineages[i].raw_lineage_output.get("scorpio_call"),
+                            "scorpio_support": sample_lineages[i].raw_lineage_output.get("scorpio_support"),
                         }
                     ],
                 }
