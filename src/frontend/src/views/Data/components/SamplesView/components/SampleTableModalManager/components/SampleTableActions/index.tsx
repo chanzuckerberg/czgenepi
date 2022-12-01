@@ -1,3 +1,5 @@
+import { Link } from "czifui";
+import { ROUTES } from "src/common/routes";
 import { IconButton } from "../IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
 import { TreeSelectionMenu } from "./components/TreeSelectionMenu";
@@ -5,6 +7,7 @@ import {
   Divider,
   StyledChip,
   StyledSelectedCount,
+  StyledUploadButton,
   StyledWrapper,
   TooltipDescriptionText,
   TooltipHeaderText,
@@ -77,6 +80,17 @@ const SampleTableActions = ({
         onEditSelected={openEditSampleModal}
         data-test-id="sample-page-more-action-btn"
       />
+      <Link href={ROUTES.UPLOAD_STEP1} passHref>
+        <StyledUploadButton
+          component="a"
+          href="passHref"
+          sdsType="primary"
+          sdsStyle="rounded"
+          data-test-id="upload-btn"
+        >
+          Upload
+        </StyledUploadButton>
+      </Link>
     </StyledWrapper>
   );
 };

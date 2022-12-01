@@ -51,7 +51,7 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     User,
 )
-from aspen.util.swipe import PangolinJob
+from aspen.util.swipe import LineageQcJob, PangolinJob
 
 router = APIRouter()
 
@@ -345,10 +345,12 @@ async def create_samples(
     )
     res = await db.execute(new_samples_query)
 
-    pangolin_sample_ids = []
+    pangolin_sample_ids = []  # public_identifier
+    lineage_qc_sample_ids = []  # sample PK ids
     result = SamplesResponse(samples=[])
     for sample in res.unique().scalars().all():
         pangolin_sample_ids.append(sample.public_identifier)
+        lineage_qc_sample_ids.append(sample.id)
         sample.gisaid = determine_gisaid_status(
             sample,
         )
@@ -358,12 +360,20 @@ async def create_samples(
 
     await db.commit()
 
-    job = PangolinJob(settings)
+    # Asynchronously kick off various on-demand jobs via threads before return
+    _pangolin_job = PangolinJob(settings)
     pangolin_job = threading.Thread(
-        target=job.run,
+        target=_pangolin_job.run,
         args=(group, pangolin_sample_ids),
     )
     pangolin_job.start()
+
+    _lineage_qc_job = LineageQcJob(settings)
+    lineage_qc_job = threading.Thread(
+        target=_lineage_qc_job.run,
+        args=(group, pathogen.slug, lineage_qc_sample_ids),
+    )
+    lineage_qc_job.start()
 
     return result
 

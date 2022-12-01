@@ -1,10 +1,12 @@
 import { Button } from "czifui";
 import NextLink from "next/link";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { HeadAppTitle } from "src/common/components";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
 import { useUserInfo } from "src/common/queries/auth";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import { B } from "src/common/styles/basicStyle";
 import { pluralize } from "src/common/utils/strUtils";
@@ -20,6 +22,7 @@ import {
 import { Props } from "../common/types";
 import Table from "./components/Table";
 import Upload from "./components/Upload";
+import { reviewSamplesPathogenStrings } from "./strings";
 import {
   CheckboxText,
   CheckboxWrapper,
@@ -35,6 +38,7 @@ export default function Review({
   cancelPrompt,
   analyticsFlowUuid,
 }: Props): JSX.Element {
+  const pathogen = useSelector(selectCurrentPathogen);
   const { data: userInfo } = useUserInfo();
   const [isGroupConfirmationChecked, setIsGroupConfirmationChecked] =
     useState<boolean>(false);
@@ -69,7 +73,9 @@ export default function Review({
       </Header>
       <Content>
         <ContentTitleWrapper>
-          <ContentTitle>Sample Info</ContentTitle>
+          <ContentTitle>
+            {reviewSamplesPathogenStrings[pathogen].pathogenName} Sample Info
+          </ContentTitle>
           <NextLink href={ROUTES.UPLOAD_STEP1} passHref>
             <a href="passHref">
               <StyledButton sdsType="secondary" sdsStyle="minimal">

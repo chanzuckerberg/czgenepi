@@ -4,14 +4,26 @@
 import { store } from "src/common/redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
+import { PathogenConfigType } from "src/common/types/pathogenConfig";
 import {
   getEditExampleRows,
   SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
   SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
   UPLOAD_EXAMPLE_ROWS,
 } from "./common/constants";
+
+interface TemplateUpdatedDate {
+  updatedDate: string;
+}
 // Should change below whenever there are material changes to upload TSV download
-export const TEMPLATE_UPDATED_DATE = "2022-02-22"; // YYYY-MM-DD
+export const TEMPLATE_UPDATED_DATE: PathogenConfigType<TemplateUpdatedDate> = {
+  [Pathogen.COVID]: {
+    updatedDate: "2022-02-22", // YYYY-MM-DD
+  },
+  [Pathogen.MONKEY_POX]: {
+    updatedDate: "2022-12-01", // YYYY-MM-DD
+  },
+};
 
 // If a future pathogen has different headers, we'll need to modify this.
 function getUploadTemplateHeaders(pathogen: Pathogen): string[] {
