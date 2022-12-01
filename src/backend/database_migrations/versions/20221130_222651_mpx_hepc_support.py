@@ -21,8 +21,11 @@ def upgrade():
         """
     )
 
-    op.execute("select nextval('aspen.pathogen_repo_configs_id_seq')")
-    op.execute("select nextval('aspen.pathogen_repo_configs_id_seq')")
+    op.execute(
+        """
+        SELECT setval('aspen.pathogen_repo_configs_id_seq', (SELECT MAX(id) FROM aspen.pathogen_repo_configs)+1);
+        """
+    )
 
     op.execute(
         """
