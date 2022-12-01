@@ -162,7 +162,6 @@ async def test_samples_list(
                     },
                     "qc_metrics": [
                         {
-                            "id": qc_metrics[i].id,
                             "qc_score": qc_metrics[i].qc_score,
                             "qc_software_version": qc_metrics[i].qc_software_version,
                             "qc_status": qc_metrics[i].qc_status,
@@ -175,7 +174,6 @@ async def test_samples_list(
                     ],
                     "lineages": [
                         {
-                            "id": sample_lineages[i].id,
                             "lineage_type": sample_lineages[i].lineage_type.value,
                             "lineage": sample_lineages[i].lineage,
                             "lineage_software_version": sample_lineages[

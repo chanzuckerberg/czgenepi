@@ -9,7 +9,7 @@ interface GISAID {
 }
 
 interface Lineage {
-  id?: number;
+  last_updated?: string;
   lineage?: string;
   lineage_type?: string;
   lineage_software_version?: string;
@@ -19,10 +19,10 @@ interface Lineage {
   reference_dataset_tag?: string;
   scorpio_call?: string;
   scorpio_support?: string;
+  qc_status?: string;
 }
 
 interface QCMetrics {
-  id?: number;
   qc_score?: string;
   qc_software_version?: string;
   qc_status?: string;
@@ -57,8 +57,8 @@ interface Sample extends BioinformaticsType {
   };
   gisaid: GISAID;
   CZBFailedGenomeRecovery: boolean;
-  lineages: Lineage[];
-  qc_metrics: QCMetrics[];
+  lineages: [Lineage];
+  qc_metrics: [QCMetrics];
   private?: boolean;
 }
 

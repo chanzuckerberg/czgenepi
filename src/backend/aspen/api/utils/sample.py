@@ -215,13 +215,6 @@ def determine_gisaid_status(
 def format_sample_lineage(sample: Sample) -> List[Dict[str, Any]]:
     pathogen = sample.pathogen
     lineage: Dict[str, Any] = {
-        "lineage": None,
-        "lineage_type": None,
-        "lineage_software_version": None,
-        "lineage_probability": None,
-        "reference_dataset_name": None,
-        "reference_sequence_accession": None,
-        "reference_dataset_tag": None,
         "scorpio_call": None,
         "scorpio_support": None,
         "qc_status": None,
@@ -230,7 +223,6 @@ def format_sample_lineage(sample: Sample) -> List[Dict[str, Any]]:
     lineages = []
     for lin in sample.lineages:
         lineage_response = lineage.copy()
-        lineage_response["id"] = lin.id
         lineage_response["lineage"] = lin.lineage
         lineage_response["lineage_type"] = lin.lineage_type
         lineage_response["lineage_software_version"] = lin.lineage_software_version

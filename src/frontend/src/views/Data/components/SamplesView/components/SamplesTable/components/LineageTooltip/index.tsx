@@ -15,15 +15,25 @@ const KEY_TO_LABELS = {
   scorpio_call: "Scorpio Call",
   scorpio_support: "Scorpio Support",
   lineage_software_version: "Version",
+  lineage_type: "Lineage Type",
+  lineage_probability: "Lineage Probability",
+  reference_dataset_name: "Reference Dataset Name",
+  reference_sequence_accession: "Reference Sequence Accession",
+  reference_dataset_tag: "Reference Dataset Tag",
 };
 
 const DISPLAY_ORDER: Array<keyof Lineage> = [
   "lineage",
   "qc_status",
   "lineage_software_version",
+  "lineage_type",
+  "lineage_probability",
   "last_updated",
   "scorpio_call",
   "scorpio_support",
+  "reference_dataset_name",
+  "reference_sequence_accession",
+  "reference_dataset_tag",
 ];
 
 export const LineageTooltip = ({ children, lineage }: Props): JSX.Element => {
@@ -31,14 +41,27 @@ export const LineageTooltip = ({ children, lineage }: Props): JSX.Element => {
     <>
       {DISPLAY_ORDER.map((key) => {
         let value = lineage[key];
-        if (key === "last_updated") {
+        if (key === "last_updated" && value) {
           value = datetimeWithTzToLocalDate(value);
         }
-        return (
-          <Wrapper key={key}>
-            <Label>{KEY_TO_LABELS[key]}:</Label> <Text>{value}</Text>
-          </Wrapper>
-        );
+        // skip certain keys for now that are extra and not included in current design
+        if (
+          !(
+            key in
+            [
+              "reference_dataset_name",
+              "reference_sequence_accession",
+              "reference_dataset_tag",
+              "lineage_type",
+            ]
+          )
+        ) {
+          return (
+            <Wrapper key={key}>
+              <Label>{KEY_TO_LABELS[key]}:</Label> <Text>{value}</Text>
+            </Wrapper>
+          );
+        }
       })}
     </>
   );

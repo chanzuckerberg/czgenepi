@@ -66,7 +66,7 @@ const DATA_FILTER_INIT = {
     params: {
       multiSelected: [],
     },
-    transform: (d: Sample) => d.lineage?.lineage,
+    transform: (d: Sample) => d.lineages[0]?.lineage,
     type: TypeFilterType.Multiple,
   },
   uploadDate: {

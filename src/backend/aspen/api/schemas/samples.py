@@ -26,7 +26,6 @@ class SampleGisaidResponse(BaseResponse):
 
 # TODO: add field to capture pangolin_last_updated (last_updated) once we add support for that
 class SampleLineageResponse(BaseResponse):
-    id: int
     lineage_type: Optional[LineageType]
     lineage: Optional[str]
     lineage_software_version: Optional[str]
@@ -51,7 +50,6 @@ class SampleQCMetricsResponse(BaseResponse):
     class Config:
         orm_mode = True
 
-    id: int
     qc_score: Optional[str]
     qc_software_version: str
     qc_status: str
@@ -115,10 +113,10 @@ class SampleResponse(BaseResponse):
     upload_date: Optional[datetime.datetime]
     lineages: Optional[
         List[SampleLineageResponse]
-    ]  # TODO: make non optional once tables have been initially populated
+    ]
     qc_metrics: Optional[
         List[SampleQCMetricsResponse]
-    ]  # TODO: make non optional once tables have been initially populated
+    ]
 
 
 class SampleBulkDeleteRequest(BaseRequest):
