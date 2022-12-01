@@ -31,7 +31,7 @@ def upgrade():
         """
         INSERT INTO aspen.pathogen_repo_configs (prefix, public_repository_id, pathogen_id) VALUES
              ( 'hcv', (SELECT id from aspen.public_repositories WHERE name='GenBank'), (SELECT id from aspen.pathogens WHERE slug='HCV') ),
-             ( 'hMpxV', (SELECT id from aspen.public_repositories WHERE name='GenBank'), (SELECT id from aspen.pathogens WHERE slug='MPX') )
+             ( 'MPXV', (SELECT id from aspen.public_repositories WHERE name='GenBank'), (SELECT id from aspen.pathogens WHERE slug='MPX') )
         """
     )
 
