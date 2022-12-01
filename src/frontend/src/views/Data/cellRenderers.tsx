@@ -68,26 +68,28 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     // for now we're assuming that each sample has only one lineage
     // SC2 has lineages from Pangolin, other pathogens are assigned lineages from Nextclade
     // If we start adding multiple lineages per sample we'll need to revisit this logic.
-    console.log("VALUE: ", value);
     const firstLineageValue = value[0];
-    console.log("firstLineage: ", firstLineageValue);
-    const hasLineage = Boolean(firstLineageValue.lineage_software_version);
-
+    console.log("firstLineageValue", firstLineageValue);
+    const hasLineage = Boolean(firstLineageValue && firstLineageValue.lineage_software_version);
+    console.log("hasLineage: ", hasLineage);
     const Component = hasLineage ? UnderlinedRowContent : RowContent;
 
     const Content = (
       <Component>
         <Cell data-test-id="row-lineage">
-          {firstLineageValue.lineage || "Not Yet Processed"}
+          {(firstLineageValue && firstLineageValue.lineage) || "Not Yet Processed"}
         </Cell>
       </Component>
     );
 
-    return hasLineage ? (
+    // return hasLineage ? (
+    //   <LineageTooltip lineage={firstLineageValue}>{Content}</LineageTooltip>
+    // ) : (
+    //   Content
+    // );
+    return (
       <LineageTooltip lineage={firstLineageValue}>{Content}</LineageTooltip>
-    ) : (
-      Content
-    );
+    )
   },
 
   privateId: ({

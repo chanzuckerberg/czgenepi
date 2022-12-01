@@ -82,7 +82,6 @@ const Data: FunctionComponent = () => {
   const { asPath: currentPath } = router;
 
   const sampleResponse = useSampleInfo();
-  // console.log("sampleResponse", sampleResponse)
   const PhyloRunResponse = usePhyloRunInfo();
   const {
     data: sampleData,
@@ -123,7 +122,6 @@ const Data: FunctionComponent = () => {
     }),
     [sampleData, phyloRunData]
   );
-  console.log("!!!!!!samples: ", samples)
   useEffect(() => {
     if (currentPath === ROUTES.DATA) {
       router.push(ROUTES.DATA_SAMPLES);

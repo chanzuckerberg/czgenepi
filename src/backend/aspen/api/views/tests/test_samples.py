@@ -189,6 +189,7 @@ async def test_samples_list(
                             "reference_dataset_tag": sample_lineages[i].reference_dataset_tag,
                             "scorpio_call": sample_lineages[i].raw_lineage_output.get("scorpio_call"),
                             "scorpio_support": sample_lineages[i].raw_lineage_output.get("scorpio_support"),
+                            "qc_status": qc_metrics[i].qc_status,
                         }
                     ],
                 }

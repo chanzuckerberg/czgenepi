@@ -224,6 +224,7 @@ def format_sample_lineage(sample: Sample) -> List[Dict[str, Any]]:
         "reference_dataset_tag": None,
         "scorpio_call": None,
         "scorpio_support": None,
+        "qc_status": None,
     }
 
     lineages = []
@@ -237,6 +238,7 @@ def format_sample_lineage(sample: Sample) -> List[Dict[str, Any]]:
         lineage_response["reference_dataset_name"] = lin.reference_dataset_name
         lineage_response["reference_sequence_accession"] = lin.reference_sequence_accession
         lineage_response["reference_dataset_tag"] = lin.reference_dataset_tag
+        lineage_response["qc_status"] = sample.qc_metrics[0].qc_status
 
         if pathogen.slug == "SC2":
             lineage_response["scorpio_call"] = lin.raw_lineage_output.get("scorpio_call")

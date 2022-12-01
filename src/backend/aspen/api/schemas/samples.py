@@ -24,8 +24,7 @@ class SampleGisaidResponse(BaseResponse):
     gisaid_id: Optional[str]
     status: str
 
-
-# TODO: make this the main SampleLineagResponse once we've moved away from lineages stored on uploadedpathogengenome class
+# TODO: add field to capture pangolin_last_updated (last_updated) once we add support for that
 class SampleLineageResponse(BaseResponse):
     id: int
     lineage_type: Optional[LineageType]
@@ -37,6 +36,7 @@ class SampleLineageResponse(BaseResponse):
     reference_dataset_tag: Optional[str]
     scorpio_call: Optional[str]
     scorpio_support: Optional[str]
+    qc_status: Optional[str]  # we're also returning this here from the SampleQCMetrics table so that the frontend cellRenderers have all the data needed to render tooltip
 
 
 class SampleGroupResponse(BaseResponse):
