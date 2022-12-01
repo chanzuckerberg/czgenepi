@@ -1,4 +1,5 @@
-"""
+"""add MPX and HCV DB support for gisaid/genbank template
+
 
 Create Date: 2022-11-30 22:26:58.178142
 
