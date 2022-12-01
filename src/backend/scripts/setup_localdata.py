@@ -1,6 +1,6 @@
 import os
-from datetime import datetime
 import random
+from datetime import datetime
 
 import boto3
 import requests
@@ -11,25 +11,25 @@ from aspen.database.connection import get_db_uri, init_db
 from aspen.database.models import (
     AlignedRepositoryData,
     Group,
+    LineageType,
     Location,
     Pathogen,
     PhyloRun,
     PhyloTree,
     ProcessedRepositoryData,
     PublicRepository,
+    QCMetricCaller,
     RawRepositoryData,
     RepositoryAlignmentWorkflow,
     RepositoryDownloadWorkflow,
     Sample,
+    SampleLineage,
+    SampleQCMetric,
     TreeType,
     UploadedPathogenGenome,
     User,
     Workflow,
     WorkflowStatusType,
-    LineageType, 
-    QCMetricCaller, 
-    SampleLineage, 
-    SampleQCMetric
 )
 from aspen.database.models.workflow import SoftwareNames
 
@@ -131,11 +131,10 @@ def create_pathogens(session):
         pathogens.append(pathogen)
     return pathogens
 
-def create_sample_lineage(session, sample): 
+
+def create_sample_lineage(session, sample):
     sample_lineage = (
-        session.query(SampleLineage)
-        .filter(SampleLineage.sample == sample)
-        .first()
+        session.query(SampleLineage).filter(SampleLineage.sample == sample).first()
     )
     if sample_lineage:
         print("SampleLineage already exists")
@@ -143,7 +142,9 @@ def create_sample_lineage(session, sample):
     print(f"Creating SampleLineage with sample private_id {sample.private_identifier}")
 
     pathogen_slug = sample.pathogen.slug
-    lineage_type = LineageType.PANGOLIN if pathogen_slug == "SC2" else LineageType.NEXTCLADE
+    lineage_type = (
+        LineageType.PANGOLIN if pathogen_slug == "SC2" else LineageType.NEXTCLADE
+    )
 
     # we're not using raw lineage output from NextClade for now, so only adding pangolin output for now
 
@@ -161,7 +162,7 @@ def create_sample_lineage(session, sample):
         lineage=random.choice(random_scorpio_calls),
         lineage_software_version="1.0.0",
         lineage_probability=random.choice(random_support_calls),
-        raw_lineage_output=raw_lineage_output
+        raw_lineage_output=raw_lineage_output,
     )
     session.add(sample_lineage)
     return sample_lineage
@@ -170,20 +171,22 @@ def create_sample_lineage(session, sample):
 def create_sample_qc_metrics(session, sample):
 
     sample_qc_metric = (
-        session.query(SampleQCMetric)
-        .filter(SampleQCMetric.sample == sample)
-        .first()
+        session.query(SampleQCMetric).filter(SampleQCMetric.sample == sample).first()
     )
     if sample_qc_metric:
         print("SampleQCMetric already exists")
         return sample_qc_metric
-    print(f"Creating SampleSampleQCMetricLineage with sample private_id {sample.private_identifier}")
+    print(
+        f"Creating SampleSampleQCMetricLineage with sample private_id {sample.private_identifier}"
+    )
 
     random_qc_status_scores = {
         "good": ["18.062500", "8.062500", "11.062500"],
         "mediocre": ["52.062500", "86.062500", "67.062500"],
         "bad": ["493.558728", "200.694444", "771.691989"],
-        "failed": [None, ]
+        "failed": [
+            None,
+        ],
     }
 
     random_qc_status = random.choice(list(random_qc_status_scores.keys()))
@@ -191,11 +194,11 @@ def create_sample_qc_metrics(session, sample):
 
     sample_qc_metrics = SampleQCMetric(
         sample=sample,
-        qc_caller= QCMetricCaller.NEXTCLADE,
+        qc_caller=QCMetricCaller.NEXTCLADE,
         qc_software_version="1.0.0",
-        qc_score = random_qc_score,
-        qc_status = random_qc_status,
-        raw_qc_output = {},
+        qc_score=random_qc_score,
+        qc_status=random_qc_status,
+        raw_qc_output={},
     )
 
     session.add(sample_qc_metrics)

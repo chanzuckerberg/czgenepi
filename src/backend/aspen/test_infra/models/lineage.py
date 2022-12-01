@@ -14,7 +14,7 @@ def sample_lineage_factory(
     raw_lineage_output={},
     reference_dataset_name="",
     reference_sequence_accession="",
-    reference_dataset_tag=""
+    reference_dataset_tag="",
 ):
     return SampleLineage(
         sample=sample,
@@ -25,5 +25,5 @@ def sample_lineage_factory(
         raw_lineage_output=raw_lineage_output,
         reference_dataset_name=reference_dataset_name,
         reference_sequence_accession=reference_sequence_accession,
-        reference_dataset_tag=reference_dataset_tag
+        reference_dataset_tag=reference_dataset_tag,
     )

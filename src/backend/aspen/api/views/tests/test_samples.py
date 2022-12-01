@@ -85,7 +85,9 @@ async def test_samples_list(
         )
         qc_metrics.append(sample_qc_metrics_factory(samples[i], qc_score=f"{i}"))
         if pathogen.slug == "SC2":
-            sample_lineages.append(sample_lineage_factory(samples[i], raw_lineage_output=pangolin_output))
+            sample_lineages.append(
+                sample_lineage_factory(samples[i], raw_lineage_output=pangolin_output)
+            )
         else:
             sample_lineages.append(sample_lineage_factory(samples[i]))
 
@@ -166,10 +168,15 @@ async def test_samples_list(
                             "qc_software_version": qc_metrics[i].qc_software_version,
                             "qc_status": qc_metrics[i].qc_status,
                             "qc_caller": qc_metrics[i].qc_caller.value,
-                            "reference_dataset_name": qc_metrics[i].reference_dataset_name,
-                            "reference_sequence_accession": qc_metrics[i].reference_sequence_accession,
-                            "reference_dataset_tag": qc_metrics[i].reference_dataset_tag,
-
+                            "reference_dataset_name": qc_metrics[
+                                i
+                            ].reference_dataset_name,
+                            "reference_sequence_accession": qc_metrics[
+                                i
+                            ].reference_sequence_accession,
+                            "reference_dataset_tag": qc_metrics[
+                                i
+                            ].reference_dataset_tag,
                         }
                     ],
                     "lineages": [
@@ -182,11 +189,21 @@ async def test_samples_list(
                             "lineage_probability": sample_lineages[
                                 i
                             ].lineage_probability,
-                            "reference_dataset_name" : sample_lineages[i].reference_dataset_name,
-                            "reference_sequence_accession": sample_lineages[i].reference_sequence_accession,
-                            "reference_dataset_tag": sample_lineages[i].reference_dataset_tag,
-                            "scorpio_call": sample_lineages[i].raw_lineage_output.get("scorpio_call"),
-                            "scorpio_support": sample_lineages[i].raw_lineage_output.get("scorpio_support"),
+                            "reference_dataset_name": sample_lineages[
+                                i
+                            ].reference_dataset_name,
+                            "reference_sequence_accession": sample_lineages[
+                                i
+                            ].reference_sequence_accession,
+                            "reference_dataset_tag": sample_lineages[
+                                i
+                            ].reference_dataset_tag,
+                            "scorpio_call": sample_lineages[i].raw_lineage_output.get(
+                                "scorpio_call"
+                            ),
+                            "scorpio_support": sample_lineages[
+                                i
+                            ].raw_lineage_output.get("scorpio_support"),
                             "qc_status": qc_metrics[i].qc_status,
                         }
                     ],

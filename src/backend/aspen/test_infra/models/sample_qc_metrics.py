@@ -22,5 +22,5 @@ def sample_qc_metrics_factory(
         raw_qc_output=raw_qc_output,
         reference_dataset_name=reference_dataset_name,
         reference_sequence_accession=reference_sequence_accession,
-        reference_dataset_tag=reference_dataset_tag
+        reference_dataset_tag=reference_dataset_tag,
     )

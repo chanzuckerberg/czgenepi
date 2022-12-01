@@ -1,7 +1,5 @@
 import datetime
-from optparse import Option
 from typing import Any, List, Optional
-from aspen.database.models.lineages import QCMetricCaller
 
 from pydantic import constr, validator
 from pydantic.utils import GetterDict
@@ -11,6 +9,7 @@ from aspen.api.schemas.locations import LocationResponse
 from aspen.api.schemas.pathogens import PathogenResponse
 from aspen.api.utils import format_sample_lineage
 from aspen.database.models import LineageType
+from aspen.database.models.lineages import QCMetricCaller
 
 SEQUENCE_VALIDATION_REGEX = r"^[WSKMYRVHDBNZNATCGUwskmyrvhdbnznatcgu-]+$"
 
@@ -24,6 +23,7 @@ class SampleGisaidResponse(BaseResponse):
     gisaid_id: Optional[str]
     status: str
 
+
 # TODO: add field to capture pangolin_last_updated (last_updated) once we add support for that
 class SampleLineageResponse(BaseResponse):
     lineage_type: Optional[LineageType]
@@ -35,7 +35,9 @@ class SampleLineageResponse(BaseResponse):
     reference_dataset_tag: Optional[str]
     scorpio_call: Optional[str]
     scorpio_support: Optional[str]
-    qc_status: Optional[str]  # we're also returning this here from the SampleQCMetrics table so that the frontend cellRenderers have all the data needed to render tooltip
+    qc_status: Optional[
+        str
+    ]  # we're also returning this here from the SampleQCMetrics table so that the frontend cellRenderers have all the data needed to render tooltip
 
 
 class SampleGroupResponse(BaseResponse):
@@ -111,12 +113,8 @@ class SampleResponse(BaseResponse):
     submitting_group: SampleGroupResponse
     uploaded_by: SampleUserResponse
     upload_date: Optional[datetime.datetime]
-    lineages: Optional[
-        List[SampleLineageResponse]
-    ]
-    qc_metrics: Optional[
-        List[SampleQCMetricsResponse]
-    ]
+    lineages: Optional[List[SampleLineageResponse]]
+    qc_metrics: Optional[List[SampleQCMetricsResponse]]
 
 
 class SampleBulkDeleteRequest(BaseRequest):
