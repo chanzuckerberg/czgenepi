@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import {
+  Button,
   Chip,
   CommonThemeProps,
   fontHeaderXs,
@@ -64,6 +65,15 @@ export const TooltipDescriptionText = styled.div`
     const colors = getColors(props);
     return `
       color: ${colors?.gray[400]};
+    `;
+  }}
+`;
+
+export const StyledUploadButton = styled(Button)`
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-left: ${spaces?.l}px;
     `;
   }}
 `;

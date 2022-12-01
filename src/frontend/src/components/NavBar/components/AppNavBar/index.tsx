@@ -1,27 +1,13 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
-import { Icon } from "czifui";
 import Link from "next/link";
-import { MouseEventHandler, useState } from "react";
 import { useUserInfo } from "src/common/queries/auth";
 import { ROUTES } from "src/common/routes";
 import { HiddenLabel } from "src/common/styles/accessibility";
-import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
-import { InviteModal } from "src/views/GroupMembersPage/components/MembersTab/components/InviteModal";
 import RightNav from "../RightNav";
-import { GroupDetailsDropdown } from "./components/GroupDetailsDropdown";
 import { PathogenTabs } from "./components/PathogenTabs";
-import {
-  DropdownClickTarget,
-  LeftNav,
-  Logo,
-  LogoAnchor,
-  NavBar,
-  NavOrg,
-  Separator,
-  StyledNavIconWrapper,
-} from "./style";
+import { LeftNav, Logo, LogoAnchor, NavBar, Separator } from "./style";
 
 /*
  * This nav bar is shown when a user is both authenticated and
@@ -29,10 +15,6 @@ import {
  * aka behind auth logic
  */
 const AppNavBar = (): JSX.Element => {
-  const [anchorEl, setAnchorEl] = useState<Element | null>(null);
-  const [isGroupDetailsDropdownOpen, setIsGroupDetailsDropdownOpen] =
-    useState<boolean>(false);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState<boolean>(false);
   const { data: userInfo } = useUserInfo();
 
   const flag = useTreatments([USER_FEATURE_FLAGS.multi_pathogen]);
@@ -41,16 +23,7 @@ const AppNavBar = (): JSX.Element => {
     USER_FEATURE_FLAGS.multi_pathogen
   );
 
-  const group = getCurrentGroupFromUserInfo(userInfo);
   const route = userInfo ? ROUTES.DATA : ROUTES.HOMEPAGE;
-
-  const toggleDropdown: MouseEventHandler = (e) => {
-    const newAnchor = isGroupDetailsDropdownOpen ? null : e.currentTarget;
-    setAnchorEl(newAnchor);
-    setIsGroupDetailsDropdownOpen(!isGroupDetailsDropdownOpen);
-  };
-
-  const name = group?.name;
 
   return (
     <NavBar data-test-id="navbar">
@@ -65,27 +38,6 @@ const AppNavBar = (): JSX.Element => {
           <>
             <Separator />
             <PathogenTabs />
-          </>
-        )}
-        {name && (
-          <>
-            <Separator />
-            <InviteModal
-              onClose={() => setIsInviteModalOpen(false)}
-              open={isInviteModalOpen}
-              groupName={name}
-            />
-            <DropdownClickTarget onClick={toggleDropdown}>
-              <NavOrg>{name}</NavOrg>
-              <StyledNavIconWrapper>
-                <Icon sdsIcon="chevronDown" sdsSize="xs" sdsType="static" />
-              </StyledNavIconWrapper>
-              <GroupDetailsDropdown
-                anchorEl={anchorEl}
-                onClickInvite={() => setIsInviteModalOpen(true)}
-                open={isGroupDetailsDropdownOpen}
-              />
-            </DropdownClickTarget>
           </>
         )}
       </LeftNav>
