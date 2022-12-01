@@ -2,6 +2,7 @@ import AlertTitle from "@mui/material/AlertTitle";
 import { Alert, Button } from "czifui";
 import NextLink from "next/link";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import {
   AnalyticsSamplesUploadSuccess,
   EVENT_TYPES,
@@ -9,11 +10,13 @@ import {
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { RawSamplesWithId, useCreateSamples } from "src/common/queries/samples";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import Dialog from "src/components/Dialog";
 import { SampleIdToMetadata } from "src/components/WebformTable/common/types";
 import { ContinueButton } from "../../../common/style";
 import { Samples } from "../../../common/types";
+import { uploadCompletePathogenStrings } from "./strings";
 import {
   ImageWrapper,
   StyledDialogActions,
@@ -39,6 +42,7 @@ export default function Upload({
   cancelPrompt,
   analyticsFlowUuid,
 }: Props): JSX.Element {
+  const pathogen = useSelector(selectCurrentPathogen);
   const [isOpen, setIsOpen] = useState(false);
 
   const { mutate, isLoading, isSuccess, isError, error } = useCreateSamples({
@@ -126,7 +130,8 @@ export default function Upload({
 
   function getSubtitleText() {
     if (isLoading) return "Stay on this page until upload completes.";
-    if (isSuccess) return "Your upload has been added to your Samples table.";
+    if (isSuccess)
+      return `Your upload has been added to the ${uploadCompletePathogenStrings[pathogen].pathogenName} samples table.`;
     if (isError) {
       const message = (error as Error)?.message;
 
