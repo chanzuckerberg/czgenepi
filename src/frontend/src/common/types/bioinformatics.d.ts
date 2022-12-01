@@ -9,7 +9,6 @@ interface GISAID {
 }
 
 interface Lineage {
-  last_updated?: string;
   lineage?: string;
   lineage_type?: string;
   lineage_software_version?: string;

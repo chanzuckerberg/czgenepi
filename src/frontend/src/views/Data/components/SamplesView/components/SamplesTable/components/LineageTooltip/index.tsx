@@ -1,6 +1,5 @@
 import { Tooltip } from "czifui";
 import { ReactNode } from "react";
-import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { Label, Text, Wrapper } from "./style";
 
 interface Props {
@@ -9,7 +8,6 @@ interface Props {
 }
 
 const KEY_TO_LABELS = {
-  last_updated: "Last Updated",
   lineage: "Lineage",
   qc_status: "QC Status",
   scorpio_call: "Scorpio Call",
@@ -28,7 +26,6 @@ const DISPLAY_ORDER: Array<keyof Lineage> = [
   "lineage_software_version",
   "lineage_type",
   "lineage_probability",
-  "last_updated",
   "scorpio_call",
   "scorpio_support",
   "reference_dataset_name",
@@ -40,10 +37,7 @@ export const LineageTooltip = ({ children, lineage }: Props): JSX.Element => {
   const textRows = (
     <>
       {DISPLAY_ORDER.map((key) => {
-        let value = lineage[key];
-        if (key === "last_updated" && value) {
-          value = datetimeWithTzToLocalDate(value);
-        }
+        const value = lineage[key];
         // skip certain keys for now that are extra and not included in current design
         if (
           !(
