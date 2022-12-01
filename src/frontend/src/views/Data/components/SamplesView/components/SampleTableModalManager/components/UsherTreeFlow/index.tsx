@@ -28,7 +28,7 @@ const generateUsherLink = (
 ) => {
   const encodedFileLink = encodeURIComponent(remoteFile);
 
-  const DB_PARAM = USHER_DBS[pathogen];
+  const DB_PARAM = `db=${USHER_DBS[pathogen]}`;
   const FILE_PARAM = `remoteFile=${encodedFileLink}`;
   const TREE_TYPE_PARAM = `phyloPlaceTree=${treeType}`;
   const SAMPLE_COUNT_PARAM = `subtreeSize=${sampleCount}`;
