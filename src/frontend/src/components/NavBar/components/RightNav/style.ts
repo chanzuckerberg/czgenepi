@@ -3,10 +3,12 @@ import {
   Button,
   CommonThemeProps,
   fontBodyXs,
+  fontHeaderL,
   getColors,
   getPalette,
   getSpaces,
 } from "czifui";
+import { iconFillWhite } from "src/common/styles/iconStyle";
 
 const whiteBorder = "border: 1px solid white;";
 export const UploadButton = styled(Button)`
@@ -56,7 +58,7 @@ export const StyledLink = styled.a`
 
     return `
       padding: ${spaces?.xxxs}px;
-      margin-right: ${spaces?.xs}px;
+      margin-right: ${spaces?.xl}px;
     `;
   }}
 `;
@@ -77,4 +79,43 @@ export const StyledIconWrapper = styled.div`
       }
     `;
   }}
+`;
+
+export const DropdownClickTarget = styled.button`
+  display: flex;
+  align-items: center;
+  border: none;
+  ${(props: CommonThemeProps) => {
+    const palette = getPalette(props);
+
+    return `
+      background-color: ${palette?.common?.black};
+    `;
+  }}
+`;
+
+export const NavOrg = styled.div`
+  ${fontHeaderL}
+
+  height: 100%;
+  color: white;
+  align-items: center;
+  display: flex;
+
+  a {
+    color: white;
+  }
+`;
+
+export const StyledNavIconWrapper = styled.div`
+  ${iconFillWhite}
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+
+    return `
+      margin: 0 ${spaces?.l}px;
+    `;
+  }}
+  display: flex;
+  align-items: center;
 `;

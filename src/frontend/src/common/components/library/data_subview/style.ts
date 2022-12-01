@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import {
+  Button,
   Chip,
   CommonThemeProps,
   fontHeaderXs,
@@ -93,4 +94,13 @@ export const SamplesTable = styled.div`
 export const StyledBar = styled.div`
   display: flex;
   justify-content: space-between;
+`;
+
+export const StyledUploadButton = styled(Button)`
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      margin-left: ${spaces?.l}px;
+    `;
+  }}
 `;
