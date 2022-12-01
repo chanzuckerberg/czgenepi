@@ -1,4 +1,4 @@
-"""
+"""remove pangolin fields from pathogen_genomes
 
 Create Date: 2022-12-01 22:37:13.899799
 
