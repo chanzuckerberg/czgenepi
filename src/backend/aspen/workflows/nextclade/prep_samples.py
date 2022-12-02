@@ -5,6 +5,7 @@ Core approach here is a copy of what's in workflows/pangolin/export.py.
 """
 import io
 import json
+from enum import Enum
 from typing import IO, Iterable
 
 import click
@@ -21,7 +22,20 @@ from aspen.database.connection import (
 from aspen.database.models import Pathogen, Sample, UploadedPathogenGenome
 
 
+# Running this CLI script must be one of these types of runs.
+class RunType(str, Enum):  # str mix-in gives nice == compare against strings
+    # [default] Make calls against samples specified by id via sample-ids-file
+    SPECIFIED_IDS_ONLY = "specified-ids-only"
+    # Get samples for pathogen with a stale call or no call, run against those
+    REFRESH_STALE = "refresh-stale"
+    # Call against all samples for pathogen, regardless of current state
+    FORCE_ALL = "force-all"
+# `click` barfs on enums, so make a string list for it
+_run_type_click_choices = [item.value for item in RunType]
+
+
 @click.command("export")
+@click.option("run_type", "--run-type", type=click.Choice(_run_type_click_choices), default=RunType.SPECIFIED_IDS_ONLY)
 @click.option("pathogen_slug", "--pathogen-slug", type=str, required=True)
 @click.option("sample_ids_fh", "--sample-ids-file", type=click.File("r"), required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
@@ -29,6 +43,7 @@ from aspen.database.models import Pathogen, Sample, UploadedPathogenGenome
     "pathogen_info_fh", "--pathogen-info-file", type=click.File("w"), required=True
 )
 def cli(
+    run_type: str,
     pathogen_slug: str,
     sample_ids_fh: io.TextIOBase,
     sequences_fh: io.TextIOBase,
@@ -47,6 +62,7 @@ def cli(
         to samples by PK, not by private/public identifier.
     - pathogen_info_fh: Write out pathogen info for later use in workflow
     """
+    # print(run_type == RunType.SPECIFIED_IDS_ONLY)  # REMOVE
     sample_ids: list[int] = [int(id_line) for id_line in sample_ids_fh]
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
