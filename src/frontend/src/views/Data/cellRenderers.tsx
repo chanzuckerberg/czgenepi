@@ -52,17 +52,18 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       </RowContent>
     );
   },
-  gisaid: ({ value }) => {
+  gisaid: ({ value, item, index }) => {
     const { gisaid_id, status } = value as Sample["gisaid"];
-
-    return (
+    console.log("item from cell renderer: ", item);
+    console.log("index from cell renderer: ", index);
+    return (  
       <RowContent>
         <GISAIDCell data-test-id="row-gisaid-id">
           {status}
           {gisaid_id && <Subtext>{gisaid_id}</Subtext>}
         </GISAIDCell>
       </RowContent>
-    );
+    ); 
   },
   lineages: ({ value }): JSX.Element => {
     // for now we're assuming that each sample has only one lineage

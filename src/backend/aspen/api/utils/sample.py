@@ -213,26 +213,26 @@ def determine_gisaid_status(
 
 
 def format_sample_lineage(sample: Sample) -> List[Dict[str, Any]]:
-    pathogen = sample.pathogen
-    lineage: Dict[str, Any] = {
-        "scorpio_call": None,
-        "scorpio_support": None,
-        "qc_status": None,
-    }
+    # pathogen = sample.pathogen
+    # lineage: Dict[str, Any] = {
+    #     "scorpio_call": None,
+    #     "scorpio_support": None,
+    #     "qc_status": None,
+    # }
 
-    lineages = []
-    for lin in sample.lineages:
-        lineage_response = lineage.copy()
-        lineage_response["lineage"] = lin.lineage
-        lineage_response["lineage_type"] = lin.lineage_type
-        lineage_response["lineage_software_version"] = lin.lineage_software_version
-        lineage_response["lineage_probability"] = lin.lineage_probability
-        lineage_response["reference_dataset_name"] = lin.reference_dataset_name
-        lineage_response[
-            "reference_sequence_accession"
-        ] = lin.reference_sequence_accession
-        lineage_response["reference_dataset_tag"] = lin.reference_dataset_tag
-        lineage_response["qc_status"] = sample.qc_metrics[0].qc_status
+    # lineages = []
+    # for lin in sample.lineages:
+    #     lineage_response = lineage.copy()
+    #     lineage_response["lineage"] = lin.lineage
+    #     lineage_response["lineage_type"] = lin.lineage_type
+    #     lineage_response["lineage_software_version"] = lin.lineage_software_version
+    #     lineage_response["lineage_probability"] = lin.lineage_probability
+    #     lineage_response["reference_dataset_name"] = lin.reference_dataset_name
+    #     lineage_response[
+    #         "reference_sequence_accession"
+    #     ] = lin.reference_sequence_accession
+    #     lineage_response["reference_dataset_tag"] = lin.reference_dataset_tag
+    lineage_response["qc_status"] = sample.qc_metrics[0].qc_status
 
         if pathogen.slug == "SC2":
             lineage_response["scorpio_call"] = lin.raw_lineage_output.get(
