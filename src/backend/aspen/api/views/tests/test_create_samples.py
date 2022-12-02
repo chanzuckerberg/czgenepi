@@ -11,6 +11,7 @@ from aspen.database.models import PathogenGenome, Sample, UploadedPathogenGenome
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
+    pathogen_repo_config_factory,
     setup_gisaid_and_genbank_repo_configs,
 )
 from aspen.test_infra.models.sample import sample_factory
@@ -46,9 +47,12 @@ async def test_samples_create_different_pathogens(
     async_session.add(location)
     sc2 = pathogen_factory("SC2", "SARS-Cov-2")
     mpx = pathogen_factory("MPX", "MPX")
-    setup_gisaid_and_genbank_repo_configs(async_session, sc2, split_client=split_client)
-    setup_gisaid_and_genbank_repo_configs(async_session, mpx, split_client=split_client)
-    async_session.add(mpx)
+    _, default_repo = setup_gisaid_and_genbank_repo_configs(
+        async_session, sc2, split_client=split_client
+    )
+    async_session.add(
+        pathogen_repo_config_factory("MPXV", mpx, default_repo.public_repository)
+    )
     async_session.add(sc2)
     await async_session.commit()
     test_date = datetime.datetime.now()
