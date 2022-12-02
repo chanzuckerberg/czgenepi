@@ -27,6 +27,7 @@ pytestmark = pytest.mark.asyncio
 
 async def setup_sequences_download_test_data(
     async_session: AsyncSession,
+    split_client: SplitClient,
 ):
     group = group_factory()
     user = await userrole_factory(async_session, group)

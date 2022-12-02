@@ -171,6 +171,7 @@ async def update_samples(
     update_samples_request: UpdateSamplesRequest,
     db: AsyncSession = Depends(get_db),
     az: AuthZSession = Depends(get_authz_session),
+    pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ) -> SamplesResponse:
 
     # reorganize request data to make it easier to update
@@ -207,7 +208,9 @@ async def update_samples(
         # workaround for our response serializer
         sample.show_private_identifier = True
 
-        sample.generate_public_identifier(pathogen_repo_config.public_identifier_prefix, already_exists=True)
+        sample.generate_public_identifier(
+            pathogen_repo_config.prefix, already_exists=True
+        )
         res.samples.append(SampleResponse.from_orm(sample))
 
     try:
@@ -229,6 +232,7 @@ async def validate_ids(
     az: AuthZSession = Depends(get_authz_session),
     pathogen: Pathogen = Depends(get_pathogen),
     public_repository: PublicRepository = Depends(get_public_repository),
+    pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ) -> ValidateIDsResponse:
 
     """
@@ -252,7 +256,7 @@ async def validate_ids(
 
     # See if these missing_sample_ids match any Gisaid identifiers
     gisaid_ids: Set[str] = await get_matching_repo_ids(
-        db, pathogen, public_repository, missing_sample_ids
+        db, pathogen, public_repository, pathogen_repo_config, missing_sample_ids
     )
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?
@@ -325,7 +329,7 @@ async def create_samples(
         }
 
         sample: Sample = Sample(**sample_args)
-        sample.generate_public_identifier(pathogen_repo_config.public_identifier_prefix)
+        sample.generate_public_identifier(pathogen_repo_config.prefix)
         uploaded_pathogen_genome: UploadedPathogenGenome = UploadedPathogenGenome(
             sample=sample,
             sequence=pathogen_genome_input.sequence,
@@ -389,7 +393,6 @@ async def fill_submission_template(
     az: AuthZSession = Depends(get_authz_session),
     ac: AuthContext = Depends(get_auth_context),
     pathogen: Pathogen = Depends(get_pathogen),
-    pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ):
     sample_ids: Set[str] = {item for item in request.sample_ids}
 
