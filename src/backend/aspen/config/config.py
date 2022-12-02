@@ -277,3 +277,7 @@ class Config(object):
     @property
     def AWS_PANGOLIN_SFN_PARAMETERS(self) -> Mapping[str, Any]:
         return self._AWS_SSM_PARAMETER("pangolin-ondemand-sfn")
+
+    @property
+    def AWS_LINEAGE_QC_SFN_PARAMETERS(self) -> Mapping[str, Any]:
+        return self._AWS_SSM_PARAMETER("lineage-qc-ondemand-sfn")

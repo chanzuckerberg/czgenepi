@@ -14,6 +14,7 @@ import {
   StyledChip,
   StyledDiv,
   StyledFlexChildDiv,
+  StyledUploadButton,
   TooltipDescriptionText,
   TooltipHeaderText,
 } from "./style";
@@ -25,6 +26,7 @@ import { UsherTreeFlow } from "src/views/Data/components/SamplesView/components/
 import { DeleteSamplesConfirmationModal } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/DeleteSamplesConfirmationModal";
 import { EditSamplesConfirmationModal } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal";
 import { IconButton } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/IconButton";
+import { ROUTES } from "src/common/routes";
 
 interface Props {
   data?: BioinformaticsMap;
@@ -223,6 +225,15 @@ const DataSubview: FunctionComponent<Props> = ({
             onEditSelected={() => setEditSampleConfirmationOpen(true)}
             data-test-id="sample-page-more-action-btn"
           />
+          <StyledUploadButton
+            component="a"
+            href={ROUTES.UPLOAD_STEP1}
+            sdsType="primary"
+            sdsStyle="rounded"
+            data-test-id="upload-btn"
+          >
+            Upload
+          </StyledUploadButton>
         </DownloadWrapper>
       );
     }
