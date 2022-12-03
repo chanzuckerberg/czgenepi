@@ -1,13 +1,6 @@
 import styled from "@emotion/styled";
-import {
-  CommonThemeProps,
-  fontHeaderL,
-  getColors,
-  getPalette,
-  getSpaces,
-} from "czifui";
+import { CommonThemeProps, getColors, getSpaces } from "czifui";
 import LogoImage from "src/common/images/logo_complete_white.svg";
-import { iconFillWhite } from "src/common/styles/iconStyle";
 
 export const Logo = styled(LogoImage)`
   height: 25px;
@@ -60,45 +53,6 @@ export const LeftNav = styled.div`
 export const NavBar = styled.div`
   background-color: black;
   height: 50px;
-  display: flex;
-  align-items: center;
-`;
-
-export const NavOrg = styled.div`
-  ${fontHeaderL}
-
-  height: 100%;
-  color: white;
-  align-items: center;
-  display: flex;
-
-  a {
-    color: white;
-  }
-`;
-
-export const DropdownClickTarget = styled.button`
-  display: flex;
-  align-items: center;
-  border: none;
-  ${(props: CommonThemeProps) => {
-    const palette = getPalette(props);
-
-    return `
-      background-color: ${palette?.common?.black};
-    `;
-  }}
-`;
-
-export const StyledNavIconWrapper = styled.div`
-  ${iconFillWhite}
-  ${(props: CommonThemeProps) => {
-    const spaces = getSpaces(props);
-
-    return `
-      margin: 0 ${spaces?.l}px;
-    `;
-  }}
   display: flex;
   align-items: center;
 `;

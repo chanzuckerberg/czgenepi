@@ -123,6 +123,7 @@ class Settings(BaseSettings):
     # Env vars usually pulled from AWS SSM Parameters
     AWS_NEXTSTRAIN_SFN_PARAMETERS: Dict
     AWS_PANGOLIN_SFN_PARAMETERS: Dict
+    AWS_LINEAGE_QC_SFN_PARAMETERS: Dict
 
     ####################################################################################
     # database properties
@@ -207,6 +208,7 @@ class Settings(BaseSettings):
         aws_ssm_params = {
             "nextstrain-ondemand-sfn": "AWS_NEXTSTRAIN_SFN_PARAMETERS",
             "pangolin-ondemand-sfn": "AWS_PANGOLIN_SFN_PARAMETERS",
+            "lineage-qc-ondemand-sfn": "AWS_LINEAGE_QC_SFN_PARAMETERS",
         }
 
         @classmethod
