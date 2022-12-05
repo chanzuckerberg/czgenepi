@@ -56,7 +56,10 @@ export function tsvDataMap(
     const tsvData = filteredTableData.map((entry) => {
       return headersDownload.flatMap((header) => {
         if (typeof entry[header.key] === "object" && header.subHeaders) {
-          return header.subHeaders.map((subHeader) => String(subHeader.key));
+          const subEntry = entry[header.key] as Record<string, JSONPrimitive>;
+          return header.subHeaders.map((subHeader) =>
+            String(subEntry[subHeader.key])
+          );
         }
         if (header.key == "CZBFailedGenomeRecovery") {
           if (entry[header.key]) {
