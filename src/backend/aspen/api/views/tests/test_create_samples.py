@@ -10,8 +10,13 @@ from sqlalchemy.orm import joinedload
 from aspen.database.models import PathogenGenome, Sample, UploadedPathogenGenome
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import pathogen_factory
+from aspen.test_infra.models.pathogen_repo_config import (
+    pathogen_repo_config_factory,
+    setup_gisaid_and_genbank_repo_configs,
+)
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
+from aspen.util.split import SplitClient
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -31,6 +36,7 @@ def format_date(dt: Optional[datetime.date], format="%Y-%m-%d") -> str:
 async def test_samples_create_different_pathogens(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     group = group_factory()
     user = await userrole_factory(async_session, group)
@@ -41,7 +47,12 @@ async def test_samples_create_different_pathogens(
     async_session.add(location)
     sc2 = pathogen_factory("SC2", "SARS-Cov-2")
     mpx = pathogen_factory("MPX", "MPX")
-    async_session.add(mpx)
+    _, default_repo = setup_gisaid_and_genbank_repo_configs(
+        async_session, sc2, split_client=split_client
+    )
+    async_session.add(
+        pathogen_repo_config_factory("MPXV", mpx, default_repo.public_repository)
+    )
     async_session.add(sc2)
     await async_session.commit()
     test_date = datetime.datetime.now()
@@ -86,10 +97,13 @@ async def test_samples_create_different_pathogens(
 async def test_samples_create_view_pass_no_public_id(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     group = group_factory()
     user = await userrole_factory(async_session, group)
-    pathogen = pathogen_factory()
+    pathogen, default_repo_config = setup_gisaid_and_genbank_repo_configs(
+        async_session, split_client=split_client
+    )
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -127,7 +141,7 @@ async def test_samples_create_view_pass_no_public_id(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -151,9 +165,10 @@ async def test_samples_create_view_pass_no_public_id(
     # check that creating new public identifiers works
     sample_res = await async_session.execute(sa.select(Sample))  # type: ignore
     public_ids = sorted([i.public_identifier for i in sample_res.scalars().all()])
+    prefix = default_repo_config.prefix
     assert [
-        f"hCoV-19/USA/groupname-1/{test_date.year}",
-        f"hCoV-19/USA/groupname-2/{test_date.year}",
+        f"{prefix}/USA/groupname-1/{test_date.year}",
+        f"{prefix}/USA/groupname-2/{test_date.year}",
     ] == public_ids
 
     sample_1_q = await async_session.execute(
@@ -171,10 +186,13 @@ async def test_samples_create_view_pass_no_public_id(
 async def test_authz_failure(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     no_access_group = group_factory(name="Unauthorized")
     group = group_factory()
-    pathogen = pathogen_factory()
+    pathogen, _ = setup_gisaid_and_genbank_repo_configs(
+        async_session, split_client=split_client
+    )
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -203,7 +221,7 @@ async def test_authz_failure(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{no_access_group.id}/pathogens/SC2/samples/",
+        f"/v2/orgs/{no_access_group.id}/pathogens/{pathogen.slug}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -213,9 +231,12 @@ async def test_authz_failure(
 async def test_stripping_whitespace(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     group = group_factory()
-    pathogen = pathogen_factory()
+    pathogen, _ = setup_gisaid_and_genbank_repo_configs(
+        async_session, split_client=split_client
+    )
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -243,7 +264,7 @@ async def test_stripping_whitespace(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -274,10 +295,13 @@ async def test_stripping_whitespace(
 async def test_samples_create_view_pass_no_sequencing_date(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     group = group_factory()
     user = await userrole_factory(async_session, group)
-    pathogen = pathogen_factory()
+    pathogen, repo_config = setup_gisaid_and_genbank_repo_configs(
+        async_session, split_client=split_client
+    )
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -317,7 +341,7 @@ async def test_samples_create_view_pass_no_sequencing_date(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -342,8 +366,8 @@ async def test_samples_create_view_pass_no_sequencing_date(
         ]
     )
     assert [
-        f"hCoV-19/USA/groupname-1/{test_date.year}",
-        f"hCoV-19/USA/groupname-2/{test_date.year}",
+        f"{repo_config.prefix}/USA/groupname-1/{test_date.year}",
+        f"{repo_config.prefix}/USA/groupname-2/{test_date.year}",
     ] == public_ids
 
     sample_1 = (
@@ -366,9 +390,12 @@ async def test_samples_create_view_pass_no_sequencing_date(
 async def test_samples_create_view_invalid_sequence(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     group = group_factory()
-    pathogen = pathogen_factory()
+    pathogen, _ = setup_gisaid_and_genbank_repo_configs(
+        async_session, split_client=split_client
+    )
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -395,7 +422,7 @@ async def test_samples_create_view_invalid_sequence(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -416,9 +443,12 @@ async def test_samples_create_view_invalid_sequence(
 async def test_samples_create_view_fail_duplicate_ids(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     group = group_factory()
-    pathogen = pathogen_factory()
+    pathogen, _ = setup_gisaid_and_genbank_repo_configs(
+        async_session, split_client=split_client
+    )
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -467,7 +497,7 @@ async def test_samples_create_view_fail_duplicate_ids(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -482,9 +512,12 @@ async def test_samples_create_view_fail_duplicate_ids(
 async def test_samples_create_view_fail_duplicate_ids_in_request_data(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     group = group_factory()
-    pathogen = pathogen_factory()
+    pathogen, _ = setup_gisaid_and_genbank_repo_configs(
+        async_session, split_client=split_client
+    )
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -533,7 +566,7 @@ async def test_samples_create_view_fail_duplicate_ids_in_request_data(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
         json=data,
         headers=auth_headers,
     )
@@ -548,10 +581,13 @@ async def test_samples_create_view_fail_duplicate_ids_in_request_data(
 async def test_samples_create_view_fail_missing_required_fields(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     group = group_factory()
     user = await userrole_factory(async_session, group)
-    pathogen = pathogen_factory()
+    pathogen, _ = setup_gisaid_and_genbank_repo_configs(
+        async_session, split_client=split_client
+    )
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -585,7 +621,7 @@ async def test_samples_create_view_fail_missing_required_fields(
     ]
     auth_headers = {"user_id": user.auth0_user_id}
     res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples/",
         json=data,
         headers=auth_headers,
     )

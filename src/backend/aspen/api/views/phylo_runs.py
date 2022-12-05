@@ -10,7 +10,13 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.api.authn import get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
-from aspen.api.deps import get_db, get_pathogen, get_public_repository, get_settings
+from aspen.api.deps import (
+    get_db,
+    get_pathogen,
+    get_pathogen_repo_config,
+    get_public_repository,
+    get_settings,
+)
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.phylo_runs import (
     PhyloRunDeleteResponse,
@@ -32,6 +38,7 @@ from aspen.database.models import (
     Location,
     Pathogen,
     PathogenGenome,
+    PathogenRepoConfig,
     PhyloRun,
     PhyloTree,
     PublicRepository,
@@ -56,6 +63,7 @@ async def kick_off_phylo_run(
     group: Group = Depends(require_group_privilege("create_phylorun")),
     pathogen: Pathogen = Depends(get_pathogen),
     public_repository: PublicRepository = Depends(get_public_repository),
+    pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ) -> PhyloRunResponse:
 
     # validation happens in input schema
@@ -79,7 +87,7 @@ async def kick_off_phylo_run(
 
     # See if these missing_sample_ids match any Gisaid IDs
     gisaid_ids: Set[str] = await get_matching_repo_ids(
-        db, pathogen, public_repository, missing_sample_ids
+        db, pathogen, public_repository, pathogen_repo_config, missing_sample_ids
     )
 
     # Do we have any samples that are not aspen private or public identifiers or gisaid identifiers?

@@ -3,6 +3,8 @@ import { EVENT_TYPES } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { addNotification } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";
+import { Pathogen } from "src/common/redux/types";
+import { PathogenConfigType } from "src/common/types/pathogenConfig";
 import { ROUTES } from "src/common/routes";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
@@ -14,14 +16,20 @@ interface Props {
   shouldStartUsherFlow: boolean;
 }
 
+const USHER_DBS: PathogenConfigType<string> = {
+  [Pathogen.COVID]: "wuhCor1",
+  [Pathogen.MONKEY_POX]: "hub_3471181_GCF_014621545.1",
+};
+
 const generateUsherLink = (
   remoteFile: string,
   treeType: string,
-  sampleCount: number
+  sampleCount: number,
+  pathogen: Pathogen
 ) => {
   const encodedFileLink = encodeURIComponent(remoteFile);
 
-  const DB_PARAM = `db=wuhCor1`;
+  const DB_PARAM = `db=${USHER_DBS[pathogen]}`;
   const FILE_PARAM = `remoteFile=${encodedFileLink}`;
   const TREE_TYPE_PARAM = `phyloPlaceTree=${treeType}`;
   const SAMPLE_COUNT_PARAM = `subtreeSize=${sampleCount}`;
@@ -65,9 +73,10 @@ const UsherTreeFlow = ({
   const onLinkCreateSuccess = (
     url: string,
     treeType: string,
-    sampleCount: number
+    sampleCount: number,
+    pathogen: Pathogen
   ) => {
-    const usherLink = generateUsherLink(url, treeType, sampleCount);
+    const usherLink = generateUsherLink(url, treeType, sampleCount, pathogen);
     setUsherLink(usherLink);
     setIsConfirmOpen(true);
   };

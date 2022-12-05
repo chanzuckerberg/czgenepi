@@ -9,9 +9,9 @@ interface GISAID {
 }
 
 interface Lineage {
-  lineage?: string;
-  lineage_type?: string;
-  lineage_software_version?: string;
+  lineage: string;
+  lineage_type: string;
+  lineage_software_version: string;
   lineage_probability?: string;
   last_updated?: string;
   reference_dataset_name?: string;
@@ -24,9 +24,9 @@ interface Lineage {
 
 interface QCMetrics {
   qc_score?: string;
-  qc_software_version?: string;
-  qc_status?: string;
-  qc_caller?: string;
+  qc_software_version: string;
+  qc_status: string;
+  qc_caller: string;
   reference_dataset_name?: string;
   reference_sequence_accession?: string;
   reference_dataset_tag?: string;

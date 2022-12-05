@@ -22,9 +22,9 @@ from aspen.database.models import (
 )
 from aspen.test_infra.models.lineage import sample_lineage_factory
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import pathogen_factory, random_pathogen_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
+from aspen.test_infra.models.pathogen_repo_config import setup_random_repo_configs
 from aspen.test_infra.models.repo_metadata import repo_metadata_factory
-from aspen.test_infra.models.repository import random_default_repo_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sample_qc_metrics import sample_qc_metrics_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
@@ -613,11 +613,14 @@ async def test_samples_view_no_pangolin(
 async def test_bulk_delete_sample_success(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test successful sample deletion by ID
     """
-    pathogen: Pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     group = group_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
@@ -683,11 +686,14 @@ async def test_bulk_delete_sample_success(
 async def test_delete_sample_success(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test successful sample deletion by ID
     """
-    pathogen: Pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     group = group_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
@@ -772,12 +778,15 @@ async def test_delete_sample_success(
 async def test_delete_sample_failures(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test a sample deletion failure by a user without write access
     """
     group = group_factory()
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -908,12 +917,16 @@ async def make_test_samples(
 async def test_update_samples_success(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test successful sample update
     """
-    pathogen: Pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     user, group, samples, newlocation = await make_test_samples(async_session, pathogen)
+    repo_prefix = repo_config.prefix
 
     auth_headers = {"user_id": user.auth0_user_id}
 
@@ -1016,7 +1029,9 @@ async def test_update_samples_success(
             api_response_value = api_response[sample_id].get(field)
             request_field_value = expected[field]
             if field == "public_identifier" and request_field_value is None:
-                request_field_value = f"hCoV-19/USA/testgroupNone-{sample_id}/2022"
+                request_field_value = (
+                    f"{repo_prefix}/USA/testgroupNone-{sample_id}/2022"
+                )
             # Handle location fields
             if field in location_fields:
                 db_field_value = getattr(sample_pulled_from_db, field).id
@@ -1043,11 +1058,14 @@ async def test_update_samples_success(
 async def test_update_samples_access_denied(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test update failures
     """
-    pathogen: Pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     user, group, samples, newlocation = await make_test_samples(async_session, pathogen)
     user2, group2, samples2, newlocation2 = await make_test_samples(
         async_session, pathogen, suffix="2"
@@ -1080,11 +1098,14 @@ async def test_update_samples_access_denied(
 async def test_update_samples_request_failures(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test update failures
     """
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     user, group, samples, newlocation = await make_test_samples(async_session, pathogen)
 
     auth_headers = {"user_id": user.auth0_user_id}
@@ -1180,8 +1201,10 @@ async def test_update_samples_request_failures(
 
 async def setup_validation_data(async_session: AsyncSession, split_client: SplitClient):
     group = group_factory()
-    pathogen = random_pathogen_factory()
-    repo = random_default_repo_factory(split_client)
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
+    repo = repo_config.public_repository
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -1191,10 +1214,12 @@ async def setup_validation_data(async_session: AsyncSession, split_client: Split
     isl_sample = repo_metadata_factory(
         pathogen, repo, strain="USA/ISL-TEST/hCov-19", isl="EPI_ISL_3141592"
     )
-    async_session.add_all([group, pathogen, sample, strain_sample, isl_sample])
+    async_session.add(sample)
+    async_session.add(strain_sample)
+    async_session.add(isl_sample)
     await async_session.commit()
 
-    return user, group, pathogen, repo, sample, strain_sample, isl_sample
+    return user, group, pathogen, repo, sample, strain_sample, isl_sample, repo_config
 
 
 async def test_validation_endpoint(
@@ -1208,17 +1233,18 @@ async def test_validation_endpoint(
         user,
         group,
         pathogen,
-        repo,
+        _,
         sample,
         gisaid_sample,
         isl_sample,
+        repo_config,
     ) = await setup_validation_data(async_session, split_client)
 
     # add hCoV-19/ as prefix to gisaid identifier to check that stripping of prefix is being done correctly
     data = {
         "sample_ids": [
             sample.public_identifier,
-            f"hCoV-19/{gisaid_sample.strain}",
+            f"{repo_config.prefix}/{gisaid_sample.strain}",
             isl_sample.isl,
         ],
     }
@@ -1245,10 +1271,11 @@ async def test_validation_endpoint_missing_identifier(
         user,
         group,
         pathogen,
-        repo,
+        _,
         sample,
         gisaid_sample,
         isl_sample,
+        _,
     ) = await setup_validation_data(async_session, split_client)
     data = {
         "sample_ids": [

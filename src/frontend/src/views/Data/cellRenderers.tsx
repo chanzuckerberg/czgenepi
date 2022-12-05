@@ -54,7 +54,6 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   },
   gisaid: ({ value }) => {
     const { gisaid_id, status } = value as Sample["gisaid"];
-
     return (
       <RowContent>
         <GISAIDCell data-test-id="row-gisaid-id">
