@@ -4,6 +4,7 @@ import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { addNotification } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";
 import { Pathogen } from "src/common/redux/types";
+import { PathogenConfigType } from "src/common/types/pathogenConfig";
 import { ROUTES } from "src/common/routes";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { UsherConfirmationModal } from "./components/UsherConfirmationModal";
@@ -15,9 +16,9 @@ interface Props {
   shouldStartUsherFlow: boolean;
 }
 
-const USHER_DBS: Record<Pathogen, string> = {
-  SC2: "wuhCor1",
-  MPX: "hub_3471181_GCF_014621545.1",
+const USHER_DBS: PathogenConfigType<string> = {
+  [Pathogen.COVID]: "wuhCor1",
+  [Pathogen.MONKEY_POX]: "hub_3471181_GCF_014621545.1",
 };
 
 const generateUsherLink = (
