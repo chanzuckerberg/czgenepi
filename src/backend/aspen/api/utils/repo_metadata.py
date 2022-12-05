@@ -3,18 +3,24 @@ from typing import Iterable, Mapping, Set, Tuple
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models import Pathogen, PublicRepository, PublicRepositoryMetadata
+from aspen.database.models import (
+    Pathogen,
+    PathogenRepoConfig,
+    PublicRepository,
+    PublicRepositoryMetadata,
+)
 
 
 async def get_matching_repo_ids(
     session: AsyncSession,
     pathogen: Pathogen,
     repository: PublicRepository,
+    repo_config: PathogenRepoConfig,
     sample_ids: Iterable[str],
 ) -> Set[str]:
     """
-    Check if a list of identifiers exist as public repository strain names,
-    strip identifier (hCoV-19/) before proceeding with check against PublicRepositoryMetadata table
+    Check if a list of identifiers exist as public repository strain names, strip identifier
+    (for example: hCoV-19/) before proceeding with check against PublicRepositoryMetadata table
 
     Parameters:
         sample_ids Iterable[str]: A list of identifiers (usually submitted by a user)
@@ -28,12 +34,16 @@ async def get_matching_repo_ids(
 
     repo_ids = set()
 
-    # we need to strip off hCoV-19/ before checking against public repo strain name
+    # we need to strip off the public repository prefix before checking against public repo strain name
     # (public repo data is prepped by Nextstrain which strips off this prefix)
 
     # first create a mapping of ids that were stripped (so we can return unstripped id later)
     stripped_mapping: Mapping[str, str] = {
-        (s.replace("hCoV-19/", "") if s.startswith("hCoV-19/") else s): s
+        (
+            s.replace(f"{repo_config.prefix}/", "")
+            if s.startswith(f"{repo_config.prefix}/")
+            else s
+        ): s
         for s in sample_ids
     }
 
