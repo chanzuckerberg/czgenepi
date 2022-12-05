@@ -29,7 +29,7 @@ class SampleLineageResponse(BaseResponse):
     lineage_type: Optional[LineageType]
     lineage: Optional[str]
     lineage_software_version: Optional[str]
-    last_updated: Optional[str]
+    last_updated: Optional[datetime.date]
     lineage_probability: Optional[float]
     reference_dataset_name: Optional[str]
     reference_sequence_accession: Optional[str]
