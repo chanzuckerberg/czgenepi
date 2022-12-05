@@ -31,16 +31,12 @@ export const COLLECTION_DATE_HEADER: Header = {
 };
 
 export const LINEAGE_HEADER: Header = {
-  key: "lineage",
+  key: "lineages",
   sortKey: ["lineage", "lineage"],
   subHeaders: [
     {
       key: "lineage",
       text: "Lineage",
-    },
-    {
-      key: "qc_status",
-      text: "QC Status",
     },
     {
       key: "scorpio_call",
@@ -55,7 +51,7 @@ export const LINEAGE_HEADER: Header = {
       text: "Last Updated",
     },
     {
-      key: "version",
+      key: "lineage_software_version",
       text: "Version",
     },
   ],
