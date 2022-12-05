@@ -22,7 +22,6 @@ import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
-import { SAMPLE_SUBHEADERS } from "src/views/Data/headers";
 import { SAMPLE_HEADERS } from "src/views/Data/table-headers/sampleHeadersConfig";
 import { mapTsvData } from "./mapTsvData";
 import { StyledButton } from "./style";
@@ -66,12 +65,7 @@ const DownloadButton = ({
       if (!checkedSamples) return;
 
       const ids = checkedSamples.map((s) => s.publicId);
-      const data = tsvDataMap(
-        ids,
-        checkedSamples,
-        SAMPLE_HEADERS[pathogen],
-        SAMPLE_SUBHEADERS
-      );
+      const data = tsvDataMap(ids, checkedSamples, SAMPLE_HEADERS[pathogen]);
 
       if (!data || data.length < 1) {
         setTsvData([]);
@@ -81,7 +75,7 @@ const DownloadButton = ({
       const newTsvData = [data[0], ...data[1]];
       setTsvData(newTsvData);
     }
-  }, [checkedSamples]);
+  }, [checkedSamples, pathogen, usesTableRefactor]);
 
   const useFileMutationGenerator = () =>
     useFileDownload({

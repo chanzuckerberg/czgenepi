@@ -25,7 +25,7 @@ import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/DataNavigation/FilterPanelToggle";
 import { SamplesView } from "./components/SamplesView";
 import { TreesView } from "./components/TreesView";
-import { SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
+import { TREE_HEADERS } from "./headers";
 import {
   Category,
   CategoryTitle,
@@ -143,7 +143,6 @@ const Data: FunctionComponent = () => {
       headers: SAMPLE_HEADERS[pathogen],
       isDataLoading,
       renderer: SampleRenderer,
-      subheaders: SAMPLE_SUBHEADERS,
       text: VIEWNAME.SAMPLES,
       to: ROUTES.DATA_SAMPLES,
     },
@@ -153,7 +152,6 @@ const Data: FunctionComponent = () => {
       headers: TREE_HEADERS,
       isDataLoading,
       renderer: TreeRenderer,
-      subheaders: EMPTY_OBJECT,
       text: VIEWNAME.TREES,
       to: ROUTES.PHYLO_TREES,
     },
@@ -239,7 +237,6 @@ const Data: FunctionComponent = () => {
             data={category.data}
             defaultSortKey={category.defaultSortKey}
             headers={category.headers}
-            subheaders={category.subheaders}
             renderer={category.renderer}
             viewName={viewName}
             dataFilterFunc={viewName === "Samples" ? dataFilterFunc : undefined}

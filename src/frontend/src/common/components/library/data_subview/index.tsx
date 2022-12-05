@@ -32,7 +32,6 @@ interface Props {
   data?: BioinformaticsMap;
   defaultSortKey: string[];
   headers: Header[];
-  subheaders: Record<string, SubHeader[]>;
   isLoading: boolean;
   renderer?: CustomRenderer;
   viewName: VIEWNAME;
@@ -42,8 +41,7 @@ interface Props {
 export function tsvDataMap(
   checkedSampleIds: string[],
   tableData: TableItem[] | undefined,
-  headers: Header[],
-  subheaders: Record<string, SubHeader[]>
+  headers: Header[]
 ): [string[], string[][]] | undefined {
   const headersDownload = [...headers];
   headersDownload.push({
@@ -57,14 +55,8 @@ export function tsvDataMap(
     );
     const tsvData = filteredTableData.map((entry) => {
       return headersDownload.flatMap((header) => {
-        if (
-          typeof entry[header.key] === "object" &&
-          Object.prototype.hasOwnProperty.call(subheaders, header.key)
-        ) {
-          const subEntry = entry[header.key] as Record<string, JSONPrimitive>;
-          return subheaders[header.key].map((subheader) =>
-            String(subEntry[subheader.key])
-          );
+        if (typeof entry[header.key] === "object" && header.subHeaders) {
+          return header.subHeaders.map((subHeader) => String(subHeader.key));
         }
         if (header.key == "CZBFailedGenomeRecovery") {
           if (entry[header.key]) {
@@ -78,8 +70,8 @@ export function tsvDataMap(
       });
     });
     const tsvHeaders = headersDownload.flatMap((header) => {
-      if (Object.prototype.hasOwnProperty.call(subheaders, header.key)) {
-        return subheaders[header.key].map((subheader) => subheader.text);
+      if (header.subHeaders) {
+        return header.subHeaders.map((subHeader) => subHeader.text);
       }
       return header.text;
     });
