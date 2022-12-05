@@ -26,9 +26,9 @@ class SampleGisaidResponse(BaseResponse):
 
 # TODO: add field to capture pangolin_last_updated (last_updated) once we add support for that
 class SampleLineageResponse(BaseResponse):
-    lineage_type: Optional[LineageType]
-    lineage: Optional[str]
-    lineage_software_version: Optional[str]
+    lineage_type: LineageType
+    lineage: str
+    lineage_software_version: str
     last_updated: Optional[datetime.date]
     lineage_probability: Optional[float]
     reference_dataset_name: Optional[str]
