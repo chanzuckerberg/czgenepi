@@ -24,22 +24,7 @@ class SampleGisaidResponse(BaseResponse):
     status: str
 
 
-# TODO: add field to capture pangolin_last_updated (last_updated) once we add support for that
 class SampleLineageResponse(BaseResponse):
-
-    @validator("scorpio_call", pre=True)
-    def resolve_scorpio_call(cls, v):
-        return v["raw_lineage_output"].get("scorpio_call")
-    
-    @validator("scorpio_support", pre=True)
-    def resolve_scorpio_support(cls, v):
-        return v["raw_lineage_output"].get("scorpio_support")
-
-    @validator("qc_status", pre=True)
-    def resolve_qc_status(cls, v):
-        if isinstance(v, str):
-            return v
-        return v.value
 
     lineage_type: LineageType
     lineage: str
