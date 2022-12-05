@@ -1,6 +1,7 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
+import { useSelector } from "react-redux";
 import {
   AnalyticsSamplesDownloadFile,
   EVENT_TYPES,
@@ -16,11 +17,13 @@ import {
 } from "src/common/queries/samples";
 import { addNotification } from "src/common/redux/actions";
 import { useDispatch } from "src/common/redux/hooks";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
-import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS } from "src/views/Data/headers";
+import { SAMPLE_SUBHEADERS } from "src/views/Data/headers";
+import { SAMPLE_HEADERS } from "src/views/Data/table-headers/sampleHeadersConfig";
 import { mapTsvData } from "./mapTsvData";
 import { StyledButton } from "./style";
 
@@ -43,6 +46,7 @@ const DownloadButton = ({
   completedSampleIds,
   handleCloseModal,
 }: Props): JSX.Element | null => {
+  const pathogen = useSelector(selectCurrentPathogen);
   const dispatch = useDispatch();
   const { data: userInfo } = useUserInfo();
 
@@ -65,7 +69,7 @@ const DownloadButton = ({
       const data = tsvDataMap(
         ids,
         checkedSamples,
-        SAMPLE_HEADERS,
+        SAMPLE_HEADERS[pathogen],
         SAMPLE_SUBHEADERS
       );
 

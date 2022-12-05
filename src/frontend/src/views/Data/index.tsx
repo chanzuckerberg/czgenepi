@@ -3,10 +3,12 @@ import { compact, map, uniq } from "lodash";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { DataCategory, Transform } from "src/common/types/data";
 import {
   IdMap,
@@ -23,7 +25,7 @@ import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/DataNavigation/FilterPanelToggle";
 import { SamplesView } from "./components/SamplesView";
 import { TreesView } from "./components/TreesView";
-import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
+import { SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
 import {
   Category,
   CategoryTitle,
@@ -35,6 +37,7 @@ import {
   StyledView,
   View,
 } from "./style";
+import { SAMPLE_HEADERS } from "./table-headers/sampleHeadersConfig";
 import { PHYLO_RUN_TRANSFORMS } from "./transforms";
 
 // run data through transforms
@@ -72,6 +75,8 @@ const Data: FunctionComponent = () => {
     tableRefactorFlag,
     USER_FEATURE_FLAGS.table_refactor
   );
+
+  const pathogen = useSelector(selectCurrentPathogen);
 
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
@@ -135,7 +140,7 @@ const Data: FunctionComponent = () => {
     {
       data: samples,
       defaultSortKey: ["uploadDate"],
-      headers: SAMPLE_HEADERS,
+      headers: SAMPLE_HEADERS[pathogen],
       isDataLoading,
       renderer: SampleRenderer,
       subheaders: SAMPLE_SUBHEADERS,
