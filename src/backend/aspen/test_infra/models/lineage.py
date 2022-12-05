@@ -1,5 +1,6 @@
-from aspen.database.models import LineageType, Pathogen, PathogenLineage, SampleLineage
 import datetime
+
+from aspen.database.models import LineageType, Pathogen, PathogenLineage, SampleLineage
 
 
 def pathogen_lineage_factory(lineage: str, pathogen: Pathogen):
