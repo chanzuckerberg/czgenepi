@@ -227,6 +227,7 @@ def format_sample_lineage(sample: Sample) -> List[Dict[str, Any]]:
         lineage_response["lineage_type"] = lin.lineage_type
         lineage_response["lineage_software_version"] = lin.lineage_software_version
         lineage_response["lineage_probability"] = lin.lineage_probability
+        lineage_response["last_updated"] = lin.last_updated
         lineage_response["reference_dataset_name"] = lin.reference_dataset_name
         lineage_response[
             "reference_sequence_accession"

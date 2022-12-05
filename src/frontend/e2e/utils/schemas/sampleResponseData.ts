@@ -31,6 +31,7 @@ export type SampleResponseData = {
       lineage_type: string;
       lineage: string;
       lineage_software_version: string;
+      last_updated: string;
       lineage_probability?: number;
       reference_dataset_name?: string;
       reference_sequence_accession?: string;

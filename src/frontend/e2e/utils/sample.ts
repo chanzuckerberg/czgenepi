@@ -78,7 +78,7 @@ export function getSampleResponseData(
     lineages: [
       {
         lineage_type: "PANGOLIN",
-        // last_updated: getADateInThePast(),
+        last_updated: getADateInThePast(),
         lineage: lineages[Math.floor(Math.random() * lineages.length)],
         qc_status: "pass",
         scorpio_call: "Omicron (BA.1-like)",

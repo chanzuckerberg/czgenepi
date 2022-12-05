@@ -25,10 +25,10 @@ class SampleGisaidResponse(BaseResponse):
 
 
 class SampleLineageResponse(BaseResponse):
-
     lineage_type: LineageType
     lineage: str
     lineage_software_version: str
+    last_updated: Optional[datetime.date]
     lineage_probability: Optional[float]
     reference_dataset_name: Optional[str]
     reference_sequence_accession: Optional[str]
