@@ -110,6 +110,7 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
                 lineage.lineage_software_version = pango_info["version"]  # type: ignore
                 lineage.lineage_probability = pango_info["probability"]  # type: ignore
                 lineage.raw_lineage_output = pango_info["full_output"]  # type: ignore
+                lineage.last_updated = pangolin_last_updated
             else:
                 lineage = SampleLineage(
                     sample=pathogen_genome.sample,
@@ -118,6 +119,7 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
                     lineage_software_version=pango_info["version"],  # type: ignore
                     lineage_probability=pango_info["probability"],  # type: ignore
                     raw_lineage_output=pango_info["full_output"],  # type: ignore
+                    last_updated = pangolin_last_updated
                 )
                 pathogen_genome.sample.lineages.append(lineage)
 
