@@ -216,6 +216,160 @@ async def test_samples_list(
         }
         assert response == expected
 
+
+async def test_samples_list_no_qc_status(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    group = group_factory()
+    user = await userrole_factory(async_session, group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    pangolin_output = {
+        "scorpio_call": "B.1.167",
+        "scorpio_support": "0.775",
+        "qc_status": "pass",
+    }
+
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
+    mpx = pathogen_factory("MPX", "MPX")
+
+    # Make multiple samples
+    samples: List[Sample] = []
+    uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
+    sample_lineages: List[SampleLineage] = []
+    for i in range(4):
+        pathogen = sc2 if i < 2 else mpx
+        samples.append(
+            sample_factory(
+                group,
+                user,
+                location,
+                private=True,
+                private_identifier=f"private{i}",
+                public_identifier=f"public{i}",
+                pathogen=pathogen,
+            )
+        )
+        uploaded_pathogen_genomes.append(
+            uploaded_pathogen_genome_factory(
+                samples[i], pangolin_output=pangolin_output
+            )
+        )
+        if pathogen.slug == "SC2":
+            sample_lineages.append(
+                sample_lineage_factory(samples[i], raw_lineage_output=pangolin_output)
+            )
+        else:
+            sample_lineages.append(sample_lineage_factory(samples[i]))
+
+    async_session.add(group)
+    await async_session.commit()
+
+    auth_headers = {"user_id": user.auth0_user_id}
+    pathogen_specific = {  # type: ignore
+        sc2: {
+            "id_range": range(2),
+            "url": f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        },
+        mpx: {
+            "id_range": range(2, 4),
+            "url": f"/v2/orgs/{group.id}/pathogens/MPX/samples/",
+        },
+        # test support for old style urls
+        "no pathogen": {
+            "id_range": range(2),
+            "url": f"/v2/orgs/{group.id}/samples/",
+        },
+    }
+    for pathogen, params in pathogen_specific.items():  # type: ignore
+
+        res = await http_client.get(
+            params["url"],  # type: ignore
+            headers=auth_headers,
+        )
+        response = res.json()
+        if pathogen != "no pathogen":
+            pathogen_data = {
+                "id": pathogen.id,
+                "slug": pathogen.slug,
+                "name": pathogen.name,
+            }
+        else:
+            # fill with sc2 as that is the current default
+            pathogen_data = {
+                "id": sc2.id,
+                "slug": sc2.slug,
+                "name": sc2.name,
+            }
+        expected = {
+            "samples": [
+                {
+                    "id": samples[i].id,
+                    "collection_date": str(samples[i].collection_date),
+                    "collection_location": {
+                        "id": location.id,
+                        "region": location.region,
+                        "country": location.country,
+                        "division": location.division,
+                        "location": location.location,
+                    },
+                    "czb_failed_genome_recovery": False,
+                    "gisaid": {
+                        "status": "Accepted",
+                        "gisaid_id": samples[i].accessions[0].accession,
+                    },
+                    "pathogen": pathogen_data,
+                    "private_identifier": samples[i].private_identifier,
+                    "public_identifier": samples[i].public_identifier,
+                    "uploaded_by": {"id": user.id, "name": user.name},
+                    "upload_date": convert_datetime_to_iso_8601(
+                        uploaded_pathogen_genomes[i].upload_date
+                    ),
+                    "sequencing_date": str(
+                        uploaded_pathogen_genomes[i].sequencing_date
+                    ),
+                    "private": True,
+                    "submitting_group": {
+                        "id": group.id,
+                        "name": group.name,
+                    },
+                    "qc_metrics": [],
+                    "lineages": [
+                        {
+                            "lineage_type": sample_lineages[i].lineage_type.value,
+                            "lineage": sample_lineages[i].lineage,
+                            "lineage_software_version": sample_lineages[
+                                i
+                            ].lineage_software_version,
+                            "lineage_probability": sample_lineages[
+                                i
+                            ].lineage_probability,
+                            "reference_dataset_name": sample_lineages[
+                                i
+                            ].reference_dataset_name,
+                            "reference_sequence_accession": sample_lineages[
+                                i
+                            ].reference_sequence_accession,
+                            "reference_dataset_tag": sample_lineages[
+                                i
+                            ].reference_dataset_tag,
+                            "scorpio_call": sample_lineages[i].raw_lineage_output.get(
+                                "scorpio_call"
+                            ),
+                            "scorpio_support": sample_lineages[
+                                i
+                            ].raw_lineage_output.get("scorpio_support"),
+                            "qc_status": None,
+                        }
+                    ],
+                }
+                for i in params["id_range"]  # type: ignore
+            ]
+        }
+        assert response == expected
+
     # test that passing in a dud slug will raise exception
     res = await http_client.get(
         f"/v2/orgs/{group.id}/pathogens/WRONG/samples/",
