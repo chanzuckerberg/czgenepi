@@ -2,12 +2,15 @@ import { TextField } from "@mui/material";
 import { DefaultMenuSelectOption, Dropdown, Icon, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
 import { SyntheticEvent, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import {
   FastaResponseType,
   getUsherOptions,
   useFastaFetch,
 } from "src/common/queries/trees";
+import { Pathogen } from "src/common/redux/types";
 import { ROUTES } from "src/common/routes";
 import {
   StyledCloseIconButton,
@@ -43,7 +46,12 @@ interface Props {
   failedSampleIds: string[];
   open: boolean;
   onClose: () => void;
-  onLinkCreateSuccess(url: string, treeType: string, sampleCount: number): void;
+  onLinkCreateSuccess(
+    url: string,
+    treeType: string,
+    sampleCount: number,
+    pathogen: Pathogen
+  ): void;
 }
 
 interface DropdownOptionProps extends DefaultMenuSelectOption {
@@ -86,6 +94,8 @@ export const UsherPlacementModal = ({
     checkedSampleIds?.length
   );
 
+  const pathogen = useSelector(selectCurrentPathogen);
+
   useEffect(() => {
     const fetchUsherOpts = async () => {
       const resp = (await getUsherOptions()) as UsherDataType;
@@ -122,7 +132,8 @@ export const UsherPlacementModal = ({
     },
     componentOnSuccess: (data: FastaResponseType) => {
       const url = data?.url;
-      if (url) onLinkCreateSuccess(data.url, treeType, numSamplesPerSubtree);
+      if (url)
+        onLinkCreateSuccess(data.url, treeType, numSamplesPerSubtree, pathogen);
       setIsLoading(false);
     },
   });
