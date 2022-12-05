@@ -30,7 +30,7 @@ export const SAMPLE_HEADERS: Header[] = [
     },
   },
   {
-    key: "lineage",
+    key: "lineages",
     sortKey: ["lineage", "lineage"],
     text: "Lineage",
     tooltip: {
@@ -100,10 +100,6 @@ export const SAMPLE_SUBHEADERS: Record<string, SubHeader[]> = {
       text: "Lineage",
     },
     {
-      key: "qc_status",
-      text: "QC Status",
-    },
-    {
       key: "scorpio_call",
       text: "Scorpio Call",
     },
@@ -116,7 +112,7 @@ export const SAMPLE_SUBHEADERS: Record<string, SubHeader[]> = {
       text: "Last Updated",
     },
     {
-      key: "version",
+      key: "lineage_software_version",
       text: "Version",
     },
   ],

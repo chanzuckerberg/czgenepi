@@ -15,14 +15,18 @@ from aspen.database.models import (
     Location,
     Pathogen,
     Sample,
+    SampleLineage,
+    SampleQCMetric,
     UploadedPathogenGenome,
     User,
 )
+from aspen.test_infra.models.lineage import sample_lineage_factory
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import setup_random_repo_configs
 from aspen.test_infra.models.repo_metadata import repo_metadata_factory
 from aspen.test_infra.models.sample import sample_factory
+from aspen.test_infra.models.sample_qc_metrics import sample_qc_metrics_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import (
     group_factory,
@@ -59,6 +63,8 @@ async def test_samples_list(
     # Make multiple samples
     samples: List[Sample] = []
     uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
+    qc_metrics: List[SampleQCMetric] = []
+    sample_lineages: List[SampleLineage] = []
     for i in range(4):
         pathogen = sc2 if i < 2 else mpx
         samples.append(
@@ -77,6 +83,13 @@ async def test_samples_list(
                 samples[i], pangolin_output=pangolin_output
             )
         )
+        qc_metrics.append(sample_qc_metrics_factory(samples[i], qc_score=f"{i}"))
+        if pathogen.slug == "SC2":
+            sample_lineages.append(
+                sample_lineage_factory(samples[i], raw_lineage_output=pangolin_output)
+            )
+        else:
+            sample_lineages.append(sample_lineage_factory(samples[i]))
 
     async_session.add(group)
     await async_session.commit()
@@ -137,29 +150,63 @@ async def test_samples_list(
                     "pathogen": pathogen_data,
                     "private_identifier": samples[i].private_identifier,
                     "public_identifier": samples[i].public_identifier,
+                    "uploaded_by": {"id": user.id, "name": user.name},
                     "upload_date": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genomes[i].upload_date
                     ),
                     "sequencing_date": str(
                         uploaded_pathogen_genomes[i].sequencing_date
                     ),
-                    "lineage": {
-                        "lineage": uploaded_pathogen_genomes[i].pangolin_lineage,
-                        "confidence": uploaded_pathogen_genomes[i].pangolin_probability,
-                        "version": uploaded_pathogen_genomes[i].pangolin_version,
-                        "last_updated": convert_datetime_to_iso_8601(
-                            uploaded_pathogen_genomes[i].pangolin_last_updated
-                        ),
-                        "scorpio_call": pangolin_output["scorpio_call"],
-                        "scorpio_support": float(pangolin_output["scorpio_support"]),
-                        "qc_status": pangolin_output["qc_status"],
-                    },
                     "private": True,
                     "submitting_group": {
                         "id": group.id,
                         "name": group.name,
                     },
-                    "uploaded_by": {"id": user.id, "name": user.name},
+                    "qc_metrics": [
+                        {
+                            "qc_score": qc_metrics[i].qc_score,
+                            "qc_software_version": qc_metrics[i].qc_software_version,
+                            "qc_status": qc_metrics[i].qc_status,
+                            "qc_caller": qc_metrics[i].qc_caller.value,
+                            "reference_dataset_name": qc_metrics[
+                                i
+                            ].reference_dataset_name,
+                            "reference_sequence_accession": qc_metrics[
+                                i
+                            ].reference_sequence_accession,
+                            "reference_dataset_tag": qc_metrics[
+                                i
+                            ].reference_dataset_tag,
+                        }
+                    ],
+                    "lineages": [
+                        {
+                            "lineage_type": sample_lineages[i].lineage_type.value,
+                            "lineage": sample_lineages[i].lineage,
+                            "lineage_software_version": sample_lineages[
+                                i
+                            ].lineage_software_version,
+                            "lineage_probability": sample_lineages[
+                                i
+                            ].lineage_probability,
+                            "reference_dataset_name": sample_lineages[
+                                i
+                            ].reference_dataset_name,
+                            "reference_sequence_accession": sample_lineages[
+                                i
+                            ].reference_sequence_accession,
+                            "reference_dataset_tag": sample_lineages[
+                                i
+                            ].reference_dataset_tag,
+                            "scorpio_call": sample_lineages[i].raw_lineage_output.get(
+                                "scorpio_call"
+                            ),
+                            "scorpio_support": sample_lineages[
+                                i
+                            ].raw_lineage_output.get("scorpio_support"),
+                            "qc_status": qc_metrics[i].qc_status,
+                        }
+                    ],
                 }
                 for i in params["id_range"]  # type: ignore
             ]
@@ -220,17 +267,6 @@ async def test_samples_view_gisaid_rejected(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-                "lineage": {
-                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                    "confidence": uploaded_pathogen_genome.pangolin_probability,
-                    "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": convert_datetime_to_iso_8601(
-                        uploaded_pathogen_genome.pangolin_last_updated
-                    ),
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -238,6 +274,8 @@ async def test_samples_view_gisaid_rejected(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }
@@ -290,17 +328,6 @@ async def test_samples_view_gisaid_no_info(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-                "lineage": {
-                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                    "confidence": uploaded_pathogen_genome.pangolin_probability,
-                    "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": convert_datetime_to_iso_8601(
-                        uploaded_pathogen_genome.pangolin_last_updated
-                    ),
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -308,6 +335,8 @@ async def test_samples_view_gisaid_no_info(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }
@@ -357,15 +386,6 @@ async def test_samples_view_gisaid_not_eligible(
                 # failed genome recovery, but for this test it's None because the sample
                 # has no underlying sequenced entity (no uploaded_pathogen_genome).
                 "sequencing_date": None,
-                "lineage": {
-                    "lineage": None,
-                    "confidence": None,
-                    "version": None,
-                    "last_updated": None,
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -373,6 +393,8 @@ async def test_samples_view_gisaid_not_eligible(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }
@@ -500,17 +522,6 @@ async def test_samples_view_cansee_all(
                 uploaded_pathogen_genome.upload_date
             ),
             "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-            "lineage": {
-                "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                "confidence": uploaded_pathogen_genome.pangolin_probability,
-                "version": uploaded_pathogen_genome.pangolin_version,
-                "last_updated": convert_datetime_to_iso_8601(
-                    uploaded_pathogen_genome.pangolin_last_updated
-                ),
-                "scorpio_call": None,
-                "scorpio_support": None,
-                "qc_status": None,
-            },
             "pathogen": {
                 "id": pathogen.id,
                 "slug": pathogen.slug,
@@ -525,6 +536,8 @@ async def test_samples_view_cansee_all(
                 "id": 1,
                 "name": "test",
             },
+            "qc_metrics": [],
+            "lineages": [],
         }
     ]
 
@@ -578,15 +591,6 @@ async def test_samples_view_no_pangolin(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-                "lineage": {
-                    "lineage": None,
-                    "confidence": None,
-                    "version": None,
-                    "last_updated": None,
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -594,6 +598,8 @@ async def test_samples_view_no_pangolin(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }

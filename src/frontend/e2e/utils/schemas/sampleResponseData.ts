@@ -13,15 +13,6 @@ export type SampleResponseData = {
     gisaid_id: string | null;
     status: string;
   };
-  lineage: {
-    last_updated: string;
-    lineage?: string;
-    confidence: string;
-    version: string;
-    scorpio_call: string;
-    scorpio_support: number;
-    qc_status: string;
-  };
   private?: boolean;
   private_identifier: string;
   public_identifier: string;
@@ -35,4 +26,29 @@ export type SampleResponseData = {
     id: number;
     name: string;
   };
+  lineages: [
+    {
+      lineage_type: string;
+      lineage: string;
+      lineage_software_version: string;
+      lineage_probability?: number;
+      reference_dataset_name?: string;
+      reference_sequence_accession?: string;
+      reference_dataset_tag?: string;
+      scorpio_call?: string;
+      scorpio_support?: string;
+      qc_status?: string;
+    }
+  ];
+  qc_metrics: [
+    {
+      qc_score?: string;
+      qc_software_version: string;
+      qc_status: string;
+      qc_caller: string;
+      reference_dataset_name?: string;
+      reference_sequence_accession?: string;
+      reference_dataset_tag?: string;
+    }
+  ];
 };

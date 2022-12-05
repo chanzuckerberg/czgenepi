@@ -1,4 +1,5 @@
 import os
+import random
 from datetime import datetime
 
 import boto3
@@ -10,16 +11,20 @@ from aspen.database.connection import get_db_uri, init_db
 from aspen.database.models import (
     AlignedRepositoryData,
     Group,
+    LineageType,
     Location,
     Pathogen,
     PhyloRun,
     PhyloTree,
     ProcessedRepositoryData,
     PublicRepository,
+    QCMetricCaller,
     RawRepositoryData,
     RepositoryAlignmentWorkflow,
     RepositoryDownloadWorkflow,
     Sample,
+    SampleLineage,
+    SampleQCMetric,
     TreeType,
     UploadedPathogenGenome,
     User,
@@ -127,6 +132,79 @@ def create_pathogens(session):
     return pathogens
 
 
+def create_sample_lineage(session, sample):
+    sample_lineage = (
+        session.query(SampleLineage).filter(SampleLineage.sample == sample).first()
+    )
+    if sample_lineage:
+        print("SampleLineage already exists")
+        return sample_lineage
+    print(f"Creating SampleLineage with sample private_id {sample.private_identifier}")
+
+    pathogen_slug = sample.pathogen.slug
+    lineage_type = (
+        LineageType.PANGOLIN if pathogen_slug == "SC2" else LineageType.NEXTCLADE
+    )
+
+    # we're not using raw lineage output from NextClade for now, so only adding pangolin output for now
+
+    random_scorpio_calls = ["B.1.167", "BA.1.15", "C.2", "A.1.1"]
+    random_support_calls = ["0.775", "0.512", "0.477", "0.897"]
+    raw_lineage_pangolin_output = {
+        "scorpio_call": random.choice(random_scorpio_calls),
+        "scorpio_support": random.choice(random_support_calls),
+    }
+
+    raw_lineage_output = raw_lineage_pangolin_output if pathogen_slug == "SC2" else {}
+    sample_lineage = SampleLineage(
+        sample=sample,
+        lineage_type=lineage_type,
+        lineage=random.choice(random_scorpio_calls),
+        lineage_software_version="1.0.0",
+        lineage_probability=random.choice(random_support_calls),
+        raw_lineage_output=raw_lineage_output,
+    )
+    session.add(sample_lineage)
+    return sample_lineage
+
+
+def create_sample_qc_metrics(session, sample):
+
+    sample_qc_metric = (
+        session.query(SampleQCMetric).filter(SampleQCMetric.sample == sample).first()
+    )
+    if sample_qc_metric:
+        print("SampleQCMetric already exists")
+        return sample_qc_metric
+    print(
+        f"Creating SampleSampleQCMetricLineage with sample private_id {sample.private_identifier}"
+    )
+
+    random_qc_status_scores = {
+        "good": ["18.062500", "8.062500", "11.062500"],
+        "mediocre": ["52.062500", "86.062500", "67.062500"],
+        "bad": ["493.558728", "200.694444", "771.691989"],
+        "failed": [
+            None,
+        ],
+    }
+
+    random_qc_status = random.choice(list(random_qc_status_scores.keys()))
+    random_qc_score = random.choice(random_qc_status_scores[random_qc_status])
+
+    sample_qc_metrics = SampleQCMetric(
+        sample=sample,
+        qc_caller=QCMetricCaller.NEXTCLADE,
+        qc_software_version="1.0.0",
+        qc_score=random_qc_score,
+        qc_status=random_qc_status,
+        raw_qc_output={},
+    )
+
+    session.add(sample_qc_metrics)
+    return sample_qc_metrics
+
+
 def create_sample(
     session, group, pathogen, uploaded_by_user, location, suffix, is_failed=False
 ):
@@ -135,6 +213,7 @@ def create_sample(
     if is_failed:
         private_id += "_failed"
         public_id += "_failed"
+
     sample = (
         session.query(Sample)
         .filter(Sample.private_identifier == private_id)
@@ -146,6 +225,9 @@ def create_sample(
     )
     if sample:
         print("Sample already exists")
+        # check if sample has associated sample_lineage or sample_qc_metrics
+        create_sample_lineage(session, sample)
+        create_sample_qc_metrics(session, sample)
         return sample
     print(f"Creating sample {private_id}")
     sample = Sample(
@@ -168,6 +250,8 @@ def create_sample(
         sequencing_date=datetime.now(),
         upload_date=datetime.now(),
     )
+    create_sample_lineage(session, sample)
+    create_sample_qc_metrics(session, sample)
     session.add(upg)
     session.add(sample)
     return sample

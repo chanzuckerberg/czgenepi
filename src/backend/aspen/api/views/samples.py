@@ -82,6 +82,8 @@ async def list_samples(
         selectinload(Sample.collection_location),
         selectinload(Sample.accessions),
         selectinload(Sample.pathogen),
+        selectinload(Sample.lineages),
+        selectinload(Sample.qc_metrics),
     )
     user_visible_samples_query = user_visible_samples_query.filter(
         Sample.pathogen_id == pathogen.id
@@ -103,7 +105,6 @@ async def list_samples(
         # TODO - convert this to an oso check.
         if sample.submitting_group_id == ac.group.id:  # type: ignore
             sample.show_private_identifier = True
-
         sampleinfo = SampleResponse.from_orm(sample)
         result.samples.append(sampleinfo)
     return result
@@ -122,6 +123,9 @@ async def get_write_samples_by_ids(
     ).filter(
         Sample.id.in_(sample_ids)
     )  # type: ignore
+    query = query.options(
+        selectinload(Sample.lineages), selectinload(Sample.qc_metrics)
+    )
     results = await db.execute(query)
     return results.scalars()
 
@@ -351,6 +355,8 @@ async def create_samples(
             selectinload(Sample.uploaded_by),
             selectinload(Sample.collection_location),
             selectinload(Sample.accessions),
+            selectinload(Sample.qc_metrics),
+            selectinload(Sample.lineages),
         )
         .filter(Sample.id.in_([sample.id for sample in created_samples]))
         .execution_options(populate_existing=True)

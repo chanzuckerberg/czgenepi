@@ -8,6 +8,8 @@ from aspen.api.schemas.base import BaseRequest, BaseResponse
 from aspen.api.schemas.locations import LocationResponse
 from aspen.api.schemas.pathogens import PathogenResponse
 from aspen.api.utils import format_sample_lineage
+from aspen.database.models import LineageType
+from aspen.database.models.lineages import QCMetricCaller
 
 SEQUENCE_VALIDATION_REGEX = r"^[WSKMYRVHDBNZNATCGUwskmyrvhdbnznatcgu-]+$"
 
@@ -23,13 +25,19 @@ class SampleGisaidResponse(BaseResponse):
 
 
 class SampleLineageResponse(BaseResponse):
-    last_updated: Optional[datetime.datetime]
-    lineage: Optional[str]
-    confidence: Optional[float]
-    version: Optional[str]
+
+    lineage_type: LineageType
+    lineage: str
+    lineage_software_version: str
+    lineage_probability: Optional[float]
+    reference_dataset_name: Optional[str]
+    reference_sequence_accession: Optional[str]
+    reference_dataset_tag: Optional[str]
     scorpio_call: Optional[str]
-    scorpio_support: Optional[float]
-    qc_status: Optional[str]
+    scorpio_support: Optional[str]
+    qc_status: Optional[
+        str
+    ]  # we're also returning this here from the SampleQCMetrics table so that the frontend cellRenderers have all the data needed to render tooltip
 
 
 class SampleGroupResponse(BaseResponse):
@@ -38,6 +46,19 @@ class SampleGroupResponse(BaseResponse):
 
     id: int
     name: str
+
+
+class SampleQCMetricsResponse(BaseResponse):
+    class Config:
+        orm_mode = True
+
+    qc_score: Optional[str]
+    qc_software_version: str
+    qc_status: str
+    qc_caller: QCMetricCaller
+    reference_dataset_name: Optional[str]
+    reference_sequence_accession: Optional[str]
+    reference_dataset_tag: Optional[str]
 
 
 class SampleUserResponse(BaseResponse):
@@ -60,7 +81,7 @@ class SampleGetterDict(GetterDict):
             if obj.uploaded_pathogen_genome
             else None
         ),
-        "lineage": format_sample_lineage,
+        "lineages": format_sample_lineage,
         "private_identifier": lambda obj: (
             obj.private_identifier if obj.show_private_identifier else None
         ),
@@ -84,7 +105,6 @@ class SampleResponse(BaseResponse):
     collection_location: LocationResponse
     czb_failed_genome_recovery: bool
     gisaid: Optional[SampleGisaidResponse]
-    lineage: Optional[SampleLineageResponse]
     pathogen: Optional[PathogenResponse]
     private: bool
     private_identifier: Optional[str]
@@ -93,6 +113,8 @@ class SampleResponse(BaseResponse):
     submitting_group: SampleGroupResponse
     uploaded_by: SampleUserResponse
     upload_date: Optional[datetime.datetime]
+    lineages: Optional[List[SampleLineageResponse]]
+    qc_metrics: Optional[List[SampleQCMetricsResponse]]
 
 
 class SampleBulkDeleteRequest(BaseRequest):

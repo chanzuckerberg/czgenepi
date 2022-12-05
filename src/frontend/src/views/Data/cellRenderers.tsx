@@ -54,7 +54,6 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   },
   gisaid: ({ value }) => {
     const { gisaid_id, status } = value as Sample["gisaid"];
-
     return (
       <RowContent>
         <GISAIDCell data-test-id="row-gisaid-id">
@@ -64,21 +63,27 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       </RowContent>
     );
   },
-  lineage: ({ value }): JSX.Element => {
-    const hasLineage = Boolean(value.version);
-
+  lineages: ({ value }): JSX.Element => {
+    // for now we're assuming that each sample has only one lineage
+    // SC2 has lineages from Pangolin, other pathogens are assigned lineages from Nextclade
+    // If we start adding multiple lineages per sample we'll need to revisit this logic.
+    const firstLineageValue = value[0];
+    const hasLineage = Boolean(
+      firstLineageValue && firstLineageValue.lineage_software_version
+    );
     const Component = hasLineage ? UnderlinedRowContent : RowContent;
 
     const Content = (
       <Component>
         <Cell data-test-id="row-lineage">
-          {value.lineage || "Not Yet Processed"}
+          {(firstLineageValue && firstLineageValue.lineage) ||
+            "Not Yet Processed"}
         </Cell>
       </Component>
     );
 
     return hasLineage ? (
-      <LineageTooltip lineage={value}>{Content}</LineageTooltip>
+      <LineageTooltip lineage={firstLineageValue}>{Content}</LineageTooltip>
     ) : (
       Content
     );

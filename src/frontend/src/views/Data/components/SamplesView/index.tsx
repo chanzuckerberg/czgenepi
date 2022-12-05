@@ -51,7 +51,9 @@ const SamplesView = (): JSX.Element => {
 
   // update list of lineages to use in the filter panel on the left side of the screen
   useEffect(() => {
-    const newLineages = uniq(compact(map(samples, (d) => d.lineage?.lineage)))
+    const newLineages = uniq(
+      compact(map(samples, (d) => d.lineages[0]?.lineage))
+    )
       .sort()
       .map((name) => ({ name }));
 

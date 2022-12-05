@@ -122,7 +122,6 @@ const Data: FunctionComponent = () => {
     }),
     [sampleData, phyloRunData]
   );
-
   useEffect(() => {
     if (currentPath === ROUTES.DATA) {
       router.push(ROUTES.DATA_SAMPLES);
@@ -197,7 +196,7 @@ const Data: FunctionComponent = () => {
   // * to reference the parent's props (?). Passing in only the lineages, or
   // * incomplete options causes the component to break
   const sampleMap = viewName === "Samples" ? (samples as SampleMap) : {};
-  const lineages = uniq(compact(map(sampleMap, (d) => d.lineage?.lineage)))
+  const lineages = uniq(compact(map(sampleMap, (d) => d.lineages[0]?.lineage)))
     .sort()
     .map((l) => {
       return { name: l as string };
