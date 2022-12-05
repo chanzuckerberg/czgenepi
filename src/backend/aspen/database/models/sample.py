@@ -205,7 +205,7 @@ class Sample(idbase, DictMixin):  # type: ignore
     mutations = relationship("SampleMutation", back_populates="sample")  # type: ignore
     aligned_peptides = relationship("AlignedPeptides", back_populates="sample")  # type: ignore
 
-    def generate_public_identifier(self, already_exists=False):
+    def generate_public_identifier(self, prefix, already_exists=False):
         # If we don't have an explicit public identifier, generate one from
         # our current model context
         if self.public_identifier:
@@ -217,11 +217,11 @@ class Sample(idbase, DictMixin):  # type: ignore
         if already_exists:
             id = self.id
             self.public_identifier = (
-                f"hCoV-19/{country}/{group_prefix}-{id}/{current_year}"
+                f"{prefix}/{country}/{group_prefix}-{id}/{current_year}"
             )
         else:
             self.public_identifier = func.concat(
-                f"hCoV-19/{country}/{group_prefix}-",
+                f"{prefix}/{country}/{group_prefix}-",
                 text("currval('aspen.samples_id_seq')"),
                 f"/{current_year}",
             )

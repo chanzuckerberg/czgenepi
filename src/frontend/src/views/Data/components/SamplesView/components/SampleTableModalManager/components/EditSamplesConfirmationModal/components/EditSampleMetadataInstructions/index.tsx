@@ -1,10 +1,13 @@
+import { useSelector } from "react-redux";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
 import { SampleEditTsvTemplateDownload } from "src/components/DownloadMetadataTemplate";
 import {
   InstructionsNotSemiBold,
   InstructionsSemiBold,
 } from "src/components/TreeNameInput/style";
+import { editSamplesPathogenStrings } from "./strings";
 import { StyledButton } from "./style";
 
 // TODO fix types
@@ -19,6 +22,8 @@ const EditSampleMetaDataInstructions = ({
   templateRows,
   templateHeaders,
 }: Props): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const downloadTSVButton = (
     <SampleEditTsvTemplateDownload
       headers={templateHeaders}
@@ -26,7 +31,7 @@ const EditSampleMetaDataInstructions = ({
       instructions={templateInstructionRows}
     >
       <StyledButton sdsType="secondary">
-        Download Metadata Template (TSV)
+        {editSamplesPathogenStrings[pathogen].templateName}
       </StyledButton>
     </SampleEditTsvTemplateDownload>
   );
@@ -61,8 +66,11 @@ const EditSampleMetaDataInstructions = ({
     </InstructionsSemiBold>,
     <InstructionsNotSemiBold key="2">
       Column header naming conventions and metadata value formatting must match
-      those found in the TSV template. See the help documentation above for more
-      details.
+      those found in the TSV template or the{" "}
+      <NewTabLink href="https://docs.nextstrain.org/projects/ncov/en/latest/reference/metadata-fields.html">
+        Nextstrain defaults
+      </NewTabLink>
+      . See the help documentation above for more details.
     </InstructionsNotSemiBold>,
     <InstructionsNotSemiBold key="3">
       Do not include any personal identifying information (PII) in the Private
