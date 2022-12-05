@@ -24,7 +24,6 @@ class SampleGisaidResponse(BaseResponse):
     status: str
 
 
-# TODO: add field to capture pangolin_last_updated (last_updated) once we add support for that
 class SampleLineageResponse(BaseResponse):
     lineage_type: LineageType
     lineage: str
