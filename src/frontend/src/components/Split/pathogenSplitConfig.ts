@@ -25,13 +25,17 @@ const pathogenTrafficFlagConfig: PathogenTrafficFlagConfig = {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
     [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.OFF,
   },
+  [PATHOGEN_FEATURE_FLAGS.nextstrain_enabled]: {
+    [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
+    [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.OFF,
+  },
   [PATHOGEN_FEATURE_FLAGS.public_repository]: {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
     [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.OFF,
   },
   [PATHOGEN_FEATURE_FLAGS.usher_linkout]: {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
-    [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.OFF,
+    [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.ON,
   },
 };
 

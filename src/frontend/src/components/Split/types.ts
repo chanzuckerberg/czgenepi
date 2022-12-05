@@ -32,6 +32,7 @@ export enum USER_FEATURE_FLAGS {
 export enum PATHOGEN_FEATURE_FLAGS {
   galago_linkout = "PATHOGEN_galago_linkout",
   lineage_filter_enabled = "PATHOGEN_lineage_filter_enabled",
+  nextstrain_enabled = "PATHOGEN_nextstrain_enabled",
   public_repository = "PATHOGEN_public_repository",
   usher_linkout = "PATHOGEN_usher_linkout",
 }
