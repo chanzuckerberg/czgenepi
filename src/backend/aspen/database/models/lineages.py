@@ -3,6 +3,7 @@ import enum
 import enumtables
 from sqlalchemy import (
     Column,
+    DateTime,
     Float,
     ForeignKey,
     Integer,
@@ -107,6 +108,7 @@ class SampleLineage(idbase):  # type: ignore
     lineage = Column(String, nullable=False)
     lineage_probability = Column(Float, nullable=True)
     raw_lineage_output = Column(JSONB, nullable=True)
+    last_updated = Column(DateTime, nullable=True)
 
     # For Nextclade, we need to track the underlying reference data bundle
     # that was involved to know how the lineage call was made.

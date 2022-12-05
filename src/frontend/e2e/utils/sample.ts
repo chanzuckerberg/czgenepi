@@ -14,7 +14,7 @@ import { SampleUploadData } from "./schemas/sampleUploadData";
 
 dotenv.config();
 
-const lineages = ["A", "BA.1.1", "BA.1.15"]; //todo: will be good to get this from API and then choose randomly
+const lineages: string[] = ["A", "BA.1.1", "BA.1.15"]; //todo: will be good to get this from API and then choose randomly
 
 const locations = getLocations();
 /**
@@ -75,15 +75,25 @@ export function getSampleResponseData(
       status: "Not Found",
     },
     id: getValueOrDefault(defaults?.id, getRandomNumber()),
-    lineage: {
-      confidence: "",
-      last_updated: getADateInThePast(),
-      lineage: sample(lineages),
-      qc_status: "pass",
-      scorpio_call: "Omicron (BA.1-like)",
-      scorpio_support: 0.93,
-      version: "PUSHER-v1.13",
-    },
+    lineages: [
+      {
+        lineage_type: "PANGOLIN",
+        last_updated: getADateInThePast(),
+        lineage: lineages[Math.floor(Math.random() * lineages.length)],
+        qc_status: "pass",
+        scorpio_call: "Omicron (BA.1-like)",
+        scorpio_support: "0.93",
+        lineage_software_version: "PUSHER-v1.13",
+      },
+    ],
+    qc_metrics: [
+      {
+        qc_score: "1.12234",
+        qc_software_version: "1.0.0",
+        qc_status: "good",
+        qc_caller: "NEXTCLADE",
+      },
+    ],
     private: getValueOrDefault(defaults?.private, true),
     private_identifier: generatePrivateSampleId(),
     public_identifier: generatePublicSampleId(),

@@ -266,7 +266,6 @@ export const DataTable: FunctionComponent<Props> = ({
       const onEditTreeModalOpen = isSampleTable
         ? noop
         : handleEditTreeModalOpen;
-
       return (
         <Fragment key={`${item[indexingKey]}-${header.key}`}>
           {renderer({

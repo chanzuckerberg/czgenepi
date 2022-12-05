@@ -9,12 +9,27 @@ interface GISAID {
 }
 
 interface Lineage {
-  last_updated: string;
   lineage: string;
+  lineage_type: string;
+  lineage_software_version: string;
+  lineage_probability?: string;
+  last_updated?: string;
+  reference_dataset_name?: string;
+  reference_sequence_accession?: string;
+  reference_dataset_tag?: string;
+  scorpio_call?: string;
+  scorpio_support?: string;
+  qc_status?: string;
+}
+
+interface QCMetrics {
+  qc_score?: string;
+  qc_software_version: string;
   qc_status: string;
-  scorpio_call: string;
-  scorpio_support: string;
-  version: string;
+  qc_caller: string;
+  reference_dataset_name?: string;
+  reference_sequence_accession?: string;
+  reference_dataset_tag?: string;
 }
 
 enum TREE_STATUS {
@@ -42,7 +57,8 @@ interface Sample extends BioinformaticsType {
   };
   gisaid: GISAID;
   CZBFailedGenomeRecovery: boolean;
-  lineage: Lineage;
+  lineages: [Lineage];
+  qc_metrics: [QCMetrics];
   private?: boolean;
 }
 

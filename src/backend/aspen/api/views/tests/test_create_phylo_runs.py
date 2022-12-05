@@ -5,9 +5,8 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import random_pathogen_factory
+from aspen.test_infra.models.pathogen_repo_config import setup_random_repo_configs
 from aspen.test_infra.models.repo_metadata import repo_metadata_factory
-from aspen.test_infra.models.repository import random_default_repo_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
@@ -31,53 +30,11 @@ async def test_create_phylo_run(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
-    sample = sample_factory(group, user, location, pathogen=pathogen)
-    repo = random_default_repo_factory(split_client)
-    repo_data = aligned_repo_data_factory(pathogen, repo)
-    uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-    async_session.add(group)
-    async_session.add(repo_data)
-    await async_session.commit()
-
-    auth_headers = {"user_id": user.auth0_user_id}
-    data = {
-        "name": "test phylorun",
-        "tree_type": "targeted",
-        "samples": [sample.public_identifier],
-    }
-    res = await http_client.post(
-        f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/phylo_runs/",
-        json=data,
-        headers=auth_headers,
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
     )
-    assert res.status_code == 200
-    response = res.json()
-    assert response["template_args"] == {}
-    assert response["workflow_status"] == "STARTED"
-    assert response["group"]["name"] == group.name
-    assert response["user"]["name"] == user.name
-    assert response["user"]["id"] == user.id
-    assert response["pathogen"]["slug"] == pathogen.slug
-    assert "id" in response
-
-
-async def test_create_phylo_run_mpx(
-    async_session: AsyncSession,
-    http_client: AsyncClient,
-    split_client: SplitClient,
-):
-    """
-    Test phylo tree creation, local-only samples.
-    """
-    group = group_factory()
-    user = await userrole_factory(async_session, group)
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    pathogen = random_pathogen_factory()
     sample = sample_factory(group, user, location, pathogen=pathogen)
-    repo = random_default_repo_factory(split_client)
+    repo = repo_config.public_repository
     repo_data = aligned_repo_data_factory(pathogen, repo)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
@@ -119,10 +76,12 @@ async def test_create_phylo_run_with_failed_sample(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     sample = sample_factory(group, user, location, pathogen=pathogen)
     sample.czb_failed_genome_recovery = True
-    repo = random_default_repo_factory(split_client)
+    repo = repo_config.public_repository
     repo_data = aligned_repo_data_factory(pathogen, repo)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
@@ -156,10 +115,12 @@ async def test_create_phylo_run_with_invalid_args(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-    repo = random_default_repo_factory(split_client)
+    repo = repo_config.public_repository
     repo_data = aligned_repo_data_factory(pathogen, repo)
     repo_sample = repo_metadata_factory(pathogen, repo)
     async_session.add(group)
@@ -211,10 +172,12 @@ async def test_create_phylo_run_with_template_args(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-    repo = random_default_repo_factory(split_client)
+    repo = repo_config.public_repository
     repo_data = aligned_repo_data_factory(pathogen, repo)
     repo_sample = repo_metadata_factory(pathogen, repo)
     async_session.add(group)
@@ -285,10 +248,12 @@ async def test_create_phylo_run_with_strain_ids(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-    repo = random_default_repo_factory(split_client)
+    repo = repo_config.public_repository
     repo_data = aligned_repo_data_factory(pathogen, repo)
     repo_sample = repo_metadata_factory(pathogen, repo)
     async_session.add(group)
@@ -328,10 +293,12 @@ async def test_create_phylo_run_with_epi_isls(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     sample = sample_factory(group, user, location, pathogen=pathogen)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-    repo = random_default_repo_factory(split_client)
+    repo = repo_config.public_repository
     repo_data = aligned_repo_data_factory(pathogen, repo)
     isl_sample = repo_metadata_factory(pathogen, repo)
     async_session.add(group)
@@ -371,9 +338,11 @@ async def test_create_invalid_phylo_run_name(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     sample = sample_factory(group, user, location, pathogen=pathogen)
-    repo = random_default_repo_factory(split_client)
+    repo = repo_config.public_repository
     repo_data = aligned_repo_data_factory(pathogen, repo)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
@@ -407,9 +376,11 @@ async def test_create_invalid_phylo_run_tree_type(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     sample = sample_factory(group, user, location, pathogen=pathogen)
-    repo = random_default_repo_factory(split_client)
+    repo = repo_config.public_repository
     repo_data = aligned_repo_data_factory(pathogen, repo)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
@@ -443,9 +414,11 @@ async def test_create_invalid_phylo_run_bad_sample_id(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     sample = sample_factory(group, user, location, pathogen=pathogen)
-    repo = random_default_repo_factory(split_client)
+    repo = repo_config.public_repository
     repo_data = aligned_repo_data_factory(pathogen, repo)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
@@ -479,7 +452,9 @@ async def test_create_invalid_phylo_run_sample_cannot_see(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     sample = sample_factory(group, user, location, pathogen=pathogen)
 
     group2 = group_factory(name="The Other Group")
@@ -500,7 +475,7 @@ async def test_create_invalid_phylo_run_sample_cannot_see(
         pathogen=pathogen,
     )
 
-    repo = random_default_repo_factory(split_client)
+    repo = repo_config.public_repository
     aligned_repo_data = aligned_repo_data_factory(pathogen, repo)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)
@@ -536,9 +511,11 @@ async def test_create_phylo_run_unauthorized(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     sample = sample_factory(group, user, location, pathogen=pathogen)
-    repo = random_default_repo_factory(split_client)
+    repo = repo_config.public_repository
     repo_data = aligned_repo_data_factory(pathogen, repo)
     uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
     async_session.add(group)

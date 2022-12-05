@@ -1,7 +1,7 @@
 import csv
 import datetime
 import io
-from typing import Any, List
+from typing import List
 
 import pytest
 from httpx import AsyncClient
@@ -11,16 +11,17 @@ from aspen.api.utils import (
     GenBankSubmissionFormTSVStreamer,
     GisaidSubmissionFormCSVStreamer,
 )
-from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
-from aspen.database.models import Sample, UploadedPathogenGenome
+from aspen.database.models import Sample
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
     setup_gisaid_and_genbank_repo_configs,
+    setup_random_repo_configs,
 )
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import group_factory, userrole_factory
+from aspen.util.split import SplitClient
 
 # All test coroutines will be treated as marked.
 pytestmark = pytest.mark.asyncio
@@ -29,6 +30,7 @@ pytestmark = pytest.mark.asyncio
 async def test_submission_template_download_gisaid(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test a regular tsv download for samples submitted by the user's group
@@ -38,9 +40,8 @@ async def test_submission_template_download_gisaid(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
-    pathogen = setup_gisaid_and_genbank_repo_configs(
-        async_session, pathogen, "hCoV-19", "SARS-CoV-2/human"
+    pathogen, _ = setup_gisaid_and_genbank_repo_configs(
+        async_session, split_client=split_client, default_repo="GISAID"
     )
     pangolin_output = {
         "scorpio_call": "B.1.167",
@@ -49,7 +50,6 @@ async def test_submission_template_download_gisaid(
     }
     # Make multiple samples
     samples: List[Sample] = []
-    uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
     for i in range(2):
         samples.append(
             sample_factory(
@@ -62,14 +62,12 @@ async def test_submission_template_download_gisaid(
                 public_identifier=f"public{i}",
             )
         )
-        uploaded_pathogen_genomes.append(
+        async_session.add(
             uploaded_pathogen_genome_factory(
                 samples[i], pangolin_output=pangolin_output
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
-    to_add: list[Any] = [user, group, location] + samples  # type: ignore
-    async_session.add_all(to_add)
     await async_session.commit()
 
     today = datetime.date.today()
@@ -115,6 +113,7 @@ async def test_submission_template_download_gisaid(
 async def test_submission_template_download_genbank_SC2(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test a regular tsv download for samples submitted by the user's group
@@ -126,7 +125,7 @@ async def test_submission_template_download_genbank_SC2(
     )
     pathogen = random_pathogen_factory(slug="SC2")
     setup_gisaid_and_genbank_repo_configs(
-        async_session, pathogen, "hCoV-19", "SARS-CoV-2/human"
+        async_session, pathogen, split_client=split_client, default_repo="GenBank"
     )
 
     pangolin_output = {
@@ -136,7 +135,6 @@ async def test_submission_template_download_genbank_SC2(
     }
     # Make multiple samples
     samples: List[Sample] = []
-    uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
     for i in range(2):
         samples.append(
             sample_factory(
@@ -149,14 +147,12 @@ async def test_submission_template_download_genbank_SC2(
                 public_identifier=f"public{i}",
             )
         )
-        uploaded_pathogen_genomes.append(
+        async_session.add(
             uploaded_pathogen_genome_factory(
                 samples[i], pangolin_output=pangolin_output
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
-    to_add: list[Any] = [user, group, location] + samples  # type: ignore
-    async_session.add_all(to_add)
     await async_session.commit()
 
     today = datetime.date.today()
@@ -199,6 +195,7 @@ async def test_submission_template_download_genbank_SC2(
 async def test_submission_template_download_genbank_MPX(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test MPX tsv download for samples submitted by the user's group
@@ -209,11 +206,16 @@ async def test_submission_template_download_genbank_MPX(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen = random_pathogen_factory(slug="MPX")
-    setup_gisaid_and_genbank_repo_configs(async_session, pathogen, "", "hMpxV")
+    setup_random_repo_configs(
+        async_session,
+        pathogen,
+        {"GenBank": "hMpxV"},
+        split_client=split_client,
+        default_repo="GenBank",
+    )
 
     # Make multiple samples
     samples: List[Sample] = []
-    uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
     for i in range(2):
         samples.append(
             sample_factory(
@@ -226,14 +228,12 @@ async def test_submission_template_download_genbank_MPX(
                 public_identifier=f"public{i}",
             )
         )
-        uploaded_pathogen_genomes.append(
+        async_session.add(
             uploaded_pathogen_genome_factory(
                 samples[i]  # , pangolin_output=pangolin_output
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
-    to_add: list[Any] = [user, group, location] + samples  # type: ignore
-    async_session.add_all(to_add)
     await async_session.commit()
 
     today = datetime.date.today()
@@ -273,6 +273,7 @@ async def test_submission_template_download_genbank_MPX(
 async def test_submission_template_prefix_stripping(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test a regular tsv download for samples submitted by the user's group
@@ -282,9 +283,8 @@ async def test_submission_template_prefix_stripping(
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
-    pathogen = random_pathogen_factory()
-    pathogen = setup_gisaid_and_genbank_repo_configs(
-        async_session, pathogen, "hCoV-19", "SARS-CoV-2/human"
+    pathogen, _ = setup_gisaid_and_genbank_repo_configs(
+        async_session, split_client=split_client, default_repo="GISAID"
     )
 
     pangolin_output = {
@@ -294,7 +294,6 @@ async def test_submission_template_prefix_stripping(
     }
     # Make multiple samples
     samples: List[Sample] = []
-    uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
     for i in range(2):
         samples.append(
             sample_factory(
@@ -307,14 +306,12 @@ async def test_submission_template_prefix_stripping(
                 public_identifier=f"hCoV-19/public{i}",
             )
         )
-        uploaded_pathogen_genomes.append(
+        async_session.add(
             uploaded_pathogen_genome_factory(
                 samples[i], pangolin_output=pangolin_output
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
-    to_add: list[Any] = [user, group, location] + samples  # type: ignore
-    async_session.add_all(to_add)
     await async_session.commit()
 
     today = datetime.date.today()
@@ -363,6 +360,7 @@ async def test_submission_template_prefix_stripping(
 async def test_submission_template_incomplete_location(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test a regular tsv download for samples submitted by the user's group
@@ -371,10 +369,8 @@ async def test_submission_template_incomplete_location(
     user = await userrole_factory(async_session, group)
     location = location_factory("North America", "USA", "California")
 
-    pathogen = random_pathogen_factory()
-    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
-        pathogen, "GISAID", async_session
+    pathogen, pathogen_repo_config = setup_gisaid_and_genbank_repo_configs(
+        async_session, split_client=split_client, default_repo="GISAID"
     )
 
     pangolin_output = {
@@ -384,7 +380,6 @@ async def test_submission_template_incomplete_location(
     }
     # Make multiple samples
     samples: List[Sample] = []
-    uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
     for i in range(2):
         samples.append(
             sample_factory(
@@ -397,14 +392,12 @@ async def test_submission_template_incomplete_location(
                 public_identifier=f"{pathogen_repo_config.prefix}/public{i}",
             )
         )
-        uploaded_pathogen_genomes.append(
+        async_session.add(
             uploaded_pathogen_genome_factory(
                 samples[i], pangolin_output=pangolin_output
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
-    to_add: list[Any] = [user, group, location] + samples  # type: ignore
-    async_session.add_all(to_add)
     await async_session.commit()
 
     today = datetime.date.today()

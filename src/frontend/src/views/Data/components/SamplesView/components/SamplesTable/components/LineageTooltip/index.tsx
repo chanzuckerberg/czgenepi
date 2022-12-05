@@ -1,6 +1,5 @@
 import { Tooltip } from "czifui";
 import { ReactNode } from "react";
-import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { Label, Text, Wrapper } from "./style";
 
 interface Props {
@@ -9,36 +8,56 @@ interface Props {
 }
 
 const KEY_TO_LABELS = {
-  last_updated: "Last Updated",
   lineage: "Lineage",
   qc_status: "QC Status",
   scorpio_call: "Scorpio Call",
   scorpio_support: "Scorpio Support",
-  version: "Version",
+  lineage_software_version: "Version",
+  lineage_type: "Lineage Type",
+  lineage_probability: "Lineage Probability",
+  last_updated: "Last Updated",
+  reference_dataset_name: "Reference Dataset Name",
+  reference_sequence_accession: "Reference Sequence Accession",
+  reference_dataset_tag: "Reference Dataset Tag",
 };
 
 const DISPLAY_ORDER: Array<keyof Lineage> = [
   "lineage",
   "qc_status",
-  "version",
+  "lineage_software_version",
+  "lineage_type",
+  "lineage_probability",
   "last_updated",
   "scorpio_call",
   "scorpio_support",
+  "reference_dataset_name",
+  "reference_sequence_accession",
+  "reference_dataset_tag",
 ];
 
 export const LineageTooltip = ({ children, lineage }: Props): JSX.Element => {
   const textRows = (
     <>
       {DISPLAY_ORDER.map((key) => {
-        let value = lineage[key];
-        if (key === "last_updated") {
-          value = datetimeWithTzToLocalDate(value);
+        const value = lineage[key];
+        // skip certain keys for now that are extra and not included in current design
+        if (
+          !(
+            key in
+            [
+              "reference_dataset_name",
+              "reference_sequence_accession",
+              "reference_dataset_tag",
+              "lineage_type",
+            ]
+          )
+        ) {
+          return (
+            <Wrapper key={key}>
+              <Label>{KEY_TO_LABELS[key]}:</Label> <Text>{value}</Text>
+            </Wrapper>
+          );
         }
-        return (
-          <Wrapper key={key}>
-            <Label>{KEY_TO_LABELS[key]}:</Label> <Text>{value}</Text>
-          </Wrapper>
-        );
       })}
     </>
   );
