@@ -44,15 +44,9 @@ export type SampleResponseData = {
   qc_metrics: [
     {
       qc_score?: string;
-<<<<<<< HEAD
-      qc_software_version?: string;
-      qc_status?: string;
-      qc_caller?: string;
-=======
       qc_software_version: string;
       qc_status: string;
       qc_caller: string;
->>>>>>> trunk
       reference_dataset_name?: string;
       reference_sequence_accession?: string;
       reference_dataset_tag?: string;
