@@ -189,7 +189,9 @@ async def test_samples_list(
                             "lineage_probability": sample_lineages[
                                 i
                             ].lineage_probability,
-                            "last_updated": sample_lineages[i].last_updated,
+                            "last_updated": sample_lineages[i].last_updated.strftime(
+                                "%Y-%m-%d"
+                            ),
                             "reference_dataset_name": sample_lineages[
                                 i
                             ].reference_dataset_name,

@@ -1,3 +1,5 @@
+import datetime
+
 from aspen.database.models import LineageType, Pathogen, PathogenLineage, SampleLineage
 
 
@@ -11,7 +13,7 @@ def sample_lineage_factory(
     lineage_software_version="1.0.0",
     lineage="B.1.1",
     lineage_probability=None,
-    last_updated="2022-11-25",
+    last_updated=datetime.date.today(),
     raw_lineage_output={},
     reference_dataset_name="",
     reference_sequence_accession="",
