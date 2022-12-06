@@ -31,7 +31,6 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   // define table data
   const tsvData = checkedSamples.map((sample) => {
     // for each sample, generate an array of values, one column at a time
-    debugger;
     return allHeaders.flatMap((header) => {
       const { key } = header;
       const value = sample[key];
