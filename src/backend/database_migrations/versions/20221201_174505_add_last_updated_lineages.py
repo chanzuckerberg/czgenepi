@@ -1,4 +1,4 @@
-"""
+"""add last_updated to sample_lineages table
 
 Create Date: 2022-12-01 17:45:12.807002
 
@@ -22,26 +22,19 @@ def upgrade():
     )
 
     conn = op.get_bind()
-
-    # this is the same as jess' query from backfill sample lineages,
-    # only tacking on the last_updated portion to the query.
-    # this is still valid at this time because we are still
-    # populating the pathogen_genome fields from the pangolin save script.
-
-    insert_accessions_sql = sa.sql.text(
+    insert_last_updated_sql = sa.sql.text(
         """
-        INSERT INTO aspen.sample_lineages (sample_id, lineage_type, lineage, lineage_probability, lineage_software_version, raw_lineage_output, last_updated)
-        SELECT s.id, 'PANGOLIN', pg.pangolin_lineage, pg.pangolin_probability, pg.pangolin_version, pg.pangolin_output, pg.pangolin_last_updated
-        FROM aspen.uploaded_pathogen_genomes upg
-        INNER JOIN aspen.pathogen_genomes pg ON pg.entity_id = upg.pathogen_genome_id
-        INNER JOIN aspen.samples s ON s.id = upg.sample_id
-        INNER JOIN aspen.pathogens p ON p.id = s.pathogen_id
-        WHERE pg.pangolin_lineage IS NOT NULL AND p.slug = 'SC2'
-        ON CONFLICT DO NOTHING
-        """
+    UPDATE aspen.sample_lineages 
+    SET last_updated = t.pangolin_last_updated FROM (SELECT *  
+    FROM aspen.uploaded_pathogen_genomes upg
+    INNER JOIN aspen.pathogen_genomes pg 
+    ON pg.entity_id = upg.pathogen_genome_id
+    ) t
+    WHERE aspen.sample_lineages.sample_id = t.sample_id
+    """
     )
 
-    conn.execute(insert_accessions_sql)
+    conn.execute(insert_last_updated_sql)
 
 
 def downgrade():
