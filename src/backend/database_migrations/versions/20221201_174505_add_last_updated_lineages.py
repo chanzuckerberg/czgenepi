@@ -23,14 +23,14 @@ def upgrade():
 
     conn = op.get_bind()
     insert_last_updated_sql = sa.sql.text(
-    """
-    UPDATE aspen.sample_lineages
-    SET last_updated = t.pangolin_last_updated FROM (SELECT *
-    FROM aspen.uploaded_pathogen_genomes upg
-    INNER JOIN aspen.pathogen_genomes pg
-    ON pg.entity_id = upg.pathogen_genome_id
-    ) t
-    WHERE aspen.sample_lineages.sample_id = t.sample_id
+        """
+        UPDATE aspen.sample_lineages
+        SET last_updated = t.pangolin_last_updated FROM (SELECT *
+        FROM aspen.uploaded_pathogen_genomes upg
+        INNER JOIN aspen.pathogen_genomes pg
+        ON pg.entity_id = upg.pathogen_genome_id
+        ) t
+        WHERE aspen.sample_lineages.sample_id = t.sample_id
     """
     )
 
