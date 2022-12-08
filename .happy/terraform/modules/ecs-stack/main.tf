@@ -318,7 +318,7 @@ module nextstrain_ondemand_template_sfn_config {
   source   = "../sfn_config"
   app_name = "nextstrain-ondemand-sfn"
   image    = local.nextstrain_image
-  memory   = 64000
+  memory   = 120000
   wdl_path = "workflows/nextstrain-ondemand.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
