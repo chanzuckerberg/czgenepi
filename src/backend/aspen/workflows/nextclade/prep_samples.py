@@ -6,7 +6,9 @@ Core approach here is a copy of what's in workflows/pangolin/export.py.
 import io
 import json
 from enum import Enum
-from typing import IO, Iterable
+from pathlib import Path
+from typing import Dict, IO, Iterable
+import subprocess
 
 import click
 import sqlalchemy as sa
@@ -20,7 +22,7 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import Pathogen, Sample, UploadedPathogenGenome
-
+from aspen.workflows.nextclade.utils import extract_dataset_info
 
 # Running this CLI script must be one of these types of runs.
 class RunType(str, Enum):  # str mix-in gives nice == compare against strings
@@ -33,6 +35,9 @@ class RunType(str, Enum):  # str mix-in gives nice == compare against strings
 # `click` barfs on enums, so make a string list for it
 _run_type_click_choices = [item.value for item in RunType]
 
+
+NEXTCLADE_DATASET_DIR = "nextclade_dataset_bundle"
+NEXTCLADE_TAG_FILENAME = "tag.json"
 
 @click.command("export")
 @click.option("run_type", "--run-type", type=click.Choice(_run_type_click_choices), default=RunType.SPECIFIED_IDS_ONLY)
@@ -63,6 +68,14 @@ def cli(
     - pathogen_info_fh: Write out pathogen info for later use in workflow
     """
     # print(run_type == RunType.SPECIFIED_IDS_ONLY)  # REMOVE
+
+    # VOODOO temp workshop
+    pathogen = "sars-cov-2"
+    curr_dataset_info = get_nextclade_dataset_info(pathogen, NEXTCLADE_DATASET_DIR, NEXTCLADE_TAG_FILENAME)
+    print(curr_dataset_info)
+    raise RuntimeError('donezo')
+    # END VOODOO
+
     sample_ids: list[int] = [int(id_line) for id_line in sample_ids_fh]
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
@@ -107,6 +120,37 @@ def cli(
             sequences_fh.write("\n")
 
         print("Finished writing FASTA for samples.")
+
+
+def download_nextclade_dataset(dataset_name: str, output_dir: str, tag_filename: str) -> Dict[str, str]:
+    """Downloads most recent Nextclade dataset, returns important tag info.
+
+    We determine the staleness of previous Nextclade calls by comparing those
+    previous calls against the most recent tag info. If they do not match,
+    we need to run Nextclade again to bring the call up to date.
+
+    As part of this, we download the Nextclade dataset. This is where the
+    dataset download happens for the overall process. We could do it in the
+    shell script, but since the tag info is necessary for other steps, we
+    pull the whole thing now.
+
+    Note: we could instead use a different Nextclade CLI call
+        nextclade dataset list --name DATASET_NAME_HERE --json
+    to fetch just the tag info, **however** the structure of that JSON is
+    different than the structure of the `tag.json` file. It seemed better
+    to me (Vince) to have one, consistent way to pull tag info than needing
+    to maintain two sources of truth. The overall bundle download is not
+    very large and we do go on to use it if there's any calls to make, so
+    that seemed reasonable to me. But if downloading here causes problems,
+    try switching to just fetchign the tag JSON and parsing it.
+    """
+    subprocess.run(
+        ['nextclade', 'dataset', 'get', '--name', dataset_name, '--output-dir', output_dir],
+        timeout=60,  # Just in case the call hangs, blow up everything
+        check=True,  # Raise and blow up everything if non-zero exit code
+        )
+    with open(Path(output_dir, tag_filename)) as tag_fh:
+        return extract_dataset_info(tag_fh)
 
 
 def save_pathogen_info(pathogen_info_fh: IO[str], pathogen: Pathogen):
