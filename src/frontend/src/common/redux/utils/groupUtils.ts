@@ -4,7 +4,7 @@ import {
 } from "src/common/utils/localStorage";
 import { canUserViewGroup } from "src/common/utils/userInfo";
 import { store } from "..";
-import { fetchUserInfo, mapUserData } from "../../queries/auth";
+import { fetchUserInfo, mapUserData, RawUserRequest } from "../../queries/auth";
 import { setGroup } from "../actions";
 import { selectCurrentGroup } from "../selectors";
 import { ReduxPersistenceTokens } from "../types";
@@ -14,7 +14,15 @@ export const ensureValidGroup = async (): Promise<void> => {
 
   const { dispatch, getState } = store;
   const state = getState();
-  const rawUserInfo = await fetchUserInfo();
+  let rawUserInfo: RawUserRequest | null = null;
+  try {
+    rawUserInfo = await fetchUserInfo();
+  } catch (e) {
+    return;
+  }
+  if (rawUserInfo == null) {
+    return;
+  }
   const userInfo = mapUserData(rawUserInfo);
   const { groups } = userInfo;
 
