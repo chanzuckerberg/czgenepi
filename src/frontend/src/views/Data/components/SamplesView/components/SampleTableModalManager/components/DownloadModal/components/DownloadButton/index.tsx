@@ -32,6 +32,7 @@ interface Props {
   isGenbankSelected: boolean;
   isGisaidSelected: boolean;
   isMetadataSelected: boolean;
+  isNextcladeDataSelected: boolean;
   completedSampleIds: string[];
   handleCloseModal(): void;
 }
@@ -42,6 +43,7 @@ const DownloadButton = ({
   isGenbankSelected,
   isGisaidSelected,
   isMetadataSelected,
+  isNextcladeDataSelected,
   completedSampleIds,
   handleCloseModal,
 }: Props): JSX.Element | null => {
@@ -136,7 +138,8 @@ const DownloadButton = ({
     isFastaSelected ||
     isMetadataSelected ||
     isGisaidSelected ||
-    isGenbankSelected
+    isGenbankSelected ||
+    isNextcladeDataSelected
   );
 
   const onClick = () => {
@@ -145,6 +148,13 @@ const DownloadButton = ({
     if (isFastaSelected) {
       downloadMutation.mutate({
         endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
+        sampleIds: completedSampleIds,
+      });
+    }
+
+    if (isNextcladeDataSelected) {
+      downloadMutation.mutate({
+        endpoint: ORG_API.SAMPLES_NEXTCLADE_DOWNLOAD,
         sampleIds: completedSampleIds,
       });
     }

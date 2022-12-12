@@ -43,6 +43,8 @@ const DownloadModal = ({
   const [isMetadataSelected, setMetadataSelected] = useState<boolean>(false);
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
   const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
+  const [isNextcladeDataSelected, setNextcladeDataSelected] = useState(false);
+
   const pathogen = useSelector(selectCurrentPathogen);
   const isGisaidTemplateEnabled = pathogen === Pathogen.COVID;
 
@@ -69,11 +71,16 @@ const DownloadModal = ({
     setGenbankSelected(!isGenbankSelected);
   };
 
+  const handleNextcladeDataClick = function () {
+    setNextcladeDataSelected(!isNextcladeDataSelected);
+  }
+
   const handleCloseModal = () => {
     setFastaSelected(false);
     setMetadataSelected(false);
     setGenbankSelected(false);
     setGisaidSelected(false);
+    setNextcladeDataSelected(false);
     onClose();
   };
 
@@ -121,7 +128,6 @@ const DownloadModal = ({
                 Download multiple consensus genomes in a single concatenated
                 file.
               </DownloadMenuSelection>
-
               <DownloadMenuSelection
                 id="download-metadata-checkbox"
                 isChecked={isMetadataSelected}
@@ -132,6 +138,16 @@ const DownloadModal = ({
                 Sample metadata including Private and Public IDs, Collection
                 Date, Sequencing Date, Lineage, GISAID Status, and ISL Accession
                 #.
+              </DownloadMenuSelection>
+              <DownloadMenuSelection
+                id="download-nextclade-checkbox"
+                isChecked={isNextcladeDataSelected}
+                onChange={handleNextcladeDataClick}
+                downloadTitle="Sample Mutations and QC Metrics"
+                fileTypes=".csv"
+              >
+                Download a list of nucelotide and protein mutations and QC metrics 
+                for the selected samples. Learn More.
               </DownloadMenuSelection>
               {isGisaidTemplateEnabled && (
                 <DownloadMenuSelection
@@ -169,6 +185,7 @@ const DownloadModal = ({
                   Learn More.
                 </Link>
               </DownloadMenuSelection>
+
             </Container>
             {failedSampleIds.length > 0 &&
               !isFastaDisabled && ( //ignore alert if fasta is already disabled
@@ -198,6 +215,7 @@ const DownloadModal = ({
               isGenbankSelected={isGenbankSelected}
               isGisaidSelected={isGisaidSelected}
               isMetadataSelected={isMetadataSelected}
+              isNextcladeDataSelected={isNextcladeDataSelected}
               completedSampleIds={completedSampleIds}
               handleCloseModal={handleCloseModal}
             />
