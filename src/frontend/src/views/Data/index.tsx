@@ -18,7 +18,6 @@ import { FilterPanel } from "src/components/FilterPanel";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { DataSubview } from "../../common/components";
-import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
