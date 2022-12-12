@@ -1,6 +1,6 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { Alert, Icon, Link } from "czifui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
@@ -47,20 +47,30 @@ const DownloadModal = ({
   const [isGisaidSelected, setGisaidSelected] = useState<boolean>(false);
   const [isGenbankSelected, setGenbankSelected] = useState<boolean>(false);
   const [isNextcladeDataSelected, setNextcladeDataSelected] = useState(false);
+  const [noQCDataSampleIds, setNoQCDataSampleIds] = useState<number>(0);
 
   const pathogen = useSelector(selectCurrentPathogen);
   const isGisaidTemplateEnabled = pathogen === Pathogen.COVID;
 
-  const nextcladeDownloadFlag = useTreatments([USER_FEATURE_FLAGS.nextclade_download]);
+  const nextcladeDownloadFlag = useTreatments([
+    USER_FEATURE_FLAGS.nextclade_download,
+  ]);
   const usesNextcladeDownload = isUserFlagOn(
     nextcladeDownloadFlag,
     USER_FEATURE_FLAGS.nextclade_download
   );
 
+  useEffect(() => {
+    const noQCIds = checkedSamples
+      .filter((s) => s.qc_metrics[0].qc_status === null)
+      .map((s) => s.publicId);
+      setNoQCDataSampleIds(noQCIds.length);
+  }, [checkedSamples]);
+  
   const completedSampleIds = checkedSamples
     .filter((sample) => !failedSampleIds.includes(sample.publicId))
     .map((s) => s.publicId);
-
+  
   const nCompletedSampleIds = completedSampleIds.length;
   const isFastaDisabled = nCompletedSampleIds === 0;
 
@@ -82,7 +92,7 @@ const DownloadModal = ({
 
   const handleNextcladeDataClick = function () {
     setNextcladeDataSelected(!isNextcladeDataSelected);
-  }
+  };
 
   const handleCloseModal = () => {
     setFastaSelected(false);
@@ -100,6 +110,16 @@ const DownloadModal = ({
       </TooltipHeaderText>
       <TooltipDescriptionText>
         Select at least 1 sample with successful genome recovery.
+      </TooltipDescriptionText>
+    </div>
+  );
+  const NO_NEXTCLADE_DATA_TOOLTIP_TEXT = (
+    <div>
+      <TooltipHeaderText>
+        No QC data available for download.
+      </TooltipHeaderText>
+      <TooltipDescriptionText>
+        Select at least 1 sample with a QC Status of good, mediocre, or bad to proceed.
       </TooltipDescriptionText>
     </div>
   );
@@ -148,17 +168,19 @@ const DownloadModal = ({
                 Date, Sequencing Date, Lineage, GISAID Status, and ISL Accession
                 #.
               </DownloadMenuSelection>
-              { usesNextcladeDownload && (
-              <DownloadMenuSelection
-                id="download-nextclade-checkbox"
-                isChecked={isNextcladeDataSelected}
-                onChange={handleNextcladeDataClick}
-                downloadTitle="Sample Mutations and QC Metrics"
-                fileTypes=".csv"
-              >
-                Download a list of nucelotide and protein mutations and QC metrics 
-                for the selected samples. Learn More.
-              </DownloadMenuSelection>
+              {usesNextcladeDownload && (
+                <DownloadMenuSelection
+                  id="download-nextclade-checkbox"
+                  isChecked={isNextcladeDataSelected}
+                  isDisabled={noQCDataSampleIds === 0}
+                  tooltipTitle={NO_NEXTCLADE_DATA_TOOLTIP_TEXT}
+                  onChange={handleNextcladeDataClick}
+                  downloadTitle="Sample Mutations and QC Metrics"
+                  fileTypes=".csv"
+                >
+                  Download a list of nucelotide and protein mutations and QC
+                  metrics for the selected samples. Learn More.
+                </DownloadMenuSelection>
               )}
               {isGisaidTemplateEnabled && (
                 <DownloadMenuSelection
@@ -196,7 +218,6 @@ const DownloadModal = ({
                   Learn More.
                 </Link>
               </DownloadMenuSelection>
-
             </Container>
             {failedSampleIds.length > 0 &&
               !isFastaDisabled && ( //ignore alert if fasta is already disabled

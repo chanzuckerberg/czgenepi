@@ -17,6 +17,7 @@ const SampleTableModalManager = ({
 }: Props): JSX.Element => {
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
   const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
+  const [badQCSampleIds, setBadQCSampleIds] = useState<string[]>([]);
   const [canEditSamples, setCanEditSamples] = useState<boolean>(false);
 
   const [isDeleteSampleModalOpen, setIsDeleteSampleModalOpen] =
@@ -36,9 +37,12 @@ const SampleTableModalManager = ({
     const failedIds = checkedSamples
       .filter((s) => s.CZBFailedGenomeRecovery)
       .map((s) => s.publicId);
-
+    const badQCIds = checkedSamples
+      .filter((s) => s.qc_metrics[0].qc_status === "bad")
+      .map((s) => s.publicId);
     setCheckedSampleIds(checkedIds);
     setFailedSampleIds(failedIds);
+    setBadQCSampleIds(badQCIds);
   }, [checkedSamples]);
 
   // determine whether selected samples can be edited
@@ -76,12 +80,14 @@ const SampleTableModalManager = ({
       <CreateNSTreeModal
         checkedSampleIds={checkedSampleIds}
         failedSampleIds={failedSampleIds}
+        badQCSampleIds={badQCSampleIds}
         open={isNSCreateTreeModalOpen}
         onClose={() => setIsNSCreateTreeModalOpen(false)}
       />
       <UsherTreeFlow
         checkedSampleIds={checkedSampleIds}
         failedSampleIds={failedSampleIds}
+        badQCSampleIds={badQCSampleIds}
         shouldStartUsherFlow={shouldStartUsherFlow}
       />
       <DeleteSamplesConfirmationModal
