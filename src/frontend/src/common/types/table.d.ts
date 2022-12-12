@@ -1,8 +1,12 @@
+interface SubHeader extends Header {
+  sortKey?: string[];
+}
 interface Header {
   text: string;
   key: string;
   sortKey: string[];
   align?: string;
+  subHeaders?: SubHeader[];
   tooltip?: {
     boldText: string;
     regularText: string;
@@ -11,10 +15,6 @@ interface Header {
       href: string;
     };
   };
-}
-
-interface SubHeader extends Header {
-  sortKey?: string[];
 }
 
 type TableItem = Record<

@@ -1,9 +1,14 @@
 // TODO-TR (mlila): consider moving or restructuring this blob
-import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS } from "src/views/Data/headers";
+import { store } from "src/common/redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { SAMPLE_HEADERS } from "src/views/Data/table-headers/sampleHeadersConfig";
 
 export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+
   const allHeaders: Header[] = [
-    ...SAMPLE_HEADERS,
+    ...SAMPLE_HEADERS[pathogen],
     {
       key: "CZBFailedGenomeRecovery",
       sortKey: ["CZBFailedGenomeRecovery"],
@@ -13,11 +18,11 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
 
   // define header row
   const tsvHeaders = allHeaders.flatMap((header) => {
-    const { key, text } = header;
+    const { text } = header;
 
     // create multiple columns for more complex data types (such as lineage)
-    if (SAMPLE_SUBHEADERS[key]) {
-      return SAMPLE_SUBHEADERS[key].map((subheader) => subheader.text);
+    if (header.subHeaders) {
+      return header.subHeaders.map((subHeader) => subHeader.text);
     }
 
     return text;
@@ -31,9 +36,9 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
       const value = sample[key];
 
       // break this piece of data into multiple columns, if necessary
-      if (typeof value === "object" && SAMPLE_SUBHEADERS[key]) {
-        return SAMPLE_SUBHEADERS[key].map((subheader) =>
-          String(value[subheader.key])
+      if (typeof value === "object" && header.subHeaders) {
+        return header.subHeaders.map((subHeader) =>
+          String(value[subHeader.key])
         );
       }
 
