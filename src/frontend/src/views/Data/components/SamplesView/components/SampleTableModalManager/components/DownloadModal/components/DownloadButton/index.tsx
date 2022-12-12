@@ -116,6 +116,7 @@ const DownloadButton = ({
     analyticsTrackEvent<AnalyticsSamplesDownloadFile>(
       EVENT_TYPES.SAMPLES_DOWNLOAD_FILE,
       {
+        // TODO: add nextclade download to analytics once defined
         includes_consensus_genome: isFastaSelected,
         includes_genbank_template: isGenbankSelected,
         includes_gisaid_template: isGisaidSelected,

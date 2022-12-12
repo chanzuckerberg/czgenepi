@@ -1,3 +1,4 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { Alert, Icon, Link } from "czifui";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -12,6 +13,8 @@ import {
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { DownloadButton } from "./components/DownloadButton";
 import { DownloadMenuSelection } from "./components/DownloadMenuSelection";
 import {
@@ -47,6 +50,12 @@ const DownloadModal = ({
 
   const pathogen = useSelector(selectCurrentPathogen);
   const isGisaidTemplateEnabled = pathogen === Pathogen.COVID;
+
+  const nextcladeDownloadFlag = useTreatments([USER_FEATURE_FLAGS.nextclade_download]);
+  const usesNextcladeDownload = isUserFlagOn(
+    nextcladeDownloadFlag,
+    USER_FEATURE_FLAGS.nextclade_download
+  );
 
   const completedSampleIds = checkedSamples
     .filter((sample) => !failedSampleIds.includes(sample.publicId))
@@ -139,6 +148,7 @@ const DownloadModal = ({
                 Date, Sequencing Date, Lineage, GISAID Status, and ISL Accession
                 #.
               </DownloadMenuSelection>
+              { usesNextcladeDownload && (
               <DownloadMenuSelection
                 id="download-nextclade-checkbox"
                 isChecked={isNextcladeDataSelected}
@@ -149,6 +159,7 @@ const DownloadModal = ({
                 Download a list of nucelotide and protein mutations and QC metrics 
                 for the selected samples. Learn More.
               </DownloadMenuSelection>
+              )}
               {isGisaidTemplateEnabled && (
                 <DownloadMenuSelection
                   id="download-gisaid-checkbox"
