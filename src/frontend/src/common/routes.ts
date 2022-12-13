@@ -37,6 +37,7 @@ export enum ROUTES {
 export const publicPaths: string[] = [
   ROUTES.HOMEPAGE,
   ROUTES.PRIVACY,
+  ROUTES.PRIVACY_PREVIEW,
   ROUTES.TERMS,
 ];
 
