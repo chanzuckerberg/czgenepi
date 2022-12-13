@@ -7,6 +7,7 @@ import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import RightNav from "../RightNav";
 import { PathogenTabs } from "./components/PathogenTabs";
+import { Announcements } from "./components/Announcements";
 import { LeftNav, Logo, LogoAnchor, NavBar, Separator } from "./style";
 
 /*
@@ -26,23 +27,28 @@ const AppNavBar = (): JSX.Element => {
   const route = userInfo ? ROUTES.DATA : ROUTES.HOMEPAGE;
 
   return (
-    <NavBar data-test-id="navbar">
-      <LeftNav>
-        <HiddenLabel id="logo-label">CZ Gen Epi Logo. Go to data.</HiddenLabel>
-        <Link href={route} passHref>
-          <LogoAnchor aria-labelledby="logo-label" href="passHref">
-            <Logo data-test-id="logo" aria-hidden="true" />
-          </LogoAnchor>
-        </Link>
-        {isMultiPathogenFlagOn && (
-          <>
-            <Separator />
-            <PathogenTabs />
-          </>
-        )}
-      </LeftNav>
-      <RightNav />
-    </NavBar>
+    <>
+      <NavBar data-test-id="navbar">
+        <LeftNav>
+          <HiddenLabel id="logo-label">
+            CZ Gen Epi Logo. Go to data.
+          </HiddenLabel>
+          <Link href={route} passHref>
+            <LogoAnchor aria-labelledby="logo-label" href="passHref">
+              <Logo data-test-id="logo" aria-hidden="true" />
+            </LogoAnchor>
+          </Link>
+          {isMultiPathogenFlagOn && (
+            <>
+              <Separator />
+              <PathogenTabs />
+            </>
+          )}
+        </LeftNav>
+        <RightNav />
+      </NavBar>
+      <Announcements />
+    </>
   );
 };
 
