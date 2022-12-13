@@ -1084,6 +1084,8 @@ const PrivacyPolicyPreview = (): JSX.Element => {
           {renderVendorAndThirdPartyPolicy()}
           {renderInformationProtectionPolicy()}
           {renderUserDataChoicesPolicy()}
+          {renderChildren()}
+          {renderDoNotTrack()}
           {renderDataTransfers()}
           {renderCaliforniaResidents()}
           {renderAdditionalResidents()}
