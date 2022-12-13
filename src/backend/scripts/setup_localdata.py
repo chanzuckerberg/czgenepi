@@ -169,6 +169,9 @@ def create_sample_lineage(session, sample):
 
 
 def create_sample_qc_metrics(session, sample):
+    should_there_be_an_associated_qc = random.choice([True, False])
+    if not should_there_be_an_associated_qc:
+        return None
 
     sample_qc_metric = (
         session.query(SampleQCMetric).filter(SampleQCMetric.sample == sample).first()
@@ -189,7 +192,7 @@ def create_sample_qc_metrics(session, sample):
         ],
     }
 
-    there_be_an_associated_qc = random.choice([True, False])
+    should_there_be_an_associated_qc = random.choice([True, False])
     random_qc_status = random.choice(list(random_qc_status_scores.keys()))
     random_qc_score = random.choice(random_qc_status_scores[random_qc_status])
 
@@ -201,11 +204,9 @@ def create_sample_qc_metrics(session, sample):
         qc_status=random_qc_status,
         raw_qc_output={},
     )
-    if there_be_an_associated_qc: 
-        session.add(sample_qc_metrics)
-        return sample_qc_metrics
-    print("decided not to have an associated QC")    
-    return None
+
+    session.add(sample_qc_metrics)
+    return sample_qc_metrics
 
 
 def create_sample(
