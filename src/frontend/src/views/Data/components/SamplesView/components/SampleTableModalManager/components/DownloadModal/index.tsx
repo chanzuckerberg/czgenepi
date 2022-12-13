@@ -11,7 +11,7 @@ import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
-import { pluralize, pluralizeVerb } from "src/common/utils/strUtils";
+import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
@@ -49,8 +49,6 @@ const DownloadModal = ({
   const [isNextcladeDataSelected, setNextcladeDataSelected] = useState(false);
   const [noQCDataSampleIds, setNoQCDataSampleIds] = useState<number>(0);
 
-  console.log("checkedSamples: ", checkedSamples);
-  console.log("noQCDataSampleIds: ", noQCDataSampleIds);
   const pathogen = useSelector(selectCurrentPathogen);
   const isGisaidTemplateEnabled = pathogen === Pathogen.COVID;
 
@@ -64,7 +62,7 @@ const DownloadModal = ({
 
   useEffect(() => {
     const noQCIds = checkedSamples
-      .filter((s) => s.qc_metrics.length === 0)
+      .filter((s) => JSON.stringify(s.qc_metrics) === "[]")
       .map((s) => s.publicId);
     setNoQCDataSampleIds(noQCIds.length);
   }, [checkedSamples]);
