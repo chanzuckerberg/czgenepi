@@ -313,7 +313,7 @@ export const DataTable: FunctionComponent<Props> = ({
       handleRowCheckboxClick(
         String(item.publicId),
         Boolean(item.CZBFailedGenomeRecovery),
-        Boolean(item.qc_metrics && item.qc_metrics[0].qc_status === "bad")
+        Boolean(item.qc_metrics.length > 0 && item.qc_metrics[0].qc_status === "bad")
       );
     };
     return (
