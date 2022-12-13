@@ -134,7 +134,7 @@ def cli(
             "url": "https://raw.githubusercontent.com/mpxv-lineages/lineage-designation/master/auto-generated/lineages.json",
             "format": "json",
             "list_path": ["lineages"],
-            "lineage_keys": ["name", "alias", "unaliased_name"],
+            "lineage_keys": ["name", "alias"],
         }
     }
     if not urls.get(pathogen_slug):
