@@ -238,7 +238,6 @@ const DataSubview: FunctionComponent<Props> = ({
     const checkedSamples = compact(
       checkedSampleIds.map((id) => data?.[id]) as Sample[]
     );
-
     return (
       <>
         {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
