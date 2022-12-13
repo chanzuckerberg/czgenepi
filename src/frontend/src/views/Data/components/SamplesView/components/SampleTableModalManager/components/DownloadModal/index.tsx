@@ -11,7 +11,7 @@ import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
-import { pluralize } from "src/common/utils/strUtils";
+import { pluralize, pluralizeVerb } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
@@ -49,6 +49,8 @@ const DownloadModal = ({
   const [isNextcladeDataSelected, setNextcladeDataSelected] = useState(false);
   const [noQCDataSampleIds, setNoQCDataSampleIds] = useState<number>(0);
 
+  console.log("checkedSamples: ", checkedSamples);
+  console.log("noQCDataSampleIds: ", noQCDataSampleIds);
   const pathogen = useSelector(selectCurrentPathogen);
   const isGisaidTemplateEnabled = pathogen === Pathogen.COVID;
 
@@ -62,15 +64,15 @@ const DownloadModal = ({
 
   useEffect(() => {
     const noQCIds = checkedSamples
-      .filter((s) => s.qc_metrics[0].qc_status === null)
+      .filter((s) => s.qc_metrics.length === 0)
       .map((s) => s.publicId);
-      setNoQCDataSampleIds(noQCIds.length);
+    setNoQCDataSampleIds(noQCIds.length);
   }, [checkedSamples]);
-  
+
   const completedSampleIds = checkedSamples
     .filter((sample) => !failedSampleIds.includes(sample.publicId))
     .map((s) => s.publicId);
-  
+
   const nCompletedSampleIds = completedSampleIds.length;
   const isFastaDisabled = nCompletedSampleIds === 0;
 
@@ -115,11 +117,10 @@ const DownloadModal = ({
   );
   const NO_NEXTCLADE_DATA_TOOLTIP_TEXT = (
     <div>
-      <TooltipHeaderText>
-        No QC data available for download.
-      </TooltipHeaderText>
+      <TooltipHeaderText>No QC data available for download.</TooltipHeaderText>
       <TooltipDescriptionText>
-        Select at least 1 sample with a QC Status of good, mediocre, or bad to proceed.
+        Select at least 1 sample with a QC Status of good, mediocre, or bad to
+        proceed.
       </TooltipDescriptionText>
     </div>
   );
@@ -172,7 +173,7 @@ const DownloadModal = ({
                 <DownloadMenuSelection
                   id="download-nextclade-checkbox"
                   isChecked={isNextcladeDataSelected}
-                  isDisabled={noQCDataSampleIds === 0}
+                  isDisabled={noQCDataSampleIds === checkedSamples.length}
                   tooltipTitle={NO_NEXTCLADE_DATA_TOOLTIP_TEXT}
                   onChange={handleNextcladeDataClick}
                   downloadTitle="Sample Mutations and QC Metrics"
@@ -240,6 +241,20 @@ const DownloadModal = ({
                 1000 samples. To avoid an error while submitting to GISIAD, we
                 recommend splitting your download into smaller batches.
               </StyledCallout>
+            )}
+            {isNextcladeDataSelected && noQCDataSampleIds > 0 && (
+              <Alert severity="warning">
+                <AlertStrong>
+                  {noQCDataSampleIds} {pluralize("sample", noQCDataSampleIds)}{" "}
+                  will not be included in your QC Metrics download
+                </AlertStrong>{" "}
+                <AlertBody>
+                  because {pluralize("it", noQCDataSampleIds)}{" "}
+                  {pluralize("does", noQCDataSampleIds)} not have QC data
+                  available yet. These samples will still be included in other
+                  selected downloads.
+                </AlertBody>
+              </Alert>
             )}
             <DownloadButton
               checkedSamples={checkedSamples}

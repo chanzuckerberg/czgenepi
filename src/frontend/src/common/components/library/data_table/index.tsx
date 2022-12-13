@@ -30,6 +30,8 @@ interface Props {
   checkedSampleIds: string[];
   setCheckedSampleIds(samples: string[]): void;
   failedSampleIds: string[];
+  setBadQCSampleIds(samples: string[]): void;
+  badQCSampleIds: string[];
   setFailedSampleIds(samples: string[]): void;
   viewName: VIEWNAME;
   renderer?: CustomRenderer;
@@ -138,6 +140,16 @@ function extractPublicIdsFromDataWFailedGenomeRecovery(data: TableItem[]) {
   return failedSampleIds;
 }
 
+function extractPublicIdsWBadQCData(data: TableItem[]) {
+  const badQCDataSampleIds: string[] = [];
+  for (const key in data) {
+    if (data[key as any].qc_metrics?.qc_status === "bad") {
+      badQCDataSampleIds.push(String(data[key as any].publicId));
+    }
+  }
+  return badQCDataSampleIds;
+}
+
 interface TableState {
   sortKey: string[];
   ascending: boolean;
@@ -157,6 +169,8 @@ export const DataTable: FunctionComponent<Props> = ({
   setCheckedSampleIds,
   failedSampleIds,
   setFailedSampleIds,
+  setBadQCSampleIds,
+  badQCSampleIds,
   viewName,
   handleDeleteTreeModalOpen,
   handleEditTreeModalOpen,
@@ -200,6 +214,7 @@ export const DataTable: FunctionComponent<Props> = ({
       false
     );
     const newFailedIds = extractPublicIdsFromDataWFailedGenomeRecovery(data);
+    const newBadQCDataIds = extractPublicIdsWBadQCData(data);
 
     if (isHeaderIndeterminant || isHeaderChecked) {
       // remove samples in current data selection when selecting checkbox when indeterminate
@@ -211,6 +226,7 @@ export const DataTable: FunctionComponent<Props> = ({
       );
       setCheckedSampleIds(newCheckedSamples);
       setFailedSampleIds(newFailedSamples);
+      setBadQCSampleIds(newBadQCDataIds);
       setIsHeaderChecked(false);
       setHeaderIndeterminant(false);
     }
@@ -218,23 +234,31 @@ export const DataTable: FunctionComponent<Props> = ({
       // set isHeaderChecked to true, add all samples in current view
       setCheckedSampleIds(checkedSampleIds.concat(newPublicIds));
       setFailedSampleIds(failedSampleIds.concat(newFailedIds));
+      setBadQCSampleIds(badQCSampleIds.concat(newBadQCDataIds))
       setIsHeaderChecked(true);
     }
   }
 
   function handleRowCheckboxClick(
     sampleId: string,
-    failedGenomeRecovery: boolean
+    failedGenomeRecovery: boolean,
+    badQCData: boolean,
   ) {
     if (checkedSampleIds.includes(sampleId)) {
       setCheckedSampleIds(checkedSampleIds.filter((id) => id !== sampleId));
       if (failedGenomeRecovery) {
         setFailedSampleIds(failedSampleIds.filter((id) => id !== sampleId));
       }
+      if (badQCData) {
+        setBadQCSampleIds(badQCSampleIds.filter((id) => id !== sampleId));
+      }
     } else {
       setCheckedSampleIds([...checkedSampleIds, sampleId]);
       if (failedGenomeRecovery) {
         setFailedSampleIds([...failedSampleIds, sampleId]);
+      }
+      if (badQCData) {
+        setBadQCSampleIds([...badQCSampleIds, sampleId]);
       }
     }
   }
@@ -288,7 +312,8 @@ export const DataTable: FunctionComponent<Props> = ({
     const handleClick = function handleClick() {
       handleRowCheckboxClick(
         String(item.publicId),
-        Boolean(item.CZBFailedGenomeRecovery)
+        Boolean(item.CZBFailedGenomeRecovery),
+        Boolean(item.qc_metrics && item.qc_metrics[0].qc_status === "bad"),
       );
     };
     return (

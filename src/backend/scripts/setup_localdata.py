@@ -189,6 +189,7 @@ def create_sample_qc_metrics(session, sample):
         ],
     }
 
+    there_be_an_associated_qc = random.choice([True, False])
     random_qc_status = random.choice(list(random_qc_status_scores.keys()))
     random_qc_score = random.choice(random_qc_status_scores[random_qc_status])
 
@@ -200,9 +201,11 @@ def create_sample_qc_metrics(session, sample):
         qc_status=random_qc_status,
         raw_qc_output={},
     )
-
-    session.add(sample_qc_metrics)
-    return sample_qc_metrics
+    if there_be_an_associated_qc: 
+        session.add(sample_qc_metrics)
+        return sample_qc_metrics
+    print("decided not to have an associated QC")    
+    return None
 
 
 def create_sample(
