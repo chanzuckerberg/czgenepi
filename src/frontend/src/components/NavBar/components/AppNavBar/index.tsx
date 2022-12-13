@@ -30,7 +30,9 @@ const AppNavBar = (): JSX.Element => {
     <>
       <NavBar data-test-id="navbar">
         <LeftNav>
-          <HiddenLabel id="logo-label">CZ Gen Epi Logo. Go to data.</HiddenLabel>
+          <HiddenLabel id="logo-label">
+            CZ Gen Epi Logo. Go to data.
+          </HiddenLabel>
           <Link href={route} passHref>
             <LogoAnchor aria-labelledby="logo-label" href="passHref">
               <Logo data-test-id="logo" aria-hidden="true" />
