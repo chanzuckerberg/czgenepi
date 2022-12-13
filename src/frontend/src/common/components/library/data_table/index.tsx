@@ -143,6 +143,7 @@ function extractPublicIdsFromDataWFailedGenomeRecovery(data: TableItem[]) {
 function extractPublicIdsWBadQCData(data: Sample[]) {
   return data
     .filter(
+      // for now there should only ever be one qc_metrics entry per sample
       (s) => s.qc_metrics.length > 0 && s.qc_metrics[0].qc_status === "bad"
     )
     .map((s) => s.publicId);
@@ -212,8 +213,8 @@ export const DataTable: FunctionComponent<Props> = ({
       false
     );
     const newFailedIds = extractPublicIdsFromDataWFailedGenomeRecovery(data);
-    // TODO TableItem[] appears identicle to Sample[] we should go through and refactor this once we have time to do so
-    // since TableItem and Sample are identicle i think it's safe to do this cast here
+    // TODO TableItem[] appears identical to Sample[] we should go through and refactor this once we have time to do so
+    // since TableItem and Sample are identical i think it's safe to do this cast here
     const newBadQCDataIds = extractPublicIdsWBadQCData(data as Sample[]);
 
     if (isHeaderIndeterminant || isHeaderChecked) {
@@ -337,7 +338,7 @@ export const DataTable: FunctionComponent<Props> = ({
       const item = tableData[props.index];
       return (
         <TableRow style={props.style} data-test-id="table-row">
-          {/* cast item as sample since they are identicle, related to earlier TODO around replacing all instances of TableItem with Sample */}
+          {/* cast item as sample since they are identical, related to earlier TODO around replacing all instances of TableItem with Sample */}
           {isSampleTable && rowCheckbox(item as Sample)}
           {item ? (
             sampleRow(item)
