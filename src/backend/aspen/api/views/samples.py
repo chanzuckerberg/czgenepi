@@ -1,8 +1,6 @@
 import datetime
 import threading
 from typing import Any, List, Mapping, MutableSequence, Optional, Set, Type, Union
-from aspen.api.deps import get_splitio
-from aspen.util.split import SplitClient
 
 import sentry_sdk
 import sqlalchemy as sa
@@ -20,6 +18,7 @@ from aspen.api.deps import (
     get_pathogen_repo_config,
     get_public_repository,
     get_settings,
+    get_splitio,
 )
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
@@ -60,6 +59,7 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     User,
 )
+from aspen.util.split import SplitClient
 from aspen.util.swipe import LineageQcJob, PangolinJob
 
 router = APIRouter()

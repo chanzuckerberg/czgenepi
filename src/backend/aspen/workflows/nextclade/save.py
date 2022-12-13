@@ -212,7 +212,9 @@ def is_nextclade_result_valid(nextclade_csv_row: Dict[str, str]) -> bool:
     return False
 
 
-def get_lineage_from_row(nextclade_csv_row: Dict[str, str], is_result_valid: bool) -> str:
+def get_lineage_from_row(
+    nextclade_csv_row: Dict[str, str], is_result_valid: bool
+) -> str:
     """Gets lineage value for a sample from the dict of its Nextclade CSV row.
 
     Background: the `clade` is generally available when looking at the sequence
@@ -238,14 +240,14 @@ def get_lineage_from_row(nextclade_csv_row: Dict[str, str], is_result_valid: boo
     """
 
     lineage = nextclade_csv_row.get("lineage")
-        
+
     if lineage is None:
         lineage = nextclade_csv_row["clade"]
 
     # if the sample is very low quality or unable to be matched against reference, there will be no lineage assigned, return FAILED
     if not is_result_valid or lineage == "":
         return FAILED_LINEAGE_STATUS
-    
+
     return lineage
 
 
