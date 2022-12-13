@@ -212,7 +212,9 @@ export const DataTable: FunctionComponent<Props> = ({
       false
     );
     const newFailedIds = extractPublicIdsFromDataWFailedGenomeRecovery(data);
-    const newBadQCDataIds = extractPublicIdsWBadQCData(data);
+    // TODO TableItem[] appears identicle to Sample[] we should go through and refactor this once we have time to do so
+    // since TableItem and Sample are identicle i think it's safe to do this cast here
+    const newBadQCDataIds = extractPublicIdsWBadQCData(data as Sample[]);
 
     if (isHeaderIndeterminant || isHeaderChecked) {
       // remove samples in current data selection when selecting checkbox when indeterminate
@@ -303,7 +305,7 @@ export const DataTable: FunctionComponent<Props> = ({
     });
   };
 
-  const rowCheckbox = (item: TableItem): React.ReactNode => {
+  const rowCheckbox = (item: Sample): React.ReactNode => {
     const checked: boolean = checkedSampleIds.includes(
       item?.publicId as string
     );
@@ -333,7 +335,8 @@ export const DataTable: FunctionComponent<Props> = ({
       const item = tableData[props.index];
       return (
         <TableRow style={props.style} data-test-id="table-row">
-          {isSampleTable && rowCheckbox(item)}
+          {/* cast item as sample since they are identicle, related to earlier TODO around replacing all instances of TableItem with Sample */}
+          {isSampleTable && rowCheckbox(item as Sample)}
           {item ? (
             sampleRow(item)
           ) : (

@@ -18,8 +18,8 @@ interface Header {
 }
 
 type TableItem = Record<
-  string | number ,
-  JSONPrimitive | Record<string, JSONPrimitive>  
+  string | number,
+  JSONPrimitive | Record<string, JSONPrimitive>
 >;
 
 interface CustomTableRenderProps {
