@@ -17,11 +17,11 @@
     treatment: "Pangolin"
     keys: "SC2"
 - PATHOGEN_lineage_caller:
-    treatment: "ncov"
+    treatment: "Nextclade"
     keys: "MPX"
 - PATHOGEN_lineage_caller:
     # default value
-    treatment: "ncov"
+    treatment: "Nextclade"
 - PATHOGEN_galago_linkout:
     treatment: "on"
     keys: "SC2"
