@@ -28,7 +28,7 @@ export const PathogenTabs = (): JSX.Element => {
       textColor="inherit"
     >
       <StyledTab value={Pathogen.COVID} label="SARS-CoV-2" />
-      <StyledTab value={Pathogen.MONKEY_POX} label="Monkey Pox" />
+      <StyledTab value={Pathogen.MONKEY_POX} label="Mpox" />
     </StyledTabs>
   );
 };
