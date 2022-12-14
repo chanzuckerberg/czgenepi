@@ -12,6 +12,7 @@ from aspen.database.connection import (
     session_scope,
 )
 from aspen.database.models import Pathogen, PathogenLineage
+from aspen.util.pathogen_configs import get_lineage_urls
 from aspen.workflows.shared_utils.database import (
     create_temp_table,
     drop_temp_table,
@@ -129,16 +130,7 @@ def cli(
         print("Success!")
         return  # Do nothing other than basic smoke test
 
-    urls = {
-        "MPX": {
-            "url": "https://raw.githubusercontent.com/mpxv-lineages/lineage-designation/master/auto-generated/lineages.json",
-            "format": "json",
-            "list_path": ["lineages"],
-            "lineage_keys": ["name", "alias"],
-        }
-    }
-    if not urls.get(pathogen_slug):
-        raise RuntimeError(f"Pathogen slug '{pathogen_slug}' not supported")
+    urls = get_lineage_urls(pathogen_slug)
 
     print("Parsing lineages data from file...")
     lineages = download_lineages(
