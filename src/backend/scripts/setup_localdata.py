@@ -169,6 +169,9 @@ def create_sample_lineage(session, sample):
 
 
 def create_sample_qc_metrics(session, sample):
+    should_there_be_an_associated_qc = random.choice([True, False])
+    if not should_there_be_an_associated_qc:
+        return None
 
     sample_qc_metric = (
         session.query(SampleQCMetric).filter(SampleQCMetric.sample == sample).first()

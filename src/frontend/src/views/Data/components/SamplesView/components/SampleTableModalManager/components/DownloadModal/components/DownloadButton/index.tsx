@@ -28,20 +28,24 @@ import { StyledButton } from "./style";
 
 interface Props {
   checkedSamples: Sample[];
+  sampleIdsWQCData: string[];
   isFastaSelected: boolean;
   isGenbankSelected: boolean;
   isGisaidSelected: boolean;
   isMetadataSelected: boolean;
+  isNextcladeDataSelected: boolean;
   completedSampleIds: string[];
   handleCloseModal(): void;
 }
 
 const DownloadButton = ({
   checkedSamples,
+  sampleIdsWQCData,
   isFastaSelected,
   isGenbankSelected,
   isGisaidSelected,
   isMetadataSelected,
+  isNextcladeDataSelected,
   completedSampleIds,
   handleCloseModal,
 }: Props): JSX.Element | null => {
@@ -114,6 +118,7 @@ const DownloadButton = ({
     analyticsTrackEvent<AnalyticsSamplesDownloadFile>(
       EVENT_TYPES.SAMPLES_DOWNLOAD_FILE,
       {
+        // TODO: add nextclade download to analytics once defined
         includes_consensus_genome: isFastaSelected,
         includes_genbank_template: isGenbankSelected,
         includes_gisaid_template: isGisaidSelected,
@@ -136,7 +141,8 @@ const DownloadButton = ({
     isFastaSelected ||
     isMetadataSelected ||
     isGisaidSelected ||
-    isGenbankSelected
+    isGenbankSelected ||
+    isNextcladeDataSelected
   );
 
   const onClick = () => {
@@ -146,6 +152,13 @@ const DownloadButton = ({
       downloadMutation.mutate({
         endpoint: ORG_API.SAMPLES_FASTA_DOWNLOAD,
         sampleIds: completedSampleIds,
+      });
+    }
+
+    if (isNextcladeDataSelected) {
+      downloadMutation.mutate({
+        endpoint: ORG_API.SAMPLES_NEXTCLADE_DOWNLOAD,
+        sampleIds: sampleIdsWQCData,
       });
     }
 

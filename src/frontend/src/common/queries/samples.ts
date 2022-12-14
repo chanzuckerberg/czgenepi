@@ -34,7 +34,8 @@ export enum PUBLIC_REPOSITORY_NAME {
 
 type FileDownloadEndpointType =
   | ORG_API.SAMPLES_FASTA_DOWNLOAD
-  | ORG_API.SAMPLES_TEMPLATE_DOWNLOAD;
+  | ORG_API.SAMPLES_TEMPLATE_DOWNLOAD
+  | ORG_API.SAMPLES_NEXTCLADE_DOWNLOAD;
 interface SampleFileDownloadType {
   endpoint: FileDownloadEndpointType;
   page?: number;

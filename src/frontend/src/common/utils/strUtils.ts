@@ -3,6 +3,7 @@ const WORDS_TO_PLURALIZE: Record<string, string> = {
   was: "were",
   is: "are",
   it: "they",
+  does: "do",
 };
 
 export const pluralize = (str: string, count: number): string => {

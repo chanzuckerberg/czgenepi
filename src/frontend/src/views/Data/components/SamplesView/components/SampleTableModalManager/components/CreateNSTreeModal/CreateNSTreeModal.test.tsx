@@ -12,6 +12,7 @@ test("shows NS and GISAID attribution", async () => {
         <CreateNSTreeModal
           checkedSampleIds={[]}
           failedSampleIds={[]}
+          badQCSampleIds={[]}
           open
           onClose={noop}
         />
