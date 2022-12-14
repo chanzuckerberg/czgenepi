@@ -112,7 +112,6 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
     const label = () => {
       const qcStatus = qcMetrics[0]?.qc_status;
-      
       switch(qcStatus) {
         case "good":
           return LABEL_STATUS.success;
