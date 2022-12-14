@@ -1,20 +1,21 @@
 """Views around Quality Control and/or Mutations info."""
+from typing import Iterable
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from typing import Iterable
 
 from aspen.api.authn import AuthContext, get_auth_context
 from aspen.api.authz import AuthZSession, get_authz_session
 from aspen.api.deps import get_db, get_pathogen
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.qc_mutations import QcMutationsRequest
-from aspen.api.utils import samples_by_identifiers, NextcladeQcMutationsOutputStreamer
+from aspen.api.utils import NextcladeQcMutationsOutputStreamer, samples_by_identifiers
 from aspen.database.models import Pathogen, Sample
 
-
 router = APIRouter()
+
 
 @router.post("/")
 async def download_qc_mutations_output(
@@ -40,7 +41,9 @@ async def download_qc_mutations_output(
     """
     sample_ids = request.sample_ids
     sample_query = await samples_by_identifiers(
-        az, pathogen, sample_ids,
+        az,
+        pathogen,
+        sample_ids,
     )
     sample_query = sample_query.options(
         # `innerjoin` /only/ returns samples that have a qc_metric connected
@@ -57,7 +60,7 @@ async def download_qc_mutations_output(
         "sample_mutation.tsv",
         fields_in_use,
         data,
-        )
+    )
     return streamer.get_response()
 
 

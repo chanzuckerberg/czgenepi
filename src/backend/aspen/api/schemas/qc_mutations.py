@@ -1,5 +1,3 @@
-from typing import Optional
-
 from aspen.api.schemas.base import BaseRequest
 
 

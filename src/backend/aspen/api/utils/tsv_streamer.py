@@ -209,6 +209,7 @@ class NextcladeQcMutationsOutputStreamer(FieldSeparatedStreamer):
     only those fields actually present on the data, and finally tack on
     any extra fields that were in the data but not in `base_fields`.
     """
+
     base_fields = [
         "seqName",
         "clade",
