@@ -38,7 +38,8 @@ const SampleTableModalManager = ({
       .filter((s) => s.CZBFailedGenomeRecovery)
       .map((s) => s.publicId);
     const badQCIds = checkedSamples
-      .filter((s) => s.qc_metrics[0].qc_status === "bad")
+      // for now there should only ever be one qcMetrics entry per sample
+      .filter((s) => s.qcMetrics[0].qc_status === "bad")
       .map((s) => s.publicId);
     setCheckedSampleIds(checkedIds);
     setFailedSampleIds(failedIds);

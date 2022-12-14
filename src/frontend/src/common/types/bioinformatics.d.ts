@@ -58,7 +58,7 @@ interface Sample extends BioinformaticsType {
   gisaid: GISAID;
   CZBFailedGenomeRecovery: boolean;
   lineages: [Lineage];
-  qc_metrics: [QCMetrics];
+  qcMetrics: [QCMetrics];
   private?: boolean;
 }
 

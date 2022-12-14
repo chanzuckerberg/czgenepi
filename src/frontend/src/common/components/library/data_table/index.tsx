@@ -143,8 +143,8 @@ function extractPublicIdsFromDataWFailedGenomeRecovery(data: TableItem[]) {
 function extractPublicIdsWBadQCData(data: Sample[]) {
   return data
     .filter(
-      // for now there should only ever be one qc_metrics entry per sample
-      (s) => s.qc_metrics.length > 0 && s.qc_metrics[0].qc_status === "bad"
+      // for now there should only ever be one qcMetrics entry per sample
+      (s) => s.qcMetrics.length > 0 && s.qcMetrics[0].qc_status === "bad"
     )
     .map((s) => s.publicId);
 }
@@ -315,7 +315,7 @@ export const DataTable: FunctionComponent<Props> = ({
         String(item.publicId),
         Boolean(item.CZBFailedGenomeRecovery),
         Boolean(
-          item.qc_metrics.length > 0 && item.qc_metrics[0].qc_status === "bad"
+          item.qcMetrics.length > 0 && item.qcMetrics[0].qc_status === "bad"
         )
       );
     };

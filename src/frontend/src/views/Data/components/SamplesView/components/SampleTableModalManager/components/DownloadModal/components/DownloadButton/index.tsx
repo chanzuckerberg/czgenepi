@@ -28,6 +28,7 @@ import { StyledButton } from "./style";
 
 interface Props {
   checkedSamples: Sample[];
+  sampleIdsWQCData: string[];
   isFastaSelected: boolean;
   isGenbankSelected: boolean;
   isGisaidSelected: boolean;
@@ -39,6 +40,7 @@ interface Props {
 
 const DownloadButton = ({
   checkedSamples,
+  sampleIdsWQCData,
   isFastaSelected,
   isGenbankSelected,
   isGisaidSelected,
@@ -156,7 +158,7 @@ const DownloadButton = ({
     if (isNextcladeDataSelected) {
       downloadMutation.mutate({
         endpoint: ORG_API.SAMPLES_NEXTCLADE_DOWNLOAD,
-        sampleIds: completedSampleIds,
+        sampleIds: sampleIdsWQCData,
       });
     }
 
