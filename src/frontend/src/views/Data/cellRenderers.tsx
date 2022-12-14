@@ -112,16 +112,18 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
 
     const label = () => {
       const qcStatus = qcMetrics[0]?.qc_status;
-      if (qcStatus === "good") {
-        return LABEL_STATUS.success;
-      } else if (qcStatus === "bad") {
-        return LABEL_STATUS.error;
-      } else if (qcStatus === "mediocre") {
-        return LABEL_STATUS.warning;
-      } else if (qcStatus === "failed") {
-        return LABEL_STATUS.failed;
-      } else {
-        return LABEL_STATUS.processing;
+      
+      switch(qcStatus) {
+        case "good":
+          return LABEL_STATUS.success;
+        case "bad":
+          return LABEL_STATUS.error;
+        case "mediocre":
+          return LABEL_STATUS.warning;
+        case "failed":
+          return LABEL_STATUS.failed;
+        default:
+          return LABEL_STATUS.processing;
       }
     };
 
