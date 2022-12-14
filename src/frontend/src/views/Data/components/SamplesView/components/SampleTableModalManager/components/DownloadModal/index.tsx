@@ -250,7 +250,7 @@ const DownloadModal = ({
             {isNextcladeDataSelected && noQCDataSampleIds.length > 0 && (
               <Alert severity="warning">
                 <AlertStrong>
-                  {noQCDataSampleIds}{" "}
+                  {noQCDataSampleIds.length}{" "}
                   {pluralize("sample", noQCDataSampleIds.length)} will not be
                   included in your QC Metrics download
                 </AlertStrong>{" "}
