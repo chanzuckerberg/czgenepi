@@ -1,4 +1,3 @@
-import { CatchingPokemonSharp } from "@mui/icons-material";
 import { DefaultMenuSelectOption } from "czifui";
 import { useEffect, useState } from "react";
 import { StyledComplexFilter } from "../../style";
@@ -34,7 +33,7 @@ const QCStatusFilter = (props: Props): JSX.Element => {
 
   useEffect(() => {
     if (value) {
-        updateQCStatusFilter(
+      updateQCStatusFilter(
         (value as DefaultMenuSelectOption[]).map((d) => d.name)
       );
     }

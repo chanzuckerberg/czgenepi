@@ -181,7 +181,6 @@ const FilterPanel: FC<Props> = ({
   }, [dataFilters, setActiveFilterCount]);
 
   const updateDataFilter = (filterKey: string, params: FilterParamsType) => {
-
     const { transform, type } = dataFilters[filterKey];
     const newFilters = {
       ...dataFilters,

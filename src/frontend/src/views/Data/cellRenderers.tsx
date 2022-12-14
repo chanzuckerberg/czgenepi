@@ -52,7 +52,7 @@ const LABEL_STATUS: Record<
   failed: {
     label: "failed",
     status: "pending",
-  }
+  },
 };
 
 const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
@@ -108,33 +108,22 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     value: string;
     item: Sample;
   }): JSX.Element => {
-    const {
-      qcMetrics,
-      private: isPrivate,
-      submittingGroup,
-      uploadedBy,
-    } = item;
+    const { qcMetrics, private: isPrivate, submittingGroup, uploadedBy } = item;
 
-      const label = () => {
-         const qcStatus = qcMetrics[0]?.qc_status;
-         console.log("qcStatus: ", qcStatus);
-         if (qcStatus === "good") {
-          return LABEL_STATUS.success
-         } 
-         else if (qcStatus === "bad") {
-          return LABEL_STATUS.error
-         }
-         else if (qcStatus === "mediocre") {
-          return LABEL_STATUS.warning
-         }
-         else if (qcStatus === "failed") {
-          return LABEL_STATUS.failed
-         }
-         else {
-          return LABEL_STATUS.processing
-         }
+    const label = () => {
+      const qcStatus = qcMetrics[0]?.qc_status;
+      if (qcStatus === "good") {
+        return LABEL_STATUS.success;
+      } else if (qcStatus === "bad") {
+        return LABEL_STATUS.error;
+      } else if (qcStatus === "mediocre") {
+        return LABEL_STATUS.warning;
+      } else if (qcStatus === "failed") {
+        return LABEL_STATUS.failed;
+      } else {
+        return LABEL_STATUS.processing;
       }
-
+    };
 
     const displayName =
       submittingGroup?.name === CZ_BIOHUB_GROUP
