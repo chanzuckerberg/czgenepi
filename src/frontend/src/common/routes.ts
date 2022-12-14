@@ -22,6 +22,7 @@ export enum ROUTES {
   PANGOLIN = "https://pangolin.cog-uk.io/",
   PHYLO_TREES = "/data/phylogenetic_trees",
   PRIVACY = "/privacy",
+  PRIVACY_PREVIEW = "/privacy-preview",
   PRIVACY_DATA_SHARING_FAQ = "https://help.czgenepi.org/hc/en-us/sections/6406789491732",
   REQUEST_ACCESS = "https://airtable.com/shrblHnTRd9dtu6c0",
   RESOURCES = "https://help.czgenepi.org/hc/en-us/categories/6217716150804-Genomic-Epidemiology-Learning-Center",
@@ -36,6 +37,7 @@ export enum ROUTES {
 export const publicPaths: string[] = [
   ROUTES.HOMEPAGE,
   ROUTES.PRIVACY,
+  ROUTES.PRIVACY_PREVIEW,
   ROUTES.TERMS,
 ];
 
