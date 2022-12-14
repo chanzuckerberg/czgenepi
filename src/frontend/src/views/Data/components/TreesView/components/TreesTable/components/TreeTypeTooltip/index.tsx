@@ -46,6 +46,8 @@ export const TreeTypeTooltip = ({ children, value }: Props): JSX.Element => {
     </div>
   );
 
+  // TODO-TR (ehoops): The lineage tooltip wasn't showing when children was wrapped in a fragment rather than a div
+  // todo is to verify this tooltip shows and if it doesn't, wrap it in a div.
   return (
     <Tooltip arrow placement="bottom-start" title={TOOLTIP_TEXT}>
       {children}
