@@ -16,9 +16,10 @@ interface Props {
   shouldStartUsherFlow: boolean;
 }
 
-const USHER_DBS: PathogenConfigType<string> = {
-  [Pathogen.COVID]: "wuhCor1",
-  [Pathogen.MONKEY_POX]: "hub_3471181_GCF_014621545.1",
+const USHER_PATHOGEN_PARAMS: PathogenConfigType<string> = {
+  [Pathogen.COVID]: "db=wuhCor1",
+  [Pathogen.MONKEY_POX]:
+    "db=hub_3471181_GCF_014621545.1&hgHubConnect.hub.3471181=1",
 };
 
 const generateUsherLink = (
@@ -29,13 +30,12 @@ const generateUsherLink = (
 ) => {
   const encodedFileLink = encodeURIComponent(remoteFile);
 
-  const DB_PARAM = `db=${USHER_DBS[pathogen]}`;
   const FILE_PARAM = `remoteFile=${encodedFileLink}`;
   const TREE_TYPE_PARAM = `phyloPlaceTree=${treeType}`;
   const SAMPLE_COUNT_PARAM = `subtreeSize=${sampleCount}`;
 
   const queryParams = [
-    DB_PARAM,
+    USHER_PATHOGEN_PARAMS[pathogen],
     FILE_PARAM,
     TREE_TYPE_PARAM,
     SAMPLE_COUNT_PARAM,
