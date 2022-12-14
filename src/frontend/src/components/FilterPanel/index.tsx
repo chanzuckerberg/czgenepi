@@ -3,6 +3,7 @@ import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import { GenomeRecoveryFilter } from "./components/GenomeRecoveryFilter";
 import { LineageFilter } from "./components/LineageFilter";
+import { QCStatusFilter } from "./components/QCStatusFilter";
 import { UploadDateFilter } from "./components/UploadDateFilter";
 import { StyledFilterPanel } from "./style";
 
@@ -18,6 +19,7 @@ export interface DefaultMenuSelectOption {
 interface Props {
   isOpen: boolean;
   lineages: DefaultMenuSelectOption[];
+  qcStatuses: DefaultMenuSelectOption[];
   setActiveFilterCount: (count: number) => void;
   setDataFilterFunc: Dispatch<
     SetStateAction<(data: TableItem[]) => TableItem[]>
@@ -51,6 +53,14 @@ const DATA_FILTER_INIT = {
     transform: (d: Sample) =>
       d.CZBFailedGenomeRecovery ? "Failed" : "Complete",
     type: TypeFilterType.Single,
+  },
+  qcMetrics: {
+    key: "qcMetrics",
+    params: {
+      multiSelected: [],
+    },
+    transform: (d: Sample) => d.qcMetrics[0]?.qc_status,
+    type: TypeFilterType.Multiple,
   },
   collectionDate: {
     key: "collectionDate",
@@ -122,11 +132,11 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
 const FilterPanel: FC<Props> = ({
   isOpen,
   lineages,
+  qcStatuses,
   setActiveFilterCount,
   setDataFilterFunc,
 }) => {
   const [dataFilters, setDataFilters] = useState<FiltersType>(DATA_FILTER_INIT);
-
   useEffect(() => {
     const wrappedFilterFunc = () => {
       const filterFunc = (filters: FiltersType) => {
@@ -171,6 +181,7 @@ const FilterPanel: FC<Props> = ({
   }, [dataFilters, setActiveFilterCount]);
 
   const updateDataFilter = (filterKey: string, params: FilterParamsType) => {
+
     const { transform, type } = dataFilters[filterKey];
     const newFilters = {
       ...dataFilters,
@@ -199,8 +210,21 @@ const FilterPanel: FC<Props> = ({
     // * (mlila): need to do a comparison here, or else the component gets into
     // * an infinite state loop (because arrays are compared by identity rather
     // * than content, by default)
+    console.log("prevSelected from Lineage", prevSelected);
     if (!isEqual(prevSelected, multiSelected)) {
       updateDataFilter("lineage", { multiSelected });
+    }
+  };
+
+  const updateQCStatusFilter = (multiSelected: string[]) => {
+    const prevSelected = dataFilters.qcMetrics?.params.multiSelected;
+
+    // * (mlila): need to do a comparison here, or else the component gets into
+    // * an infinite state loop (because arrays are compared by identity rather
+    // * than content, by default)
+    console.log("prevSelected from QC", prevSelected);
+    if (!isEqual(prevSelected, multiSelected)) {
+      updateDataFilter("qcMetrics", { multiSelected });
     }
   };
 
@@ -226,6 +250,11 @@ const FilterPanel: FC<Props> = ({
         options={lineages}
         updateLineageFilter={updateLineageFilter}
         data-test-id="sample-filter-lineage"
+      />
+      <QCStatusFilter
+        options={qcStatuses}
+        updateQCStatusFilter={updateQCStatusFilter}
+        data-test-id="sample-filter-qc-status"
       />
       <GenomeRecoveryFilter
         updateGenomeRecoveryFilter={updateGenomeRecoveryFilter}

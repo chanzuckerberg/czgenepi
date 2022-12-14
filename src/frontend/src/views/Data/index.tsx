@@ -204,6 +204,14 @@ const Data: FunctionComponent = () => {
       return { name: l as string };
     });
 
+  const qcStatuses = uniq(
+    compact(map(sampleMap, (d) => d.qcMetrics[0]?.qc_status))
+  )
+    .sort()
+    .map((l) => {
+      return { name: l as string };
+    });
+
   if (!usesTableRefactor) {
     return (
       <Container>
@@ -223,6 +231,7 @@ const Data: FunctionComponent = () => {
             // TODO (mlila): replace with sds filterpanel once it's complete
             <FilterPanel
               lineages={lineages}
+              qcStatuses={qcStatuses}
               isOpen={shouldShowFilters}
               setActiveFilterCount={setActiveFilterCount}
               setDataFilterFunc={setDataFilterFunc}

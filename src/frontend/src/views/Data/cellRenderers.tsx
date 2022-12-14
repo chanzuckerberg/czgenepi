@@ -34,12 +34,16 @@ const LABEL_STATUS: Record<
   { label: string; status: NonNullable<ChipProps["status"]> }
 > = {
   error: {
-    label: "failed",
+    label: "bad",
     status: "error",
   },
   success: {
-    label: "complete",
+    label: "good",
     status: "success",
+  },
+  warning: {
+    label: "mediocre",
+    status: "warning",
   },
 };
 
@@ -98,13 +102,29 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   }): JSX.Element => {
     const {
       CZBFailedGenomeRecovery,
+      qcMetrics,
       private: isPrivate,
       submittingGroup,
       uploadedBy,
     } = item;
-    const label = CZBFailedGenomeRecovery
-      ? LABEL_STATUS.error
-      : LABEL_STATUS.success;
+
+    // const label = CZBFailedGenomeRecovery
+    //   ? LABEL_STATUS.error
+    //   : LABEL_STATUS.success;
+
+      const label = () => {
+         const qcStatus = qcMetrics[0]?.qc_status;
+         if (qcStatus == "good") {
+          return LABEL_STATUS.success
+         } 
+         if (qcStatus == "bad") {
+          return LABEL_STATUS.error
+         }
+         if (qcStatus == "mediocre") {
+          return LABEL_STATUS.warning
+         }
+      }
+
 
     const displayName =
       submittingGroup?.name === CZ_BIOHUB_GROUP
@@ -137,8 +157,8 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
               <StyledChip
                 data-test-id="row-sample-status"
                 size="small"
-                label={label.label}
-                status={label.status}
+                label={label()?.label}
+                status={label()?.status}
               />
             </CenteredFlexContainer>
             <StyledUploaderName data-test-id="row-user-name">
