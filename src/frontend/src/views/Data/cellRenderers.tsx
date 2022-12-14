@@ -10,11 +10,10 @@ import {
   RowContent,
   TreeRowContent,
 } from "src/common/components/library/data_table/style";
-import { Pathogen } from "src/common/redux/types";
 import { createTableCellRenderer } from "src/common/utils";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
-import { LineageTooltip } from "./components/SamplesView/components/SamplesTable/components/lineageTooltipConfig";
+import { LineageTooltip } from "./components/SamplesView/components/SamplesTable/components/LineageTooltip";
 import { TreeActionMenu } from "./components/TreesView/components/TreesTable/components/TreeActionMenu";
 import TreeTableNameCell from "./components/TreesView/components/TreesTable/components/TreeTableNameCell";
 import { TreeTypeTooltip } from "./components/TreesView/components/TreesTable/components/TreeTypeTooltip";
@@ -64,7 +63,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       </RowContent>
     );
   },
-  lineages: ({ value, pathogen }): JSX.Element => {
+  lineages: ({ value }): JSX.Element => {
     // for now we're assuming that each sample has only one lineage
     // SC2 has lineages from Pangolin, other pathogens are assigned lineages from Nextclade
     // If we start adding multiple lineages per sample we'll need to revisit this logic.
@@ -83,11 +82,8 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
       </Component>
     );
 
-    const LineageTooltipComponent = LineageTooltip[pathogen as Pathogen];
     return hasLineage ? (
-      <LineageTooltipComponent lineage={firstLineageValue}>
-        {Content}
-      </LineageTooltipComponent>
+      <LineageTooltip lineage={firstLineageValue}>{Content}</LineageTooltip>
     ) : (
       Content
     );
