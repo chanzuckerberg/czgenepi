@@ -20,7 +20,7 @@ import { map } from "lodash";
 import { useEffect, useState } from "react";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
-import { LineageTooltip } from "./components/LineageTooltip";
+import { LineageTooltip } from "./components/CovidLineageTooltip";
 import { DefaultCell } from "./components/DefaultCell";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
 import { StyledCellBasic, StyledPrivateId, StyledTableRow } from "./style";

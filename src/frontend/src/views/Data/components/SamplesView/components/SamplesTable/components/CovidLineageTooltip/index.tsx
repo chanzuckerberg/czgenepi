@@ -1,11 +1,6 @@
 import { Tooltip } from "czifui";
-import { ReactNode } from "react";
+import { LineageTooltipProps } from "../lineageTooltipConfig";
 import { Label, Text, Wrapper } from "./style";
-
-interface Props {
-  children: ReactNode;
-  lineage: Lineage;
-}
 
 const KEY_TO_LABELS = {
   lineage: "Lineage",
@@ -35,22 +30,22 @@ const DISPLAY_ORDER: Array<keyof Lineage> = [
   "reference_dataset_tag",
 ];
 
-export const LineageTooltip = ({ children, lineage }: Props): JSX.Element => {
+export const CovidLineageTooltip = ({
+  children,
+  lineage,
+}: LineageTooltipProps): JSX.Element => {
   const textRows = (
     <>
       {DISPLAY_ORDER.map((key) => {
         const value = lineage[key];
         // skip certain keys for now that are extra and not included in current design
         if (
-          !(
-            key in
-            [
-              "reference_dataset_name",
-              "reference_sequence_accession",
-              "reference_dataset_tag",
-              "lineage_type",
-            ]
-          )
+          ![
+            "reference_dataset_name",
+            "reference_sequence_accession",
+            "reference_dataset_tag",
+            "lineage_type",
+          ].includes(key)
         ) {
           return (
             <Wrapper key={key}>
