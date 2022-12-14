@@ -26,6 +26,7 @@ from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import setup_random_repo_configs
 from aspen.test_infra.models.repo_metadata import repo_metadata_factory
 from aspen.test_infra.models.sample import sample_factory
+from aspen.test_infra.models.sample_mutations import sample_mutations_factory
 from aspen.test_infra.models.sample_qc_metrics import sample_qc_metrics_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import (
@@ -812,8 +813,12 @@ async def test_bulk_delete_sample_success(
         ),
     ]
     for sample in samples:
-        upg = uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-        async_session.add(upg)
+        async_session.add(
+            uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+        )
+        async_session.add(sample_qc_metrics_factory(sample))
+        async_session.add(sample_mutations_factory(sample))
+        async_session.add(sample_lineage_factory(sample))
     async_session.add(group)
     await async_session.commit()
 
