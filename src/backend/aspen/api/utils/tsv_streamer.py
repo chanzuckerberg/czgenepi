@@ -1,5 +1,5 @@
 import csv
-from typing import Any, Iterable, Mapping
+from typing import Any, Iterable, Mapping, Set
 
 from fastapi.responses import StreamingResponse
 
@@ -193,3 +193,104 @@ class GenBankSubmissionFormTSVStreamer(FieldSeparatedStreamer):
             else:
                 data[field] = ""
         return data
+
+
+class NextcladeQcMutationsOutputStreamer(FieldSeparatedStreamer):
+    """Streamer for downloading QC/Mutations data TSV.
+
+    Unlike other classes in this file, the `fields` of the download are not
+    unchanging and instead need to be set on __init__ based on what fields
+    were actually present in the data being downloaded.
+
+    The fields are fairly consistent, but there are slight differences between
+    pathogens and possibly over version changes / different reference datasets.
+    With this in mind, we have a `base_fields` listing that is a sane mashup
+    of the various fields we've seen so far, then we restrict that down to
+    only those fields actually present on the data, and finally tack on
+    any extra fields that were in the data but not in `base_fields`.
+    """
+    base_fields = [
+        "seqName",
+        "clade",
+        "outbreak",  # seen in MPX, not in SC2
+        "lineage",  # seen in MPX, not in SC2
+        "Nextclade_pango",  # SC2 only
+        "partiallyAliased",  # SC2 only
+        "clade_nextstrain",  # SC2 only
+        "clade_who",  # SC2 only
+        "clade_legacy",  # SC2 only
+        "qc.overallScore",
+        "qc.overallStatus",
+        "totalSubstitutions",
+        "totalDeletions",
+        "totalInsertions",
+        "totalFrameShifts",
+        "totalAminoacidSubstitutions",
+        "totalAminoacidDeletions",
+        "totalAminoacidInsertions",
+        "totalMissing",
+        "totalNonACGTNs",
+        "totalPcrPrimerChanges",
+        "substitutions",
+        "deletions",
+        "insertions",
+        "privateNucMutations.reversionSubstitutions",
+        "privateNucMutations.labeledSubstitutions",
+        "privateNucMutations.unlabeledSubstitutions",
+        "privateNucMutations.totalReversionSubstitutions",
+        "privateNucMutations.totalLabeledSubstitutions",
+        "privateNucMutations.totalUnlabeledSubstitutions",
+        "privateNucMutations.totalPrivateSubstitutions",
+        "frameShifts",
+        "aaSubstitutions",
+        "aaDeletions",
+        "aaInsertions",
+        "missing",
+        "nonACGTNs",
+        "pcrPrimerChanges",
+        "alignmentScore",
+        "alignmentStart",
+        "alignmentEnd",
+        "coverage",
+        "qc.missingData.missingDataThreshold",
+        "qc.missingData.score",
+        "qc.missingData.status",
+        "qc.missingData.totalMissing",
+        "qc.mixedSites.mixedSitesThreshold",
+        "qc.mixedSites.score",
+        "qc.mixedSites.status",
+        "qc.mixedSites.totalMixedSites",
+        "qc.privateMutations.cutoff",
+        "qc.privateMutations.excess",
+        "qc.privateMutations.score",
+        "qc.privateMutations.status",
+        "qc.privateMutations.total",
+        "qc.snpClusters.clusteredSNPs",
+        "qc.snpClusters.score",
+        "qc.snpClusters.status",
+        "qc.snpClusters.totalSNPs",
+        "qc.frameShifts.frameShifts",
+        "qc.frameShifts.totalFrameShifts",
+        "qc.frameShifts.frameShiftsIgnored",
+        "qc.frameShifts.totalFrameShiftsIgnored",
+        "qc.frameShifts.score",
+        "qc.frameShifts.status",
+        "qc.stopCodons.stopCodons",
+        "qc.stopCodons.totalStopCodons",
+        "qc.stopCodons.score",
+        "qc.stopCodons.status",
+        "isReverseComplement",
+        "failedGenes",
+        "warnings",
+        "errors",
+    ]
+
+    def __init__(self, filename: str, fields_in_use: Set[str], data: Iterable):
+        fields = [field for field in self.base_fields if field in fields_in_use]
+        addl_fields = fields_in_use.difference(self.base_fields)
+        self.fields = fields + list(addl_fields)
+        super().__init__("\t", filename, data)
+
+    def generate_row(self, item):
+        """Prep of rows handled by `prepare_output_data` in assoc view func"""
+        return item
