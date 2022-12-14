@@ -1,0 +1,19 @@
+clade hub_3471181
+db hub_3471181_GCF_014621545.1
+hgHubConnect.hub.3471181 1
+hgS_loadUrlName 
+hgS_otherUserName 
+hgS_otherUserSessionName 
+hgS_saveLocalFileCompress none
+hgS_saveLocalFileName zzz
+hgsid 1515288845_7vNA8fs2nzRiXDWlpCUUAnaPdM14
+ignoreCookie 1
+org hub_3471181_ASM1462154v1 May 2022
+phyloPlaceTree hgPhyloPlaceData/GCF_014621545.1/mpxv.latest.pb
+position NC_063383.1:65736-75736
+subtreeSize 50
+textFont Helvetica
+textSize 12
+textStyle Normal
+trackHubs 3471181
+defaultsSet on
