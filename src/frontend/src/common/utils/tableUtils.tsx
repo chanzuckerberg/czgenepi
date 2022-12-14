@@ -1,8 +1,6 @@
 import { Column } from "@tanstack/react-table";
 import { CSSProperties } from "react";
-import { useSelector } from "react-redux";
 import { UNDEFINED_TEXT } from "../components/library/data_table";
-import { selectCurrentPathogen } from "../redux/selectors";
 
 // TODO-TR (mlila): delete this after samples table refactor
 export function createTableCellRenderer(
@@ -18,7 +16,6 @@ export function createTableCellRenderer(
     onDeleteTreeModalOpen,
     onEditTreeModalOpen,
   }: CustomTableRenderProps) => {
-    const pathogen = useSelector(selectCurrentPathogen);
     const unwrappedValue = value || UNDEFINED_TEXT;
 
     const renderer = customRenderers[header.key] || defaultRenderer;
@@ -29,7 +26,6 @@ export function createTableCellRenderer(
       item,
       onDeleteTreeModalOpen,
       onEditTreeModalOpen,
-      pathogen,
       userInfo,
       value: unwrappedValue,
     });
