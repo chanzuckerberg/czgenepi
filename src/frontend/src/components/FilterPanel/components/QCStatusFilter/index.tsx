@@ -21,7 +21,6 @@ const getOptionSelected = (
   option: DefaultMenuSelectOption,
   value: DefaultMenuSelectOption
 ) => {
-  console.log("value: ", value);
   return option.name === value.name;
 };
 // ComplexFilter doesn't directly do the check, it's done by its child MenuSelect

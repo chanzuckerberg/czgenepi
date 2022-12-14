@@ -45,6 +45,14 @@ const LABEL_STATUS: Record<
     label: "mediocre",
     status: "warning",
   },
+  processing: {
+    label: "processing",
+    status: "pending",
+  },
+  failed: {
+    label: "failed",
+    status: "pending",
+  }
 };
 
 const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
@@ -101,27 +109,29 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     item: Sample;
   }): JSX.Element => {
     const {
-      CZBFailedGenomeRecovery,
       qcMetrics,
       private: isPrivate,
       submittingGroup,
       uploadedBy,
     } = item;
 
-    // const label = CZBFailedGenomeRecovery
-    //   ? LABEL_STATUS.error
-    //   : LABEL_STATUS.success;
-
       const label = () => {
          const qcStatus = qcMetrics[0]?.qc_status;
-         if (qcStatus == "good") {
+         console.log("qcStatus: ", qcStatus);
+         if (qcStatus === "good") {
           return LABEL_STATUS.success
          } 
-         if (qcStatus == "bad") {
+         else if (qcStatus === "bad") {
           return LABEL_STATUS.error
          }
-         if (qcStatus == "mediocre") {
+         else if (qcStatus === "mediocre") {
           return LABEL_STATUS.warning
+         }
+         else if (qcStatus === "failed") {
+          return LABEL_STATUS.failed
+         }
+         else {
+          return LABEL_STATUS.processing
          }
       }
 
