@@ -93,6 +93,13 @@ export const CreateNSTreeModal = ({
   const [validatedInputSamples, setValidatedInputSamples] = useState<string[]>(
     []
   );
+  const nextcladeDownloadFlag = useTreatments([
+    USER_FEATURE_FLAGS.nextclade_download,
+  ]);
+  const usesNextcladeDownload = isUserFlagOn(
+    nextcladeDownloadFlag,
+    USER_FEATURE_FLAGS.nextclade_download
+  );
 
   const handleChangeTreeType = (e: React.ChangeEvent<HTMLInputElement>) => {
     resetFilters();
@@ -444,7 +451,9 @@ export const CreateNSTreeModal = ({
           />
           <MissingSampleAlert missingSamples={missingInputSamples} />
           <FailedSampleAlert numFailedSamples={failedSampleIds?.length} />
-          <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
+          {usesNextcladeDownload && (
+            <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
+          )}
         </StyledDialogContent>
         <StyledFooter>
           <CreateTreeButton

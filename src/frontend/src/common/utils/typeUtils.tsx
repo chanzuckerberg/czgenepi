@@ -5,6 +5,23 @@ export function get<T, K extends keyof T>(o: T, propertyName: K): T[K] {
   return o[propertyName]; // o[propertyName] is of type T[K]
 }
 
+function getInputValue(
+  inputObject: Record<string, JSONPrimitive>,
+  key: string
+): JSONPrimitive | { qc_status: string }[] {
+  // stub qc_status to be 'processing if no qc_metrics data is available (this means sample was recently uploaded)'
+  const inputValue = inputObject[key];
+  if (key === "qc_metrics") {
+    if (JSON.stringify(inputValue) === "[]") {
+      return [{ qc_status: "processing" }];
+    } else {
+      return inputValue;
+    }
+  } else {
+    return inputValue;
+  }
+}
+
 // Take in a whole or subset of an API response that corresponds
 // to a defined type in the frontend, along with a mapping of
 // differing keys (e.g. if we're going from snake_case to camelCase)
@@ -15,15 +32,17 @@ export function jsonToType<T>(
   inputObject: Record<string, JSONPrimitive>,
   keyMap: Map<string, string | number> | null
 ): T {
-  const entries: Array<Array<JSONPrimitive>> = [];
+  const entries: Array<Array<JSONPrimitive | { qc_status: string }[]>> = [];
   Object.keys(inputObject).forEach((key) => {
+    const inputValue = getInputValue(inputObject, key);
     if (keyMap === null) {
-      entries.push([key, inputObject[key]]);
+      entries.push([key, inputValue]);
     } else if (keyMap.has(key)) {
-      entries.push([keyMap.get(key) as string, inputObject[key]]);
+      entries.push([keyMap.get(key) as string, inputValue]);
     } else {
-      entries.push([key, inputObject[key]]);
+      entries.push([key, inputValue]);
     }
+    // }
   });
   return Object.fromEntries(entries);
 }
