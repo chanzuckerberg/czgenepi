@@ -62,7 +62,8 @@ const DownloadModal = ({
 
   useEffect(() => {
     const noQCIds = checkedSamples
-      .filter((s) => JSON.stringify(s.qcMetrics) === "[]")
+      // for now samples should only have one qcMetrics entry
+      .filter((s) => s.qcMetrics[0].qc_status === "processing")
       .map((s) => s.publicId);
     setNoQCDataSampleIds(noQCIds);
   }, [checkedSamples]);
