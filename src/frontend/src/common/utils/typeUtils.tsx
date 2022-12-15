@@ -5,7 +5,7 @@ export function get<T, K extends keyof T>(o: T, propertyName: K): T[K] {
   return o[propertyName]; // o[propertyName] is of type T[K]
 }
 
-function getInputValue(inputObject: Record<string, JSONPrimitive>, key: string) {
+function getInputValue(inputObject: Record<string, JSONPrimitive>, key: string): JSONPrimitive | { qc_status: string; }[] {
   const inputValue = inputObject[key];
   if (key === "qc_metrics") {
     if (JSON.stringify(inputValue) === "[]") {
@@ -29,7 +29,7 @@ export function jsonToType<T>(
   inputObject: Record<string, JSONPrimitive>,
   keyMap: Map<string, string | number> | null
 ): T {
-  const entries: Array<Array<JSONPrimitive>> = [];
+  const entries: Array<Array<JSONPrimitive | { qc_status: string; }[]>> = [];
   Object.keys(inputObject).forEach((key) => {
     const inputValue = getInputValue(inputObject, key);
     if (keyMap === null) {
