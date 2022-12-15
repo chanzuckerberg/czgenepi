@@ -188,7 +188,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     );
     const Component = hasLineage ? UnderlinedRowContent : RowContent;
 
-  const Content = (
+    const Content = (
       <Component>
         <Cell data-test-id="row-lineage">
           {(firstLineageValue && firstLineageValue.lineage) ||
