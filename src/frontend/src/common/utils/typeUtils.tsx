@@ -9,6 +9,7 @@ function getInputValue(
   inputObject: Record<string, JSONPrimitive>,
   key: string
 ): JSONPrimitive | { qc_status: string }[] {
+  // stub qc_status to be 'processing if no qc_metrics data is available (this means sample was recently uploaded)'
   const inputValue = inputObject[key];
   if (key === "qc_metrics") {
     if (JSON.stringify(inputValue) === "[]") {
