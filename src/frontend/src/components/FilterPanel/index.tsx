@@ -43,6 +43,14 @@ interface FiltersType {
   [filterKey: string]: FilterType;
 }
 
+function getQCStatus(sample: Sample) {
+  const qcStatus = sample.qcMetrics[0]?.qc_status;
+  if (qcStatus === undefined) {
+    
+  }
+  return qcStatus;
+}
+
 // * (mlila): `key` should be the name of the column you are filtering on
 const DATA_FILTER_INIT = {
   CZBFailedGenomeRecovery: {

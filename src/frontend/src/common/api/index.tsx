@@ -117,7 +117,6 @@ function convert<U extends APIResponse, T extends U[keyof U]>(
       }
     });
   }
-
   return converted;
 }
 
@@ -141,7 +140,6 @@ export async function apiResponse<T extends APIResponse>(
   subMappings?: Map<string, Map<string, string>>[]
 ): Promise<T> {
   const response = await fetch(ENV.API_URL + endpoint, DEFAULT_FETCH_OPTIONS);
-
   const result = await response.json();
   if (!response.ok) {
     throw result;

@@ -5,6 +5,20 @@ export function get<T, K extends keyof T>(o: T, propertyName: K): T[K] {
   return o[propertyName]; // o[propertyName] is of type T[K]
 }
 
+function getInputValue(inputObject: Record<string, JSONPrimitive>, key: string) {
+  const inputValue = inputObject[key];
+  if (key === "qc_metrics") {
+    if (JSON.stringify(inputValue) === "[]") {
+      const mockEntry = [{qc_status: "processing"}]
+      return mockEntry;
+    } else {
+      return inputValue;
+    }
+  } else {
+    return inputValue;
+  }
+}; 
+
 // Take in a whole or subset of an API response that corresponds
 // to a defined type in the frontend, along with a mapping of
 // differing keys (e.g. if we're going from snake_case to camelCase)
@@ -17,13 +31,15 @@ export function jsonToType<T>(
 ): T {
   const entries: Array<Array<JSONPrimitive>> = [];
   Object.keys(inputObject).forEach((key) => {
+    const inputValue = getInputValue(inputObject, key);
     if (keyMap === null) {
-      entries.push([key, inputObject[key]]);
+      entries.push([key, inputValue]);
     } else if (keyMap.has(key)) {
-      entries.push([keyMap.get(key) as string, inputObject[key]]);
+      entries.push([keyMap.get(key) as string, inputValue]);
     } else {
-      entries.push([key, inputObject[key]]);
+      entries.push([key, inputValue]);
     }
+    // }
   });
   return Object.fromEntries(entries);
 }
