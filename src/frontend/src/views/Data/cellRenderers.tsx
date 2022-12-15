@@ -89,8 +89,8 @@ const PrivateId = ({
   );
 
   const labelCZBFailedGenomeRecovery = CZBFailedGenomeRecovery
-    ? LABEL_STATUS.error
-    : LABEL_STATUS.success;
+    ? LABEL_STATUS.errorGenomeRecovery
+    : LABEL_STATUS.successGenomeRecovery;
 
   const labelQCStatus = () => {
     const qcStatus = qcMetrics[0]?.qc_status;

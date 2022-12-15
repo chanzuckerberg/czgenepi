@@ -72,6 +72,7 @@ const SamplesView = (): JSX.Element => {
     setQCStatuses(newQCStatuses);
   }, [samples]);
 
+
   const toggleFilterPanel = () => {
     setIsFilterPanelOpen(!isFilterPanelOpen);
   };
