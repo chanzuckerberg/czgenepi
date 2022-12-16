@@ -3,10 +3,6 @@
 import { useTreatments } from "@splitsoftware/splitio-react";
 import { ChipProps, Icon } from "czifui";
 import {
-  TooltipDescriptionText,
-  TooltipHeaderText,
-} from "src/common/components/library/data_subview/style";
-import {
   defaultSampleCellRenderer,
   defaultTreeCellRenderer,
 } from "src/common/components/library/data_table";
