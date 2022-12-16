@@ -21,7 +21,7 @@ export enum ORG_API {
   SAMPLES_VALIDATE_IDS = "samples/validate_ids/",
   SAMPLES_FASTA_DOWNLOAD = "sequences/",
   SAMPLES_TEMPLATE_DOWNLOAD = "samples/submission_template",
-  SAMPLES_NEXTCLADE_DOWNLOAD = "samples/nextclade/", // TODO: this is a stub for now, hook it up for real when it's ready
+  SAMPLES_NEXTCLADE_DOWNLOAD = "qc_mutations/",
   GET_FASTA_URL = "sequences/getfastaurl",
   USHER_TREE_OPTIONS = "usher/tree_versions/",
 }
