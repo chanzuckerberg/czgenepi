@@ -232,7 +232,7 @@ const columns: ColumnDef<Sample, any>[] = [
       </SortableHeader>
     ),
     cell: ({ getValue }) => {
-      const { lineage } = getValue();
+      const lineage = getValue()?.lineage;
       const CellContent = (
         <StyledCellBasic
           shouldTextWrap
@@ -269,7 +269,9 @@ const columns: ColumnDef<Sample, any>[] = [
     cell: ({ getValue }) => (
       <StyledCellBasic
         shouldTextWrap
-        primaryText={getValue().location}
+        primaryText={
+          getValue().location || getValue().division || getValue().country
+        }
         primaryTextWrapLineCount={2}
         shouldShowTooltipOnHover={false}
       />
