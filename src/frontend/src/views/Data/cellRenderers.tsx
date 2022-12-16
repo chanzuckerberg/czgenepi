@@ -160,7 +160,7 @@ const PrivateId = ({
 
 const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   collectionLocation: ({ value }): JSX.Element => {
-    const location = value.location ?? value.division;
+    const location = value.location ?? value.division ?? value.country;
     return (
       <RowContent>
         <Cell data-test-id="row-collectionLocation">{location}</Cell>
