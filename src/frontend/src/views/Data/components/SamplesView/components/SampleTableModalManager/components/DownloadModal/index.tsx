@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import DialogActions from "src/common/components/library/Dialog/components/DialogActions";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
 import {
@@ -121,11 +122,8 @@ const DownloadModal = ({
   );
   const NO_NEXTCLADE_DATA_TOOLTIP_TEXT = (
     <div>
-      <TooltipHeaderText>No QC data available for download.</TooltipHeaderText>
-      <TooltipDescriptionText>
-        Select at least 1 sample with a QC Status of good, mediocre, or bad to
-        proceed.
-      </TooltipDescriptionText>
+      <b>No QC data available for download.</b> Select at least 1 sample with a
+      QC Status of good, mediocre, or bad to proceed.
     </div>
   );
 
@@ -186,7 +184,14 @@ const DownloadModal = ({
                   fileTypes=".csv"
                 >
                   Download a list of nucelotide and protein mutations and QC
-                  metrics for the selected samples. Learn More.
+                  metrics for the selected samples.{" "}
+                  <NewTabLink
+                    href={
+                      "https://help.czgenepi.org/hc/en-us/articles/11569567939604-Download-QC-Metrics-and-Mutation-Data"
+                    }
+                  >
+                    Learn more
+                  </NewTabLink>
                 </DownloadMenuSelection>
               )}
               {isGisaidTemplateEnabled && (
