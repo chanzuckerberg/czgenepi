@@ -110,7 +110,7 @@ const PrivateId = ({
         or bioinformatics errors. Learn more.
         <NewTabLink
           href={
-            "https://help.czgenepi.org/hc/en-us/articles/11569567939604-Download-QC-Metrics-and-Mutation-Data"
+            "https://docs.nextstrain.org/projects/nextclade/en/stable/user/algorithm/07-quality-control.html"
           }
         >
           Learn more
