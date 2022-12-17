@@ -181,7 +181,7 @@ const DownloadModal = ({
                   tooltipTitle={NO_NEXTCLADE_DATA_TOOLTIP_TEXT}
                   onChange={handleNextcladeDataClick}
                   downloadTitle="Sample Mutations and QC Metrics"
-                  fileTypes=".csv"
+                  fileTypes=".tsv"
                 >
                   Download a list of nucelotide and protein mutations and QC
                   metrics for the selected samples.{" "}
