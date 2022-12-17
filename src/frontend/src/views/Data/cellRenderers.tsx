@@ -11,12 +11,14 @@ import {
   RowContent,
   TreeRowContent,
 } from "src/common/components/library/data_table/style";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { createTableCellRenderer } from "src/common/utils";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
 import { LineageTooltip } from "./components/SamplesView/components/SamplesTable/components/LineageTooltip";
+import { StatusChip } from "./components/StatusChip";
 import { TreeActionMenu } from "./components/TreesView/components/TreesTable/components/TreeActionMenu";
 import TreeTableNameCell from "./components/TreesView/components/TreesTable/components/TreeTableNameCell";
 import { TreeTypeTooltip } from "./components/TreesView/components/TreesTable/components/TreeTypeTooltip";
@@ -25,7 +27,6 @@ import {
   GISAIDCell,
   PrivateIdValueWrapper,
   SampleIconWrapper,
-  StyledChip,
   StyledUploaderName,
   Subtext,
   UnderlinedCell,
@@ -92,9 +93,44 @@ const PrivateId = ({
     ? LABEL_STATUS.errorGenomeRecovery
     : LABEL_STATUS.successGenomeRecovery;
 
+  const PROCESSING_STATUS_TOOLTIP_TEXT = (
+    <div>
+      <div>
+        This sample doesn’t currently have a quality score because it is still
+        processing. Score will update when complete.
+      </div>
+    </div>
+  );
+
+  const GENERIC_STATUS_TOOLTIP_TEXT = (
+    <div>
+      <div>
+        <b>Quality Score: </b> Overall QC score from Nextclade which considers
+        genome completion and screens for potential contamination and sequencing
+        or bioinformatics errors. Learn more.
+        <NewTabLink
+          href={
+            "https://docs.nextstrain.org/projects/nextclade/en/stable/user/algorithm/07-quality-control.html"
+          }
+        >
+          Learn more
+        </NewTabLink>
+      </div>
+    </div>
+  );
+
+  const FAILED_STATUS_TOOLTIP_TEXT = (
+    <div>
+      <div>
+        QC may fail when the sequence processing failed due to quality, or if
+        the uploaded sequence does not represent the correct pathogen
+      </div>
+    </div>
+  );
+
   const labelQCStatus = () => {
     const qcStatus = qcMetrics[0]?.qc_status;
-    switch (qcStatus) {
+    switch (qcStatus.toLowerCase()) {
       case "good":
         return LABEL_STATUS.success;
       case "bad":
@@ -107,6 +143,24 @@ const PrivateId = ({
         return LABEL_STATUS.processing;
     }
   };
+
+  const qcStatusLabel = labelQCStatus();
+
+  const LABEL_TO_TOOLTIP_TEXT: Record<string, JSX.Element> = {
+    processing: PROCESSING_STATUS_TOOLTIP_TEXT,
+    bad: GENERIC_STATUS_TOOLTIP_TEXT,
+    good: GENERIC_STATUS_TOOLTIP_TEXT,
+    mediocre: GENERIC_STATUS_TOOLTIP_TEXT,
+    failed: FAILED_STATUS_TOOLTIP_TEXT,
+  };
+
+  const label = usesNextcladeDownload
+    ? qcStatusLabel.label
+    : labelCZBFailedGenomeRecovery.label;
+
+  const status = usesNextcladeDownload
+    ? qcStatusLabel?.status
+    : labelCZBFailedGenomeRecovery.status;
 
   const displayName =
     submittingGroup?.name === CZ_BIOHUB_GROUP ? "CZ Biohub" : uploadedBy?.name;
@@ -134,19 +188,10 @@ const PrivateId = ({
         <PrivateIdValueWrapper>
           <CenteredFlexContainer>
             <span data-test-id="row-private-id">{value}</span>
-            <StyledChip
-              data-test-id="row-sample-status"
-              size="small"
-              label={
-                usesNextcladeDownload
-                  ? labelQCStatus()?.label
-                  : labelCZBFailedGenomeRecovery.label
-              }
-              status={
-                usesNextcladeDownload
-                  ? labelQCStatus()?.status
-                  : labelCZBFailedGenomeRecovery.status
-              }
+            <StatusChip
+              label={label}
+              status={status}
+              tooltipText={LABEL_TO_TOOLTIP_TEXT[label]}
             />
           </CenteredFlexContainer>
           <StyledUploaderName data-test-id="row-user-name">

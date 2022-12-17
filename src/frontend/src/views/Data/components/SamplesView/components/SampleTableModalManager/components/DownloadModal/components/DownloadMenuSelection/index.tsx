@@ -56,7 +56,6 @@ const DownloadMenuSelection = ({
   return (
     <Tooltip
       arrow
-      inverted
       title={tooltipTitle}
       disableHoverListener={!isDisabled}
       placement="top"
