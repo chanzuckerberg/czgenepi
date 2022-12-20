@@ -68,15 +68,17 @@ const DownloadButton = ({
     } else {
       if (!checkedSamples) return;
 
-      const ids = checkedSamples.map((s) => s.publicId);
-      const data = tsvDataMap(ids, checkedSamples, SAMPLE_HEADERS[pathogen]);
+      // const ids = checkedSamples.map((s) => s.publicId);
+      // const data = tsvDataMap(ids, checkedSamples, SAMPLE_HEADERS[pathogen]);
 
-      if (!data || data.length < 1) {
-        setTsvData([]);
-        return;
-      }
+      // if (!data || data.length < 1) {
+      //   setTsvData([]);
+      //   return;
+      // }
 
-      const newTsvData = [data[0], ...data[1]];
+      // const newTsvData = [data[0], ...data[1]];
+      // setTsvData(newTsvData);
+      const newTsvData = mapTsvData(checkedSamples);
       setTsvData(newTsvData);
     }
   }, [checkedSamples, pathogen, usesTableRefactor]);

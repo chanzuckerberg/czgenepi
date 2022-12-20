@@ -6,7 +6,7 @@ import { SAMPLE_HEADERS } from "src/views/Data/table-headers/sampleHeadersConfig
 export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   const state = store.getState();
   const pathogen = selectCurrentPathogen(state);
-
+  console.log("in mapTSVData")
   const allHeaders: Header[] = [
     ...SAMPLE_HEADERS[pathogen],
     {
@@ -20,14 +20,16 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   const tsvHeaders = allHeaders.flatMap((header) => {
     const { text } = header;
 
-    // create multiple columns for more complex data types (such as lineage)
+    // create multiple columns for more complex data types (such as lineages)
     if (header.subHeaders) {
+
       return header.subHeaders.map((subHeader) => subHeader.text);
     }
-
+    // console.log("header: ", header);
     return text;
   });
 
+  const defaultEmptyValue = "";
   // define table data
   const tsvData = checkedSamples.map((sample) => {
     // for each sample, generate an array of values, one column at a time
@@ -36,10 +38,31 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
       const value = sample[key];
 
       // break this piece of data into multiple columns, if necessary
-      if (typeof value === "object" && header.subHeaders) {
-        return header.subHeaders.map((subHeader) =>
-          String(value[subHeader.key])
+      if (header.subHeaders && typeof value === "object") {
+        if (key === "qcMetrics" || key === "lineages") {
+          // qcMetrics and lineages can contain multiple entries, for now
+          // we are jsut taking the first entry since no entry should have more 
+          // than one value at the current moment (Dec. 2022)
+          const firstValue = value && value[0];
+          if (firstValue) {
+            return header.subHeaders.map((subHeader) => {
+              const entry = firstValue[subHeader.key];
+              if (entry) {
+                return String(entry);
+              } else {
+                return defaultEmptyValue;
+              }
+            }
+            );
+          } else {
+            // fill row with default values if qcMetrics or lineages is empty
+            return header.subHeaders.map(() => (defaultEmptyValue));
+          }
+        } else {
+        return header.subHeaders.map((subHeader) => (
+          String(value[subHeader.key]))
         );
+        }
       }
 
       // otherwise, return a single value for this column

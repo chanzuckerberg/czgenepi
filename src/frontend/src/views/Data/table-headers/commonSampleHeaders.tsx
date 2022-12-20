@@ -55,6 +55,26 @@ export const LINEAGE_HEADER: Header = {
       key: "lineage_software_version",
       text: "Version",
     },
+    {
+      key: "reference_dataset_name",
+      text: "Reference Dataset Name",
+    },
+    {
+      key: "lineage_type",
+      text: "Lineage Caller",
+    },
+    {
+      key: "reference_dataset_tag",
+      text: "Reference Dataset Tag",
+    },
+    {
+      key: "reference_sequence_accession",
+      text: "Reference Sequence Accession",
+    },
+    {
+      key: "lineage_probability",
+      text: "Lineage Probability",
+    },
   ],
   text: "Lineage",
   tooltip: {
@@ -67,6 +87,53 @@ export const LINEAGE_HEADER: Header = {
       'A lineage is a named group of related sequences. This may sometimes be referred to as a "genotype," "subtype," or "variant." Some lineages are associated with changes in the epidemiological, biological or clinical characteristics of the pathogen. We update these lineages regularly whenever there are new designations available.',
   },
 };
+
+
+export const QC_METRICS_HEADER: Header = {
+  key: "qcMetrics",
+  sortKey: ["lineage", "lineage"],
+  subHeaders: [
+    {
+      key: "qc_caller",
+      text: "QC Caller",
+    },
+    {
+      key: "qc_score",
+      text: "QC Score",
+    },
+    {
+      key: "qc_software_version",
+      text: "QC Software Version",
+    },
+    {
+      key: "qc_status",
+      text: "QC Status",
+    },
+    {
+      key: "reference_dataset_name",
+      text: "Reference Dataset Name",
+    },
+    {
+      key: "reference_dataset_tag",
+      text: "Reference Dataset Tag",
+    },
+    {
+      key: "reference_sequence_accession",
+      text: "Reference Sequence Accession",
+    },
+  ],
+  text: "QC Metrics",
+  tooltip: {
+    boldText: "QC Metrics",
+    link: {
+      href: "https://cov-lineages.org/pangolin.html",
+      linkText: "Learn more.",
+    },
+    regularText:
+      'A lineage is a named group of related sequences. This may sometimes be referred to as a "genotype," "subtype," or "variant." Some lineages are associated with changes in the epidemiological, biological or clinical characteristics of the pathogen. We update these lineages regularly whenever there are new designations available.',
+  },
+};
+
 
 export const UPLOAD_DATE_HEADER: Header = {
   key: "uploadDate",
