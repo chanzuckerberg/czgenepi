@@ -47,5 +47,5 @@ export const SAMPLE_HEADERS_TSV_ONLY = [
     sortKey: ["CZBFailedGenomeRecovery"],
     text: "Genome Recovery",
   },
-  QC_METRICS_HEADER
+  QC_METRICS_HEADER,
 ]
