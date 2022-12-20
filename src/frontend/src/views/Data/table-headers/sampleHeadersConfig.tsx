@@ -25,7 +25,6 @@ export const SAMPLE_HEADERS: PathogenConfigType<Header[]> = {
     },
     COLLECTION_DATE_HEADER,
     LINEAGE_HEADER,
-    QC_METRICS_HEADER,
     UPLOAD_DATE_HEADER,
     COLLECTION_LOCATION_HEADER,
     SEQUENCING_DATE_HEADER,
@@ -36,9 +35,17 @@ export const SAMPLE_HEADERS: PathogenConfigType<Header[]> = {
     PUBLIC_ID_HEADER,
     COLLECTION_DATE_HEADER,
     LINEAGE_HEADER,
-    QC_METRICS_HEADER,
     UPLOAD_DATE_HEADER,
     COLLECTION_LOCATION_HEADER,
     SEQUENCING_DATE_HEADER,
   ],
 };
+
+export const SAMPLE_HEADERS_TSV_ONLY = [
+  {
+    key: "CZBFailedGenomeRecovery",
+    sortKey: ["CZBFailedGenomeRecovery"],
+    text: "Genome Recovery",
+  },
+  QC_METRICS_HEADER
+]

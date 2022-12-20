@@ -1,7 +1,7 @@
 // TODO-TR (mlila): consider moving or restructuring this blob
 import { store } from "src/common/redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
-import { SAMPLE_HEADERS } from "src/views/Data/table-headers/sampleHeadersConfig";
+import { SAMPLE_HEADERS, SAMPLE_HEADERS_TSV_ONLY } from "src/views/Data/table-headers/sampleHeadersConfig";
 
 export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   const state = store.getState();
@@ -9,11 +9,7 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   console.log("in mapTSVData")
   const allHeaders: Header[] = [
     ...SAMPLE_HEADERS[pathogen],
-    {
-      key: "CZBFailedGenomeRecovery",
-      sortKey: ["CZBFailedGenomeRecovery"],
-      text: "Genome Recovery",
-    },
+    ...SAMPLE_HEADERS_TSV_ONLY
   ];
 
   // define header row

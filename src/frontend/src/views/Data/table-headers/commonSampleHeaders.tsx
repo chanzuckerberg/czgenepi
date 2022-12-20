@@ -109,28 +109,16 @@ export const QC_METRICS_HEADER: Header = {
       key: "qc_status",
       text: "QC Status",
     },
-    {
-      key: "reference_dataset_name",
-      text: "Reference Dataset Name",
-    },
-    {
-      key: "reference_dataset_tag",
-      text: "Reference Dataset Tag",
-    },
-    {
-      key: "reference_sequence_accession",
-      text: "Reference Sequence Accession",
-    },
   ],
   text: "QC Metrics",
   tooltip: {
-    boldText: "QC Metrics",
+    boldText: "Quality Score: ",
     link: {
-      href: "https://cov-lineages.org/pangolin.html",
+      href: "https://docs.nextstrain.org/projects/nextclade/en/stable/user/algorithm/07-quality-control.html",
       linkText: "Learn more.",
     },
     regularText:
-      'A lineage is a named group of related sequences. This may sometimes be referred to as a "genotype," "subtype," or "variant." Some lineages are associated with changes in the epidemiological, biological or clinical characteristics of the pathogen. We update these lineages regularly whenever there are new designations available.',
+      'Overall QC score from Nextclade which considers genome completion and screens for potential contamination and sequencing or bioinformatics errors. Learn more.',
   },
 };
 
