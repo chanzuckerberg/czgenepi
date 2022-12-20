@@ -1,4 +1,3 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import { useSelector } from "react-redux";
@@ -52,8 +51,8 @@ const DownloadButton = ({
   const [tsvData, setTsvData] = useState<string[][]>([]);
 
   useEffect(() => {
-      const newTsvData = mapTsvData(checkedSamples);
-      setTsvData(newTsvData);
+    const newTsvData = mapTsvData(checkedSamples);
+    setTsvData(newTsvData);
   }, [checkedSamples, pathogen]);
 
   const useFileMutationGenerator = () =>

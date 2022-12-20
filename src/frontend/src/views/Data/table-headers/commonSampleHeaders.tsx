@@ -88,7 +88,6 @@ export const LINEAGE_HEADER: Header = {
   },
 };
 
-
 export const QC_METRICS_HEADER: Header = {
   key: "qcMetrics",
   sortKey: ["lineage", "lineage"],
@@ -118,10 +117,9 @@ export const QC_METRICS_HEADER: Header = {
       linkText: "Learn more.",
     },
     regularText:
-      'Overall QC score from Nextclade which considers genome completion and screens for potential contamination and sequencing or bioinformatics errors. Learn more.',
+      "Overall QC score from Nextclade which considers genome completion and screens for potential contamination and sequencing or bioinformatics errors. Learn more.",
   },
 };
-
 
 export const UPLOAD_DATE_HEADER: Header = {
   key: "uploadDate",

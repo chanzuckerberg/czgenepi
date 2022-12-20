@@ -1,15 +1,17 @@
 // TODO-TR (mlila): consider moving or restructuring this blob
 import { store } from "src/common/redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
-import { SAMPLE_HEADERS, SAMPLE_HEADERS_TSV_ONLY } from "src/views/Data/table-headers/sampleHeadersConfig";
+import {
+  SAMPLE_HEADERS,
+  SAMPLE_HEADERS_TSV_ONLY,
+} from "src/views/Data/table-headers/sampleHeadersConfig";
 
 export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   const state = store.getState();
   const pathogen = selectCurrentPathogen(state);
-  console.log("in mapTSVData")
   const allHeaders: Header[] = [
     ...SAMPLE_HEADERS[pathogen],
-    ...SAMPLE_HEADERS_TSV_ONLY
+    ...SAMPLE_HEADERS_TSV_ONLY,
   ];
 
   // define header row
@@ -18,10 +20,8 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
 
     // create multiple columns for more complex data types (such as lineages)
     if (header.subHeaders) {
-
       return header.subHeaders.map((subHeader) => subHeader.text);
     }
-    // console.log("header: ", header);
     return text;
   });
 
@@ -37,7 +37,7 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
       if (header.subHeaders && typeof value === "object") {
         if (key === "qcMetrics" || key === "lineages") {
           // qcMetrics and lineages can contain multiple entries, for now
-          // we are jsut taking the first entry since no entry should have more 
+          // we are just taking the first entry since no entry should have more
           // than one value at the current moment (Dec. 2022)
           const firstValue = value && value[0];
           if (firstValue) {
@@ -48,16 +48,15 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
               } else {
                 return defaultEmptyValue;
               }
-            }
-            );
+            });
           } else {
             // fill row with default values if qcMetrics or lineages is empty
-            return header.subHeaders.map(() => (defaultEmptyValue));
+            return header.subHeaders.map(() => defaultEmptyValue);
           }
         } else {
-        return header.subHeaders.map((subHeader) => (
-          String(value[subHeader.key]))
-        );
+          return header.subHeaders.map((subHeader) =>
+            String(value[subHeader.key])
+          );
         }
       }
 
