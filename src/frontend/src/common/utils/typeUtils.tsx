@@ -8,13 +8,21 @@ export function get<T, K extends keyof T>(o: T, propertyName: K): T[K] {
 function getInputValue(
   inputObject: Record<string, JSONPrimitive>,
   key: string
-): JSONPrimitive | { qc_status: string }[] {
+): JSONPrimitive | { qc_status: string }[] | QCMetrics[] {
   // stub qc_status to be 'processing if no qc_metrics data is available (this means sample was recently uploaded)'
   const inputValue = inputObject[key];
   if (key === "qc_metrics") {
     if (JSON.stringify(inputValue) === "[]") {
-      return [{ qc_status: "processing" }];
+      return [{ qc_status: "Processing" }];
     } else {
+      // this is guaranteed to be QCMetric since we did the earlier check
+      const qcMetric = inputValue as unknown as QCMetrics[];
+      qcMetric.map((e) => {
+        const qcStatusValue = e.qc_status;
+        // Capitalize first letter of qc_status
+        e["qc_status"] =
+          qcStatusValue.charAt(0).toUpperCase() + qcStatusValue.slice(1);
+      });
       return inputValue;
     }
   } else {

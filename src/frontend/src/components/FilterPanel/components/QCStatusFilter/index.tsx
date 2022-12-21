@@ -61,7 +61,6 @@ const QCStatusFilter = (props: Props): JSX.Element => {
       onChange={setValue}
       DropdownMenuProps={DropdownMenuProps}
       multiple
-      search
       InputDropdownProps={PROPS_FOR_INPUT_DROPDOWN}
       data-test-id="sample-filter-qc-status"
     />
