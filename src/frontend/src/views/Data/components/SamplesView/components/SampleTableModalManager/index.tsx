@@ -39,7 +39,7 @@ const SampleTableModalManager = ({
       .map((s) => s.publicId);
     const badQCIds = checkedSamples
       // for now there should only ever be one qcMetrics entry per sample
-      .filter((s) => s.qcMetrics[0].qc_status === "bad")
+      .filter((s) => s.qcMetrics[0].qc_status === "Bad")
       .map((s) => s.publicId);
     setCheckedSampleIds(checkedIds);
     setFailedSampleIds(failedIds);

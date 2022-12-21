@@ -65,8 +65,15 @@ export const AlertBody = styled.span`
 `;
 
 export const TooltipHeaderText = styled.div`
-  color: white;
   text-align: center;
+  ${(props: CommonThemeProps) => {
+    const colors = getColors(props);
+    const fontWeights = getFontWeights(props);
+    return `
+      color: ${colors?.gray[600]};
+      font-weight: ${fontWeights?.semibold};
+  `;
+  }}
 `;
 
 export const TooltipDescriptionText = styled.div`
@@ -74,7 +81,7 @@ export const TooltipDescriptionText = styled.div`
   ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
-      color: ${colors?.gray[400]};
+      color: ${colors?.gray[600]};
   `;
   }}
 `;

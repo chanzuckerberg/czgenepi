@@ -144,7 +144,7 @@ function extractPublicIdsWBadQCData(data: Sample[]) {
   return data
     .filter(
       // for now there should only ever be one qcMetrics entry per sample
-      (s) => s.qcMetrics.length > 0 && s.qcMetrics[0].qc_status === "bad"
+      (s) => s.qcMetrics.length > 0 && s.qcMetrics[0].qc_status === "Bad"
     )
     .map((s) => s.publicId);
 }
@@ -315,7 +315,7 @@ export const DataTable: FunctionComponent<Props> = ({
         String(item.publicId),
         Boolean(item.CZBFailedGenomeRecovery),
         Boolean(
-          item.qcMetrics.length > 0 && item.qcMetrics[0].qc_status === "bad"
+          item.qcMetrics.length > 0 && item.qcMetrics[0].qc_status === "Bad"
         )
       );
     };

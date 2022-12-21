@@ -64,7 +64,7 @@ const DownloadModal = ({
   useEffect(() => {
     const noQCIds = checkedSamples
       // for now samples should only have one qcMetrics entry
-      .filter((s) => s.qcMetrics[0].qc_status === "processing")
+      .filter((s) => s.qcMetrics[0].qc_status === "Processing")
       .map((s) => s.publicId);
     setNoQCDataSampleIds(noQCIds);
   }, [checkedSamples]);
@@ -122,8 +122,11 @@ const DownloadModal = ({
   );
   const NO_NEXTCLADE_DATA_TOOLTIP_TEXT = (
     <div>
-      <b>No QC data available for download.</b> Select at least 1 sample with a
-      QC Status of good, mediocre, or bad to proceed.
+      <TooltipHeaderText>No QC data available for download.</TooltipHeaderText>
+      <TooltipDescriptionText>
+        Select at least 1 sample with a QC Status of good, mediocre, bad, or
+        failed to proceed.
+      </TooltipDescriptionText>
     </div>
   );
 
