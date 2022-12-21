@@ -1,5 +1,8 @@
 // credit: Typescript documentation, src
 // https://www.typescriptlang.org/docs/handbook/advanced-types.html#index-types
+
+import { ConstructionOutlined } from "@mui/icons-material";
+
 // gets a property from an object.
 export function get<T, K extends keyof T>(o: T, propertyName: K): T[K] {
   return o[propertyName]; // o[propertyName] is of type T[K]
@@ -12,6 +15,7 @@ function getInputValue(
   // stub qc_status to be 'processing if no qc_metrics data is available (this means sample was recently uploaded)'
   const inputValue = inputObject[key];
   if (key === "qc_metrics") {
+    console.log("inputValue: ", inputValue);
     if (JSON.stringify(inputValue) === "[]") {
       return [{ qc_status: "Processing" }];
     } else {
@@ -19,9 +23,15 @@ function getInputValue(
       const qcMetric = inputValue as unknown as QCMetrics[];
       qcMetric.map((e) => {
         const qcStatusValue = e.qc_status;
-        // Capitalize first letter of qc_status
-        e["qc_status"] =
+        // TODO: remove this when we have designs ready to deal with invalid case, for now put a bandaid over the problem by marking samples as Failed 
+        if (qcStatusValue === "invalid") {
+          e["qc_status"] = "Failed";
+        } else {
+          // Capitalize first letter of qc_status
+          e["qc_status"] =
           qcStatusValue.charAt(0).toUpperCase() + qcStatusValue.slice(1);
+        }
+
       });
       return inputValue;
     }
