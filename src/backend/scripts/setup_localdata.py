@@ -255,7 +255,9 @@ def create_sample_qc_metrics(session, sample):
         "failed": [
             None,
         ],
-        "invalid": [None,],
+        "invalid": [
+            None,
+        ],
     }
 
     random_qc_status = random.choice(list(random_qc_status_scores.keys()))
