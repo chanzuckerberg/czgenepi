@@ -124,7 +124,7 @@ const DownloadModal = ({
     <div>
       <TooltipHeaderText>No QC data available for download.</TooltipHeaderText>
       <TooltipDescriptionText>
-        Select at least 1 sample with a QC Status of good, mediocre, or bad to
+        Select at least 1 sample with a QC Status of good, mediocre, bad, or failed to
         proceed.
       </TooltipDescriptionText>
     </div>
