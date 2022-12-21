@@ -26,6 +26,8 @@ import {
   Header,
   StyledCallout,
   Title,
+  TooltipDescriptionText,
+  TooltipHeaderText,
 } from "./style";
 
 interface Props {
@@ -110,14 +112,16 @@ const DownloadModal = ({
 
   const FASTA_DISABLED_TOOLTIP_TEXT = (
     <div>
-      <b>No Consensus Genomes available for download</b>
-      <div>Select at least 1 sample with successful genome recovery.</div>
+      <TooltipHeaderText>No Consensus Genomes available for download</TooltipHeaderText>
+      <TooltipDescriptionText>Select at least 1 sample with successful genome recovery.</TooltipDescriptionText>
     </div>
   );
   const NO_NEXTCLADE_DATA_TOOLTIP_TEXT = (
     <div>
-      <b>No QC data available for download.</b> Select at least 1 sample with a
-      QC Status of good, mediocre, or bad to proceed.
+      <TooltipHeaderText>No QC data available for download.</TooltipHeaderText> 
+      <TooltipDescriptionText>
+        Select at least 1 sample with a QC Status of good, mediocre, or bad to proceed.
+      </TooltipDescriptionText>
     </div>
   );
 

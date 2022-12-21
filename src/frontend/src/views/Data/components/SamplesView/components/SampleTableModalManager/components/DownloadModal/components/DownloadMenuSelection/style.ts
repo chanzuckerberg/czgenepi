@@ -47,14 +47,18 @@ export const StyledFileTypeItem = styled.li`
     const spaces = getSpaces(props);
     const { isDisabled, isSelected } = props;
 
-    const backgroundColor = isDisabled
-      ? `${colors?.gray[200]}`
-      : isSelected
+    const backgroundColor = 
+      isSelected
       ? `${colors?.gray[100]}`
       : "transparent"; // Default to "transparent if not disabled or selected"
 
+      const textColor = isDisabled
+      ? `${colors?.gray[400]}`
+      : `${colors?.gray[600]}`;
+    
     return `
       background-color: ${backgroundColor};
+      color: ${textColor};
       &:hover {
         ${!isDisabled && `background-color: ${colors?.gray[100]};`}
       }
@@ -71,9 +75,16 @@ export const DownloadType = styled.div`
   display: inline-block;
   color: black;
 
-  ${(props: CommonThemeProps) => {
+  ${(props: StyledFileTypeItemProps) => {
     const fontWeights = getFontWeights(props);
+    const colors = getColors(props);
+    const { isDisabled } = props;
+    const textColor = isDisabled
+    ? `${colors?.gray[400]}`
+    : `${colors?.gray[600]}`;
+
     return `
+      color: ${textColor};
       font-weight: ${fontWeights?.semibold};
     `;
   }}
