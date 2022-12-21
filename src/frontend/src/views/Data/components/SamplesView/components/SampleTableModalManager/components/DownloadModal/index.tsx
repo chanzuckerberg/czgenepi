@@ -112,15 +112,20 @@ const DownloadModal = ({
 
   const FASTA_DISABLED_TOOLTIP_TEXT = (
     <div>
-      <TooltipHeaderText>No Consensus Genomes available for download</TooltipHeaderText>
-      <TooltipDescriptionText>Select at least 1 sample with successful genome recovery.</TooltipDescriptionText>
+      <TooltipHeaderText>
+        No Consensus Genomes available for download
+      </TooltipHeaderText>
+      <TooltipDescriptionText>
+        Select at least 1 sample with successful genome recovery.
+      </TooltipDescriptionText>
     </div>
   );
   const NO_NEXTCLADE_DATA_TOOLTIP_TEXT = (
     <div>
-      <TooltipHeaderText>No QC data available for download.</TooltipHeaderText> 
+      <TooltipHeaderText>No QC data available for download.</TooltipHeaderText>
       <TooltipDescriptionText>
-        Select at least 1 sample with a QC Status of good, mediocre, or bad to proceed.
+        Select at least 1 sample with a QC Status of good, mediocre, or bad to
+        proceed.
       </TooltipDescriptionText>
     </div>
   );

@@ -47,15 +47,12 @@ export const StyledFileTypeItem = styled.li`
     const spaces = getSpaces(props);
     const { isDisabled, isSelected } = props;
 
-    const backgroundColor = 
-      isSelected
-      ? `${colors?.gray[100]}`
-      : "transparent"; // Default to "transparent if not disabled or selected"
+    const backgroundColor = isSelected ? `${colors?.gray[100]}` : "transparent"; // Default to "transparent if not disabled or selected"
 
-      const textColor = isDisabled
+    const textColor = isDisabled
       ? `${colors?.gray[400]}`
       : `${colors?.gray[600]}`;
-    
+
     return `
       background-color: ${backgroundColor};
       color: ${textColor};
@@ -80,8 +77,8 @@ export const DownloadType = styled.div`
     const colors = getColors(props);
     const { isDisabled } = props;
     const textColor = isDisabled
-    ? `${colors?.gray[400]}`
-    : `${colors?.gray[600]}`;
+      ? `${colors?.gray[400]}`
+      : `${colors?.gray[600]}`;
 
     return `
       color: ${textColor};

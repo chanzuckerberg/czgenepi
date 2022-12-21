@@ -44,7 +44,8 @@ const DownloadMenuSelection = ({
       </CheckBoxInfo>
       <CheckboxLabel htmlFor={id}>
         <span onMouseOver={(e) => setAnchorEl(e.currentTarget)}>
-          <DownloadType isDisabled={isDisabled}>{downloadTitle} </DownloadType> ({fileTypes})
+          <DownloadType isDisabled={isDisabled}>{downloadTitle} </DownloadType>{" "}
+          ({fileTypes})
         </span>
         <DownloadTypeInfo>{children}</DownloadTypeInfo>
       </CheckboxLabel>
