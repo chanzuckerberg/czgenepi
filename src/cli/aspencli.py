@@ -900,5 +900,20 @@ def list_runs(ctx, print_headers):
     print(resp.text)
 
 
+@cli.group()
+def qc_mutations():
+    pass
+
+
+@qc_mutations.command(name="download")
+@click.argument("sample_ids", nargs=-1)
+@click.pass_context
+def download_qc_mutations_output(ctx, sample_ids):
+    api_client = ctx.obj["api_client"]
+    payload = {"sample_ids": sample_ids}
+    resp = api_client.post_with_org_and_pathogen("/v2/qc_mutations/", json=payload)
+    print(resp.text)
+
+
 if __name__ == "__main__":
     cli()
