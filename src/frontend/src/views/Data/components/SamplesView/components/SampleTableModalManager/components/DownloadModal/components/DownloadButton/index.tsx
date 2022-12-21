@@ -1,4 +1,3 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import { useSelector } from "react-redux";
@@ -8,7 +7,6 @@ import {
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { ORG_API } from "src/common/api";
-import { tsvDataMap } from "src/common/components/library/data_subview";
 import { useUserInfo } from "src/common/queries/auth";
 import {
   FileDownloadResponsePayload,
@@ -20,9 +18,6 @@ import { useDispatch } from "src/common/redux/hooks";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
-import { SAMPLE_HEADERS } from "src/views/Data/table-headers/sampleHeadersConfig";
 import { mapTsvData } from "./mapTsvData";
 import { StyledButton } from "./style";
 
@@ -55,31 +50,10 @@ const DownloadButton = ({
 
   const [tsvData, setTsvData] = useState<string[][]>([]);
 
-  const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
-  const usesTableRefactor = isUserFlagOn(
-    tableRefactorFlag,
-    USER_FEATURE_FLAGS.table_refactor
-  );
-
   useEffect(() => {
-    if (usesTableRefactor) {
-      const newTsvData = mapTsvData(checkedSamples);
-      setTsvData(newTsvData);
-    } else {
-      if (!checkedSamples) return;
-
-      const ids = checkedSamples.map((s) => s.publicId);
-      const data = tsvDataMap(ids, checkedSamples, SAMPLE_HEADERS[pathogen]);
-
-      if (!data || data.length < 1) {
-        setTsvData([]);
-        return;
-      }
-
-      const newTsvData = [data[0], ...data[1]];
-      setTsvData(newTsvData);
-    }
-  }, [checkedSamples, pathogen, usesTableRefactor]);
+    const newTsvData = mapTsvData(checkedSamples);
+    setTsvData(newTsvData);
+  }, [checkedSamples, pathogen]);
 
   const useFileMutationGenerator = () =>
     useFileDownload({

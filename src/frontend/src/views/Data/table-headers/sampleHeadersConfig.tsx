@@ -7,6 +7,7 @@ import {
   LINEAGE_HEADER,
   PRIVATE_ID_HEADER,
   PUBLIC_ID_HEADER,
+  QC_METRICS_HEADER,
   SEQUENCING_DATE_HEADER,
   UPLOAD_DATE_HEADER,
 } from "./commonSampleHeaders";
@@ -39,3 +40,13 @@ export const SAMPLE_HEADERS: PathogenConfigType<Header[]> = {
     SEQUENCING_DATE_HEADER,
   ],
 };
+
+// This is for headers we want in the TSV, but not in the table
+export const SAMPLE_HEADERS_TSV_ONLY = [
+  {
+    key: "CZBFailedGenomeRecovery",
+    sortKey: ["CZBFailedGenomeRecovery"],
+    text: "Genome Recovery",
+  },
+  QC_METRICS_HEADER,
+];
