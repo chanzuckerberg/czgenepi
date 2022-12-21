@@ -7,6 +7,7 @@ workflow nextstrain {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
+        String pathogen_slug
         Int    workflow_id
         String s3_filestem
     }
@@ -17,6 +18,7 @@ workflow nextstrain {
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
+        pathogen_slug = pathogen_slug,
         workflow_id = workflow_id,
         s3_filestem = s3_filestem,
     }
@@ -29,6 +31,7 @@ task nextstrain_workflow {
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
+	String pathogen_slug
         Int    workflow_id
         String s3_filestem
     }
@@ -43,12 +46,14 @@ task nextstrain_workflow {
     fi
     export WORKFLOW_ID="~{workflow_id}"
     export S3_FILESTEM="~{s3_filestem}"
+    export PATHOGEN_SLUG="~{pathogen_slug}"
+    export LC_PATHOGEN_SLUG=$(echo ~{pathogen_slug} | tr '[:upper:]' '[:lower:]');
 
     # Just in case the run script bails out before defining this var
     ncov_git_rev=""
 
     # run main workflow
-    /usr/src/app/aspen/workflows/nextstrain_run/run_nextstrain_ondemand.sh
+    /usr/src/app/aspen/workflows/nextstrain_run/run_nextstrain_${LC_PATHOGEN_SLUG}.sh
 
     # error handling
     if [[ $? != 0 ]]; then
@@ -57,10 +62,10 @@ task nextstrain_workflow {
         # collect any recoverable information from the main workflow
         if [[ -e /tmp/ncov_git_rev ]]; then ncov_git_rev=$(cat /tmp/ncov_git_rev); fi
 
-        python3 /usr/src/app/aspen/workflows/nextstrain_run/error.py            \
-        --ncov-rev "${ncov_git_rev}"                                            \
-        --end-time "${end_time}"                                                \
-        --phylo-run-id "~{workflow_id}"                                         \
+        python3 /usr/src/app/aspen/workflows/nextstrain_run/error.py \
+        --ncov-rev "${ncov_git_rev}"                                 \
+        --end-time "${end_time}"                                     \
+        --phylo-run-id "~{workflow_id}"                              \
 
         exit 1
     fi
