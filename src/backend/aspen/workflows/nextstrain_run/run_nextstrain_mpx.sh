@@ -45,7 +45,7 @@ aligned_upstream_location=$(
            --metadata /monkeypox/data/metadata_czge.tsv                  \
            --selected /monkeypox/data/include.txt                        \
            --resolved-template-args "${RESOLVED_TEMPLATE_ARGS_SAVEFILE}" \
-           --builds-file /monkeypox/config/config.yaml                   \  # TODO - subsampling.yaml needs to be written too!
+           --builds-file /monkeypox/config/build.yaml                    \ 
            --reset-status
 )
 
