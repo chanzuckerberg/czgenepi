@@ -133,9 +133,10 @@ class TokenHandler:
 
 
 class ApiClient:
-    def __init__(self, url, token_handler, org_id):
+    def __init__(self, url, token_handler, org_id, pathogen_slug):
         self.url = url
         self.org_id = org_id
+        self.pathogen_slug = pathogen_slug
         self.token_handler = token_handler
 
     def get_headers(self):
@@ -145,26 +146,44 @@ class ApiClient:
             headers["Cookie"] = f"_oauth2_proxy={os.getenv('OAUTH2_PROXY_COOKIE')}"
         return headers
 
-    def url_with_org(self, path):
-        if self.org_id:
-            path = path.replace("/v2/", f"/v2/orgs/{self.org_id}/")
+    def url_with_org_and_pathogen(self, path):
+        """Constructs a URL that contains org and pathogen info.
+
+        Some endpoints need the org and pathogen to choose what view code does.
+        - org is MANDATORY if hitting an endpoint that involves it. If we call
+          this without an org_id available, raises an exception.
+        - pathogen is optional. If it's not provided in the URL, the BE will
+          default the pathogen (currently to SC2).
+        """
+        if not self.org_id:
+            err_msg = ("The endpoint this command uses requires an org_id.\n"
+                "You need to use the `--org` option with the primary key id "
+                "(or set a CZGE_ORG env var\nwith the id) for the desired org. "
+                "You can see what orgs your user account can access by\n"
+                "running the aspencli `user me` command and looking at `groups`."
+                )
+            raise click.UsageError(err_msg)
+        path_replacement = f"/v2/orgs/{self.org_id}/"
+        if self.pathogen_slug:
+            path_replacement += f"pathogens/{self.pathogen_slug}/"
+        path = path.replace("/v2/", path_replacement)
         logging.info(f"path: {path}")
         return path
 
-    def get_with_org(self, path, **kwargs):
-        url = self.url_with_org(path)
+    def get_with_org_and_pathogen(self, path, **kwargs):
+        url = self.url_with_org_and_pathogen(path)
         return self.get(url, **kwargs)
 
-    def delete_with_org(self, path, **kwargs):
-        url = self.url_with_org(path)
+    def delete_with_org_and_pathogen(self, path, **kwargs):
+        url = self.url_with_org_and_pathogen(path)
         return self.delete(url, **kwargs)
 
-    def put_with_org(self, path, **kwargs):
-        url = self.url_with_org(path)
+    def put_with_org_and_pathogen(self, path, **kwargs):
+        url = self.url_with_org_and_pathogen(path)
         return self.put(url, **kwargs)
 
-    def post_with_org(self, path, **kwargs):
-        url = self.url_with_org(path)
+    def post_with_org_and_pathogen(self, path, **kwargs):
+        url = self.url_with_org_and_pathogen(path)
         return self.post(url, **kwargs)
 
     def get(self, path, **kwargs):
@@ -237,9 +256,10 @@ class CliConfig:
         self.api = api
         self.env = env
 
-    def get_api_client(self, org_id):
+    def get_api_client(self, org_id, pathogen_slug):
         auth_config = self.oauth_config["default"]
         self.org_id = org_id
+        self.pathogen_slug = pathogen_slug
         if self.env in self.oauth_config:
             auth_config = self.oauth_config[self.env]
 
@@ -250,7 +270,7 @@ class CliConfig:
             oauth_api_config=auth_config["oauth_api_config"],
             verify=auth_config["verify"],
         )
-        api_client = ApiClient(self.api, token_handler, org_id)
+        api_client = ApiClient(self.api, token_handler, org_id, pathogen_slug)
         return api_client
 
 
@@ -269,6 +289,12 @@ class CliConfig:
     help="Org context for requests",
 )
 @click.option(
+    "--pathogen-slug",
+    required=False,
+    type=str,
+    help="Pathogen context for requests. If not provided, uses default.",
+)
+@click.option(
     "--api",
     help="Aspen API endpoint to use - this overrides the default value chosen by the --env flag",
 )
@@ -277,11 +303,11 @@ class CliConfig:
     help="Aspen rdev stack to query",
 )
 @click.pass_context
-def cli(ctx, env, org, api, stack):
+def cli(ctx, env, org, pathogen_slug, api, stack):
     ctx.ensure_object(dict)
     config = CliConfig(env, api, stack)
     ctx.obj["config"] = config
-    ctx.obj["api_client"] = config.get_api_client(org)
+    ctx.obj["api_client"] = config.get_api_client(org, pathogen_slug)
 
 
 @cli.group()
@@ -296,7 +322,7 @@ def usher():
 def get_link(ctx, sample_ids, sample_count = 50):
     api_client = ctx.obj["api_client"]
     payload = {"samples": sample_ids, "downstream_consumer": "USHER"}
-    resp = api_client.post_with_org("/v2/sequences/getfastaurl", json=payload)
+    resp = api_client.post_with_org_and_pathogen("/v2/sequences/getfastaurl", json=payload)
     resp_info = resp.json()
     s3_url = resp_info["url"]
     print(
@@ -519,7 +545,7 @@ def download_tree(ctx, tree_id, public_ids):
         params["id_style"] = "public"
     else:
         params["id_style"] = "private"
-    resp = api_client.get_with_org(f"/v2/phylo_trees/{tree_id}/download", params=params)
+    resp = api_client.get_with_org_and_pathogen(f"/v2/phylo_trees/{tree_id}/download", params=params)
     print(resp.text)
 
 
@@ -534,7 +560,7 @@ def get_selected_samples(ctx, tree_id, public_ids):
         params["id_style"] = "public"
     else:
         params["id_style"] = "private"
-    resp = api_client.get_with_org(
+    resp = api_client.get_with_org_and_pathogen(
         f"/v2/phylo_trees/{tree_id}/sample_ids", params=params
     )
     print(resp.text)
@@ -625,7 +651,7 @@ def samples():
 @click.pass_context
 def list_samples(ctx):
     api_client = ctx.obj["api_client"]
-    resp = api_client.get_with_org("/v2/samples/")
+    resp = api_client.get_with_org_and_pathogen("/v2/samples/")
     print(resp.text)
 
 
@@ -640,7 +666,7 @@ def download_samples(ctx, sample_ids, repository):
     payload = {"sample_ids": sample_ids}
     if repository:
         payload["public_repository_name"] = repository
-    resp = api_client.post_with_org("/v2/sequences/", json=payload)
+    resp = api_client.post_with_org_and_pathogen("/v2/sequences/", json=payload)
     print(resp.headers)
     print(resp.text)
 
@@ -651,11 +677,11 @@ def download_samples(ctx, sample_ids, repository):
 def delete_samples(ctx, sample_ids):
     api_client = ctx.obj["api_client"]
     if len(sample_ids) == 1:
-        resp = api_client.delete_with_org(f"/v2/samples/{sample_ids[0]}")
+        resp = api_client.delete_with_org_and_pathogen(f"/v2/samples/{sample_ids[0]}")
         print(resp.headers)
         print(resp.text)
         return
-    resp = api_client.delete_with_org(f"/v2/samples/", json={"ids": sample_ids})
+    resp = api_client.delete_with_org_and_pathogen(f"/v2/samples/", json={"ids": sample_ids})
     print(resp.headers)
     print(resp.text)
 
@@ -701,7 +727,7 @@ def update_samples(
 ):
     api_client = ctx.obj["api_client"]
     if json:
-        resp = api_client.put_with_org(f"/v2/samples/", json=json.loads(json_data))
+        resp = api_client.put_with_org_and_pathogen(f"/v2/samples/", json=json.loads(json_data))
         print(resp.text)
     else:
         if collection_date:
@@ -724,7 +750,7 @@ def update_samples(
             sample["public_identifier"] = public_id
         if private_id:
             sample["private_identifier"] = private_id
-        resp = api_client.put_with_org(f"/v2/samples/", json={"samples": [sample]})
+        resp = api_client.put_with_org_and_pathogen(f"/v2/samples/", json={"samples": [sample]})
         print(resp.text)
 
 
@@ -787,7 +813,7 @@ def create_samples(
     # Remove None fields
     print(sample)
     body = [sample]
-    resp = api_client.post_with_org("/v2/samples/", json=body)
+    resp = api_client.post_with_org_and_pathogen("/v2/samples/", json=body)
     print(resp.text)
 
 
@@ -817,7 +843,7 @@ def start_phylo_run_v2(ctx, name, tree_type, template_args, sample_ids, show_hea
     if template_args:
         payload["template_args"] = json.loads(template_args)
     print(json.dumps(payload))
-    resp = api_client.post_with_org("/v2/phylo_runs/", json=payload)
+    resp = api_client.post_with_org_and_pathogen("/v2/phylo_runs/", json=payload)
     if show_headers:
         print(resp.headers)
     print(resp.text)
@@ -833,7 +859,7 @@ def update_phylorun(ctx, run_id, name):
     body = {
         "name": name,
     }
-    resp = api_client.put_with_org(f"/v2/phylo_runs/{run_id}", json=body)
+    resp = api_client.put_with_org_and_pathogen(f"/v2/phylo_runs/{run_id}", json=body)
     print(resp.headers)
     print(resp.text)
 
@@ -845,7 +871,7 @@ def update_phylorun(ctx, run_id, name):
 def validate_sample_ids(ctx, sample_ids, show_headers):
     api_client = ctx.obj["api_client"]
     payload = {"sample_ids": sample_ids}
-    resp = api_client.post_with_org("/v2/samples/validate_ids/", json=payload)
+    resp = api_client.post_with_org_and_pathogen("/v2/samples/validate_ids/", json=payload)
     if show_headers:
         print(resp.headers)
     print(resp.text)
@@ -858,7 +884,7 @@ def validate_sample_ids(ctx, sample_ids, show_headers):
 def delete_runs(ctx, run_ids):
     api_client = ctx.obj["api_client"]
     for run_id in run_ids:
-        resp = api_client.delete_with_org(f"/v2/phylo_runs/{run_id}")
+        resp = api_client.delete_with_org_and_pathogen(f"/v2/phylo_runs/{run_id}")
         print(resp.headers)
         print(resp.text)
 
@@ -868,9 +894,24 @@ def delete_runs(ctx, run_ids):
 @click.pass_context
 def list_runs(ctx, print_headers):
     api_client = ctx.obj["api_client"]
-    resp = api_client.get_with_org(f"/v2/phylo_runs/")
+    resp = api_client.get_with_org_and_pathogen(f"/v2/phylo_runs/")
     if print_headers:
         print(resp.headers)
+    print(resp.text)
+
+
+@cli.group()
+def qc_mutations():
+    pass
+
+
+@qc_mutations.command(name="download")
+@click.argument("sample_ids", nargs=-1)
+@click.pass_context
+def download_qc_mutations_output(ctx, sample_ids):
+    api_client = ctx.obj["api_client"]
+    payload = {"sample_ids": sample_ids}
+    resp = api_client.post_with_org_and_pathogen("/v2/qc_mutations/", json=payload)
     print(resp.text)
 
 

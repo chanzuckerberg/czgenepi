@@ -76,7 +76,10 @@ const SampleTableModalManager = ({
         checkedSamples={checkedSamples}
         failedSampleIds={failedSampleIds}
         open={isDownloadModalOpen}
-        onClose={() => setIsDownloadModalOpen(false)}
+        onClose={() => {
+          setIsDownloadModalOpen(false);
+          clearCheckedSamples();
+        }}
       />
       <CreateNSTreeModal
         checkedSampleIds={checkedSampleIds}

@@ -91,6 +91,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleDownloadClose = () => {
     setDownloadModalOpen(false);
+    setCheckedSampleIds([]);
   };
 
   useEffect(() => {
