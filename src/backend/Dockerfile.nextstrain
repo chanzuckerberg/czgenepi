@@ -46,14 +46,6 @@ RUN mkdir /ncov && \
     git fetch origin czgenepi && \
     git reset --hard FETCH_HEAD
 
-# Add a ncov fork that includes a subsampling script.
-RUN mkdir /subsampling && \
-    cd /subsampling && \
-    git init && \
-    git remote add origin https://github.com/chanzuckerberg/ncov.git && \
-    git fetch origin subsampling-script && \
-    git reset --hard FETCH_HEAD
-
 # Add support for our custom mpox workflow
 RUN mkdir /mpox && \
     cd /mpox && \
