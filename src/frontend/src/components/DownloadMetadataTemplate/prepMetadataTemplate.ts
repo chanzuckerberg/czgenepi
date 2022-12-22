@@ -21,7 +21,7 @@ export const TEMPLATE_UPDATED_DATE: PathogenConfigType<TemplateUpdatedDate> = {
     updatedDate: "2022-02-22", // YYYY-MM-DD
   },
   [Pathogen.MONKEY_POX]: {
-    updatedDate: "2022-12-01", // YYYY-MM-DD
+    updatedDate: "2022-12-22", // YYYY-MM-DD
   },
 };
 
