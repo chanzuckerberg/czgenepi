@@ -3,10 +3,9 @@ import { Banner } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { B } from "src/common/styles/basicStyle";
 
-const PRIVACY_BANNER_EXPIRATION = "2023-02-01T00:00:00"
+const PRIVACY_BANNER_EXPIRATION = "2023-02-01T00:00:00";
 
 export const Announcements = (): JSX.Element => {
-
   // Remove on or after Feb 1, 2023
   const shouldRenderPrivacyBanner = () => {
     const today = new Date();
@@ -29,9 +28,5 @@ export const Announcements = (): JSX.Element => {
     </>
   );
 
-  return (
-    <>
-      {shouldRenderPrivacyBanner() && renderPrivacyBanner()}
-    </>
-  );
+  return <>{shouldRenderPrivacyBanner() && renderPrivacyBanner()}</>;
 };
