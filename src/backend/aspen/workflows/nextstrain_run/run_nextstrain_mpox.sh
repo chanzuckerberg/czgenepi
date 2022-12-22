@@ -43,7 +43,7 @@ aligned_upstream_location=$(
            --phylo-run-id "${WORKFLOW_ID}"                               \
            --sequences /monkeypox/data/sequences_czge.fasta              \
            --metadata /monkeypox/data/metadata_czge.tsv                  \
-           --selected /monkeypox/config/include.txt                        \
+           --selected /monkeypox/data/include.txt                        \
            --resolved-template-args "${RESOLVED_TEMPLATE_ARGS_SAVEFILE}" \
            --builds-file /monkeypox/config/config.yaml                   \  # TODO - subsampling.yaml needs to be written too!
            --reset-status
