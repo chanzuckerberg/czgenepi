@@ -13,6 +13,9 @@ class TreeTypePlugin(BaseConfigPlugin):
     subsampling_scheme: str = "NONE"
 
     def _update_config_params(self, config):
+        if not config.get("builds"):
+            # TODO, force MPX structure to look more like SC2's
+            config["builds"] = {"aspen": {}}
         build = config["builds"]["aspen"]
 
         location = self.template_args["location"]
@@ -61,10 +64,12 @@ class TreeTypePlugin(BaseConfigPlugin):
                 end_date=end_date,
             )
 
-        config["files"]["description"] = config["files"]["description"].format(
-            tree_type=self.subsampling_scheme.lower()
-        )
-        config["priorities"]["crowding_penalty"] = self.crowding_penalty
+        if config.get("files"):
+            config["files"]["description"] = config["files"]["description"].format(
+                tree_type=self.subsampling_scheme.lower()
+            )
+        if config.get("priorities"):
+            config["priorities"]["crowding_penalty"] = self.crowding_penalty
 
     def _get_formatted_tree_end_date(self):
         """Returns appropriate YYYY-MM-DD for tree's end date or "--" if none.

@@ -12,4 +12,15 @@ class SC2Plugin(PathogenPlugin):
 
 class MPXPlugin(PathogenPlugin):
     def update_config(self, config):
-        pass
+        build_config = {}
+        try:
+            build_config = config["builds"]["aspen"]
+            config["subsampling_scheme"] = build_config["subsampling_scheme"]
+            del config["builds"]
+        except KeyError:
+            pass
+        print(build_config)
+        subsampling_scheme = config["subsampling_scheme"]
+        for _, sample in config["subsampling"][subsampling_scheme].items():
+            if sample.get("query"):
+                sample["query"] = sample["query"].format(**build_config)
