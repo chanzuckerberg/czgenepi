@@ -31,7 +31,7 @@ echo "* set \$aspen_s3_db_bucket"
 aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 set -x
 
-mkdir -p /mpox/data /mpox/results
+mkdir -p /mpox/data /mpox/results /mpox/logs
 key_prefix="phylo_run/${S3_FILESTEM}/${WORKFLOW_ID}"
 s3_prefix="s3://${aspen_s3_db_bucket}/${key_prefix}"
 
@@ -56,8 +56,10 @@ aligned_upstream_sequences_s3_key=$(echo "${aligned_upstream_location}" | jq -r 
 aligned_upstream_metadata_s3_key=$(echo "${aligned_upstream_location}" | jq -r .metadata_key)
 
 # fetch the upstream dataset
-$aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_sequences_s3_key}" /mpox/data/
-$aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_metadata_s3_key}" /mpox/data/
+$aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_sequences_s3_key}" /mpox/data/sequences.fasta.xz
+$aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_metadata_s3_key}" /mpox/data/metadata.tsv.xz
+
+unxz /mpox/data/*.xz
 
 # If we've written out any samples, add them to the upstream metadata/fasta files
 if [ -e /mpox/data/sequences_czge.fasta ]; then
