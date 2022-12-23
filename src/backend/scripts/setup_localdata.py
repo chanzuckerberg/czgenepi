@@ -428,7 +428,7 @@ def create_test_trees(session, group, pathogen, user):
 
 
 def create_alignment_entity(session, pathogen, repository):
-    aligned_workflow = session.query(AlignedRepositoryData).first()
+    aligned_workflow = session.query(AlignedRepositoryData).where(AlignedRepositoryData.pathogen == pathogen).first()
     if aligned_workflow:
         print("Aligned Repository Dump already exists")
         return

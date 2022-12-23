@@ -163,6 +163,13 @@ class ApiClient:
                 "running the aspencli `user me` command and looking at `groups`."
                 )
             raise click.UsageError(err_msg)
+        if not self.pathogen_slug:
+            err_msg = ("The endpoint this command uses requires a pathogen slug.\n"
+                "You need to use the `--pathogen-slug` option with the slug \n"
+                "(or set a CZGE_PATHOGEN env var with the slug) for the desired pathogen."
+            )
+            raise click.UsageError(err_msg)
+
         path_replacement = f"/v2/orgs/{self.org_id}/"
         if self.pathogen_slug:
             path_replacement += f"pathogens/{self.pathogen_slug}/"
@@ -292,6 +299,7 @@ class CliConfig:
     "--pathogen-slug",
     required=False,
     type=str,
+    default=lambda: os.environ.get("CZGE_PATHOGEN"),
     help="Pathogen context for requests. If not provided, uses default.",
 )
 @click.option(

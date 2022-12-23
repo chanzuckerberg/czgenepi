@@ -72,5 +72,7 @@ ENV PYTHONPATH=.
 COPY . .
 # Install the aspen package
 RUN poetry install
+RUN chmod a+w /ncov/auspice /ncov/logs
+RUN chmod a+w /mpox/ /mpox/config
 
 WORKDIR /nextstrain

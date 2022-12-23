@@ -31,6 +31,7 @@ echo "* set \$aspen_s3_db_bucket"
 aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 set -x
 
+mkdir -p /mpox/data /mpox/results
 key_prefix="phylo_run/${S3_FILESTEM}/${WORKFLOW_ID}"
 s3_prefix="s3://${aspen_s3_db_bucket}/${key_prefix}"
 
@@ -38,14 +39,15 @@ s3_prefix="s3://${aspen_s3_db_bucket}/${key_prefix}"
 RESOLVED_TEMPLATE_ARGS_SAVEFILE=/tmp/resolved_template_args.json
 
 # dump the sequences, metadata, and builds.yaml for a run out to disk.
+# TODO -- we need to emit *aligned* mpox sequences!!!
 aligned_upstream_location=$(
     python3 /usr/src/app/aspen/workflows/nextstrain_run/export.py        \
            --phylo-run-id "${WORKFLOW_ID}"                               \
-           --sequences /monkeypox/data/sequences_czge.fasta              \
-           --metadata /monkeypox/data/metadata_czge.tsv                  \
-           --selected /monkeypox/data/include.txt                        \
+           --sequences /mpox/data/sequences_czge.fasta                   \
+           --metadata /mpox/data/metadata_czge.tsv                       \
+           --selected /mpox/data/include.txt                             \
            --resolved-template-args "${RESOLVED_TEMPLATE_ARGS_SAVEFILE}" \
-           --builds-file /monkeypox/config/build.yaml                    \ 
+           --builds-file /mpox/config/build_czge.yaml                    \
            --reset-status
 )
 
@@ -54,27 +56,26 @@ aligned_upstream_sequences_s3_key=$(echo "${aligned_upstream_location}" | jq -r 
 aligned_upstream_metadata_s3_key=$(echo "${aligned_upstream_location}" | jq -r .metadata_key)
 
 # fetch the upstream dataset
-$aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_sequences_s3_key}" /monkeypox/data/
-$aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_metadata_s3_key}" /monkeypox/data/
+$aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_sequences_s3_key}" /mpox/data/
+$aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_metadata_s3_key}" /mpox/data/
 
 # If we've written out any samples, add them to the upstream metadata/fasta files
-if [ -e /monkeypox/data/sequences_czge.fasta ]; then
+if [ -e /mpox/data/sequences_czge.fasta ]; then
     # Skip the TSV header when appending
-    tail +2 /monkeypox/data/metadata_czge.tsv > /monkeypox/data/metadata.tsv
-    cat /monkeypox/data/sequences_czge.fasta > /monkeypox/data/sequences.fasta
+    tail +2 /mpox/data/metadata_czge.tsv > /mpox/data/metadata.tsv
+    cat /mpox/data/sequences_czge.fasta > /mpox/data/sequences.fasta
 fi;
 
 # Persist the build config we generated.
-$aws s3 cp /monkeypox/config/config.yaml "${s3_prefix}/config.yaml"
-$aws s3 cp /monkeypox/config/config.yaml "${s3_prefix}/subsampling.yaml"
-$aws s3 cp /monkeypox/config/include.txt "${s3_prefix}/include.txt"
+$aws s3 cp /mpox/config/build_czge.yaml "${s3_prefix}/build_czge.yaml"
+$aws s3 cp /mpox/config/include.txt "${s3_prefix}/include.txt"
 
 # run snakemake, if run fails export the logs from snakemake and ncov to s3
-(cd /monkeypox && snakemake --printshellcmds --configfile config/config.yaml --resources=mem_mb=312320) || { $aws s3 cp /monkeypox/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /monkeypox/logs/ "${s3_prefix}/logs/ncov/" --recursive ; }
+(cd /mpox && snakemake --printshellcmds --configfile config/build_czge.yaml --resources=mem_mb=312320) || { $aws s3 cp /mpox/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /mpox/logs/ "${s3_prefix}/logs/ncov/" --recursive ; }
 
 # upload the tree to S3. The variable key is created to use later
-key="${key_prefix}/ncov_aspen.json"
-$aws s3 cp /monkeypox/results/mpxv/tree.json "s3://${aspen_s3_db_bucket}/${key}"
+key="${key_prefix}/mpx_czge.json"
+$aws s3 cp /mpox/results/mpxv/tree.json "s3://${aspen_s3_db_bucket}/${key}"
 
 # update aspen
 aspen_workflow_rev=WHATEVER
