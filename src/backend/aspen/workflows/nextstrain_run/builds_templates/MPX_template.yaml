@@ -1,0 +1,142 @@
+subsampling_scheme: "OVERVIEW"
+
+exclude: "config/exclude_accessions_mpxv.txt"
+reference: "config/reference.fasta"
+genemap: "config/genemap.gff"
+genbank_reference: "config/reference.gb"
+colors: "config/colors_mpxv.tsv"
+lat_longs: "config/lat_longs.tsv"
+auspice_config: "config/auspice_config_mpxv.json"
+description: "config/description.md"
+clades: "config/clades.tsv"
+tree_mask: "config/tree_mask.tsv"
+
+strain_id_field: "accession"
+display_strain_field: "strain_original"
+
+build_name: "mpxv"
+auspice_name: "monkeypox_mpxv"
+
+## align
+max_indel: 10000
+seed_spacing: 1000
+
+## treefix
+fix_tree: true
+
+## refine
+timetree: false
+root: "min_dev"
+clock_rate: 3e-6
+clock_std_dev: 6e-6
+
+## recency
+recency: true
+
+mask:
+  from_beginning: 1350
+  from_end: 6422
+  maskfile: "config/mask_overview.bed"
+
+## Subsampling schemas
+subsampling:
+
+  OVERVIEW:
+    root:
+      exclude: "--exclude-where 'root_ref!=yes'"
+
+    group:
+      group_by: "year month"
+      max_sequences: 2000
+      query: --query "(location == '{location}') & (division == '{division}')"
+
+    state:
+      group_by: "location year month"
+      max_sequences: 500
+      query: --query "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
+      priorities:
+        type: "proximity"
+        focus: "group"
+
+    country:
+      group_by: "division year month"
+      max_sequences: 400
+      query: --query "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
+      priorities:
+        type: "proximity"
+        focus: "group"
+
+    international:
+      group_by: "region year month"
+      max_sequences: 100
+      query: --query "(country != '{country}')" # exclude add'l samples from USA
+      priorities:
+          type: "proximity"
+          focus: "group"
+
+    international_serial_sampling:
+      group_by: "region year month"
+      seq_per_group: 2
+      query: --query "(country != '{country}')"
+
+
+
+  TARGETED:
+    root:
+      exclude: "--exclude-where 'root_ref!=yes'"
+
+    focal:
+      exclude: "--exclude-all"
+
+    closest:
+      max_sequences: 100
+      priorities:
+        type: "proximity"
+        focus: "focal"
+
+    group:
+      group_by: "year month"
+      max_sequences: 25
+      query: --query "(location == '{location}') & (division == '{division}')"
+      priorities:
+        type: "proximity"
+        focus: "focal"
+
+    state:
+      group_by: "location year month"
+      max_sequences: 25
+      query: --query "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
+      priorities:
+        type: "proximity"
+        focus: "focal"
+
+    country:
+      group_by: "division year month"
+      max_sequences: 25
+      query: --query "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
+      priorities:
+        type: "proximity"
+        focus: "focal"
+
+    international:
+      group_by: "region year month"
+      max_sequences: 25
+      query: --query "(country != '{country}')" # exclude add'l samples from USA
+      priorities:
+        type: "proximity"
+        focus: "focal"
+
+    international_serial_sampling:
+      group_by: "region year month"
+      seq_per_group: 2
+      query: --query "(country != '{country}')"
+
+
+  NON_CONTEXTUALIZED:
+    root:
+      exclude: "--exclude-where 'root_ref!=yes'"
+
+    group:
+      group_by: "year month"
+      max_sequences: 2000
+      query: --query "(location == '{location}') & (division == '{division}')"

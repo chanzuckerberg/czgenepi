@@ -25,7 +25,7 @@ class TemplateBuilder:
         self.template_args = template_args
         self.kwargs = kwargs
         self.template = None
-        self.template_file: str = "/usr/src/app/aspen/workflows/nextstrain_run/builds_templates/mega_template.yaml"
+        self.template_file: str = f"/usr/src/app/aspen/workflows/nextstrain_run/builds_templates/{pathogen.slug}_template.yaml"
 
         # Update our "build" section
         self.plugins = []
