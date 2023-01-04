@@ -36,12 +36,6 @@ const TreeActionMenu = ({
   onDeleteTreeModalOpen,
   onEditTreeModalOpen,
 }: Props): JSX.Element => {
-  const flag = useTreatments([USER_FEATURE_FLAGS.galago_integration]);
-  const isGalagoIntegrationFlagOn = isUserFlagOn(
-    flag,
-    USER_FEATURE_FLAGS.galago_integration
-  );
-
   const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
   const usesTableRefactor = isUserFlagOn(
     tableRefactorFlag,
@@ -56,11 +50,10 @@ const TreeActionMenu = ({
       <StyledActionWrapper>
         <OpenInNextstrainButton item={item} />
       </StyledActionWrapper>
-      {isGalagoIntegrationFlagOn && (
-        <StyledActionWrapper>
-          <OpenInGalagoButton item={item} />
-        </StyledActionWrapper>
-      )}
+      <StyledActionWrapper>
+        <OpenInGalagoButton item={item} />
+      </StyledActionWrapper>
+
       <StyledActionWrapper>
         <TreeTableDownloadMenu item={item} />
       </StyledActionWrapper>
