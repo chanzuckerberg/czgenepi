@@ -1,3 +1,4 @@
+import datetime
 import json
 from typing import Any, List, Optional, Tuple
 
@@ -1177,6 +1178,7 @@ async def test_update_samples_success(
     ]
     location_fields = ["collection_location"]
     genome_fields = ["sequencing_date"]
+    current_year = datetime.date.today().strftime("%Y")
     for sample_id, expected in reorganized_data.items():
         # pull sample from the database to verify sample was updated correctly
         q = await async_session.execute(
@@ -1194,7 +1196,7 @@ async def test_update_samples_success(
             request_field_value = expected[field]
             if field == "public_identifier" and request_field_value is None:
                 request_field_value = (
-                    f"{repo_prefix}/USA/testgroupNone-{sample_id}/2022"
+                    f"{repo_prefix}/USA/testgroupNone-{sample_id}/{current_year}"
                 )
             # Handle location fields
             if field in location_fields:
