@@ -139,12 +139,6 @@ export const CreateNSTreeModal = ({
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
 
-  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isUserFlagOn(
-    flag,
-    USER_FEATURE_FLAGS.tree_location_filter
-  );
-
   const handleFilterChange = (onChangeFilter: () => void): void => {
     setIsFilterEnabled(true);
     onChangeFilter();
@@ -368,19 +362,16 @@ export const CreateNSTreeModal = ({
                 </StyledInfoIconWrapper>
               </StyledTooltip>
             </TreeNameInfoWrapper>
-            {isTreeLocationFilterFlagOn && (
-              <TreeTypeSubtext>
-                Samples already selected on the sample table or included by ID
-                in the bottom section will always be force-included on your
-                tree.{" "}
-                <Link
-                  href="https://help.czgenepi.org/hc/en-us/articles/6712563575956-Build-on-demand-trees#generating"
-                  target="_blank"
-                >
-                  Learn More.
-                </Link>
-              </TreeTypeSubtext>
-            )}
+            <TreeTypeSubtext>
+              Samples already selected on the sample table or included by ID in
+              the bottom section will always be force-included on your tree.{" "}
+              <Link
+                href="https://help.czgenepi.org/hc/en-us/articles/6712563575956-Build-on-demand-trees#generating"
+                target="_blank"
+              >
+                Learn More.
+              </Link>
+            </TreeTypeSubtext>
             <RadioGroup value={treeType} onChange={handleChangeTreeType}>
               <StyledFormControlLabel
                 value={TreeTypes.Overview}
