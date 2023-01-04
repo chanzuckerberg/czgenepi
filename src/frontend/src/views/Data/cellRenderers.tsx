@@ -107,7 +107,7 @@ const PrivateId = ({
       <div>
         <b>Quality Score: </b> Overall QC score from Nextclade which considers
         genome completion and screens for potential contamination and sequencing
-        or bioinformatics errors.
+        or bioinformatics errors.{" "}
         <NewTabLink
           href={
             "https://docs.nextstrain.org/projects/nextclade/en/stable/user/algorithm/07-quality-control.html"
