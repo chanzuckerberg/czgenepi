@@ -245,7 +245,7 @@ export type AnalyticsSamplesDownloadFile = {
   includes_genbank_template: boolean;
   // User downloaded gisaid template for these samples
   includes_gisaid_template: boolean;
-  // User downloaded nextclade data for these samples (CSV)
+  // User downloaded nextclade data for these samples (TSV)
   includes_nextclade_data: boolean;
   // User downloaded info on metadata for these samples
   includes_sample_metadata: boolean;
