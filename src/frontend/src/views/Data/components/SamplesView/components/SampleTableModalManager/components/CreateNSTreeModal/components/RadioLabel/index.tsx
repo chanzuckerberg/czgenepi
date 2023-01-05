@@ -1,11 +1,8 @@
 // eslint-disable @typescript-eslint/explicit-member-accessibility
 import ListItemText from "@mui/material/ListItemText";
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon, List } from "czifui";
 import { useSelector } from "react-redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { ResetFiltersType } from "../..";
 import { SampleFiltering } from "../SampleFiltering";
 import {
@@ -15,7 +12,7 @@ import {
 import { LineageFilterType } from "../SampleFiltering/components/LineageFilter";
 import { LocationFilterType } from "../SampleFiltering/components/LocationFilter";
 import { TargetedFiltering } from "../TargetedFiltering";
-import { pathogenStrings, tempLocationFilterCopyUpdates } from "./strings";
+import { pathogenStrings } from "./strings";
 import {
   Label,
   LabelMain,
@@ -55,26 +52,12 @@ export const RadioLabelOverview = ({
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
-  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isUserFlagOn(
-    flag,
-    USER_FEATURE_FLAGS.tree_location_filter
-  );
-
-  // While the feature flag is in use, merge the updated strings with the originals.
-  // When we remove the feature flag, remove this variable
-  const tempPathogenStringsWithCopyUpdates =
-    isTreeLocationFilterFlagOn && pathogen
-      ? { ...pathogenStrings[pathogen], ...tempLocationFilterCopyUpdates }
-      : pathogenStrings[pathogen];
-
   const {
     overviewDescription = "",
     overviewBestFor = "",
     overviewGoodFor1 = "",
     overviewGoodFor2 = "",
-    // When we remove the feature flag, change this line back to use pathogenStrings[pathogen]
-  } = pathogen ? tempPathogenStringsWithCopyUpdates : {};
+  } = pathogen ? pathogenStrings[pathogen] : {};
 
   return (
     <div>
@@ -146,25 +129,11 @@ export const RadioLabelTargeted = ({
 }: RadioLabelTargetedProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
-  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isUserFlagOn(
-    flag,
-    USER_FEATURE_FLAGS.tree_location_filter
-  );
-
-  // While the feature flag is in use, merge the updated strings with the originals.
-  // When we remove the feature flag, remove this variable
-  const tempPathogenStringsWithCopyUpdates =
-    isTreeLocationFilterFlagOn && pathogen
-      ? { ...pathogenStrings[pathogen], ...tempLocationFilterCopyUpdates }
-      : pathogenStrings[pathogen];
-
   const {
     targetedDescription = "",
     targetedBestFor = "",
     targetedGoodFor = "",
-    // When we remove the feature flag, change this line back to use pathogenStrings[pathogen]
-  } = pathogen ? tempPathogenStringsWithCopyUpdates : {};
+  } = pathogen ? pathogenStrings[pathogen] : {};
 
   return (
     <div>
@@ -192,15 +161,13 @@ export const RadioLabelTargeted = ({
               </ListItemText>
             </StyledListItem>
           </List>
-          {isTreeLocationFilterFlagOn && (
-            <TargetedFiltering
-              namedLocations={namedLocations}
-              selectedLocation={selectedLocation}
-              setSelectedLocation={setSelectedLocation}
-              isFilterEnabled={isFilterEnabled}
-              resetFilters={resetFilters}
-            />
-          )}
+          <TargetedFiltering
+            namedLocations={namedLocations}
+            selectedLocation={selectedLocation}
+            setSelectedLocation={setSelectedLocation}
+            isFilterEnabled={isFilterEnabled}
+            resetFilters={resetFilters}
+          />
         </>
       )}
     </div>
@@ -224,26 +191,12 @@ export const RadioLabelNonContextualized = ({
 }: TreeChoiceWithFilteringProps): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
 
-  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isUserFlagOn(
-    flag,
-    USER_FEATURE_FLAGS.tree_location_filter
-  );
-
-  // While the feature flag is in use, merge the updated strings with the originals.
-  // When we remove the feature flag, remove this variable
-  const tempPathogenStringsWithCopyUpdates =
-    isTreeLocationFilterFlagOn && pathogen
-      ? { ...pathogenStrings[pathogen], ...tempLocationFilterCopyUpdates }
-      : pathogenStrings[pathogen];
-
   const {
     nonContextualizedDescription = "",
     nonContextualizedBestFor = "",
     nonContextualizedGoodFor = "",
     nonContextualizedNotRecommended = "",
-    // When we remove the feature flag, change this line back to use pathogenStrings[pathogen]
-  } = pathogen ? tempPathogenStringsWithCopyUpdates : {};
+  } = pathogen ? pathogenStrings[pathogen] : {};
 
   return (
     <div>
