@@ -163,14 +163,6 @@ const FilterPanel: FC<Props> = ({
     const lineage = activeFilters.find((e) => e.key === "lineage");
     const qcStatuses = qcStatus?.params.multiSelected || [];
     const lineages = lineage?.params.multiSelected || [];
-    const uploadDateStartEnd = {
-      start: uploadDate?.params.start,
-      end: uploadDate?.params.end,
-    };
-    const collectionDateStartEnd = {
-      start: collectionDate?.params.start,
-      end: collectionDate?.params.end,
-    };
     analyticsTrackEvent<AnalyticsSamplesFilter>(EVENT_TYPES.SAMPLES_FILTER, {
       filtering_by_upload_date: !!uploadDate,
       filtering_by_collection_date: !!collectionDate,
@@ -178,8 +170,11 @@ const FilterPanel: FC<Props> = ({
       filtering_by_lineage: !!lineage,
       qc_statuses: JSON.stringify(qcStatuses),
       lineages: JSON.stringify(lineages),
-      upload_date_start_end: uploadDateStartEnd,
-      collection_date_start_end: collectionDateStartEnd,
+      // format dates to match YYYY-MM-DD
+      upload_date_start: uploadDate?.params.start?.toLocaleDateString("en-CA"),
+      upload_date_end: uploadDate?.params.end?.toLocaleDateString("en-CA"),
+      collection_date_start: collectionDate?.params.start?.toLocaleDateString("en-CA"),
+      collection_date_end: collectionDate?.params.end?.toLocaleDateString("en-CA"),
     });
   }, [activeFilters]);
 

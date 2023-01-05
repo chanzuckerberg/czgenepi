@@ -85,18 +85,12 @@ export enum EVENT_TYPES {
  * that kicks off the underlying Segment `track` by ensuring that all events
  * extend from that base structure.
  */
-type EventValue = string | number | boolean | FilterDate | null;
+type EventValue = string | number | boolean | null;
 export type EventData = Record<string, EventValue | undefined>;
 
 // While we only send values of EventValue, sometimes we send a JSON string.
 // For ease of readability below, we alias string for those cases.
 type JsonString = string;
-
-// For sending date types back to segment (e.g. for filtering on upload or collection dates)
-type FilterDate = {
-  start?: Date;
-  end?: Date;
-};
 
 /**
  * Structure of additionalEventData for each EVENT_TYPES type that sends it.
@@ -280,9 +274,11 @@ export type AnalyticsSamplesFilter = {
   // User is filtering by qcStatus
   filtering_by_qc_status: boolean;
   // Upload dates that user is filtering on
-  upload_date_start_end: FilterDate;
+  upload_date_start: FormattedDateType | null;
+  upload_date_end: FormattedDateType | null;
   // Collection dates that user is filtering on
-  collection_date_start_end: FilterDate;
+  collection_date_start: FormattedDateType | null;
+  collection_date_end: FormattedDateType | null;
   // Lineages that user is filtering on
   lineages: JsonString;
   // qcStatus that user is filtering on
