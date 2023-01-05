@@ -173,8 +173,10 @@ const FilterPanel: FC<Props> = ({
       // format dates to match YYYY-MM-DD
       upload_date_start: uploadDate?.params.start?.toLocaleDateString("en-CA"),
       upload_date_end: uploadDate?.params.end?.toLocaleDateString("en-CA"),
-      collection_date_start: collectionDate?.params.start?.toLocaleDateString("en-CA"),
-      collection_date_end: collectionDate?.params.end?.toLocaleDateString("en-CA"),
+      collection_date_start:
+        collectionDate?.params.start?.toLocaleDateString("en-CA"),
+      collection_date_end:
+        collectionDate?.params.end?.toLocaleDateString("en-CA"),
     });
   }, [activeFilters]);
 
