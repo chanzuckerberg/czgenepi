@@ -163,21 +163,32 @@ const FilterPanel: FC<Props> = ({
     const lineage = activeFilters.find((e) => e.key === "lineage");
     const qcStatuses = qcStatus?.params.multiSelected || [];
     const lineages = lineage?.params.multiSelected || [];
-    analyticsTrackEvent<AnalyticsSamplesFilter>(EVENT_TYPES.SAMPLES_FILTER, {
-      filtering_by_upload_date: !!uploadDate,
-      filtering_by_collection_date: !!collectionDate,
-      filtering_by_qc_status: !!qcStatus,
-      filtering_by_lineage: !!lineage,
-      qc_statuses: JSON.stringify(qcStatuses),
-      lineages: JSON.stringify(lineages),
-      // format dates to match YYYY-MM-DD
-      upload_date_start: uploadDate?.params.start?.toLocaleDateString("en-CA"),
-      upload_date_end: uploadDate?.params.end?.toLocaleDateString("en-CA"),
-      collection_date_start:
-        collectionDate?.params.start?.toLocaleDateString("en-CA"),
-      collection_date_end:
-        collectionDate?.params.end?.toLocaleDateString("en-CA"),
-    });
+
+    const anyFiltersActive: boolean[] = [
+      !!uploadDate,
+      !!collectionDate,
+      !!qcStatus,
+      !!lineage,
+    ];
+    // only trigger analytics event if any filters are active
+    if (anyFiltersActive.includes(true)) {
+      analyticsTrackEvent<AnalyticsSamplesFilter>(EVENT_TYPES.SAMPLES_FILTER, {
+        filtering_by_upload_date: !!uploadDate,
+        filtering_by_collection_date: !!collectionDate,
+        filtering_by_qc_status: !!qcStatus,
+        filtering_by_lineage: !!lineage,
+        qc_statuses: JSON.stringify(qcStatuses),
+        lineages: JSON.stringify(lineages),
+        // format dates to match YYYY-MM-DD
+        upload_date_start:
+          uploadDate?.params.start?.toLocaleDateString("en-CA"),
+        upload_date_end: uploadDate?.params.end?.toLocaleDateString("en-CA"),
+        collection_date_start:
+          collectionDate?.params.start?.toLocaleDateString("en-CA"),
+        collection_date_end:
+          collectionDate?.params.end?.toLocaleDateString("en-CA"),
+      });
+    }
   }, [activeFilters]);
 
   useEffect(() => {
