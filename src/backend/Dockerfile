@@ -1,4 +1,4 @@
-FROM python:3.9.1-slim AS build
+FROM python:3.10.1-slim-bullseye AS build
 ENV FLASK_APP=aspen.main
 RUN apt-get update && apt-get install -y vim build-essential libdigest-sha-perl wget unzip libdigest-sha-perl
 ENV POETRY_VERSION=1.1.15
@@ -21,7 +21,7 @@ RUN cp -r oso-czge-oso25/languages/python/oso/oso/* /usr/local/lib/python3.9/sit
 RUN cp -r oso-czge-oso25/languages/python/oso/polar/* /usr/local/lib/python3.9/site-packages/polar/
 
 # Separate base image so that we can use it to update the Pipfile.lock and requirements.txt file
-FROM python:3.9.1-slim AS base
+FROM python:3.10-slim-bullseye AS base
 ENV FLASK_APP=aspen.main
 EXPOSE 3000
 

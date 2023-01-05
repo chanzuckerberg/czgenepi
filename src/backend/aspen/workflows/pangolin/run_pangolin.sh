@@ -4,11 +4,6 @@
 set -Eeuxo pipefail
 shopt -s inherit_errexit  # no silent breaking
 
-# activate miniconda
-eval "$($HOME/miniconda/bin/conda shell.bash hook)"
-conda init
-conda activate pangolin
-
 # check pangolin is present:
 pangolin -pv
 

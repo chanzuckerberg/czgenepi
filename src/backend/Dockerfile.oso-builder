@@ -1,0 +1,19 @@
+FROM rust:1.63-buster AS rust
+RUN apt update && apt install -y jq
+RUN cd /tmp && git clone --depth 1 https://github.com/chanzuckerberg/oso.git
+RUN cd /tmp/oso && git checkout czge-oso25 && cargo build
+
+FROM python:3.9.1-slim AS python
+ENV OSO_ENV=CI
+ENV CIBW_SKIP="cp27-* cp35-* pp27-*"
+# 64-bit builds only
+ENV CIBW_BUILD="*64"
+ENV CIBW_ENVIRONMENT="OSO_ENV=CI"
+COPY --from=rust /tmp/oso /tmp/oso
+RUN apt update && apt install -y build-essential
+WORKDIR /tmp/oso
+RUN mkdir -p languages/python/oso/native
+RUN cp polar-c-api/polar.h languages/python/oso/native/polar.h
+RUN cp target/debug/libpolar.a languages/python/oso/native/libpolar.a
+RUN cd /tmp/oso/languages/python/oso && make build && python3 -m pip wheel . --wheel-dir=/tmp/wheels
+RUN cd /tmp/oso/languages/python/sqlalchemy-oso && make build && python3 -m pip wheel . --wheel-dir=/tmp/wheels
