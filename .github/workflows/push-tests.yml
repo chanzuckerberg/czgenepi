@@ -225,7 +225,7 @@ jobs:
           python3 -m pip install miniwdl
           make pipeline-test-gisaid
   build-push-images:
-    if: github.ref == 'refs/heads/trunk'
+    if: github.ref == 'refs/heads/trunk' || github.ref == 'refs/heads/jgadling/kill-conda'
     runs-on: ubuntu-20.04
     needs:
       - tf-lint
