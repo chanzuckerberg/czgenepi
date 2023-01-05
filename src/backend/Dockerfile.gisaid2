@@ -1,4 +1,0 @@
-FROM 473004499091.dkr.ecr.us-west-2.amazonaws.com/genepi-gisaid:branch-trunk
-WORKDIR /usr/src/app
-COPY . .
-WORKDIR /nextstrain
