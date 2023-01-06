@@ -1,13 +1,5 @@
 #!/bin/bash
 
-# activate miniconda
-eval "$($HOME/miniconda/bin/conda shell.bash hook)"
-conda init
-cd /pangolin
-conda activate pangolin
-git pull
-conda env update -f environment.yml
-pip install .
+pip3 install --upgrade git+https://github.com/cov-lineages/pangolin.git git+https://github.com/cov-lineages/pangolin-data.git
 
-# check pangolin is present:
 pangolin -pv
