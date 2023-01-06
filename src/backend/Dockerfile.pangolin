@@ -4,7 +4,7 @@ ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 ENV DEBIAN_FRONTEND=noninteractive
 USER root
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    git wget \
+    git wget curl bzip2 \
     ca-certificates \
     sudo python3 python3-pip
 RUN mkdir -p /usherbuild
@@ -49,6 +49,13 @@ RUN pip3 install pysam==0.19.1
 
 # libtbb doesn't install well on bullseye:
 RUN ln -s /usr/lib/x86_64-linux-gnu/libtbb.so.2 /usr/lib/x86_64-linux-gnu/libtbb_preview.so.2
+
+# Download gofasta and minimap2 for Pangolin
+RUN curl -fsSL https://github.com/virus-evolution/gofasta/releases/download/v0.0.6/gofasta-linux-amd64 \
+ -o /usr/local/bin/gofasta && chmod a+x /usr/local/bin/gofasta
+RUN curl -fsSL https://github.com/lh3/minimap2/releases/download/v2.24/minimap2-2.24_x64-linux.tar.bz2 \
+  | tar xjvpf - --no-same-owner --strip-components=1 -C /usr/local/bin minimap2-2.24_x64-linux/minimap2 \
+  && chmod a+x /usr/local/bin/gofasta
 
 COPY --from=usher \
     /usherbuild/usher/build/compareVCF \
