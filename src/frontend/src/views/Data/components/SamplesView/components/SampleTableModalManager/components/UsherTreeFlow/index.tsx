@@ -12,7 +12,6 @@ import { UsherPlacementModal } from "./components/UsherPlacementModal";
 
 interface Props {
   checkedSampleIds: string[];
-  failedSampleIds: string[];
   badQCSampleIds: string[];
   shouldStartUsherFlow: boolean;
 }
@@ -47,7 +46,6 @@ const generateUsherLink = (
 
 const UsherTreeFlow = ({
   checkedSampleIds,
-  failedSampleIds,
   badQCSampleIds,
   shouldStartUsherFlow,
 }: Props): JSX.Element => {
@@ -112,7 +110,6 @@ const UsherTreeFlow = ({
     <>
       <UsherPlacementModal
         checkedSampleIds={checkedSampleIds}
-        failedSampleIds={failedSampleIds}
         badQCSampleIds={badQCSampleIds}
         open={isPlacementOpen}
         onClose={() => setIsPlacementOpen(false)}

@@ -16,7 +16,6 @@ const SampleTableModalManager = ({
   clearCheckedSamples,
 }: Props): JSX.Element => {
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
-  const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
   const [badQCSampleIds, setBadQCSampleIds] = useState<string[]>([]);
   const [canEditSamples, setCanEditSamples] = useState<boolean>(false);
 
@@ -34,15 +33,11 @@ const SampleTableModalManager = ({
   // generate ID lists from sample objects
   useEffect(() => {
     const checkedIds = checkedSamples.map((s) => s.publicId);
-    const failedIds = checkedSamples
-      .filter((s) => s.CZBFailedGenomeRecovery)
-      .map((s) => s.publicId);
     const badQCIds = checkedSamples
       // for now there should only ever be one qcMetrics entry per sample
       .filter((s) => s.qcMetrics[0].qc_status === "Bad")
       .map((s) => s.publicId);
     setCheckedSampleIds(checkedIds);
-    setFailedSampleIds(failedIds);
     setBadQCSampleIds(badQCIds);
   }, [checkedSamples]);
 
@@ -74,7 +69,6 @@ const SampleTableModalManager = ({
     <>
       <DownloadModal
         checkedSamples={checkedSamples}
-        failedSampleIds={failedSampleIds}
         open={isDownloadModalOpen}
         onClose={() => {
           setIsDownloadModalOpen(false);
@@ -83,14 +77,12 @@ const SampleTableModalManager = ({
       />
       <CreateNSTreeModal
         checkedSampleIds={checkedSampleIds}
-        failedSampleIds={failedSampleIds}
         badQCSampleIds={badQCSampleIds}
         open={isNSCreateTreeModalOpen}
         onClose={() => setIsNSCreateTreeModalOpen(false)}
       />
       <UsherTreeFlow
         checkedSampleIds={checkedSampleIds}
-        failedSampleIds={failedSampleIds}
         badQCSampleIds={badQCSampleIds}
         shouldStartUsherFlow={shouldStartUsherFlow}
       />

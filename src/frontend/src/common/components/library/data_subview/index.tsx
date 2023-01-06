@@ -50,7 +50,6 @@ const DataSubview: FunctionComponent<Props> = ({
   const [searchResults, setSearchResults] = useState<TableItem[]>([]);
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
-  const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
   const [badQCSampleIds, setBadQCSampleIds] = useState<string[]>([]);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
@@ -202,21 +201,18 @@ const DataSubview: FunctionComponent<Props> = ({
               checkedSamples={(tableData as Sample[]).filter((sample) =>
                 checkedSampleIds.includes(String(sample["publicId"]))
               )}
-              failedSampleIds={failedSampleIds}
               open={isDownloadModalOpen}
               onClose={handleDownloadClose}
             />
             <CreateNSTreeModal
               badQCSampleIds={badQCSampleIds}
               checkedSampleIds={checkedSampleIds}
-              failedSampleIds={failedSampleIds}
               open={isNSCreateTreeModalOpen}
               onClose={handleCreateTreeClose}
             />
             <UsherTreeFlow
               badQCSampleIds={badQCSampleIds}
               checkedSampleIds={checkedSampleIds}
-              failedSampleIds={failedSampleIds}
               shouldStartUsherFlow={shouldStartUsherFlow}
             />
             <DeleteSamplesConfirmationModal
@@ -256,8 +252,6 @@ const DataSubview: FunctionComponent<Props> = ({
               isLoading={isLoading}
               checkedSampleIds={checkedSampleIds}
               setCheckedSampleIds={setCheckedSampleIds}
-              failedSampleIds={failedSampleIds}
-              setFailedSampleIds={setFailedSampleIds}
               badQCSampleIds={badQCSampleIds}
               setBadQCSampleIds={setBadQCSampleIds}
               viewName={viewName}

@@ -29,10 +29,8 @@ interface Props {
   isLoading: boolean;
   checkedSampleIds: string[];
   setCheckedSampleIds(samples: string[]): void;
-  failedSampleIds: string[];
   setBadQCSampleIds(samples: string[]): void;
   badQCSampleIds: string[];
-  setFailedSampleIds(samples: string[]): void;
   viewName: VIEWNAME;
   renderer?: CustomRenderer;
   handleDeleteTreeModalOpen(t: PhyloRun): void;
@@ -130,16 +128,6 @@ function extractPublicIdsFromData(
   return publicIds;
 }
 
-function extractPublicIdsFromDataWFailedGenomeRecovery(data: TableItem[]) {
-  const failedSampleIds: string[] = [];
-  for (const key in data) {
-    if (data[key as any].CZBFailedGenomeRecovery) {
-      failedSampleIds.push(String(data[key as any].publicId));
-    }
-  }
-  return failedSampleIds;
-}
-
 function extractPublicIdsWBadQCData(data: Sample[]) {
   return data
     .filter(
@@ -166,8 +154,6 @@ export const DataTable: FunctionComponent<Props> = ({
   isLoading,
   checkedSampleIds,
   setCheckedSampleIds,
-  failedSampleIds,
-  setFailedSampleIds,
   setBadQCSampleIds,
   badQCSampleIds,
   viewName,
@@ -212,7 +198,7 @@ export const DataTable: FunctionComponent<Props> = ({
       checkedSampleIds,
       false
     );
-    const newFailedIds = extractPublicIdsFromDataWFailedGenomeRecovery(data);
+
     // TODO TableItem[] appears identical to Sample[] we should go through and refactor this once we have time to do so
     // since TableItem and Sample are identical i think it's safe to do this cast here
     const newBadQCDataIds = extractPublicIdsWBadQCData(data as Sample[]);
@@ -222,11 +208,7 @@ export const DataTable: FunctionComponent<Props> = ({
       const newCheckedSamples = checkedSampleIds.filter(
         (el) => !newPublicIds.includes(el)
       );
-      const newFailedSamples = failedSampleIds.filter(
-        (el) => !newFailedIds.includes(el)
-      );
       setCheckedSampleIds(newCheckedSamples);
-      setFailedSampleIds(newFailedSamples);
       setBadQCSampleIds(newBadQCDataIds);
       setIsHeaderChecked(false);
       setHeaderIndeterminant(false);
@@ -234,30 +216,19 @@ export const DataTable: FunctionComponent<Props> = ({
     if (!isHeaderChecked && !isHeaderIndeterminant) {
       // set isHeaderChecked to true, add all samples in current view
       setCheckedSampleIds(checkedSampleIds.concat(newPublicIds));
-      setFailedSampleIds(failedSampleIds.concat(newFailedIds));
       setBadQCSampleIds(badQCSampleIds.concat(newBadQCDataIds));
       setIsHeaderChecked(true);
     }
   }
 
-  function handleRowCheckboxClick(
-    sampleId: string,
-    failedGenomeRecovery: boolean,
-    badQCData: boolean
-  ) {
+  function handleRowCheckboxClick(sampleId: string, badQCData: boolean) {
     if (checkedSampleIds.includes(sampleId)) {
       setCheckedSampleIds(checkedSampleIds.filter((id) => id !== sampleId));
-      if (failedGenomeRecovery) {
-        setFailedSampleIds(failedSampleIds.filter((id) => id !== sampleId));
-      }
       if (badQCData) {
         setBadQCSampleIds(badQCSampleIds.filter((id) => id !== sampleId));
       }
     } else {
       setCheckedSampleIds([...checkedSampleIds, sampleId]);
-      if (failedGenomeRecovery) {
-        setFailedSampleIds([...failedSampleIds, sampleId]);
-      }
       if (badQCData) {
         setBadQCSampleIds([...badQCSampleIds, sampleId]);
       }
@@ -313,7 +284,6 @@ export const DataTable: FunctionComponent<Props> = ({
     const handleClick = function handleClick() {
       handleRowCheckboxClick(
         String(item.publicId),
-        Boolean(item.CZBFailedGenomeRecovery),
         Boolean(
           item.qcMetrics.length > 0 && item.qcMetrics[0].qc_status === "Bad"
         )

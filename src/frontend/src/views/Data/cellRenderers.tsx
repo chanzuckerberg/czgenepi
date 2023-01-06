@@ -1,6 +1,5 @@
 /* eslint-disable react/display-name */
 
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { ChipProps, Icon } from "czifui";
 import {
   defaultSampleCellRenderer,
@@ -14,8 +13,6 @@ import {
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { createTableCellRenderer } from "src/common/utils";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
 import { LineageTooltip } from "./components/SamplesView/components/SamplesTable/components/LineageTooltip";
 import { StatusChip } from "./components/StatusChip";
@@ -57,14 +54,6 @@ const LABEL_STATUS: Record<
     label: "failed",
     status: "pending",
   },
-  errorGenomeRecovery: {
-    label: "failed",
-    status: "error",
-  },
-  successGenomeRecovery: {
-    label: "complete",
-    status: "success",
-  },
 };
 
 const PrivateId = ({
@@ -74,24 +63,7 @@ const PrivateId = ({
   value: string;
   item: Sample;
 }): JSX.Element => {
-  const {
-    CZBFailedGenomeRecovery,
-    qcMetrics,
-    private: isPrivate,
-    submittingGroup,
-    uploadedBy,
-  } = item;
-  const nextcladeDownloadFlag = useTreatments([
-    USER_FEATURE_FLAGS.nextclade_download,
-  ]);
-  const usesNextcladeDownload = isUserFlagOn(
-    nextcladeDownloadFlag,
-    USER_FEATURE_FLAGS.nextclade_download
-  );
-
-  const labelCZBFailedGenomeRecovery = CZBFailedGenomeRecovery
-    ? LABEL_STATUS.errorGenomeRecovery
-    : LABEL_STATUS.successGenomeRecovery;
+  const { qcMetrics, private: isPrivate, submittingGroup, uploadedBy } = item;
 
   const PROCESSING_STATUS_TOOLTIP_TEXT = (
     <div>
@@ -154,13 +126,8 @@ const PrivateId = ({
     failed: FAILED_STATUS_TOOLTIP_TEXT,
   };
 
-  const label = usesNextcladeDownload
-    ? qcStatusLabel.label
-    : labelCZBFailedGenomeRecovery.label;
-
-  const status = usesNextcladeDownload
-    ? qcStatusLabel?.status
-    : labelCZBFailedGenomeRecovery.status;
+  const label = qcStatusLabel.label;
+  const status = qcStatusLabel.status;
 
   const displayName =
     submittingGroup?.name === CZ_BIOHUB_GROUP ? "CZ Biohub" : uploadedBy?.name;

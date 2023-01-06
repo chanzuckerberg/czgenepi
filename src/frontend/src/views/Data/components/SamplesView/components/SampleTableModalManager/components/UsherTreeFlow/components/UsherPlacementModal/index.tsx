@@ -19,7 +19,6 @@ import {
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
 import { Header } from "../../../DownloadModal/style";
-import { FailedSampleAlert } from "../../../FailedSampleAlert";
 import {
   Content,
   FlexWrapper,
@@ -41,13 +40,9 @@ import {
   TreeNameInfoWrapper,
 } from "./style";
 import { BadQCSampleAlert } from "../../../CreateNSTreeModal/components/BadQCSampleAlert";
-import { useTreatments } from "@splitsoftware/splitio-react";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
-import { isUserFlagOn } from "src/components/Split";
 
 interface Props {
   checkedSampleIds: string[];
-  failedSampleIds: string[];
   badQCSampleIds: string[];
   open: boolean;
   onClose: () => void;
@@ -77,7 +72,6 @@ const getDefaultNumSamplesPerSubtree = (numSelected: number): number => {
 };
 
 export const UsherPlacementModal = ({
-  failedSampleIds,
   checkedSampleIds,
   badQCSampleIds,
   onClose,
@@ -94,14 +88,6 @@ export const UsherPlacementModal = ({
   const [treeType, setTreeType] = useState<string>("");
   const [numSamplesPerSubtree, setNumSamplesPerSubtree] = useState<number>(
     SUGGESTED_MIN_SAMPLES
-  );
-
-  const nextcladeDownloadFlag = useTreatments([
-    USER_FEATURE_FLAGS.nextclade_download,
-  ]);
-  const usesNextcladeDownload = isUserFlagOn(
-    nextcladeDownloadFlag,
-    USER_FEATURE_FLAGS.nextclade_download
   );
 
   const defaultNumSamples = getDefaultNumSamplesPerSubtree(
@@ -133,11 +119,8 @@ export const UsherPlacementModal = ({
   }, []);
 
   useEffect(() => {
-    const hasValidSamplesSelected =
-      checkedSampleIds?.length > failedSampleIds?.length;
-    const shouldDisable = !hasValidSamplesSelected || isLoading;
-    setUsherDisabled(shouldDisable);
-  }, [checkedSampleIds, failedSampleIds, isLoading]);
+    setUsherDisabled(isLoading);
+  }, [isLoading]);
 
   const fastaFetch = useFastaFetch({
     componentOnError: () => {
@@ -154,11 +137,8 @@ export const UsherPlacementModal = ({
 
   const handleSubmit = (evt: SyntheticEvent) => {
     evt.preventDefault();
-    const sampleIdsToSubmit = checkedSampleIds.filter(
-      (id) => !failedSampleIds.includes(id)
-    );
     fastaFetch.mutate({
-      sampleIds: sampleIdsToSubmit,
+      sampleIds: checkedSampleIds,
       downstreamConsumer: "USHER", // Let backend know eventual destination for this fasta
     });
     setIsLoading(true);
@@ -347,10 +327,7 @@ export const UsherPlacementModal = ({
                   </StyledSuggestionWrapper>
                 )}
               </StyledTextField>
-              <FailedSampleAlert numFailedSamples={failedSampleIds?.length} />
-              {usesNextcladeDownload && (
-                <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
-              )}
+              <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
             </div>
             <StyledButton
               sdsType="primary"

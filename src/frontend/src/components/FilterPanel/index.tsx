@@ -1,10 +1,6 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { filter, forEach, isEqual } from "lodash";
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
-import { isUserFlagOn } from "../Split";
-import { USER_FEATURE_FLAGS } from "../Split/types";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
-import { GenomeRecoveryFilter } from "./components/GenomeRecoveryFilter";
 import { LineageFilter } from "./components/LineageFilter";
 import { QCStatusFilter } from "./components/QCStatusFilter";
 import { UploadDateFilter } from "./components/UploadDateFilter";
@@ -48,15 +44,6 @@ interface FiltersType {
 
 // * (mlila): `key` should be the name of the column you are filtering on
 const DATA_FILTER_INIT = {
-  CZBFailedGenomeRecovery: {
-    key: "CZBFailedGenomeRecovery",
-    params: {
-      selected: undefined,
-    },
-    transform: (d: Sample) =>
-      d.CZBFailedGenomeRecovery ? "Failed" : "Complete",
-    type: TypeFilterType.Single,
-  },
   qcMetrics: {
     key: "qcMetrics",
     params: {
@@ -140,13 +127,6 @@ const FilterPanel: FC<Props> = ({
   setDataFilterFunc,
 }) => {
   const [dataFilters, setDataFilters] = useState<FiltersType>(DATA_FILTER_INIT);
-  const nextcladeDownloadFlag = useTreatments([
-    USER_FEATURE_FLAGS.nextclade_download,
-  ]);
-  const usesNextcladeDownload = isUserFlagOn(
-    nextcladeDownloadFlag,
-    USER_FEATURE_FLAGS.nextclade_download
-  );
 
   useEffect(() => {
     const wrappedFilterFunc = () => {
@@ -236,14 +216,6 @@ const FilterPanel: FC<Props> = ({
     }
   };
 
-  const updateGenomeRecoveryFilter = (selected?: string) => {
-    const prevSelected = dataFilters.CZBFailedGenomeRecovery?.params.selected;
-
-    if (!isEqual(prevSelected, selected)) {
-      updateDataFilter("CZBFailedGenomeRecovery", { selected });
-    }
-  };
-
   return (
     <StyledFilterPanel isOpen={isOpen}>
       <UploadDateFilter
@@ -259,18 +231,11 @@ const FilterPanel: FC<Props> = ({
         updateLineageFilter={updateLineageFilter}
         data-test-id="sample-filter-lineage"
       />
-      {usesNextcladeDownload ? (
-        <QCStatusFilter
-          options={qcStatuses}
-          updateQCStatusFilter={updateQCStatusFilter}
-          data-test-id="sample-filter-qc-status"
-        />
-      ) : (
-        <GenomeRecoveryFilter
-          updateGenomeRecoveryFilter={updateGenomeRecoveryFilter}
-          data-test-id="sample-filter-status"
-        />
-      )}
+      <QCStatusFilter
+        options={qcStatuses}
+        updateQCStatusFilter={updateQCStatusFilter}
+        data-test-id="sample-filter-qc-status"
+      />
     </StyledFilterPanel>
   );
 };

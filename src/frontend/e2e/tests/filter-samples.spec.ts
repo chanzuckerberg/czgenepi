@@ -328,7 +328,6 @@ function prepareTestData() {
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the status to failed
     const defaults = getDefaults();
-    defaults.czb_failed_genome_recovery = true;
     mockResponseData.push(getSampleResponseData(defaults));
   }
 
@@ -336,7 +335,13 @@ function prepareTestData() {
   for (let i = 1; i <= totalSamplePerScenario; i++) {
     // get default values and set the statue to failed
     const defaults = getDefaults();
-    defaults.lineage = "BA.1.15";
+    defaults.lineages = [
+      {
+        lineage: "BA.1.15",
+        lineage_type: "PANGOLIN",
+        lineage_software_version: "1.0.0",
+      },
+    ];
     mockResponseData.push(getSampleResponseData(defaults));
   }
 
@@ -398,10 +403,22 @@ function getDefaults(): Partial<SampleResponseDefaults> {
   return {
     collection_date: "2021-05-05",
     collection_location: 2605082,
-    czb_failed_genome_recovery: false,
     gisaid_id: null,
     gisaid_status: "Not Found",
-    lineage: "QA.1.15",
+    lineages: [
+      {
+        lineage: "QA.1.15",
+        lineage_type: "PANGOLIN",
+        lineage_software_version: "1.0.0",
+      },
+    ],
+    qc_metrics: [
+      {
+        qc_software_version: "1.0.0",
+        qc_status: "good",
+        qc_caller: "PANGOLIN",
+      },
+    ],
     private: false,
     upload_date: "2021-05-05",
   };

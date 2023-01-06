@@ -1,5 +1,4 @@
 import RadioGroup from "@mui/material/RadioGroup";
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon, Link } from "czifui";
 import { uniq } from "lodash";
 import Image from "next/image";
@@ -28,11 +27,8 @@ import {
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { Header } from "../DownloadModal/style";
-import { FailedSampleAlert } from "../FailedSampleAlert";
 import { BadQCSampleAlert } from "./components/BadQCSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
 import { MissingSampleAlert } from "./components/MissingSampleAlert";
@@ -72,7 +68,6 @@ export type ResetFiltersType = {
 
 interface Props {
   checkedSampleIds: string[];
-  failedSampleIds: string[];
   badQCSampleIds: string[];
   open: boolean;
   onClose: () => void;
@@ -80,7 +75,6 @@ interface Props {
 
 export const CreateNSTreeModal = ({
   checkedSampleIds,
-  failedSampleIds,
   badQCSampleIds,
   open,
   onClose,
@@ -92,13 +86,6 @@ export const CreateNSTreeModal = ({
   const [missingInputSamples, setMissingInputSamples] = useState<string[]>([]);
   const [validatedInputSamples, setValidatedInputSamples] = useState<string[]>(
     []
-  );
-  const nextcladeDownloadFlag = useTreatments([
-    USER_FEATURE_FLAGS.nextclade_download,
-  ]);
-  const usesNextcladeDownload = isUserFlagOn(
-    nextcladeDownloadFlag,
-    USER_FEATURE_FLAGS.nextclade_download
   );
 
   const handleChangeTreeType = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -265,13 +252,12 @@ export const CreateNSTreeModal = ({
   );
 
   const allPossibleTreeSamples = checkedSampleIds.concat(validatedInputSamples);
-  const allFailedOrMissingSamples = failedSampleIds.concat(missingInputSamples);
   const allValidSamplesForTreeCreation = allPossibleTreeSamples.filter(
-    (id) => !allFailedOrMissingSamples.includes(id)
+    (id) => !missingInputSamples.includes(id)
   );
 
   const allSamplesRequestedTableAndInput = uniq(
-    allPossibleTreeSamples.concat(allFailedOrMissingSamples)
+    allPossibleTreeSamples.concat(missingInputSamples)
   );
 
   const handleSubmit = (evt: SyntheticEvent) => {
@@ -463,10 +449,7 @@ export const CreateNSTreeModal = ({
             shouldReset={shouldReset}
           />
           <MissingSampleAlert missingSamples={missingInputSamples} />
-          <FailedSampleAlert numFailedSamples={failedSampleIds?.length} />
-          {usesNextcladeDownload && (
-            <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
-          )}
+          <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
         </StyledDialogContent>
         <StyledFooter>
           <CreateTreeButton

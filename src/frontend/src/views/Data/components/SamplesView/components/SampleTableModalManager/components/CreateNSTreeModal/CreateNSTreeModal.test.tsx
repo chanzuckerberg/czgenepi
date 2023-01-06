@@ -11,7 +11,6 @@ test("shows NS and GISAID attribution", async () => {
       <ReactQueryWrapper>
         <CreateNSTreeModal
           checkedSampleIds={[]}
-          failedSampleIds={[]}
           badQCSampleIds={[]}
           open
           onClose={noop}
