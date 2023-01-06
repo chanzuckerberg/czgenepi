@@ -3,10 +3,13 @@ import { compact, map, uniq } from "lodash";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { FunctionComponent, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { HeadAppTitle } from "src/common/components";
 import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { Pathogen } from "src/common/redux/types";
 import { DataCategory, Transform } from "src/common/types/data";
 import {
   IdMap,
@@ -16,14 +19,13 @@ import { FilterPanel } from "src/components/FilterPanel";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { DataSubview } from "../../common/components";
-import { EMPTY_OBJECT } from "../../common/constants/empty";
 import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/DataNavigation/FilterPanelToggle";
 import { SamplesView } from "./components/SamplesView";
 import { TreesView } from "./components/TreesView";
-import { SAMPLE_HEADERS, SAMPLE_SUBHEADERS, TREE_HEADERS } from "./headers";
+import { TREE_HEADERS } from "./headers";
 import {
   Category,
   CategoryTitle,
@@ -35,6 +37,7 @@ import {
   StyledView,
   View,
 } from "./style";
+import { SAMPLE_HEADERS } from "./table-headers/sampleHeadersConfig";
 import { PHYLO_RUN_TRANSFORMS } from "./transforms";
 
 // run data through transforms
@@ -72,6 +75,8 @@ const Data: FunctionComponent = () => {
     tableRefactorFlag,
     USER_FEATURE_FLAGS.table_refactor
   );
+
+  const pathogen = useSelector(selectCurrentPathogen);
 
   const [isDataLoading, setIsDataLoading] = useState(false);
   const [shouldShowFilters, setShouldShowFilters] = useState<boolean>(true);
@@ -122,7 +127,6 @@ const Data: FunctionComponent = () => {
     }),
     [sampleData, phyloRunData]
   );
-
   useEffect(() => {
     if (currentPath === ROUTES.DATA) {
       router.push(ROUTES.DATA_SAMPLES);
@@ -135,10 +139,9 @@ const Data: FunctionComponent = () => {
     {
       data: samples,
       defaultSortKey: ["uploadDate"],
-      headers: SAMPLE_HEADERS,
+      headers: SAMPLE_HEADERS[pathogen],
       isDataLoading,
       renderer: SampleRenderer,
-      subheaders: SAMPLE_SUBHEADERS,
       text: VIEWNAME.SAMPLES,
       to: ROUTES.DATA_SAMPLES,
     },
@@ -148,7 +151,6 @@ const Data: FunctionComponent = () => {
       headers: TREE_HEADERS,
       isDataLoading,
       renderer: TreeRenderer,
-      subheaders: EMPTY_OBJECT,
       text: VIEWNAME.TREES,
       to: ROUTES.PHYLO_TREES,
     },
@@ -159,9 +161,18 @@ const Data: FunctionComponent = () => {
   };
 
   // create JSX elements from categories
-  dataCategories.forEach((category) => {
+  const menuItemsOrNull = dataCategories.map((category) => {
+    // NOTE!! Here we are temporarily hiding the tree tab for monkeypox until
+    // we complete the functionality next quarter. For features that will be
+    // hidden long-term, a config would be more appropriate than this if statement.
+    if (
+      pathogen === Pathogen.MONKEY_POX &&
+      category.to === ROUTES.PHYLO_TREES
+    ) {
+      return null;
+    }
     const item = category.text.replace(" ", "-").toLowerCase();
-    dataJSX.menuItems.push(
+    return (
       <StyledMenuItem key={category.text}>
         <NextLink href={category.to} key={category.text} passHref>
           <a href="passHref">
@@ -182,6 +193,11 @@ const Data: FunctionComponent = () => {
     );
   });
 
+  // TODO: (ehoops) - once trees are re-enabled for mpx, we can remove this.
+  dataJSX.menuItems = menuItemsOrNull.filter(
+    (item) => item !== null
+  ) as Array<JSX.Element>; // Casting here because typescript thinks this can still be null.
+
   const subTitle = currentPath.startsWith(ROUTES.DATA_SAMPLES)
     ? "Samples"
     : "Phylogenetic Trees";
@@ -197,7 +213,14 @@ const Data: FunctionComponent = () => {
   // * to reference the parent's props (?). Passing in only the lineages, or
   // * incomplete options causes the component to break
   const sampleMap = viewName === "Samples" ? (samples as SampleMap) : {};
-  const lineages = uniq(compact(map(sampleMap, (d) => d.lineage?.lineage)))
+  const lineages = uniq(compact(map(sampleMap, (d) => d.lineages[0]?.lineage)))
+    .sort()
+    .map((l) => {
+      return { name: l as string };
+    });
+  const qcStatuses = uniq(
+    compact(map(sampleMap, (d) => d.qcMetrics[0]?.qc_status))
+  )
     .sort()
     .map((l) => {
       return { name: l as string };
@@ -222,6 +245,7 @@ const Data: FunctionComponent = () => {
             // TODO (mlila): replace with sds filterpanel once it's complete
             <FilterPanel
               lineages={lineages}
+              qcStatuses={qcStatuses}
               isOpen={shouldShowFilters}
               setActiveFilterCount={setActiveFilterCount}
               setDataFilterFunc={setDataFilterFunc}
@@ -234,7 +258,6 @@ const Data: FunctionComponent = () => {
             data={category.data}
             defaultSortKey={category.defaultSortKey}
             headers={category.headers}
-            subheaders={category.subheaders}
             renderer={category.renderer}
             viewName={viewName}
             dataFilterFunc={viewName === "Samples" ? dataFilterFunc : undefined}

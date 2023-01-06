@@ -13,9 +13,9 @@ def test_pathogen_treatments():
     flag_to_treatments = {
         "PATHOGEN_lineage_caller": {
             "SC2": "Pangolin",
-            "MPX": "ncov",
+            "MPX": "Nextclade",
             # SFO entry is to check that default is returned if mystery pathogen
-            "SFO": "ncov",
+            "SFO": "Nextclade",
         },
         "PATHOGEN_galago_linkout": {"SC2": "on", "MPX": "off", "SFO": "off"},
         "PATHOGEN_lineage_filter_enabled": {"SC2": "on", "MPX": "off", "SFO": "off"},

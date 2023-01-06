@@ -2,12 +2,15 @@ import { TextField } from "@mui/material";
 import { DefaultMenuSelectOption, Dropdown, Icon, InputDropdown } from "czifui";
 import { cloneDeep, debounce } from "lodash";
 import { SyntheticEvent, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import {
   FastaResponseType,
   getUsherOptions,
   useFastaFetch,
 } from "src/common/queries/trees";
+import { Pathogen } from "src/common/redux/types";
 import { ROUTES } from "src/common/routes";
 import {
   StyledCloseIconButton,
@@ -37,13 +40,23 @@ import {
   Title,
   TreeNameInfoWrapper,
 } from "./style";
+import { BadQCSampleAlert } from "../../../CreateNSTreeModal/components/BadQCSampleAlert";
+import { useTreatments } from "@splitsoftware/splitio-react";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
+import { isUserFlagOn } from "src/components/Split";
 
 interface Props {
   checkedSampleIds: string[];
   failedSampleIds: string[];
+  badQCSampleIds: string[];
   open: boolean;
   onClose: () => void;
-  onLinkCreateSuccess(url: string, treeType: string, sampleCount: number): void;
+  onLinkCreateSuccess(
+    url: string,
+    treeType: string,
+    sampleCount: number,
+    pathogen: Pathogen
+  ): void;
 }
 
 interface DropdownOptionProps extends DefaultMenuSelectOption {
@@ -66,6 +79,7 @@ const getDefaultNumSamplesPerSubtree = (numSelected: number): number => {
 export const UsherPlacementModal = ({
   failedSampleIds,
   checkedSampleIds,
+  badQCSampleIds,
   onClose,
   onLinkCreateSuccess,
   open,
@@ -82,9 +96,19 @@ export const UsherPlacementModal = ({
     SUGGESTED_MIN_SAMPLES
   );
 
+  const nextcladeDownloadFlag = useTreatments([
+    USER_FEATURE_FLAGS.nextclade_download,
+  ]);
+  const usesNextcladeDownload = isUserFlagOn(
+    nextcladeDownloadFlag,
+    USER_FEATURE_FLAGS.nextclade_download
+  );
+
   const defaultNumSamples = getDefaultNumSamplesPerSubtree(
     checkedSampleIds?.length
   );
+
+  const pathogen = useSelector(selectCurrentPathogen);
 
   useEffect(() => {
     const fetchUsherOpts = async () => {
@@ -122,7 +146,8 @@ export const UsherPlacementModal = ({
     },
     componentOnSuccess: (data: FastaResponseType) => {
       const url = data?.url;
-      if (url) onLinkCreateSuccess(data.url, treeType, numSamplesPerSubtree);
+      if (url)
+        onLinkCreateSuccess(data.url, treeType, numSamplesPerSubtree, pathogen);
       setIsLoading(false);
     },
   });
@@ -323,6 +348,9 @@ export const UsherPlacementModal = ({
                 )}
               </StyledTextField>
               <FailedSampleAlert numFailedSamples={failedSampleIds?.length} />
+              {usesNextcladeDownload && (
+                <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
+              )}
             </div>
             <StyledButton
               sdsType="primary"

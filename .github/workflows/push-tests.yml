@@ -146,9 +146,9 @@ jobs:
   #         registry: ${{ secrets.ECR_REPO }}
   #     - uses: actions/checkout@v2
   #     - name: Install happy
-  #       uses: chanzuckerberg/github-actions/.github/actions/install-happy@405f86e7f30b41403677c5df2d8d3339afa3c6d7
+  #       uses: chanzuckerberg/github-actions/.github/actions/install-happy@install-happy-v1.4.0
   #       with:
-  #         happy_version: "0.19.0"
+  #         happy_version: "0.41.0"
   #         install_globally: "true"
   #     - name: Playwright tests
   #       run: |
@@ -184,9 +184,9 @@ jobs:
           registry: ${{ secrets.ECR_REPO }}
       - uses: actions/checkout@v2
       - name: Install happy
-        uses: chanzuckerberg/github-actions/.github/actions/install-happy@405f86e7f30b41403677c5df2d8d3339afa3c6d7
+        uses: chanzuckerberg/github-actions/.github/actions/install-happy@install-happy-v1.4.0
         with:
-          happy_version: "0.19.0"
+          happy_version: "0.41.0"
           install_globally: "true"
       - name: Test Python
         run: |
@@ -214,7 +214,7 @@ jobs:
       - name: Install happy
         uses: chanzuckerberg/github-actions/.github/actions/install-happy@405f86e7f30b41403677c5df2d8d3339afa3c6d7
         with:
-          happy_version: "0.19.0"
+          happy_version: "0.41.0"
           install_globally: "true"
       - name: Test Gisaid workflow
         run: |
@@ -295,11 +295,11 @@ jobs:
           echo "SOURCE_TAG=sha-${GITHUB_SHA:0:8}" >> $GITHUB_ENV
           echo "DEST_TAG=branch-$(echo ${GITHUB_REF#refs/heads/} | sed 's/[\+\/]/-/g')" >> $GITHUB_ENV
       - name: Docker re-tag
-        uses: chanzuckerberg/github-actions/.github/actions/retag-happy@v1.6.1
+        uses: chanzuckerberg/github-actions/.github/actions/retag-happy@retag-happy-v1.1.0
         with:
           source-tag: ${{ env.SOURCE_TAG }}
           dest-tag: ${{ env.DEST_TAG }}
-          happy_version: "0.24.0"
+          happy_version: "0.41.0"
       - name: Generate payload
         run: |
           echo "payload={\"tag\":\"sha-${GITHUB_SHA:0:8}\"}" >> $GITHUB_ENV

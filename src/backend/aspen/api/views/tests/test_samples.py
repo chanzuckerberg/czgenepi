@@ -1,3 +1,4 @@
+import datetime
 import json
 from typing import Any, List, Optional, Tuple
 
@@ -15,14 +16,19 @@ from aspen.database.models import (
     Location,
     Pathogen,
     Sample,
+    SampleLineage,
+    SampleQCMetric,
     UploadedPathogenGenome,
     User,
 )
+from aspen.test_infra.models.lineage import sample_lineage_factory
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import pathogen_factory, random_pathogen_factory
+from aspen.test_infra.models.pathogen import pathogen_factory
+from aspen.test_infra.models.pathogen_repo_config import setup_random_repo_configs
 from aspen.test_infra.models.repo_metadata import repo_metadata_factory
-from aspen.test_infra.models.repository import random_default_repo_factory
 from aspen.test_infra.models.sample import sample_factory
+from aspen.test_infra.models.sample_mutations import sample_mutations_factory
+from aspen.test_infra.models.sample_qc_metrics import sample_qc_metrics_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import (
     group_factory,
@@ -52,6 +58,9 @@ async def test_samples_list(
         "scorpio_support": "0.775",
         "qc_status": "pass",
     }
+    # For non-COVID pathogens, lineage last_updated based on dataset's tag
+    reference_dataset_tag = "2021-06-25T00:00:00Z"
+    nextclade_lineage_last_updated = "2021-06-25"
 
     sc2 = pathogen_factory("SC2", "SARS-Cov-2")
     mpx = pathogen_factory("MPX", "MPX")
@@ -59,6 +68,8 @@ async def test_samples_list(
     # Make multiple samples
     samples: List[Sample] = []
     uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
+    qc_metrics: List[SampleQCMetric] = []
+    sample_lineages: List[SampleLineage] = []
     for i in range(4):
         pathogen = sc2 if i < 2 else mpx
         samples.append(
@@ -77,6 +88,17 @@ async def test_samples_list(
                 samples[i], pangolin_output=pangolin_output
             )
         )
+        qc_metrics.append(sample_qc_metrics_factory(samples[i], qc_score=f"{i}"))
+        if pathogen.slug == "SC2":
+            sample_lineages.append(
+                sample_lineage_factory(samples[i], raw_lineage_output=pangolin_output)
+            )
+        else:
+            sample_lineages.append(
+                sample_lineage_factory(
+                    samples[i], reference_dataset_tag=reference_dataset_tag
+                )
+            )
 
     async_session.add(group)
     await async_session.commit()
@@ -117,6 +139,13 @@ async def test_samples_list(
                 "slug": sc2.slug,
                 "name": sc2.name,
             }
+        # Pangolin/SC2 and Nextclade/not-SC2 expose lineage update differently
+        expected_lineage_last_updated = nextclade_lineage_last_updated
+        if pathogen_data["id"] == sc2.id:
+            expected_lineage_last_updated = sample_lineages[i].last_updated.strftime(
+                "%Y-%m-%d"
+            )
+
         expected = {
             "samples": [
                 {
@@ -137,29 +166,233 @@ async def test_samples_list(
                     "pathogen": pathogen_data,
                     "private_identifier": samples[i].private_identifier,
                     "public_identifier": samples[i].public_identifier,
+                    "uploaded_by": {"id": user.id, "name": user.name},
                     "upload_date": convert_datetime_to_iso_8601(
                         uploaded_pathogen_genomes[i].upload_date
                     ),
                     "sequencing_date": str(
                         uploaded_pathogen_genomes[i].sequencing_date
                     ),
-                    "lineage": {
-                        "lineage": uploaded_pathogen_genomes[i].pangolin_lineage,
-                        "confidence": uploaded_pathogen_genomes[i].pangolin_probability,
-                        "version": uploaded_pathogen_genomes[i].pangolin_version,
-                        "last_updated": convert_datetime_to_iso_8601(
-                            uploaded_pathogen_genomes[i].pangolin_last_updated
-                        ),
-                        "scorpio_call": pangolin_output["scorpio_call"],
-                        "scorpio_support": float(pangolin_output["scorpio_support"]),
-                        "qc_status": pangolin_output["qc_status"],
-                    },
                     "private": True,
                     "submitting_group": {
                         "id": group.id,
                         "name": group.name,
                     },
+                    "qc_metrics": [
+                        {
+                            "qc_score": qc_metrics[i].qc_score,
+                            "qc_software_version": qc_metrics[i].qc_software_version,
+                            "qc_status": qc_metrics[i].qc_status,
+                            "qc_caller": qc_metrics[i].qc_caller.value,
+                            "reference_dataset_name": qc_metrics[
+                                i
+                            ].reference_dataset_name,
+                            "reference_sequence_accession": qc_metrics[
+                                i
+                            ].reference_sequence_accession,
+                            "reference_dataset_tag": qc_metrics[
+                                i
+                            ].reference_dataset_tag,
+                        }
+                    ],
+                    "lineages": [
+                        {
+                            "lineage_type": sample_lineages[i].lineage_type.value,
+                            "lineage": sample_lineages[i].lineage,
+                            "lineage_software_version": sample_lineages[
+                                i
+                            ].lineage_software_version,
+                            "lineage_probability": sample_lineages[
+                                i
+                            ].lineage_probability,
+                            "last_updated": expected_lineage_last_updated,
+                            "reference_dataset_name": sample_lineages[
+                                i
+                            ].reference_dataset_name,
+                            "reference_sequence_accession": sample_lineages[
+                                i
+                            ].reference_sequence_accession,
+                            "reference_dataset_tag": sample_lineages[
+                                i
+                            ].reference_dataset_tag,
+                            "scorpio_call": sample_lineages[i].raw_lineage_output.get(
+                                "scorpio_call"
+                            ),
+                            "scorpio_support": sample_lineages[
+                                i
+                            ].raw_lineage_output.get("scorpio_support"),
+                            "qc_status": qc_metrics[i].qc_status,
+                        }
+                    ],
+                }
+                for i in params["id_range"]  # type: ignore
+            ]
+        }
+        assert response == expected
+
+
+async def test_samples_list_no_qc_status(
+    async_session: AsyncSession,
+    http_client: AsyncClient,
+):
+    group = group_factory()
+    user = await userrole_factory(async_session, group)
+    location = location_factory(
+        "North America", "USA", "California", "Santa Barbara County"
+    )
+    pangolin_output = {
+        "scorpio_call": "B.1.167",
+        "scorpio_support": "0.775",
+        "qc_status": "pass",
+    }
+    # For non-COVID pathogens, lineage last_updated based on dataset's tag
+    reference_dataset_tag = "2021-06-25T00:00:00Z"
+    nextclade_lineage_last_updated = "2021-06-25"
+
+    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
+    mpx = pathogen_factory("MPX", "MPX")
+
+    # Make multiple samples
+    samples: List[Sample] = []
+    uploaded_pathogen_genomes: List[UploadedPathogenGenome] = []
+    sample_lineages: List[SampleLineage] = []
+    for i in range(4):
+        pathogen = sc2 if i < 2 else mpx
+        samples.append(
+            sample_factory(
+                group,
+                user,
+                location,
+                private=True,
+                private_identifier=f"private{i}",
+                public_identifier=f"public{i}",
+                pathogen=pathogen,
+            )
+        )
+        uploaded_pathogen_genomes.append(
+            uploaded_pathogen_genome_factory(
+                samples[i], pangolin_output=pangolin_output
+            )
+        )
+        if pathogen.slug == "SC2":
+            sample_lineages.append(
+                sample_lineage_factory(samples[i], raw_lineage_output=pangolin_output)
+            )
+        else:
+            sample_lineages.append(
+                sample_lineage_factory(
+                    samples[i], reference_dataset_tag=reference_dataset_tag
+                )
+            )
+
+    async_session.add(group)
+    await async_session.commit()
+
+    auth_headers = {"user_id": user.auth0_user_id}
+    pathogen_specific = {  # type: ignore
+        sc2: {
+            "id_range": range(2),
+            "url": f"/v2/orgs/{group.id}/pathogens/SC2/samples/",
+        },
+        mpx: {
+            "id_range": range(2, 4),
+            "url": f"/v2/orgs/{group.id}/pathogens/MPX/samples/",
+        },
+        # test support for old style urls
+        "no pathogen": {
+            "id_range": range(2),
+            "url": f"/v2/orgs/{group.id}/samples/",
+        },
+    }
+    for pathogen, params in pathogen_specific.items():  # type: ignore
+
+        res = await http_client.get(
+            params["url"],  # type: ignore
+            headers=auth_headers,
+        )
+        response = res.json()
+        if pathogen != "no pathogen":
+            pathogen_data = {
+                "id": pathogen.id,
+                "slug": pathogen.slug,
+                "name": pathogen.name,
+            }
+        else:
+            # fill with sc2 as that is the current default
+            pathogen_data = {
+                "id": sc2.id,
+                "slug": sc2.slug,
+                "name": sc2.name,
+            }
+        # Pangolin/SC2 and Nextclade/not-SC2 expose lineage update differently
+        expected_lineage_last_updated = nextclade_lineage_last_updated
+        if pathogen_data["id"] == sc2.id:
+            expected_lineage_last_updated = sample_lineages[i].last_updated.strftime(
+                "%Y-%m-%d"
+            )
+
+        expected = {
+            "samples": [
+                {
+                    "id": samples[i].id,
+                    "collection_date": str(samples[i].collection_date),
+                    "collection_location": {
+                        "id": location.id,
+                        "region": location.region,
+                        "country": location.country,
+                        "division": location.division,
+                        "location": location.location,
+                    },
+                    "czb_failed_genome_recovery": False,
+                    "gisaid": {
+                        "status": "Accepted",
+                        "gisaid_id": samples[i].accessions[0].accession,
+                    },
+                    "pathogen": pathogen_data,
+                    "private_identifier": samples[i].private_identifier,
+                    "public_identifier": samples[i].public_identifier,
                     "uploaded_by": {"id": user.id, "name": user.name},
+                    "upload_date": convert_datetime_to_iso_8601(
+                        uploaded_pathogen_genomes[i].upload_date
+                    ),
+                    "sequencing_date": str(
+                        uploaded_pathogen_genomes[i].sequencing_date
+                    ),
+                    "private": True,
+                    "submitting_group": {
+                        "id": group.id,
+                        "name": group.name,
+                    },
+                    "qc_metrics": [],
+                    "lineages": [
+                        {
+                            "lineage_type": sample_lineages[i].lineage_type.value,
+                            "lineage": sample_lineages[i].lineage,
+                            "lineage_software_version": sample_lineages[
+                                i
+                            ].lineage_software_version,
+                            "lineage_probability": sample_lineages[
+                                i
+                            ].lineage_probability,
+                            "last_updated": expected_lineage_last_updated,
+                            "reference_dataset_name": sample_lineages[
+                                i
+                            ].reference_dataset_name,
+                            "reference_sequence_accession": sample_lineages[
+                                i
+                            ].reference_sequence_accession,
+                            "reference_dataset_tag": sample_lineages[
+                                i
+                            ].reference_dataset_tag,
+                            "scorpio_call": sample_lineages[i].raw_lineage_output.get(
+                                "scorpio_call"
+                            ),
+                            "scorpio_support": sample_lineages[
+                                i
+                            ].raw_lineage_output.get("scorpio_support"),
+                            "qc_status": None,
+                        }
+                    ],
                 }
                 for i in params["id_range"]  # type: ignore
             ]
@@ -220,17 +453,6 @@ async def test_samples_view_gisaid_rejected(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-                "lineage": {
-                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                    "confidence": uploaded_pathogen_genome.pangolin_probability,
-                    "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": convert_datetime_to_iso_8601(
-                        uploaded_pathogen_genome.pangolin_last_updated
-                    ),
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -238,6 +460,8 @@ async def test_samples_view_gisaid_rejected(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }
@@ -290,17 +514,6 @@ async def test_samples_view_gisaid_no_info(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-                "lineage": {
-                    "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                    "confidence": uploaded_pathogen_genome.pangolin_probability,
-                    "version": uploaded_pathogen_genome.pangolin_version,
-                    "last_updated": convert_datetime_to_iso_8601(
-                        uploaded_pathogen_genome.pangolin_last_updated
-                    ),
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -308,6 +521,8 @@ async def test_samples_view_gisaid_no_info(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }
@@ -357,15 +572,6 @@ async def test_samples_view_gisaid_not_eligible(
                 # failed genome recovery, but for this test it's None because the sample
                 # has no underlying sequenced entity (no uploaded_pathogen_genome).
                 "sequencing_date": None,
-                "lineage": {
-                    "lineage": None,
-                    "confidence": None,
-                    "version": None,
-                    "last_updated": None,
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -373,6 +579,8 @@ async def test_samples_view_gisaid_not_eligible(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }
@@ -500,17 +708,6 @@ async def test_samples_view_cansee_all(
                 uploaded_pathogen_genome.upload_date
             ),
             "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-            "lineage": {
-                "lineage": uploaded_pathogen_genome.pangolin_lineage,
-                "confidence": uploaded_pathogen_genome.pangolin_probability,
-                "version": uploaded_pathogen_genome.pangolin_version,
-                "last_updated": convert_datetime_to_iso_8601(
-                    uploaded_pathogen_genome.pangolin_last_updated
-                ),
-                "scorpio_call": None,
-                "scorpio_support": None,
-                "qc_status": None,
-            },
             "pathogen": {
                 "id": pathogen.id,
                 "slug": pathogen.slug,
@@ -525,6 +722,8 @@ async def test_samples_view_cansee_all(
                 "id": 1,
                 "name": "test",
             },
+            "qc_metrics": [],
+            "lineages": [],
         }
     ]
 
@@ -578,15 +777,6 @@ async def test_samples_view_no_pangolin(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-                "lineage": {
-                    "lineage": None,
-                    "confidence": None,
-                    "version": None,
-                    "last_updated": None,
-                    "scorpio_call": None,
-                    "scorpio_support": None,
-                    "qc_status": None,
-                },
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -594,6 +784,8 @@ async def test_samples_view_no_pangolin(
                     "name": group.name,
                 },
                 "uploaded_by": {"id": user.id, "name": user.name},
+                "qc_metrics": [],
+                "lineages": [],
             }
         ]
     }
@@ -606,11 +798,14 @@ async def test_samples_view_no_pangolin(
 async def test_bulk_delete_sample_success(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test successful sample deletion by ID
     """
-    pathogen: Pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     group = group_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
@@ -643,8 +838,12 @@ async def test_bulk_delete_sample_success(
         ),
     ]
     for sample in samples:
-        upg = uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-        async_session.add(upg)
+        async_session.add(
+            uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+        )
+        async_session.add(sample_qc_metrics_factory(sample))
+        async_session.add(sample_mutations_factory(sample))
+        async_session.add(sample_lineage_factory(sample))
     async_session.add(group)
     await async_session.commit()
 
@@ -676,11 +875,14 @@ async def test_bulk_delete_sample_success(
 async def test_delete_sample_success(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test successful sample deletion by ID
     """
-    pathogen: Pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     group = group_factory()
     user = await userrole_factory(async_session, group)
     location = location_factory(
@@ -765,12 +967,15 @@ async def test_delete_sample_success(
 async def test_delete_sample_failures(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test a sample deletion failure by a user without write access
     """
     group = group_factory()
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -901,12 +1106,16 @@ async def make_test_samples(
 async def test_update_samples_success(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test successful sample update
     """
-    pathogen: Pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     user, group, samples, newlocation = await make_test_samples(async_session, pathogen)
+    repo_prefix = repo_config.prefix
 
     auth_headers = {"user_id": user.auth0_user_id}
 
@@ -993,6 +1202,7 @@ async def test_update_samples_success(
     ]
     location_fields = ["collection_location"]
     genome_fields = ["sequencing_date"]
+    current_year = datetime.date.today().strftime("%Y")
     for sample_id, expected in reorganized_data.items():
         # pull sample from the database to verify sample was updated correctly
         q = await async_session.execute(
@@ -1009,7 +1219,9 @@ async def test_update_samples_success(
             api_response_value = api_response[sample_id].get(field)
             request_field_value = expected[field]
             if field == "public_identifier" and request_field_value is None:
-                request_field_value = f"hCoV-19/USA/testgroupNone-{sample_id}/2022"
+                request_field_value = (
+                    f"{repo_prefix}/USA/testgroupNone-{sample_id}/{current_year}"
+                )
             # Handle location fields
             if field in location_fields:
                 db_field_value = getattr(sample_pulled_from_db, field).id
@@ -1036,11 +1248,14 @@ async def test_update_samples_success(
 async def test_update_samples_access_denied(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test update failures
     """
-    pathogen: Pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     user, group, samples, newlocation = await make_test_samples(async_session, pathogen)
     user2, group2, samples2, newlocation2 = await make_test_samples(
         async_session, pathogen, suffix="2"
@@ -1073,11 +1288,14 @@ async def test_update_samples_access_denied(
 async def test_update_samples_request_failures(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test update failures
     """
-    pathogen = random_pathogen_factory()
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
     user, group, samples, newlocation = await make_test_samples(async_session, pathogen)
 
     auth_headers = {"user_id": user.auth0_user_id}
@@ -1173,8 +1391,10 @@ async def test_update_samples_request_failures(
 
 async def setup_validation_data(async_session: AsyncSession, split_client: SplitClient):
     group = group_factory()
-    pathogen = random_pathogen_factory()
-    repo = random_default_repo_factory(split_client)
+    pathogen, repo_config = setup_random_repo_configs(
+        async_session, split_client=split_client
+    )
+    repo = repo_config.public_repository
     user = await userrole_factory(async_session, group)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
@@ -1184,10 +1404,12 @@ async def setup_validation_data(async_session: AsyncSession, split_client: Split
     isl_sample = repo_metadata_factory(
         pathogen, repo, strain="USA/ISL-TEST/hCov-19", isl="EPI_ISL_3141592"
     )
-    async_session.add_all([group, pathogen, sample, strain_sample, isl_sample])
+    async_session.add(sample)
+    async_session.add(strain_sample)
+    async_session.add(isl_sample)
     await async_session.commit()
 
-    return user, group, pathogen, repo, sample, strain_sample, isl_sample
+    return user, group, pathogen, repo, sample, strain_sample, isl_sample, repo_config
 
 
 async def test_validation_endpoint(
@@ -1201,17 +1423,18 @@ async def test_validation_endpoint(
         user,
         group,
         pathogen,
-        repo,
+        _,
         sample,
         gisaid_sample,
         isl_sample,
+        repo_config,
     ) = await setup_validation_data(async_session, split_client)
 
     # add hCoV-19/ as prefix to gisaid identifier to check that stripping of prefix is being done correctly
     data = {
         "sample_ids": [
             sample.public_identifier,
-            f"hCoV-19/{gisaid_sample.strain}",
+            f"{repo_config.prefix}/{gisaid_sample.strain}",
             isl_sample.isl,
         ],
     }
@@ -1238,10 +1461,11 @@ async def test_validation_endpoint_missing_identifier(
         user,
         group,
         pathogen,
-        repo,
+        _,
         sample,
         gisaid_sample,
         isl_sample,
+        _,
     ) = await setup_validation_data(async_session, split_client)
     data = {
         "sample_ids": [

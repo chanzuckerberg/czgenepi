@@ -1,3 +1,4 @@
+import re
 from collections import Counter
 from typing import (
     Any,
@@ -11,6 +12,7 @@ from typing import (
     TYPE_CHECKING,
 )
 
+import sentry_sdk
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.query import Query
@@ -212,31 +214,76 @@ def determine_gisaid_status(
     return {"status": "Not Found", "gisaid_id": None}
 
 
-def format_sample_lineage(sample: Sample) -> Dict[str, Any]:
-    pathogen_genome = sample.uploaded_pathogen_genome
+def format_sample_lineage(sample: Sample) -> List[Dict[str, Any]]:
+    pathogen = sample.pathogen
     lineage: Dict[str, Any] = {
-        "lineage": None,
-        "confidence": None,
-        "version": None,
-        "last_updated": None,
         "scorpio_call": None,
         "scorpio_support": None,
         "qc_status": None,
     }
-    if pathogen_genome:
-        lineage["lineage"] = pathogen_genome.pangolin_lineage
-        lineage["confidence"] = pathogen_genome.pangolin_probability
-        lineage["version"] = pathogen_genome.pangolin_version
-        lineage["last_updated"] = pathogen_genome.pangolin_last_updated
 
-        # Support looking at pango csv output.
-        pango_output: Dict[str, Any] = pathogen_genome.pangolin_output  # type: ignore
-        lineage["scorpio_call"] = pango_output.get("scorpio_call")
-        lineage["qc_status"] = pango_output.get("qc_status")
-        if pango_output.get("scorpio_support"):
-            lineage["scorpio_support"] = float(pango_output.get("scorpio_support"))  # type: ignore
+    lineages = []
+    for lin in sample.lineages:
+        lineage_response = lineage.copy()
+        lineage_response["lineage"] = lin.lineage
+        lineage_response["lineage_type"] = lin.lineage_type
+        lineage_response["lineage_software_version"] = lin.lineage_software_version
+        lineage_response["lineage_probability"] = lin.lineage_probability
+        lineage_response["reference_dataset_name"] = lin.reference_dataset_name
+        lineage_response[
+            "reference_sequence_accession"
+        ] = lin.reference_sequence_accession
+        lineage_response["reference_dataset_tag"] = lin.reference_dataset_tag
+        if sample.qc_metrics:
+            lineage_response["qc_status"] = sample.qc_metrics[0].qc_status
 
-    return lineage
+        if pathogen.slug == "SC2":
+            lineage_response["scorpio_call"] = lin.raw_lineage_output.get(
+                "scorpio_call"
+            )
+            lineage_response["scorpio_support"] = lin.raw_lineage_output.get(
+                "scorpio_support"
+            )
+            # For `last_updated`, only SC2 (via Pangolin) provides a non-null val.
+            lineage_response["last_updated"] = lin.last_updated
+        else:
+            # Currently (Dec 2022), other pathogens get lineage via Nextclade.
+            # In Nextclade, dataset `tag` is a datetime, so pull from that.
+            lineage_response["last_updated"] = get_date_from_nextclade_tag(
+                lin.reference_dataset_tag
+            )
+
+        lineages.append(lineage_response)
+
+    return lineages
+
+
+def get_date_from_nextclade_tag(reference_dataset_tag: str) -> Optional[str]:
+    """Pulls out "YYYY-MM-DD" date from a Nextclade dataset's `tag` attribute.
+
+    Nextclade attaches a `tag` to every dataset to uniquely identify it. This
+    tag is consistently just a datetime (eg, "2021-06-25T00:00:00Z"), so we
+    can extract the date from it. While Nextclade seems to strongly adhere to
+    this convention for tags, there is no documentation that future tags /must/
+    keep this structure. If they ever change it we'll need to alter how we
+    handle capturing the date associated with a given dataset.
+    """
+    date = None  # default fall-through just in case tag is missing
+    if reference_dataset_tag:
+        m = re.match(r"^\d{4}-\d+-\d+(?=T)", reference_dataset_tag)
+        # Should never happen, but if it does, we need to know about it!
+        if m is None:
+            msg = (
+                f"Expected structure for Nextclade dataset `tag` was not "
+                f"found, could not extract date. This likely means Nextclade "
+                f"changed their tag structure. An engineer should investigate "
+                f"since this impacts `last_updated` for Nextclade lineages. "
+                f"Problem `reference_dataset_tag` was {reference_dataset_tag}."
+            )
+            sentry_sdk.capture_message(msg, "warning")
+        else:
+            date = m.group()
+    return date
 
 
 def collect_submission_information(

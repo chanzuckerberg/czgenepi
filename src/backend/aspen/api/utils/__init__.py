@@ -29,4 +29,5 @@ from aspen.api.utils.tsv_streamer import (  # noqa: F401
     GenBankSubmissionFormTSVStreamer,
     GisaidSubmissionFormCSVStreamer,
     MetadataTSVStreamer,
+    NextcladeQcMutationsOutputStreamer,
 )

@@ -46,7 +46,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - name: Build And Push
-        uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@v1.2.0
+        uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@docker-build-push-v1.3.1
         with:
           dockerfile: ${{ matrix.image.dockerfile }}
           context: ${{ matrix.image.context }}
@@ -68,7 +68,7 @@ jobs:
           role-duration-seconds: 900
       - name: Calculate Branch and Base Names
         id: refs
-        uses: chanzuckerberg/github-actions/.github/actions/get-github-ref-names@v1.2.0
+        uses: chanzuckerberg/github-actions/.github/actions/get-github-ref-names@get-github-ref-names-v1.4.0
       - name: Get Stack Name
         id: stack-name
         uses: actions/github-script@v6
@@ -85,8 +85,8 @@ jobs:
             console.log(`stackName: ${stackName}`)
             core.setOutput('stack-name', stackName)
       - name: Create or update rdev
-        uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@v1.2.1
+        uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@deploy-happy-stack-v1.7.0
         with:
           tfe-token: ${{ secrets.TFE_TOKEN }}
           stack-name: ${{ steps.stack-name.outputs.stack-name }}
-          happy_version: "0.23.0"
+          happy_version: "0.41.0"

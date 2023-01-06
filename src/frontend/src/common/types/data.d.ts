@@ -14,7 +14,6 @@ interface DataCategory {
   headers: Header[];
   isDataLoading: boolean;
   renderer?: CustomRenderer;
-  subheaders: Record<string, SubHeader[]>;
   text: VIEWNAME;
   to: ROUTES;
   transforms?: Transform[];

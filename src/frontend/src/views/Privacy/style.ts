@@ -6,6 +6,11 @@ import {
   getColors,
   getSpaces,
 } from "czifui";
+import { H2 } from "src/common/styles/basicStyle";
+
+export const H2AnchorLink = styled(H2)`
+  scroll-margin-top: 70rem;
+`;
 
 export const Table = styled.table`
   margin: 25px 0px;

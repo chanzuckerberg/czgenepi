@@ -35,12 +35,12 @@ jobs:
           role-duration-seconds: 900
       - uses: actions/checkout@v2
       - name: Determine the tag
-        uses: chanzuckerberg/github-actions/.github/actions/latest-successful-deployment@v1.6.1
+        uses: chanzuckerberg/github-actions/.github/actions/latest-successful-deployment@latest-successful-deployment-v1.0.1
         with:
           environment: staging
           owner: chanzuckerberg
           repo: czgenepi
-          happy_version: "0.23.0"
+          happy_version: "0.41.0"
       - name: Generate payload
         run: |
           if [ -n "${{ github.event.inputs.image_tag }}" ]; then

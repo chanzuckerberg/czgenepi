@@ -2,6 +2,10 @@ import { Menu, MenuItem, Tooltip } from "czifui";
 import { MouseEventHandler, useState } from "react";
 import { TooltipDescriptionText, TooltipHeaderText } from "../../style";
 import { IconButton } from "../../../IconButton";
+import { useSelector } from "react-redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { SplitPathogenWrapper } from "src/components/Split/SplitPathogenWrapper";
+import { PATHOGEN_FEATURE_FLAGS } from "src/components/Split/types";
 
 interface Props {
   openNSTreeModal: () => void;
@@ -16,6 +20,8 @@ const TreeSelectionMenu = ({
   isMenuDisabled,
   isUsherDisabled,
 }: Props): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
+
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
@@ -74,21 +80,34 @@ const TreeSelectionMenu = ({
         onClose={handleClose}
         data-test-id="run-nextstrain-phylo-analysis-icon"
       >
-        <MenuItem onClick={handleClickNS} data-test-id="nextstrain-phylo-tree">
-          Nextstrain Phylogenetic Tree
-        </MenuItem>
-        <Tooltip
-          arrow
-          disableHoverListener={!isUsherDisabled}
-          placement="bottom"
-          title={USHER_DISABLED_TEXT}
+        <SplitPathogenWrapper
+          pathogen={pathogen}
+          feature={PATHOGEN_FEATURE_FLAGS.nextstrain_enabled}
         >
-          <div>
-            <MenuItem onClick={handleClickUsher} disabled={isUsherDisabled}>
-              UShER Phylogenetic Placement
-            </MenuItem>
-          </div>
-        </Tooltip>
+          <MenuItem
+            onClick={handleClickNS}
+            data-test-id="nextstrain-phylo-tree"
+          >
+            Nextstrain Phylogenetic Tree
+          </MenuItem>
+        </SplitPathogenWrapper>
+        <SplitPathogenWrapper
+          pathogen={pathogen}
+          feature={PATHOGEN_FEATURE_FLAGS.usher_linkout}
+        >
+          <Tooltip
+            arrow
+            disableHoverListener={!isUsherDisabled}
+            placement="bottom"
+            title={USHER_DISABLED_TEXT}
+          >
+            <div>
+              <MenuItem onClick={handleClickUsher} disabled={isUsherDisabled}>
+                UShER Phylogenetic Placement
+              </MenuItem>
+            </div>
+          </Tooltip>
+        </SplitPathogenWrapper>
       </Menu>
     </>
   );

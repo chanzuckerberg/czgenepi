@@ -148,3 +148,7 @@ Notes:
 Drop out of remote container mode:
 * Run the `Remote-Containers: Reopen Folder Locally` command
 
+
+### Capturing Analytics Events:
+
+* [Confluence document on some basic notes on where to get started](https://czi.atlassian.net/wiki/spaces/SCI/pages/2637725697/Analytics+Notes)

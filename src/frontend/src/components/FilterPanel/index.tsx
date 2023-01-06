@@ -1,8 +1,12 @@
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { filter, forEach, isEqual } from "lodash";
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import { isUserFlagOn } from "../Split";
+import { USER_FEATURE_FLAGS } from "../Split/types";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import { GenomeRecoveryFilter } from "./components/GenomeRecoveryFilter";
 import { LineageFilter } from "./components/LineageFilter";
+import { QCStatusFilter } from "./components/QCStatusFilter";
 import { UploadDateFilter } from "./components/UploadDateFilter";
 import { StyledFilterPanel } from "./style";
 
@@ -18,6 +22,7 @@ export interface DefaultMenuSelectOption {
 interface Props {
   isOpen: boolean;
   lineages: DefaultMenuSelectOption[];
+  qcStatuses: DefaultMenuSelectOption[];
   setActiveFilterCount: (count: number) => void;
   setDataFilterFunc: Dispatch<
     SetStateAction<(data: TableItem[]) => TableItem[]>
@@ -52,6 +57,14 @@ const DATA_FILTER_INIT = {
       d.CZBFailedGenomeRecovery ? "Failed" : "Complete",
     type: TypeFilterType.Single,
   },
+  qcMetrics: {
+    key: "qcMetrics",
+    params: {
+      multiSelected: [],
+    },
+    transform: (d: Sample) => d.qcMetrics[0]?.qc_status,
+    type: TypeFilterType.Multiple,
+  },
   collectionDate: {
     key: "collectionDate",
     params: {
@@ -66,7 +79,7 @@ const DATA_FILTER_INIT = {
     params: {
       multiSelected: [],
     },
-    transform: (d: Sample) => d.lineage?.lineage,
+    transform: (d: Sample) => d.lineages[0]?.lineage,
     type: TypeFilterType.Multiple,
   },
   uploadDate: {
@@ -122,10 +135,18 @@ const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
 const FilterPanel: FC<Props> = ({
   isOpen,
   lineages,
+  qcStatuses,
   setActiveFilterCount,
   setDataFilterFunc,
 }) => {
   const [dataFilters, setDataFilters] = useState<FiltersType>(DATA_FILTER_INIT);
+  const nextcladeDownloadFlag = useTreatments([
+    USER_FEATURE_FLAGS.nextclade_download,
+  ]);
+  const usesNextcladeDownload = isUserFlagOn(
+    nextcladeDownloadFlag,
+    USER_FEATURE_FLAGS.nextclade_download
+  );
 
   useEffect(() => {
     const wrappedFilterFunc = () => {
@@ -204,6 +225,17 @@ const FilterPanel: FC<Props> = ({
     }
   };
 
+  const updateQCStatusFilter = (multiSelected: string[]) => {
+    const prevSelected = dataFilters.qcMetrics?.params.multiSelected;
+
+    // * (mlila): need to do a comparison here, or else the component gets into
+    // * an infinite state loop (because arrays are compared by identity rather
+    // * than content, by default)
+    if (!isEqual(prevSelected, multiSelected)) {
+      updateDataFilter("qcMetrics", { multiSelected });
+    }
+  };
+
   const updateGenomeRecoveryFilter = (selected?: string) => {
     const prevSelected = dataFilters.CZBFailedGenomeRecovery?.params.selected;
 
@@ -227,10 +259,18 @@ const FilterPanel: FC<Props> = ({
         updateLineageFilter={updateLineageFilter}
         data-test-id="sample-filter-lineage"
       />
-      <GenomeRecoveryFilter
-        updateGenomeRecoveryFilter={updateGenomeRecoveryFilter}
-        data-test-id="sample-filter-status"
-      />
+      {usesNextcladeDownload ? (
+        <QCStatusFilter
+          options={qcStatuses}
+          updateQCStatusFilter={updateQCStatusFilter}
+          data-test-id="sample-filter-qc-status"
+        />
+      ) : (
+        <GenomeRecoveryFilter
+          updateGenomeRecoveryFilter={updateGenomeRecoveryFilter}
+          data-test-id="sample-filter-status"
+        />
+      )}
     </StyledFilterPanel>
   );
 };

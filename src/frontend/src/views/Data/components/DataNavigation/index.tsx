@@ -1,8 +1,11 @@
 import { Tab } from "czifui";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { Pathogen } from "src/common/redux/types";
 import { ROUTES } from "src/common/routes";
 import { DataCategory } from "src/common/types/data";
 import { FilterPanelToggle } from "./FilterPanelToggle";
@@ -28,6 +31,7 @@ const DataNavigation = ({
   shouldShowSampleFilterToggle,
   toggleFilterPanel,
 }: Props): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
   const [currentTab, setCurrentTab] = useState<ROUTES>(ROUTES.DATA_SAMPLES);
   const [tabData, setTabData] = useState<Partial<DataCategory>[]>([]);
 
@@ -79,15 +83,26 @@ const DataNavigation = ({
         />
       )}
       <StyledTabs value={currentTab} sdsSize="large" onChange={handleTabClick}>
-        {tabData.map((tab) => (
-          <Tab
-            key={tab.to}
-            value={tab.to}
-            label={tab.text}
-            count={tab.count}
-            data-test-id={`menu-item-${tab.to}`}
-          />
-        ))}
+        {tabData.map((tab) => {
+          // NOTE!! Here we are temporarily hiding the tree tab for monkeypox until
+          // we complete the functionality next quarter. For features that will be
+          // hidden long-term, a config would be more appropriate than this if statement.
+          if (
+            pathogen === Pathogen.MONKEY_POX &&
+            tab.to === ROUTES.PHYLO_TREES
+          ) {
+            return;
+          }
+          return (
+            <Tab
+              key={tab.to}
+              value={tab.to}
+              label={tab.text}
+              count={tab.count}
+              data-test-id={`menu-item-${tab.to}`}
+            />
+          );
+        })}
       </StyledTabs>
     </Navigation>
   );

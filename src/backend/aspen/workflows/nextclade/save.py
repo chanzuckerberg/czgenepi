@@ -27,6 +27,8 @@ from aspen.workflows.nextclade.utils import extract_dataset_info
 # TODO, create an enum table for below and standard nextclade QC overallStatus
 INVALID_RESULT_STATUS = "invalid"
 
+FAILED_LINEAGE_STATUS = "FAILED"
+
 
 @click.command("save")
 @click.option("nextclade_fh", "--nextclade-csv", type=click.File("r"), required=True)
@@ -93,44 +95,43 @@ def cli(
                 qc_metric.reference_dataset_tag = dataset_info["tag"]
             session.add(qc_metric)
 
-            # If run was invalid, we do not set any info about mutation.
-            if is_result_valid:
-                existing_mutation_q = (
-                    sa.select(SampleMutation)
-                    .join(SampleMutation.sample)
-                    .filter(
-                        SampleMutation.sample == sample,
-                        SampleMutation.mutations_caller == MutationsCaller.NEXTCLADE,
-                    )
+            # If run was invalid, we still set mutation, but all mutation data saved will be empty strings
+            existing_mutation_q = (
+                sa.select(SampleMutation)
+                .join(SampleMutation.sample)
+                .filter(
+                    SampleMutation.sample == sample,
+                    SampleMutation.mutations_caller == MutationsCaller.NEXTCLADE,
                 )
-                mutation = session.execute(existing_mutation_q).scalars().one_or_none()
+            )
+            mutation = session.execute(existing_mutation_q).scalars().one_or_none()
 
-                if mutation is None:
-                    mutation = SampleMutation(
-                        sample=sample,
-                        mutations_caller=MutationsCaller.NEXTCLADE,
-                        substitutions=row["substitutions"],
-                        insertions=row["insertions"],
-                        deletions=row["deletions"],
-                        aa_substitutions=row["aaSubstitutions"],
-                        aa_insertions=row["aaInsertions"],
-                        aa_deletions=row["aaDeletions"],
-                        reference_sequence_accession=dataset_info["accession"],
-                    )
-                else:
-                    mutation.substitutions = row["substitutions"]
-                    mutation.insertions = row["insertions"]
-                    mutation.deletions = row["deletions"]
-                    mutation.aa_substitutions = row["aaSubstitutions"]
-                    mutation.aa_insertions = row["aaInsertions"]
-                    mutation.aa_deletions = row["aaDeletions"]
-                    mutation.reference_sequence_accession = dataset_info["accession"]
-                session.add(mutation)
+            if mutation is None:
+                mutation = SampleMutation(
+                    sample=sample,
+                    mutations_caller=MutationsCaller.NEXTCLADE,
+                    substitutions=row["substitutions"],
+                    insertions=row["insertions"],
+                    deletions=row["deletions"],
+                    aa_substitutions=row["aaSubstitutions"],
+                    aa_insertions=row["aaInsertions"],
+                    aa_deletions=row["aaDeletions"],
+                    reference_sequence_accession=dataset_info["accession"],
+                )
+            else:
+                mutation.substitutions = row["substitutions"]
+                mutation.insertions = row["insertions"]
+                mutation.deletions = row["deletions"]
+                mutation.aa_substitutions = row["aaSubstitutions"]
+                mutation.aa_insertions = row["aaInsertions"]
+                mutation.aa_deletions = row["aaDeletions"]
+                mutation.reference_sequence_accession = dataset_info["accession"]
+            session.add(mutation)
 
-            # If run was invalid, we do not set any info about the lineage.
-            # Additionally, if SC2 (covid) we use Pangolin, not Nextclade.
-            if is_result_valid and pathogen_slug != "SC2":
-                lineage = get_lineage_from_row(row)
+            # If SC2 (covid) we use Pangolin, not Nextclade.
+            if pathogen_slug != "SC2":
+                # lineage will return FAILED if sample did not match well against reference
+                lineage = get_lineage_from_row(row, is_result_valid)
 
                 existing_sample_lineage_q = (
                     sa.select(SampleLineage)
@@ -187,7 +188,9 @@ def is_nextclade_result_valid(nextclade_csv_row: Dict[str, str]) -> bool:
     return False
 
 
-def get_lineage_from_row(nextclade_csv_row: Dict[str, str]) -> str:
+def get_lineage_from_row(
+    nextclade_csv_row: Dict[str, str], is_result_valid: bool
+) -> str:
     """Gets lineage value for a sample from the dict of its Nextclade CSV row.
 
     Background: the `clade` is generally available when looking at the sequence
@@ -211,9 +214,16 @@ def get_lineage_from_row(nextclade_csv_row: Dict[str, str]) -> str:
     to run Nextclade against some sequences for that pathogen, inspect the
     results, and check in with Comp Bio colleagues.
     """
+
     lineage = nextclade_csv_row.get("lineage")
+
     if lineage is None:
         lineage = nextclade_csv_row["clade"]
+
+    # if the sample is very low quality or unable to be matched against reference, there will be no lineage assigned, return FAILED
+    if not is_result_valid or lineage == "":
+        return FAILED_LINEAGE_STATUS
+
     return lineage
 
 

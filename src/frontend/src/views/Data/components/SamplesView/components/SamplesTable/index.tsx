@@ -33,6 +33,8 @@ interface Props {
   setCheckedSamples(samples: Sample[]): void;
 }
 
+// TODO-TR (ehoops): Use config from src/views/Data/table-headers/sampleHeadersConfig.tsx
+// and move the config if necessary
 const columns: ColumnDef<Sample, any>[] = [
   {
     id: "select",
@@ -230,7 +232,7 @@ const columns: ColumnDef<Sample, any>[] = [
       </SortableHeader>
     ),
     cell: ({ getValue }) => {
-      const { lineage } = getValue();
+      const lineage = getValue()?.lineage;
       const CellContent = (
         <StyledCellBasic
           shouldTextWrap
@@ -267,7 +269,9 @@ const columns: ColumnDef<Sample, any>[] = [
     cell: ({ getValue }) => (
       <StyledCellBasic
         shouldTextWrap
-        primaryText={getValue().location}
+        primaryText={
+          getValue().location || getValue().division || getValue().country
+        }
         primaryTextWrapLineCount={2}
         shouldShowTooltipOnHover={false}
       />

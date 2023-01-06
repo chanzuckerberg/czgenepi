@@ -1,4 +1,4 @@
-FROM nextstrain/base
+FROM nextstrain/base:build-20221207T221900Z
 ARG DEBIAN_FRONTEND=noninteractive
 
 LABEL maintainer = "CZ Gen Epi"

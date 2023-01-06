@@ -27,13 +27,12 @@ pytestmark = pytest.mark.asyncio
 
 async def setup_sequences_download_test_data(
     async_session: AsyncSession,
+    split_client: SplitClient,
 ):
     group = group_factory()
     user = await userrole_factory(async_session, group)
     pathogen = random_pathogen_factory()
-    setup_gisaid_and_genbank_repo_configs(
-        async_session, pathogen, "hCoV-19", "SARS-CoV-2/human"
-    )
+    setup_gisaid_and_genbank_repo_configs(async_session, pathogen, split_client)
     location = location_factory(
         "North America", "USA", "California", "Santa Barbara County"
     )
@@ -62,7 +61,7 @@ async def test_prepare_sequences_download_gisaid(
     """
 
     group, user, sample, pathogen = await setup_sequences_download_test_data(
-        async_session
+        async_session, split_client
     )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
@@ -70,7 +69,6 @@ async def test_prepare_sequences_download_gisaid(
         "sample_ids": [sample.public_identifier],
         "public_repository_name": "GISAID",
     }
-    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -98,7 +96,7 @@ async def test_prepare_sequences_download_genbank(
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GenBank
     """
     group, user, sample, pathogen = await setup_sequences_download_test_data(
-        async_session
+        async_session, split_client
     )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
@@ -106,7 +104,6 @@ async def test_prepare_sequences_download_genbank(
         "sample_ids": [sample.public_identifier],
         "public_repository_name": "GenBank",
     }
-    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -134,7 +131,7 @@ async def test_prepare_sequences_download_public_database_DNE(
     """
 
     group, user, sample, pathogen = await setup_sequences_download_test_data(
-        async_session
+        async_session, split_client
     )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
@@ -142,7 +139,6 @@ async def test_prepare_sequences_download_public_database_DNE(
         "sample_ids": [sample.public_identifier],
         "public_repository_name": "does not exist",
     }
-    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -165,14 +161,13 @@ async def test_prepare_sequences_download_no_submission(
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GenBank
     """
     group, user, sample, pathogen = await setup_sequences_download_test_data(
-        async_session
+        async_session, split_client
     )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
     data = {
         "sample_ids": [sample.public_identifier],
     }
-    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.post(
         f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -225,7 +220,6 @@ async def test_prepare_sequences_download_no_access(
     data = {
         "sample_ids": [sample.public_identifier],
     }
-    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.post(
         f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -263,7 +257,6 @@ async def test_prepare_sequences_download_viewer_no_access(
     data = {
         "sample_ids": [sample.public_identifier],
     }
-    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.post(
         f"/v2/orgs/{viewer_group.id}/pathogens/{pathogen.slug}/sequences/",
         headers=auth_headers,
@@ -283,7 +276,9 @@ async def test_access_matrix(
     Test that we use public ids in the fasta file if the requester only has access to the samples
     sequence data but not private ids
     """
-    pathogen = setup_gisaid_and_genbank_repo_configs(async_session)
+    pathogen, _ = setup_gisaid_and_genbank_repo_configs(
+        async_session, None, split_client
+    )
     owner_group1 = group_factory(name="group1")
     owner_group2 = group_factory(name="group2")
     viewer_group = group_factory(name="CDPH")
@@ -348,7 +343,6 @@ async def test_access_matrix(
     # Make sure sample owners can see their own (shared & private) samples.
     owner_headers = {"name": owner.name, "user_id": owner.auth0_user_id}
     data = {"sample_ids": [sample1.public_identifier, sample4.public_identifier]}
-    split_client.get_pathogen_treatment.return_value = "GISAID"
     res = await http_client.post(
         f"/v2/orgs/{owner_group1.id}/pathogens/{pathogen.slug}/sequences/",
         headers=owner_headers,
@@ -436,13 +430,14 @@ async def test_access_matrix(
 async def test_getfastaurl(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GISAID
     """
 
     group, user, sample, pathogen = await setup_sequences_download_test_data(
-        async_session
+        async_session, split_client
     )
 
     auth_headers = {"name": user.name, "user_id": user.auth0_user_id}
@@ -474,13 +469,14 @@ async def test_getfastaurl(
 async def test_getfastaurl_usher(
     async_session: AsyncSession,
     http_client: AsyncClient,
+    split_client: SplitClient,
 ):
     """
     Test a regular sequence download for a sample submitted by the user's group, test prefixes are correctly added for GISAID
     """
 
     group, user, sample, pathogen = await setup_sequences_download_test_data(
-        async_session
+        async_session, split_client
     )
 
     USHER_UNSAFE_CHARS = r"[^a-zA-Z0-9._/-]"

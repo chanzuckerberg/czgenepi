@@ -32,60 +32,10 @@ interface Props {
   data?: BioinformaticsMap;
   defaultSortKey: string[];
   headers: Header[];
-  subheaders: Record<string, SubHeader[]>;
   isLoading: boolean;
   renderer?: CustomRenderer;
   viewName: VIEWNAME;
   dataFilterFunc?: (data: TableItem[]) => TableItem[];
-}
-
-export function tsvDataMap(
-  checkedSampleIds: string[],
-  tableData: TableItem[] | undefined,
-  headers: Header[],
-  subheaders: Record<string, SubHeader[]>
-): [string[], string[][]] | undefined {
-  const headersDownload = [...headers];
-  headersDownload.push({
-    key: "CZBFailedGenomeRecovery",
-    sortKey: ["CZBFailedGenomeRecovery"],
-    text: "Genome Recovery",
-  });
-  if (tableData) {
-    const filteredTableData = tableData.filter((entry) =>
-      checkedSampleIds.includes(String(entry["publicId"]))
-    );
-    const tsvData = filteredTableData.map((entry) => {
-      return headersDownload.flatMap((header) => {
-        if (
-          typeof entry[header.key] === "object" &&
-          Object.prototype.hasOwnProperty.call(subheaders, header.key)
-        ) {
-          const subEntry = entry[header.key] as Record<string, JSONPrimitive>;
-          return subheaders[header.key].map((subheader) =>
-            String(subEntry[subheader.key])
-          );
-        }
-        if (header.key == "CZBFailedGenomeRecovery") {
-          if (entry[header.key]) {
-            return "Failed";
-          } else {
-            return "Success";
-          }
-        } else {
-          return String(entry[header.key]);
-        }
-      });
-    });
-    const tsvHeaders = headersDownload.flatMap((header) => {
-      if (Object.prototype.hasOwnProperty.call(subheaders, header.key)) {
-        return subheaders[header.key].map((subheader) => subheader.text);
-      }
-      return header.text;
-    });
-
-    return [tsvHeaders, tsvData];
-  }
 }
 
 const DataSubview: FunctionComponent<Props> = ({
@@ -101,6 +51,7 @@ const DataSubview: FunctionComponent<Props> = ({
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
+  const [badQCSampleIds, setBadQCSampleIds] = useState<string[]>([]);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
   const [shouldStartUsherFlow, setShouldStartUsherFlow] =
@@ -140,6 +91,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleDownloadClose = () => {
     setDownloadModalOpen(false);
+    setCheckedSampleIds([]);
   };
 
   useEffect(() => {
@@ -242,7 +194,6 @@ const DataSubview: FunctionComponent<Props> = ({
     const checkedSamples = compact(
       checkedSampleIds.map((id) => data?.[id]) as Sample[]
     );
-
     return (
       <>
         {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
@@ -256,12 +207,14 @@ const DataSubview: FunctionComponent<Props> = ({
               onClose={handleDownloadClose}
             />
             <CreateNSTreeModal
+              badQCSampleIds={badQCSampleIds}
               checkedSampleIds={checkedSampleIds}
               failedSampleIds={failedSampleIds}
               open={isNSCreateTreeModalOpen}
               onClose={handleCreateTreeClose}
             />
             <UsherTreeFlow
+              badQCSampleIds={badQCSampleIds}
               checkedSampleIds={checkedSampleIds}
               failedSampleIds={failedSampleIds}
               shouldStartUsherFlow={shouldStartUsherFlow}
@@ -305,6 +258,8 @@ const DataSubview: FunctionComponent<Props> = ({
               setCheckedSampleIds={setCheckedSampleIds}
               failedSampleIds={failedSampleIds}
               setFailedSampleIds={setFailedSampleIds}
+              badQCSampleIds={badQCSampleIds}
+              setBadQCSampleIds={setBadQCSampleIds}
               viewName={viewName}
               data={
                 dataFilterFunc && tableData

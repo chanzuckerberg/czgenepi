@@ -200,12 +200,16 @@ class Sample(idbase, DictMixin):  # type: ignore
     aligned_pathogen_genome = relationship(  # type: ignore
         "AlignedPathogenGenome", back_populates="sample"
     )
-    qc_metrics = relationship("SampleQCMetric", back_populates="sample")  # type: ignore
     lineages = relationship("SampleLineage", back_populates="sample")  # type: ignore
-    mutations = relationship("SampleMutation", back_populates="sample")  # type: ignore
     aligned_peptides = relationship("AlignedPeptides", back_populates="sample")  # type: ignore
 
-    def generate_public_identifier(self, already_exists=False):
+    # NOTE - it's unclear why we need explicit cascade rules on some of these
+    # relationships and not others, but these are necessary to support simple
+    # deletions.
+    mutations = relationship("SampleMutation", back_populates="sample", cascade="all, delete")  # type: ignore
+    qc_metrics = relationship("SampleQCMetric", back_populates="sample", cascade="all, delete")  # type: ignore
+
+    def generate_public_identifier(self, prefix, already_exists=False):
         # If we don't have an explicit public identifier, generate one from
         # our current model context
         if self.public_identifier:
@@ -217,11 +221,11 @@ class Sample(idbase, DictMixin):  # type: ignore
         if already_exists:
             id = self.id
             self.public_identifier = (
-                f"hCoV-19/{country}/{group_prefix}-{id}/{current_year}"
+                f"{prefix}/{country}/{group_prefix}-{id}/{current_year}"
             )
         else:
             self.public_identifier = func.concat(
-                f"hCoV-19/{country}/{group_prefix}-",
+                f"{prefix}/{country}/{group_prefix}-",
                 text("currval('aspen.samples_id_seq')"),
                 f"/{current_year}",
             )
