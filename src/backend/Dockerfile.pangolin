@@ -4,7 +4,7 @@ ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 ENV DEBIAN_FRONTEND=noninteractive
 USER root
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-    git wget curl bzip2 \
+    git wget \
     ca-certificates \
     sudo python3 python3-pip
 RUN mkdir -p /usherbuild
@@ -30,7 +30,7 @@ WORKDIR /usr/src/app
 
 # boost and tbb are for supporting usher, which is for supporting pangolin.
 RUN apt-get update && apt-get install -y  \
-        make wget git jq gcc unzip \
+        make wget git jq gcc unzip curl bzip2 \
         libboost-filesystem1.74.0 \
         libboost-program-options1.74.0 \
         libboost-iostreams1.74.0 \
