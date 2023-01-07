@@ -12,8 +12,9 @@ import { UsherPlacementModal } from "./components/UsherPlacementModal";
 
 interface Props {
   checkedSampleIds: string[];
-  badQCSampleIds: string[];
+  badOrFailedQCSampleIds: string[];
   shouldStartUsherFlow: boolean;
+  setBadOrFailedQCSampleIds(sampleIds: string[]): void;
 }
 
 const USHER_PATHOGEN_PARAMS: PathogenConfigType<string> = {
@@ -46,8 +47,9 @@ const generateUsherLink = (
 
 const UsherTreeFlow = ({
   checkedSampleIds,
-  badQCSampleIds,
+  badOrFailedQCSampleIds,
   shouldStartUsherFlow,
+  setBadOrFailedQCSampleIds,
 }: Props): JSX.Element => {
   const dispatch = useDispatch();
 
@@ -85,6 +87,7 @@ const UsherTreeFlow = ({
     setIsPlacementOpen(false);
     setIsConfirmOpen(false);
     setUsherLink("");
+    setBadOrFailedQCSampleIds([]);
   };
 
   const handleConfirmationConfirm = () => {
@@ -110,7 +113,7 @@ const UsherTreeFlow = ({
     <>
       <UsherPlacementModal
         checkedSampleIds={checkedSampleIds}
-        badQCSampleIds={badQCSampleIds}
+        badOrFailedQCSampleIds={badOrFailedQCSampleIds}
         open={isPlacementOpen}
         onClose={() => setIsPlacementOpen(false)}
         onLinkCreateSuccess={onLinkCreateSuccess}

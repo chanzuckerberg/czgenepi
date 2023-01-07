@@ -50,7 +50,9 @@ const DataSubview: FunctionComponent<Props> = ({
   const [searchResults, setSearchResults] = useState<TableItem[]>([]);
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
-  const [badQCSampleIds, setBadQCSampleIds] = useState<string[]>([]);
+  const [badOrFailedQCSampleIds, setBadOrFailedQCSampleIds] = useState<
+    string[]
+  >([]);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
   const [shouldStartUsherFlow, setShouldStartUsherFlow] =
@@ -86,13 +88,15 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleCreateTreeClose = () => {
     setIsNSCreateTreeModalOpen(false);
+    setCheckedSampleIds([]);
+    setBadOrFailedQCSampleIds([]);
   };
 
   const handleDownloadClose = () => {
     setDownloadModalOpen(false);
     setCheckedSampleIds([]);
+    setBadOrFailedQCSampleIds([]);
   };
-
   useEffect(() => {
     if (shouldStartUsherFlow) setShouldStartUsherFlow(false);
   }, [shouldStartUsherFlow]);
@@ -205,15 +209,16 @@ const DataSubview: FunctionComponent<Props> = ({
               onClose={handleDownloadClose}
             />
             <CreateNSTreeModal
-              badQCSampleIds={badQCSampleIds}
+              badOrFailedQCSampleIds={badOrFailedQCSampleIds}
               checkedSampleIds={checkedSampleIds}
               open={isNSCreateTreeModalOpen}
               onClose={handleCreateTreeClose}
             />
             <UsherTreeFlow
-              badQCSampleIds={badQCSampleIds}
+              badOrFailedQCSampleIds={badOrFailedQCSampleIds}
               checkedSampleIds={checkedSampleIds}
               shouldStartUsherFlow={shouldStartUsherFlow}
+              setBadOrFailedQCSampleIds={setBadOrFailedQCSampleIds}
             />
             <DeleteSamplesConfirmationModal
               checkedSamples={checkedSamples}
@@ -252,8 +257,8 @@ const DataSubview: FunctionComponent<Props> = ({
               isLoading={isLoading}
               checkedSampleIds={checkedSampleIds}
               setCheckedSampleIds={setCheckedSampleIds}
-              badQCSampleIds={badQCSampleIds}
-              setBadQCSampleIds={setBadQCSampleIds}
+              badOrFailedQCSampleIds={badOrFailedQCSampleIds}
+              setBadOrFailedQCSampleIds={setBadOrFailedQCSampleIds}
               viewName={viewName}
               data={
                 dataFilterFunc && tableData

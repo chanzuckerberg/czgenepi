@@ -29,7 +29,7 @@ import { pluralize } from "src/common/utils/strUtils";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { Header } from "../DownloadModal/style";
-import { BadQCSampleAlert } from "./components/BadQCSampleAlert";
+import { BadOrFailedQCSampleAlert } from "./components/BadQCSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
 import { MissingSampleAlert } from "./components/MissingSampleAlert";
 import {
@@ -68,14 +68,14 @@ export type ResetFiltersType = {
 
 interface Props {
   checkedSampleIds: string[];
-  badQCSampleIds: string[];
+  badOrFailedQCSampleIds: string[];
   open: boolean;
   onClose: () => void;
 }
 
 export const CreateNSTreeModal = ({
   checkedSampleIds,
-  badQCSampleIds,
+  badOrFailedQCSampleIds,
   open,
   onClose,
 }: Props): JSX.Element => {
@@ -449,7 +449,9 @@ export const CreateNSTreeModal = ({
             shouldReset={shouldReset}
           />
           <MissingSampleAlert missingSamples={missingInputSamples} />
-          <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
+          <BadOrFailedQCSampleAlert
+            numBadOrFailedQCSamples={badOrFailedQCSampleIds?.length}
+          />
         </StyledDialogContent>
         <StyledFooter>
           <CreateTreeButton

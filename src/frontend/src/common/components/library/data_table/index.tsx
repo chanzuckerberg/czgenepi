@@ -29,8 +29,8 @@ interface Props {
   isLoading: boolean;
   checkedSampleIds: string[];
   setCheckedSampleIds(samples: string[]): void;
-  setBadQCSampleIds(samples: string[]): void;
-  badQCSampleIds: string[];
+  setBadOrFailedQCSampleIds(samples: string[]): void;
+  badOrFailedQCSampleIds: string[];
   viewName: VIEWNAME;
   renderer?: CustomRenderer;
   handleDeleteTreeModalOpen(t: PhyloRun): void;
@@ -128,11 +128,14 @@ function extractPublicIdsFromData(
   return publicIds;
 }
 
-function extractPublicIdsWBadQCData(data: Sample[]) {
+function extractPublicIdsWBadOrFailedQCData(data: Sample[]) {
   return data
     .filter(
       // for now there should only ever be one qcMetrics entry per sample
-      (s) => s.qcMetrics.length > 0 && s.qcMetrics[0].qc_status === "Bad"
+      (s) =>
+        s.qcMetrics.length > 0 &&
+        (s.qcMetrics[0].qc_status === "Bad" ||
+          s.qcMetrics[0].qc_status === "Failed")
     )
     .map((s) => s.publicId);
 }
@@ -154,8 +157,8 @@ export const DataTable: FunctionComponent<Props> = ({
   isLoading,
   checkedSampleIds,
   setCheckedSampleIds,
-  setBadQCSampleIds,
-  badQCSampleIds,
+  setBadOrFailedQCSampleIds,
+  badOrFailedQCSampleIds,
   viewName,
   handleDeleteTreeModalOpen,
   handleEditTreeModalOpen,
@@ -188,7 +191,19 @@ export const DataTable: FunctionComponent<Props> = ({
         setIsHeaderChecked(false);
       }
     }
-  }, [data, checkedSampleIds, setHeaderIndeterminant, setIsHeaderChecked]);
+  }, [
+    data,
+    checkedSampleIds,
+    badOrFailedQCSampleIds,
+    setHeaderIndeterminant,
+    setIsHeaderChecked,
+  ]);
+
+  useEffect(() => {
+    if (checkedSampleIds.length === 0) {
+      setIsHeaderChecked(false);
+    }
+  }, [checkedSampleIds]);
 
   function handleHeaderCheckboxClick() {
     if (!data) return;
@@ -201,36 +216,48 @@ export const DataTable: FunctionComponent<Props> = ({
 
     // TODO TableItem[] appears identical to Sample[] we should go through and refactor this once we have time to do so
     // since TableItem and Sample are identical i think it's safe to do this cast here
-    const newBadQCDataIds = extractPublicIdsWBadQCData(data as Sample[]);
+    const newBadOrFailedQCDataIds = extractPublicIdsWBadOrFailedQCData(
+      data as Sample[]
+    );
 
     if (isHeaderIndeterminant || isHeaderChecked) {
       // remove samples in current data selection when selecting checkbox when indeterminate
       const newCheckedSamples = checkedSampleIds.filter(
         (el) => !newPublicIds.includes(el)
       );
+      const newBadOrFailedQCDataIds = badOrFailedQCSampleIds.filter(
+        (el) => !newPublicIds.includes(el)
+      );
       setCheckedSampleIds(newCheckedSamples);
-      setBadQCSampleIds(newBadQCDataIds);
+      setBadOrFailedQCSampleIds(newBadOrFailedQCDataIds);
       setIsHeaderChecked(false);
       setHeaderIndeterminant(false);
     }
     if (!isHeaderChecked && !isHeaderIndeterminant) {
       // set isHeaderChecked to true, add all samples in current view
       setCheckedSampleIds(checkedSampleIds.concat(newPublicIds));
-      setBadQCSampleIds(badQCSampleIds.concat(newBadQCDataIds));
+      setBadOrFailedQCSampleIds(
+        badOrFailedQCSampleIds.concat(newBadOrFailedQCDataIds)
+      );
       setIsHeaderChecked(true);
     }
   }
 
-  function handleRowCheckboxClick(sampleId: string, badQCData: boolean) {
+  function handleRowCheckboxClick(
+    sampleId: string,
+    badOrFailedQCData: boolean
+  ) {
     if (checkedSampleIds.includes(sampleId)) {
       setCheckedSampleIds(checkedSampleIds.filter((id) => id !== sampleId));
-      if (badQCData) {
-        setBadQCSampleIds(badQCSampleIds.filter((id) => id !== sampleId));
+      if (badOrFailedQCData) {
+        setBadOrFailedQCSampleIds(
+          badOrFailedQCSampleIds.filter((id) => id !== sampleId)
+        );
       }
     } else {
       setCheckedSampleIds([...checkedSampleIds, sampleId]);
-      if (badQCData) {
-        setBadQCSampleIds([...badQCSampleIds, sampleId]);
+      if (badOrFailedQCData) {
+        setBadOrFailedQCSampleIds([...badOrFailedQCSampleIds, sampleId]);
       }
     }
   }
@@ -285,7 +312,9 @@ export const DataTable: FunctionComponent<Props> = ({
       handleRowCheckboxClick(
         String(item.publicId),
         Boolean(
-          item.qcMetrics.length > 0 && item.qcMetrics[0].qc_status === "Bad"
+          item.qcMetrics.length > 0 &&
+            (item.qcMetrics[0].qc_status === "Bad" ||
+              item.qcMetrics[0].qc_status === "Failed")
         )
       );
     };

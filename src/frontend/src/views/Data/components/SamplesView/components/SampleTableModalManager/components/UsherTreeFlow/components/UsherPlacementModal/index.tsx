@@ -39,11 +39,11 @@ import {
   Title,
   TreeNameInfoWrapper,
 } from "./style";
-import { BadQCSampleAlert } from "../../../CreateNSTreeModal/components/BadQCSampleAlert";
+import { BadOrFailedQCSampleAlert } from "../../../CreateNSTreeModal/components/BadQCSampleAlert";
 
 interface Props {
   checkedSampleIds: string[];
-  badQCSampleIds: string[];
+  badOrFailedQCSampleIds: string[];
   open: boolean;
   onClose: () => void;
   onLinkCreateSuccess(
@@ -73,7 +73,7 @@ const getDefaultNumSamplesPerSubtree = (numSelected: number): number => {
 
 export const UsherPlacementModal = ({
   checkedSampleIds,
-  badQCSampleIds,
+  badOrFailedQCSampleIds,
   onClose,
   onLinkCreateSuccess,
   open,
@@ -327,7 +327,9 @@ export const UsherPlacementModal = ({
                   </StyledSuggestionWrapper>
                 )}
               </StyledTextField>
-              <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
+              <BadOrFailedQCSampleAlert
+                numBadOrFailedQCSamples={badOrFailedQCSampleIds?.length}
+              />
             </div>
             <StyledButton
               sdsType="primary"
