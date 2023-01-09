@@ -1,4 +1,23 @@
-FROM python:3.9.1-slim AS base
+# Build UShER for use with pangolin 4+
+FROM debian:bullseye AS usher
+ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
+ENV DEBIAN_FRONTEND=noninteractive
+USER root
+RUN apt-get update && apt-get install -yq --no-install-recommends \
+    git wget \
+    ca-certificates \
+    sudo python3 python3-pip
+RUN mkdir -p /usherbuild
+WORKDIR /usherbuild
+# faSomeRecords and faSize are needed for the UShER WDL workflow
+RUN wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/faSomeRecords
+RUN wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/faSize
+RUN chmod 775 *
+## Checkout latest release
+RUN git clone https://github.com/yatisht/usher.git
+RUN cd usher && git checkout v0.6.0 && ./install/installUbuntu.sh
+
+FROM python:3.10-slim-bullseye AS base
 ENV FLASK_APP=aspen.main
 EXPOSE 3000
 
@@ -9,17 +28,51 @@ RUN python3 -m pip install poetry==$POETRY_VERSION
 
 WORKDIR /usr/src/app
 
-RUN apt-get update && apt-get install -y make wget git jq gcc unzip
+# boost and tbb are for supporting usher, which is for supporting pangolin.
+RUN apt-get update && apt-get install -y  \
+        make wget git jq gcc unzip curl bzip2 \
+        libboost-filesystem1.74.0 \
+        libboost-program-options1.74.0 \
+        libboost-iostreams1.74.0 \
+        libboost-date-time1.74.0 \
+        libprotobuf23 \
+        libtbb2
 
-# install miniconda
-RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-RUN chmod +x Miniconda3-latest-Linux-x86_64.sh
-RUN ./Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
-RUN eval "$($HOME/miniconda/bin/conda shell.bash hook)" && conda init
+# Install Pangolin and PangoLEARN + deps (for ncov)
+# The cov-lineages projects aren't available on PyPI, so install via git URLs.
+RUN pip3 install snakemake==6.8.0
+RUN pip3 install git+https://github.com/cov-lineages/pangolin.git@v4.1.3
+RUN pip3 install git+https://github.com/cov-lineages/pangolin-data.git@v1.16
+RUN pip3 install git+https://github.com/cov-lineages/scorpio.git@v0.3.17
+RUN pip3 install git+https://github.com/cov-lineages/constellations.git@v0.1.10
+RUN pip3 install pysam==0.19.1
 
-# install pangolin
-COPY aspen/workflows/pangolin/install_pangolin.sh .
-RUN bash install_pangolin.sh
+# libtbb doesn't install well on bullseye:
+RUN ln -s /usr/lib/x86_64-linux-gnu/libtbb.so.2 /usr/lib/x86_64-linux-gnu/libtbb_preview.so.2
+
+# Download gofasta and minimap2 for Pangolin
+RUN curl -fsSL https://github.com/virus-evolution/gofasta/releases/download/v0.0.6/gofasta-linux-amd64 \
+ -o /usr/local/bin/gofasta && chmod a+x /usr/local/bin/gofasta
+RUN curl -fsSL https://github.com/lh3/minimap2/releases/download/v2.24/minimap2-2.24_x64-linux.tar.bz2 \
+  | tar xjvpf - --no-same-owner --strip-components=1 -C /usr/local/bin minimap2-2.24_x64-linux/minimap2 \
+  && chmod a+x /usr/local/bin/gofasta
+
+COPY --from=usher \
+    /usherbuild/usher/build/compareVCF \
+    /usherbuild/usher/build/faToVcf \
+    /usherbuild/usher/build/matOptimize \
+    /usherbuild/usher/build/matUtils \
+    /usherbuild/usher/build/ripples \
+    /usherbuild/usher/build/ripples-fast \
+    /usherbuild/usher/build/ripplesInit \
+    /usherbuild/usher/build/ripplesUtils \
+    /usherbuild/usher/build/transpose_vcf \
+    /usherbuild/usher/build/transposed_vcf_print_name \
+    /usherbuild/usher/build/transposed_vcf_to_fa \
+    /usherbuild/usher/build/transposed_vcf_to_vcf \
+    /usherbuild/usher/build/usher \
+    /usherbuild/usher/build/usher-sampled \
+    /usr/local/bin
 
 # Poetry: install app
 COPY pyproject.toml poetry.lock environment.yaml ./
