@@ -92,6 +92,11 @@ const DataSubview: FunctionComponent<Props> = ({
     setBadOrFailedQCSampleIds([]);
   };
 
+  const handleUsherTreeFlowClose = () => {
+    setCheckedSampleIds([]);
+    setBadOrFailedQCSampleIds([]);
+  };
+
   const handleDownloadClose = () => {
     setDownloadModalOpen(false);
     setCheckedSampleIds([]);
@@ -218,7 +223,7 @@ const DataSubview: FunctionComponent<Props> = ({
               badOrFailedQCSampleIds={badOrFailedQCSampleIds}
               checkedSampleIds={checkedSampleIds}
               shouldStartUsherFlow={shouldStartUsherFlow}
-              setBadOrFailedQCSampleIds={setBadOrFailedQCSampleIds}
+              onClose={handleUsherTreeFlowClose}
             />
             <DeleteSamplesConfirmationModal
               checkedSamples={checkedSamples}

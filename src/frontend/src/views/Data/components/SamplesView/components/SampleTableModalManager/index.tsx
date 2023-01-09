@@ -89,9 +89,9 @@ const SampleTableModalManager = ({
       />
       <UsherTreeFlow
         checkedSampleIds={checkedSampleIds}
-        setBadOrFailedQCSampleIds={setBadOrFailedQCSampleIds}
         badOrFailedQCSampleIds={badOrFailedQCSampleIds}
         shouldStartUsherFlow={shouldStartUsherFlow}
+        onClose={clearCheckedSamples}
       />
       <DeleteSamplesConfirmationModal
         checkedSamples={checkedSamples}
