@@ -194,7 +194,6 @@ export const DataTable: FunctionComponent<Props> = ({
   }, [
     data,
     checkedSampleIds,
-    badOrFailedQCSampleIds,
     setHeaderIndeterminant,
     setIsHeaderChecked,
   ]);
