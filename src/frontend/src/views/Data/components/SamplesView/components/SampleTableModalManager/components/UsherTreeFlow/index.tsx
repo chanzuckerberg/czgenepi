@@ -117,7 +117,10 @@ const UsherTreeFlow = ({
         badOrFailedQCSampleIds={badOrFailedQCSampleIds}
         open={isPlacementOpen}
         // onClose will clear checked samples and bad/failed qc samples
-        onClose={() => {setIsPlacementOpen(false); onClose();}}
+        onClose={() => {
+          setIsPlacementOpen(false);
+          onClose();
+        }}
         onLinkCreateSuccess={onLinkCreateSuccess}
       />
       <UsherConfirmationModal
