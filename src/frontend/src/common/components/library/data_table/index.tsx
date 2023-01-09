@@ -225,11 +225,11 @@ export const DataTable: FunctionComponent<Props> = ({
       const newCheckedSamples = checkedSampleIds.filter(
         (el) => !newPublicIds.includes(el)
       );
-      const newBadOrFailedQCDataIds = badOrFailedQCSampleIds.filter(
-        (el) => !newPublicIds.includes(el)
+      const newBadOrFailedQCDataSamples = badOrFailedQCSampleIds.filter(
+        (el) => !newBadOrFailedQCDataIds.includes(el)
       );
       setCheckedSampleIds(newCheckedSamples);
-      setBadOrFailedQCSampleIds(newBadOrFailedQCDataIds);
+      setBadOrFailedQCSampleIds(newBadOrFailedQCDataSamples);
       setIsHeaderChecked(false);
       setHeaderIndeterminant(false);
     }
