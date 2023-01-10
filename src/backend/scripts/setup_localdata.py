@@ -497,11 +497,10 @@ def create_alignment_entity(session, pathogen, repository):
     session.add(aligned_workflow)
 
 
-def create_samples(
-    session, group, user, pathogen, location, num_total_samples
-):
+def create_samples(session, group, user, pathogen, location, num_total_samples):
     for suffix in range(num_total_samples):
         _ = create_sample(session, group, user, pathogen, location, suffix)
+
 
 def get_default_file(s3_resource):
     default_bucket = "genepi-db-data"
