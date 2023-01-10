@@ -11,6 +11,7 @@ from sqlalchemy import (
     func,
     Integer,
     JSON,
+    sql,
     String,
     text,
     UniqueConstraint,
