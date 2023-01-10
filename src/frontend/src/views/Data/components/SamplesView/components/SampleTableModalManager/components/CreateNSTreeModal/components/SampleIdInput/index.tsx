@@ -1,13 +1,16 @@
 import { Icon } from "czifui";
 import { compact, filter } from "lodash";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { INPUT_DELIMITERS } from "src/common/constants/inputDelimiters";
 import {
   SampleValidationResponseType,
   useValidateSampleIds,
 } from "src/common/queries/samples";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { pluralize } from "src/common/utils/strUtils";
 import { InputInstructions } from "./components/InputInstructions";
+import { SampleIdInputPathogenStrings } from "./strings";
 import {
   BaselineFlexContainer,
   FlexContainer,
@@ -29,6 +32,7 @@ const SampleIdInput = ({
   handleInputValidation,
   shouldReset,
 }: Props): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
   const [hasEverSubmittedSampleIds, setHasEverSubmittedSampleIds] =
     useState<boolean>(false);
@@ -155,7 +159,7 @@ const SampleIdInput = ({
         variant="outlined"
         rows={!isInEditMode ? 4 : 3}
         value={isInEditMode ? inputValue : inputDisplayValue}
-        placeholder="e.g. USA/CA-CZB-0000/2021, USA/CA-CDPH-000000/2021"
+        placeholder={SampleIdInputPathogenStrings[pathogen].idPlaceholderText}
         data-test-id="force-include-sample-id"
       />
       {shouldShowAddButton && (
