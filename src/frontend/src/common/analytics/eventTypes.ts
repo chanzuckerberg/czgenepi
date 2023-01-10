@@ -279,8 +279,8 @@ export type AnalyticsSamplesFilter = {
   // Collection dates that user is filtering on
   collection_date_start: FormattedDateType | null;
   collection_date_end: FormattedDateType | null;
-  // Lineages that user is filtering on
+  // JSON array of all the lineages user is filtering on
   lineages: JsonString;
-  // qcStatus that user is filtering on
+  // JSON array of all the qc statuses that user is filtering on
   qc_statuses: JsonString;
 };
