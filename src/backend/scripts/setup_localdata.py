@@ -276,9 +276,7 @@ def create_sample_qc_metrics(session, sample):
     return sample_qc_metrics
 
 
-def create_sample(
-    session, group, pathogen, uploaded_by_user, location, suffix
-):
+def create_sample(session, group, pathogen, uploaded_by_user, location, suffix):
     private_id = f"{group.prefix}-private_identifier_{suffix}_{pathogen.slug}"
     public_id = f"{group.prefix}-public_identifier_{suffix}_{pathogen.slug}"
 
