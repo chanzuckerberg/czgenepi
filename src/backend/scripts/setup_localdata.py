@@ -498,13 +498,10 @@ def create_alignment_entity(session, pathogen, repository):
 
 
 def create_samples(
-    session, group, user, pathogen, location, num_successful, num_failures
+    session, group, user, pathogen, location, num_total_samples
 ):
-    for suffix in range(num_successful):
+    for suffix in range(num_total_samples):
         _ = create_sample(session, group, user, pathogen, location, suffix)
-    for suffix in range(num_failures):
-        _ = create_sample(session, group, user, pathogen, location, suffix)
-
 
 def get_default_file(s3_resource):
     default_bucket = "genepi-db-data"
@@ -562,7 +559,7 @@ def create_test_data(engine):
     group = create_test_group(session, "CZI", "CZI", location)
     user = create_test_user(session, "user1@czgenepi.org", group, "User1", "Test User")
     for pathogen in pathogens:
-        create_samples(session, group, pathogen, user, location, 10, 5)
+        create_samples(session, group, pathogen, user, location, 15)
         create_test_trees(session, group, pathogen, user)
 
     # Create db rows for another group
@@ -574,7 +571,7 @@ def create_test_data(engine):
         session, "tbktu@czgenepi.org", group2, "tbktu", "Timbuktu User"
     )
     for pathogen in pathogens:
-        create_samples(session, group2, pathogen, user2, location2, 10, 10)
+        create_samples(session, group2, pathogen, user2, location2, 15)
         create_test_trees(session, group2, pathogen, user2)
 
     upload_tree_files(session)
