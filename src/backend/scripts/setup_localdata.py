@@ -277,19 +277,15 @@ def create_sample_qc_metrics(session, sample):
 
 
 def create_sample(
-    session, group, pathogen, uploaded_by_user, location, suffix, is_failed=False
+    session, group, pathogen, uploaded_by_user, location, suffix
 ):
     private_id = f"{group.prefix}-private_identifier_{suffix}_{pathogen.slug}"
     public_id = f"{group.prefix}-public_identifier_{suffix}_{pathogen.slug}"
-    if is_failed:
-        private_id += "_failed"
-        public_id += "_failed"
 
     sample = (
         session.query(Sample)
         .filter(Sample.private_identifier == private_id)
         .filter(Sample.submitting_group == group)
-        .filter(Sample.czb_failed_genome_recovery == is_failed)
         .filter(Sample.pathogen == pathogen)
         .order_by(Sample.id)
         .first()
@@ -312,7 +308,6 @@ def create_sample(
         pathogen=pathogen,
         public_identifier=public_id,
         collection_date=datetime.now(),
-        czb_failed_genome_recovery=is_failed,
         sample_collected_by="sample_collector",
         sample_collector_contact_address="sample_collector_address",
         collection_location=location,
