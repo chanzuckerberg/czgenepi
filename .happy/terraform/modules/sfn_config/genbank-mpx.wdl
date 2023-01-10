@@ -175,17 +175,24 @@ task TransformGenBankMPX {
     aspen_creation_rev=$COMMIT_SHA
 
     # get the bucket/key from the object id
-    raw_genbank_location=$(python3 /usr/src/app/aspen/workflows/transform_gisaid/lookup_raw_download_object.py --raw-download-object-id "~{raw_genbank_object_id}")
+    raw_genbank_location=$(python3 /usr/src/app/aspen/workflows/transform_sequences/lookup_raw_download_object.py --raw-download-object-id "~{raw_genbank_object_id}")
     raw_genbank_s3_bucket=$(echo "${raw_genbank_location}" | jq -r .bucket)
     raw_genbank_s3_key=$(echo "${raw_genbank_location}" | jq -r .key)
 
     # fetch the genbank mpx metadata on nextstrain.
     wget "~{genbank_metadata_url}" --continue --tries=2 -O metadata.tsv.gz
-    gzcat metadata.tsv.gz | zstd -o metadata.tsv.zst
+    gunzip metadata.tsv.gz
 
 
     # decompress the genbank dataset and remove sequences not found in the metadata.
     ${aws} s3 cp --no-progress "s3://${raw_genbank_s3_bucket}/${raw_genbank_s3_key}" - | zstdmt -d > raw_sequences.fasta
+
+    python3 /usr/src/app/aspen/workflows/transform_sequences/prune.py   \
+            --metadata-file "metadata.tsv"                              \
+            --sequences-file "raw_sequences.fasta"
+
+    # compress processed sequences
+    zstd raw_sequences.fasta -o sequences.fasta.zst
 
 
     # upload the files to S3
@@ -196,7 +203,7 @@ task TransformGenBankMPX {
     end_time=$(date +%s)
 
     # create the objects
-    python3 /usr/src/app/aspen/workflows/transform_gisaid/save.py   \
+    python3 /usr/src/app/aspen/workflows/transform_sequences/save.py   \
             --aspen-workflow-rev "${aspen_workflow_rev}"            \
             --aspen-creation-rev "${aspen_creation_rev}"            \
             --ncov-ingest-rev "${ncov_ingest_git_rev}"              \
