@@ -14,6 +14,7 @@ import {
 
 export const Header = styled.div`
   ${fontHeaderXl}
+  display: flex;
 `;
 
 export const Content = styled.div`

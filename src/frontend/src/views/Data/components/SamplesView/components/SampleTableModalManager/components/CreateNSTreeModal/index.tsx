@@ -139,12 +139,6 @@ export const CreateNSTreeModal = ({
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
 
-  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isUserFlagOn(
-    flag,
-    USER_FEATURE_FLAGS.tree_location_filter
-  );
-
   const handleFilterChange = (onChangeFilter: () => void): void => {
     setIsFilterEnabled(true);
     onChangeFilter();
@@ -261,6 +255,15 @@ export const CreateNSTreeModal = ({
     </div>
   );
 
+  const HEADER_TOOLTIP_TEXT = (
+    <div>
+      Visit our help center to{" "}
+      <NewTabLink href="https://help.czgenepi.org/hc/en-us/articles/6712563575956-Build-on-demand-trees">
+        learn more about building Nextstrain trees in CZ GEN EPI.
+      </NewTabLink>
+    </div>
+  );
+
   const allPossibleTreeSamples = checkedSampleIds.concat(validatedInputSamples);
   const allFailedOrMissingSamples = failedSampleIds.concat(missingInputSamples);
   const allValidSamplesForTreeCreation = allPossibleTreeSamples.filter(
@@ -310,7 +313,20 @@ export const CreateNSTreeModal = ({
               <Icon sdsIcon="xMark" sdsSize="l" sdsType="static" />
             </StyledCloseIconWrapper>
           </StyledCloseIconButton>
-          <Header>Create New Phylogenetic Tree</Header>
+          <Header>
+            Create New Phylogenetic Tree
+            <StyledTooltip
+              arrow
+              leaveDelay={1000}
+              title={HEADER_TOOLTIP_TEXT}
+              placement="top"
+              data-test-id="header-tooltip"
+            >
+              <StyledInfoIconWrapper>
+                <Icon sdsIcon="infoCircle" sdsSize="s" sdsType="interactive" />
+              </StyledInfoIconWrapper>
+            </StyledTooltip>
+          </Header>
           <Title data-test-id="title-with-sample-total">
             {allSamplesRequestedTableAndInput.length}{" "}
             {pluralize("Sample", allValidSamplesForTreeCreation.length)} Total
@@ -368,19 +384,16 @@ export const CreateNSTreeModal = ({
                 </StyledInfoIconWrapper>
               </StyledTooltip>
             </TreeNameInfoWrapper>
-            {isTreeLocationFilterFlagOn && (
-              <TreeTypeSubtext>
-                Samples already selected on the sample table or included by ID
-                in the bottom section will always be force-included on your
-                tree.{" "}
-                <Link
-                  href="https://help.czgenepi.org/hc/en-us/articles/6712563575956-Build-on-demand-trees#generating"
-                  target="_blank"
-                >
-                  Learn More.
-                </Link>
-              </TreeTypeSubtext>
-            )}
+            <TreeTypeSubtext>
+              Samples already selected on the sample table or included by ID in
+              the bottom section will always be force-included on your tree.{" "}
+              <Link
+                href="https://help.czgenepi.org/hc/en-us/articles/6712563575956-Build-on-demand-trees#generating"
+                target="_blank"
+              >
+                Learn More.
+              </Link>
+            </TreeTypeSubtext>
             <RadioGroup value={treeType} onChange={handleChangeTreeType}>
               <StyledFormControlLabel
                 value={TreeTypes.Overview}

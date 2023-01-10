@@ -62,6 +62,9 @@ export enum EVENT_TYPES {
 
   // User is in multiple groups and is changing which group they are acting in.
   ACTIVE_GROUP_CHANGE = "ACTIVE_GROUP_CHANGE",
+
+  // User has filtered data on the Samples page
+  SAMPLES_FILTER = "SAMPLES_FILTER",
 }
 
 /**
@@ -245,6 +248,8 @@ export type AnalyticsSamplesDownloadFile = {
   includes_genbank_template: boolean;
   // User downloaded gisaid template for these samples
   includes_gisaid_template: boolean;
+  // User downloaded nextclade data for these samples (TSV)
+  includes_nextclade_data: boolean;
   // User downloaded info on metadata for these samples
   includes_sample_metadata: boolean;
 };
@@ -258,4 +263,26 @@ export type AnalyticsActiveGroupChange = {
   previous_group_id: number;
   // The group ID that the user is switching to viewing/acting as.
   new_group_id: number;
+};
+
+/** EVENT_TYPES.SAMPLES_FILTER */
+export type AnalyticsSamplesFilter = {
+  // User is filtering by uploadDate
+  filtering_by_upload_date: boolean;
+  // User is filtering by collectionDate
+  filtering_by_collection_date: boolean;
+  // User is filtering by lineage
+  filtering_by_lineage: boolean;
+  // User is filtering by qcStatus
+  filtering_by_qc_status: boolean;
+  // Upload dates that user is filtering on
+  upload_date_start: FormattedDateType | null;
+  upload_date_end: FormattedDateType | null;
+  // Collection dates that user is filtering on
+  collection_date_start: FormattedDateType | null;
+  collection_date_end: FormattedDateType | null;
+  // JSON array of all the lineages user is filtering on
+  lineages: JsonString;
+  // JSON array of all the qc statuses that user is filtering on
+  qc_statuses: JsonString;
 };

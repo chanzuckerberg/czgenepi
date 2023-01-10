@@ -13,21 +13,10 @@ WORKDIR /usr/src/app
 
 RUN apt-get update && apt-get install -y make wget git jq gcc unzip
 
-# install miniconda
-RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-RUN chmod +x Miniconda3-latest-Linux-x86_64.sh
-RUN ./Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
-RUN eval "$($HOME/miniconda/bin/conda shell.bash hook)" && conda init
-
 # install nextclade, check it installed correctly
 RUN apt-get --yes install curl
 RUN cd /usr/local/bin && curl -fsSL "https://github.com/nextstrain/nextclade/releases/latest/download/nextclade-x86_64-unknown-linux-gnu" -o "nextclade" && chmod +x nextclade
 RUN nextclade --version
-
-# install pangolin
-COPY aspen/workflows/pangolin/install_pangolin.sh .
-RUN bash install_pangolin.sh
-
 
 # Poetry: install app
 COPY pyproject.toml poetry.lock environment.yaml ./

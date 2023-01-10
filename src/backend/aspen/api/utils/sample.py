@@ -1,3 +1,4 @@
+import re
 from collections import Counter
 from typing import (
     Any,
@@ -11,6 +12,7 @@ from typing import (
     TYPE_CHECKING,
 )
 
+import sentry_sdk
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.query import Query
@@ -227,7 +229,6 @@ def format_sample_lineage(sample: Sample) -> List[Dict[str, Any]]:
         lineage_response["lineage_type"] = lin.lineage_type
         lineage_response["lineage_software_version"] = lin.lineage_software_version
         lineage_response["lineage_probability"] = lin.lineage_probability
-        lineage_response["last_updated"] = lin.last_updated
         lineage_response["reference_dataset_name"] = lin.reference_dataset_name
         lineage_response[
             "reference_sequence_accession"
@@ -243,10 +244,46 @@ def format_sample_lineage(sample: Sample) -> List[Dict[str, Any]]:
             lineage_response["scorpio_support"] = lin.raw_lineage_output.get(
                 "scorpio_support"
             )
+            # For `last_updated`, only SC2 (via Pangolin) provides a non-null val.
+            lineage_response["last_updated"] = lin.last_updated
+        else:
+            # Currently (Dec 2022), other pathogens get lineage via Nextclade.
+            # In Nextclade, dataset `tag` is a datetime, so pull from that.
+            lineage_response["last_updated"] = get_date_from_nextclade_tag(
+                lin.reference_dataset_tag
+            )
 
         lineages.append(lineage_response)
 
     return lineages
+
+
+def get_date_from_nextclade_tag(reference_dataset_tag: str) -> Optional[str]:
+    """Pulls out "YYYY-MM-DD" date from a Nextclade dataset's `tag` attribute.
+
+    Nextclade attaches a `tag` to every dataset to uniquely identify it. This
+    tag is consistently just a datetime (eg, "2021-06-25T00:00:00Z"), so we
+    can extract the date from it. While Nextclade seems to strongly adhere to
+    this convention for tags, there is no documentation that future tags /must/
+    keep this structure. If they ever change it we'll need to alter how we
+    handle capturing the date associated with a given dataset.
+    """
+    date = None  # default fall-through just in case tag is missing
+    if reference_dataset_tag:
+        m = re.match(r"^\d{4}-\d+-\d+(?=T)", reference_dataset_tag)
+        # Should never happen, but if it does, we need to know about it!
+        if m is None:
+            msg = (
+                f"Expected structure for Nextclade dataset `tag` was not "
+                f"found, could not extract date. This likely means Nextclade "
+                f"changed their tag structure. An engineer should investigate "
+                f"since this impacts `last_updated` for Nextclade lineages. "
+                f"Problem `reference_dataset_tag` was {reference_dataset_tag}."
+            )
+            sentry_sdk.capture_message(msg, "warning")
+        else:
+            date = m.group()
+    return date
 
 
 def collect_submission_information(
