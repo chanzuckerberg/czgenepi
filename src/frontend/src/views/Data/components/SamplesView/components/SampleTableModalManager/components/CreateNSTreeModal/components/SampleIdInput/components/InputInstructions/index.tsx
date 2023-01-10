@@ -25,7 +25,10 @@ const InputInstructions = (): JSX.Element => {
           <div key={1}>
             Add{" "}
             <SemiBold>
-              {InputInstructionsPathogenStrings[pathogen].publicRepositoryIds}
+              {
+                InputInstructionsPathogenStrings[pathogen]
+                  .publicRepositoryIdType
+              }
             </SemiBold>{" "}
             (e.g.{" "}
             {
