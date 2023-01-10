@@ -1,8 +1,12 @@
+import { useSelector } from "react-redux";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
+import { InputInstructionsPathogenStrings } from "./strings";
 import { SemiBold, StyledWrapper } from "./style";
 
 const InputInstructions = (): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
   return (
     <StyledWrapper>
       <CollapsibleInstructions
@@ -19,9 +23,16 @@ const InputInstructions = (): JSX.Element => {
             </NewTabLink>
           </div>,
           <div key={1}>
-            Add <SemiBold>GISAID IDs</SemiBold> (e.g. USA/CA-CZB-0000/2021,
-            hCoV-19/USA/CA-CZB-0000/2021 or EPI_ISL_0000),{" "}
-            <SemiBold>CZ GEN EPI Public IDs</SemiBold>, or{" "}
+            Add{" "}
+            <SemiBold>
+              {InputInstructionsPathogenStrings[pathogen].publicRepositoryIds}
+            </SemiBold>{" "}
+            (e.g.{" "}
+            {
+              InputInstructionsPathogenStrings[pathogen]
+                .publicRepositoryIdExamples
+            }
+            ), <SemiBold>CZ GEN EPI Public IDs</SemiBold>, or{" "}
             <SemiBold>CZ GEN EPI Private IDs</SemiBold> below to include samples
             in your tree.
           </div>,
