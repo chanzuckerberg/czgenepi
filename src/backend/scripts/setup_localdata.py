@@ -503,7 +503,7 @@ def create_samples(
     for suffix in range(num_successful):
         _ = create_sample(session, group, user, pathogen, location, suffix)
     for suffix in range(num_failures):
-        _ = create_sample(session, group, user, pathogen, location, suffix, True)
+        _ = create_sample(session, group, user, pathogen, location, suffix)
 
 
 def get_default_file(s3_resource):
