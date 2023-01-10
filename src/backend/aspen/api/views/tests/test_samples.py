@@ -525,60 +525,6 @@ async def test_samples_view_gisaid_no_info(
     assert response == expected
 
 
-async def test_samples_view_gisaid_not_eligible(
-    async_session: AsyncSession, http_client: AsyncClient
-):
-    # TODO (phoenix) revisit this test (do we still need it?)
-    group = group_factory()
-    user = await userrole_factory(async_session, group)
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
-    sample = sample_factory(
-        group, user, location, pathogen=sc2
-    )
-    async_session.add(group)
-    await async_session.commit()
-
-    auth_headers = {"user_id": user.auth0_user_id}
-    res = await http_client.get(
-        f"/v2/orgs/{group.id}/pathogens/{sc2.slug}/samples/",
-        headers=auth_headers,
-    )
-    response = res.json()
-    expected = {
-        "samples": [
-            {
-                "id": sample.id,
-                "collection_date": str(sample.collection_date),
-                "collection_location": {
-                    "id": location.id,
-                    "region": location.region,
-                    "country": location.country,
-                    "division": location.division,
-                    "location": location.location,
-                },
-                "gisaid": {"status": "Not Eligible", "gisaid_id": None},
-                "private_identifier": sample.private_identifier,
-                "public_identifier": sample.public_identifier,
-                "upload_date": None,
-                "sequencing_date": None,
-                "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
-                "private": False,
-                "submitting_group": {
-                    "id": group.id,
-                    "name": group.name,
-                },
-                "uploaded_by": {"id": user.id, "name": user.name},
-                "qc_metrics": [],
-                "lineages": [],
-            }
-        ]
-    }
-    assert response == expected
-
-
 # Helper function for cansee tests
 async def _test_samples_view_cansee(
     async_session: AsyncSession,
