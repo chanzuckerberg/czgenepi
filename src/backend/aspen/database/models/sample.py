@@ -11,7 +11,6 @@ from sqlalchemy import (
     func,
     Integer,
     JSON,
-    sql,
     String,
     text,
     UniqueConstraint,
@@ -176,17 +175,6 @@ class Sample(idbase, DictMixin):  # type: ignore
                 "PHA4GE": "specimen_processing",
             }
         },
-    )
-
-    czb_failed_genome_recovery = Column(
-        Boolean,
-        nullable=True,
-        default=False,
-        server_default=sql.expression.false(),
-        comment=(
-            "This is set to true iff this sample was sequenced by CZB and failed genome "
-            "recovery."
-        ),
     )
 
     accessions = relationship(
