@@ -126,8 +126,7 @@ const PrivateId = ({
     failed: FAILED_STATUS_TOOLTIP_TEXT,
   };
 
-  const label = qcStatusLabel.label;
-  const status = qcStatusLabel.status;
+  const { label, status } = qcStatusLabel;
 
   const displayName =
     submittingGroup?.name === CZ_BIOHUB_GROUP ? "CZ Biohub" : uploadedBy?.name;
