@@ -187,17 +187,11 @@ export const DataTable: FunctionComponent<Props> = ({
       if (publicIds.length === sizeData) {
         setIsHeaderChecked(true);
       }
-      if (sizeData === 0) {
+      if (sizeData === 0 || publicIds.length === 0) {
         setIsHeaderChecked(false);
       }
     }
   }, [data, checkedSampleIds, setHeaderIndeterminant, setIsHeaderChecked]);
-
-  useEffect(() => {
-    if (checkedSampleIds.length === 0) {
-      setIsHeaderChecked(false);
-    }
-  }, [checkedSampleIds]);
 
   function handleHeaderCheckboxClick() {
     if (!data) return;
