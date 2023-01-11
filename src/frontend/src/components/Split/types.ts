@@ -21,7 +21,6 @@ export enum USER_FEATURE_FLAGS {
   multi_pathogen = "multi_pathogen",
   table_refactor = "table_refactor",
   static_metadata_table = "static_metadata_table",
-  nextclade_download = "nextclade_download",
 }
 
 /**
