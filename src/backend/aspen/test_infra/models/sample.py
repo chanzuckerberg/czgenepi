@@ -15,9 +15,9 @@ def sample_factory(
     collection_date=None,
     sample_collected_by="sample_collector",
     sample_collector_contact_address="sample_collector_address",
+    czb_failed_genome_recovery=False,
     pathogen=None,
     organism="SARS-CoV-2",
-    czb_failed_genome_recovery=False,
     private=False,
     accessions: Dict[AccessionType, str] = {
         AccessionType.GISAID_ISL: "EPI_ISL_8675309",
@@ -35,9 +35,9 @@ def sample_factory(
         sample_collected_by=sample_collected_by,
         sample_collector_contact_address=sample_collector_contact_address,
         collection_location=collection_location,
+        czb_failed_genome_recovery=czb_failed_genome_recovery,
         organism=organism,
         pathogen=pathogen,
-        czb_failed_genome_recovery=czb_failed_genome_recovery,
         private=private,
     )
     created_accessions: List[Accession] = []
