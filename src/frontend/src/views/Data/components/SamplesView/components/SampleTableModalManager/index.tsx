@@ -5,6 +5,7 @@ import DownloadModal from "./components/DownloadModal";
 import { EditSamplesConfirmationModal } from "./components/EditSamplesConfirmationModal";
 import { SampleTableActions } from "./components/SampleTableActions";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
+import { getBadOrFailedQCSampleIds } from "src/views/Upload/components/Samples/utils";
 
 interface Props {
   checkedSamples: Sample[];
@@ -16,8 +17,9 @@ const SampleTableModalManager = ({
   clearCheckedSamples,
 }: Props): JSX.Element => {
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
-  const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
-  const [badQCSampleIds, setBadQCSampleIds] = useState<string[]>([]);
+  const [badOrFailedQCSampleIds, setBadOrFailedQCSampleIds] = useState<
+    string[]
+  >([]);
   const [canEditSamples, setCanEditSamples] = useState<boolean>(false);
 
   const [isDeleteSampleModalOpen, setIsDeleteSampleModalOpen] =
@@ -34,16 +36,9 @@ const SampleTableModalManager = ({
   // generate ID lists from sample objects
   useEffect(() => {
     const checkedIds = checkedSamples.map((s) => s.publicId);
-    const failedIds = checkedSamples
-      .filter((s) => s.CZBFailedGenomeRecovery)
-      .map((s) => s.publicId);
-    const badQCIds = checkedSamples
-      // for now there should only ever be one qcMetrics entry per sample
-      .filter((s) => s.qcMetrics[0].qc_status === "Bad")
-      .map((s) => s.publicId);
+    const badOrFailedQCIds = getBadOrFailedQCSampleIds(checkedSamples);
     setCheckedSampleIds(checkedIds);
-    setFailedSampleIds(failedIds);
-    setBadQCSampleIds(badQCIds);
+    setBadOrFailedQCSampleIds(badOrFailedQCIds);
   }, [checkedSamples]);
 
   // determine whether selected samples can be edited
@@ -74,7 +69,6 @@ const SampleTableModalManager = ({
     <>
       <DownloadModal
         checkedSamples={checkedSamples}
-        failedSampleIds={failedSampleIds}
         open={isDownloadModalOpen}
         onClose={() => {
           setIsDownloadModalOpen(false);
@@ -83,16 +77,15 @@ const SampleTableModalManager = ({
       />
       <CreateNSTreeModal
         checkedSampleIds={checkedSampleIds}
-        failedSampleIds={failedSampleIds}
-        badQCSampleIds={badQCSampleIds}
+        badOrFailedQCSampleIds={badOrFailedQCSampleIds}
         open={isNSCreateTreeModalOpen}
         onClose={() => setIsNSCreateTreeModalOpen(false)}
       />
       <UsherTreeFlow
         checkedSampleIds={checkedSampleIds}
-        failedSampleIds={failedSampleIds}
-        badQCSampleIds={badQCSampleIds}
+        badOrFailedQCSampleIds={badOrFailedQCSampleIds}
         shouldStartUsherFlow={shouldStartUsherFlow}
+        onClose={clearCheckedSamples}
       />
       <DeleteSamplesConfirmationModal
         checkedSamples={checkedSamples}

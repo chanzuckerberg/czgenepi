@@ -196,8 +196,6 @@ def check_duplicate_samples_in_request(
 def determine_gisaid_status(
     sample: Sample,
 ) -> Mapping[str, Optional[str]]:
-    if sample.czb_failed_genome_recovery:
-        return {"status": "Not Eligible", "gisaid_id": None}
 
     gisaid_accession: Optional[Accession] = None
     for accession in sample.accessions:
