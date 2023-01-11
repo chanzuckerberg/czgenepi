@@ -5,6 +5,7 @@ import DownloadModal from "./components/DownloadModal";
 import { EditSamplesConfirmationModal } from "./components/EditSamplesConfirmationModal";
 import { SampleTableActions } from "./components/SampleTableActions";
 import { UsherTreeFlow } from "./components/UsherTreeFlow";
+import { getBadOrFailedQCSampleIds } from "src/views/Upload/components/Samples/utils";
 
 interface Props {
   checkedSamples: Sample[];
@@ -35,14 +36,7 @@ const SampleTableModalManager = ({
   // generate ID lists from sample objects
   useEffect(() => {
     const checkedIds = checkedSamples.map((s) => s.publicId);
-    const badOrFailedQCIds = checkedSamples
-      // for now there should only ever be one qcMetrics entry per sample
-      .filter(
-        (s) =>
-          s.qcMetrics[0].qc_status === "Bad" ||
-          s.qcMetrics[0].qc_status === "Failed"
-      )
-      .map((s) => s.publicId);
+    const badOrFailedQCIds = getBadOrFailedQCSampleIds(checkedSamples);
     setCheckedSampleIds(checkedIds);
     setBadOrFailedQCSampleIds(badOrFailedQCIds);
   }, [checkedSamples]);

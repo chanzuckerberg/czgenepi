@@ -21,6 +21,7 @@ import {
   TableRow,
   TreeRowContent,
 } from "./style";
+import { getBadOrFailedQCSampleIds } from "src/views/Upload/components/Samples/utils";
 
 interface Props {
   data?: TableItem[];
@@ -128,18 +129,6 @@ function extractPublicIdsFromData(
   return publicIds;
 }
 
-function extractPublicIdsWBadOrFailedQCData(data: Sample[]) {
-  return data
-    .filter(
-      // for now there should only ever be one qcMetrics entry per sample
-      (s) =>
-        s.qcMetrics.length > 0 &&
-        (s.qcMetrics[0].qc_status === "Bad" ||
-          s.qcMetrics[0].qc_status === "Failed")
-    )
-    .map((s) => s.publicId);
-}
-
 interface TableState {
   sortKey: string[];
   ascending: boolean;
@@ -204,9 +193,7 @@ export const DataTable: FunctionComponent<Props> = ({
 
     // TODO TableItem[] appears identical to Sample[] we should go through and refactor this once we have time to do so
     // since TableItem and Sample are identical i think it's safe to do this cast here
-    const newBadOrFailedQCDataIds = extractPublicIdsWBadOrFailedQCData(
-      data as Sample[]
-    );
+    const newBadOrFailedQCDataIds = getBadOrFailedQCSampleIds(data as Sample[]);
 
     if (isHeaderIndeterminant || isHeaderChecked) {
       // remove samples in current data selection when selecting checkbox when indeterminate
