@@ -31,8 +31,8 @@ RUN apt-get update && apt-get install -y vim procps wget make jq nano
 # Orchestration. Supervisor is heavyweight but afaik nothing else supports sane child reaping and signal forwarding.
 RUN pip install --no-cache-dir supervisor
 
-# Proxy/Router: Set up nginx
-RUN apt install -y nginx
+# Proxy/Router: Set up nginx (also install extras to get ngx_http_upstream_fair_module)
+RUN apt install -y nginx-extras
 
 # FASTAPI: Install poetry
 RUN apt install -y libdigest-sha-perl
