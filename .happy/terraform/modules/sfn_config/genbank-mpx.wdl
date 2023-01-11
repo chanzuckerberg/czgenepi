@@ -256,7 +256,7 @@ task AlignGenBankMPX {
 
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
-    
+
     # We're pinning to a specific git hash in the Dockerfile so we're not cloning this here.
     # git clone --depth 1 https://github.com/nextstrain/ncov /ncov
     ncov_git_rev=$(git -C /ncov rev-parse HEAD)
@@ -369,7 +369,7 @@ task ImportLocations {
     fi
 
     export PYTHONUNBUFFERED=true
-    python3 /usr/src/app/aspen/workflows/import_locations/save.py 1>&2
+    python3 /usr/src/app/aspen/workflows/import_locations/save.py --pathogen MPX 1>&2
     echo done > import_locations_complete
     >>>
 
