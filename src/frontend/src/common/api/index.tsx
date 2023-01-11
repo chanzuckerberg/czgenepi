@@ -226,7 +226,6 @@ const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["uploaded_by", "uploadedBy"],
   ["sequencing_date", "sequencingDate"],
   ["submitting_group", "submittingGroup"],
-  ["czb_failed_genome_recovery", "CZBFailedGenomeRecovery"],
   ["qc_metrics", "qcMetrics"],
 ]);
 

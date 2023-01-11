@@ -69,7 +69,6 @@ export function getSampleResponseData(
       location: "Corodano",
       region: "California",
     },
-    czb_failed_genome_recovery: true,
     gisaid: {
       gisaid_id: "",
       status: "Not Found",
