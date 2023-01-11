@@ -1,3 +1,4 @@
+import datetime
 import json
 from typing import Any, List, Optional, Tuple
 
@@ -26,6 +27,7 @@ from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import setup_random_repo_configs
 from aspen.test_infra.models.repo_metadata import repo_metadata_factory
 from aspen.test_infra.models.sample import sample_factory
+from aspen.test_infra.models.sample_mutations import sample_mutations_factory
 from aspen.test_infra.models.sample_qc_metrics import sample_qc_metrics_factory
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_factory
 from aspen.test_infra.models.usergroup import (
@@ -56,6 +58,9 @@ async def test_samples_list(
         "scorpio_support": "0.775",
         "qc_status": "pass",
     }
+    # For non-COVID pathogens, lineage last_updated based on dataset's tag
+    reference_dataset_tag = "2021-06-25T00:00:00Z"
+    nextclade_lineage_last_updated = "2021-06-25"
 
     sc2 = pathogen_factory("SC2", "SARS-Cov-2")
     mpx = pathogen_factory("MPX", "MPX")
@@ -89,7 +94,11 @@ async def test_samples_list(
                 sample_lineage_factory(samples[i], raw_lineage_output=pangolin_output)
             )
         else:
-            sample_lineages.append(sample_lineage_factory(samples[i]))
+            sample_lineages.append(
+                sample_lineage_factory(
+                    samples[i], reference_dataset_tag=reference_dataset_tag
+                )
+            )
 
     async_session.add(group)
     await async_session.commit()
@@ -130,6 +139,13 @@ async def test_samples_list(
                 "slug": sc2.slug,
                 "name": sc2.name,
             }
+        # Pangolin/SC2 and Nextclade/not-SC2 expose lineage update differently
+        expected_lineage_last_updated = nextclade_lineage_last_updated
+        if pathogen_data["id"] == sc2.id:
+            expected_lineage_last_updated = sample_lineages[i].last_updated.strftime(
+                "%Y-%m-%d"
+            )
+
         expected = {
             "samples": [
                 {
@@ -189,9 +205,7 @@ async def test_samples_list(
                             "lineage_probability": sample_lineages[
                                 i
                             ].lineage_probability,
-                            "last_updated": sample_lineages[i].last_updated.strftime(
-                                "%Y-%m-%d"
-                            ),
+                            "last_updated": expected_lineage_last_updated,
                             "reference_dataset_name": sample_lineages[
                                 i
                             ].reference_dataset_name,
@@ -231,6 +245,9 @@ async def test_samples_list_no_qc_status(
         "scorpio_support": "0.775",
         "qc_status": "pass",
     }
+    # For non-COVID pathogens, lineage last_updated based on dataset's tag
+    reference_dataset_tag = "2021-06-25T00:00:00Z"
+    nextclade_lineage_last_updated = "2021-06-25"
 
     sc2 = pathogen_factory("SC2", "SARS-Cov-2")
     mpx = pathogen_factory("MPX", "MPX")
@@ -262,7 +279,11 @@ async def test_samples_list_no_qc_status(
                 sample_lineage_factory(samples[i], raw_lineage_output=pangolin_output)
             )
         else:
-            sample_lineages.append(sample_lineage_factory(samples[i]))
+            sample_lineages.append(
+                sample_lineage_factory(
+                    samples[i], reference_dataset_tag=reference_dataset_tag
+                )
+            )
 
     async_session.add(group)
     await async_session.commit()
@@ -303,6 +324,13 @@ async def test_samples_list_no_qc_status(
                 "slug": sc2.slug,
                 "name": sc2.name,
             }
+        # Pangolin/SC2 and Nextclade/not-SC2 expose lineage update differently
+        expected_lineage_last_updated = nextclade_lineage_last_updated
+        if pathogen_data["id"] == sc2.id:
+            expected_lineage_last_updated = sample_lineages[i].last_updated.strftime(
+                "%Y-%m-%d"
+            )
+
         expected = {
             "samples": [
                 {
@@ -346,9 +374,7 @@ async def test_samples_list_no_qc_status(
                             "lineage_probability": sample_lineages[
                                 i
                             ].lineage_probability,
-                            "last_updated": sample_lineages[i].last_updated.strftime(
-                                "%Y-%m-%d"
-                            ),
+                            "last_updated": expected_lineage_last_updated,
                             "reference_dataset_name": sample_lineages[
                                 i
                             ].reference_dataset_name,
@@ -812,8 +838,12 @@ async def test_bulk_delete_sample_success(
         ),
     ]
     for sample in samples:
-        upg = uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
-        async_session.add(upg)
+        async_session.add(
+            uploaded_pathogen_genome_factory(sample, sequence="ATGCAAAAAA")
+        )
+        async_session.add(sample_qc_metrics_factory(sample))
+        async_session.add(sample_mutations_factory(sample))
+        async_session.add(sample_lineage_factory(sample))
     async_session.add(group)
     await async_session.commit()
 
@@ -1172,6 +1202,7 @@ async def test_update_samples_success(
     ]
     location_fields = ["collection_location"]
     genome_fields = ["sequencing_date"]
+    current_year = datetime.date.today().strftime("%Y")
     for sample_id, expected in reorganized_data.items():
         # pull sample from the database to verify sample was updated correctly
         q = await async_session.execute(
@@ -1189,7 +1220,7 @@ async def test_update_samples_success(
             request_field_value = expected[field]
             if field == "public_identifier" and request_field_value is None:
                 request_field_value = (
-                    f"{repo_prefix}/USA/testgroupNone-{sample_id}/2022"
+                    f"{repo_prefix}/USA/testgroupNone-{sample_id}/{current_year}"
                 )
             # Handle location fields
             if field in location_fields:

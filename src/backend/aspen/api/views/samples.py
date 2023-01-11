@@ -18,6 +18,7 @@ from aspen.api.deps import (
     get_pathogen_repo_config,
     get_public_repository,
     get_settings,
+    get_splitio,
 )
 from aspen.api.error import http_exceptions as ex
 from aspen.api.schemas.samples import (
@@ -58,6 +59,7 @@ from aspen.database.models import (
     UploadedPathogenGenome,
     User,
 )
+from aspen.util.split import SplitClient
 from aspen.util.swipe import LineageQcJob, PangolinJob
 
 router = APIRouter()
@@ -279,6 +281,7 @@ async def validate_ids(
 @router.post("/", response_model=SamplesResponse)
 async def create_samples(
     create_samples_request: List[CreateSampleRequest],
+    splitio: SplitClient = Depends(get_splitio),
     db: AsyncSession = Depends(get_db),
     settings: APISettings = Depends(get_settings),
     user: User = Depends(get_auth_user),
@@ -286,6 +289,10 @@ async def create_samples(
     pathogen: Pathogen = Depends(get_pathogen),
     pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ) -> SamplesResponse:
+
+    preferred_lineage_caller = splitio.get_pathogen_treatment(
+        "PATHOGEN_lineage_caller", pathogen
+    )
 
     duplicates_in_request: Union[
         None, Mapping[str, list[str]]
@@ -379,12 +386,16 @@ async def create_samples(
     await db.commit()
 
     # Asynchronously kick off various on-demand jobs via threads before return
-    _pangolin_job = PangolinJob(settings)
-    pangolin_job = threading.Thread(
-        target=_pangolin_job.run,
-        args=(group, pangolin_sample_ids),
-    )
-    pangolin_job.start()
+
+    # pangolin should only be called for SC2 samples
+    # SC2 samples still will get qc_metrics from nextclade job (LingeageQCJob)
+    if preferred_lineage_caller == "Pangolin":
+        _pangolin_job = PangolinJob(settings)
+        pangolin_job = threading.Thread(
+            target=_pangolin_job.run,
+            args=(group, pangolin_sample_ids),
+        )
+        pangolin_job.start()
 
     _lineage_qc_job = LineageQcJob(settings)
     lineage_qc_job = threading.Thread(

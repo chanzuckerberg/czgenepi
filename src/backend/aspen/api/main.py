@@ -23,6 +23,7 @@ from aspen.api.views import (
     pathogens,
     phylo_runs,
     phylo_trees,
+    qc_mutations,
     samples,
     sequences,
     users,
@@ -153,6 +154,7 @@ def get_app() -> FastAPI:
         "sequences": sequences.router,
         "phylo_trees": phylo_trees.router,
         "phylo_runs": phylo_runs.router,
+        "qc_mutations": qc_mutations.router,
         "samples": samples.router,
         "usher": usher.router,
     }

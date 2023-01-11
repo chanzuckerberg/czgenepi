@@ -30,6 +30,8 @@ interface Props {
   checkedSampleIds: string[];
   setCheckedSampleIds(samples: string[]): void;
   failedSampleIds: string[];
+  setBadQCSampleIds(samples: string[]): void;
+  badQCSampleIds: string[];
   setFailedSampleIds(samples: string[]): void;
   viewName: VIEWNAME;
   renderer?: CustomRenderer;
@@ -138,6 +140,15 @@ function extractPublicIdsFromDataWFailedGenomeRecovery(data: TableItem[]) {
   return failedSampleIds;
 }
 
+function extractPublicIdsWBadQCData(data: Sample[]) {
+  return data
+    .filter(
+      // for now there should only ever be one qcMetrics entry per sample
+      (s) => s.qcMetrics.length > 0 && s.qcMetrics[0].qc_status === "Bad"
+    )
+    .map((s) => s.publicId);
+}
+
 interface TableState {
   sortKey: string[];
   ascending: boolean;
@@ -157,6 +168,8 @@ export const DataTable: FunctionComponent<Props> = ({
   setCheckedSampleIds,
   failedSampleIds,
   setFailedSampleIds,
+  setBadQCSampleIds,
+  badQCSampleIds,
   viewName,
   handleDeleteTreeModalOpen,
   handleEditTreeModalOpen,
@@ -200,6 +213,9 @@ export const DataTable: FunctionComponent<Props> = ({
       false
     );
     const newFailedIds = extractPublicIdsFromDataWFailedGenomeRecovery(data);
+    // TODO TableItem[] appears identical to Sample[] we should go through and refactor this once we have time to do so
+    // since TableItem and Sample are identical i think it's safe to do this cast here
+    const newBadQCDataIds = extractPublicIdsWBadQCData(data as Sample[]);
 
     if (isHeaderIndeterminant || isHeaderChecked) {
       // remove samples in current data selection when selecting checkbox when indeterminate
@@ -211,6 +227,7 @@ export const DataTable: FunctionComponent<Props> = ({
       );
       setCheckedSampleIds(newCheckedSamples);
       setFailedSampleIds(newFailedSamples);
+      setBadQCSampleIds(newBadQCDataIds);
       setIsHeaderChecked(false);
       setHeaderIndeterminant(false);
     }
@@ -218,23 +235,31 @@ export const DataTable: FunctionComponent<Props> = ({
       // set isHeaderChecked to true, add all samples in current view
       setCheckedSampleIds(checkedSampleIds.concat(newPublicIds));
       setFailedSampleIds(failedSampleIds.concat(newFailedIds));
+      setBadQCSampleIds(badQCSampleIds.concat(newBadQCDataIds));
       setIsHeaderChecked(true);
     }
   }
 
   function handleRowCheckboxClick(
     sampleId: string,
-    failedGenomeRecovery: boolean
+    failedGenomeRecovery: boolean,
+    badQCData: boolean
   ) {
     if (checkedSampleIds.includes(sampleId)) {
       setCheckedSampleIds(checkedSampleIds.filter((id) => id !== sampleId));
       if (failedGenomeRecovery) {
         setFailedSampleIds(failedSampleIds.filter((id) => id !== sampleId));
       }
+      if (badQCData) {
+        setBadQCSampleIds(badQCSampleIds.filter((id) => id !== sampleId));
+      }
     } else {
       setCheckedSampleIds([...checkedSampleIds, sampleId]);
       if (failedGenomeRecovery) {
         setFailedSampleIds([...failedSampleIds, sampleId]);
+      }
+      if (badQCData) {
+        setBadQCSampleIds([...badQCSampleIds, sampleId]);
       }
     }
   }
@@ -281,14 +306,17 @@ export const DataTable: FunctionComponent<Props> = ({
     });
   };
 
-  const rowCheckbox = (item: TableItem): React.ReactNode => {
+  const rowCheckbox = (item: Sample): React.ReactNode => {
     const checked: boolean = checkedSampleIds.includes(
       item?.publicId as string
     );
     const handleClick = function handleClick() {
       handleRowCheckboxClick(
         String(item.publicId),
-        Boolean(item.CZBFailedGenomeRecovery)
+        Boolean(item.CZBFailedGenomeRecovery),
+        Boolean(
+          item.qcMetrics.length > 0 && item.qcMetrics[0].qc_status === "Bad"
+        )
       );
     };
     return (
@@ -310,7 +338,8 @@ export const DataTable: FunctionComponent<Props> = ({
       const item = tableData[props.index];
       return (
         <TableRow style={props.style} data-test-id="table-row">
-          {isSampleTable && rowCheckbox(item)}
+          {/* cast item as sample since they are identical, related to earlier TODO around replacing all instances of TableItem with Sample */}
+          {isSampleTable && rowCheckbox(item as Sample)}
           {item ? (
             sampleRow(item)
           ) : (

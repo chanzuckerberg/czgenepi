@@ -9,6 +9,7 @@ import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { Pathogen } from "src/common/redux/types";
 import { DataCategory, Transform } from "src/common/types/data";
 import {
   IdMap,
@@ -160,9 +161,18 @@ const Data: FunctionComponent = () => {
   };
 
   // create JSX elements from categories
-  dataCategories.forEach((category) => {
+  const menuItemsOrNull = dataCategories.map((category) => {
+    // NOTE!! Here we are temporarily hiding the tree tab for monkeypox until
+    // we complete the functionality next quarter. For features that will be
+    // hidden long-term, a config would be more appropriate than this if statement.
+    if (
+      pathogen === Pathogen.MONKEY_POX &&
+      category.to === ROUTES.PHYLO_TREES
+    ) {
+      return null;
+    }
     const item = category.text.replace(" ", "-").toLowerCase();
-    dataJSX.menuItems.push(
+    return (
       <StyledMenuItem key={category.text}>
         <NextLink href={category.to} key={category.text} passHref>
           <a href="passHref">
@@ -183,6 +193,11 @@ const Data: FunctionComponent = () => {
     );
   });
 
+  // TODO: (ehoops) - once trees are re-enabled for mpx, we can remove this.
+  dataJSX.menuItems = menuItemsOrNull.filter(
+    (item) => item !== null
+  ) as Array<JSX.Element>; // Casting here because typescript thinks this can still be null.
+
   const subTitle = currentPath.startsWith(ROUTES.DATA_SAMPLES)
     ? "Samples"
     : "Phylogenetic Trees";
@@ -199,6 +214,13 @@ const Data: FunctionComponent = () => {
   // * incomplete options causes the component to break
   const sampleMap = viewName === "Samples" ? (samples as SampleMap) : {};
   const lineages = uniq(compact(map(sampleMap, (d) => d.lineages[0]?.lineage)))
+    .sort()
+    .map((l) => {
+      return { name: l as string };
+    });
+  const qcStatuses = uniq(
+    compact(map(sampleMap, (d) => d.qcMetrics[0]?.qc_status))
+  )
     .sort()
     .map((l) => {
       return { name: l as string };
@@ -223,6 +245,7 @@ const Data: FunctionComponent = () => {
             // TODO (mlila): replace with sds filterpanel once it's complete
             <FilterPanel
               lineages={lineages}
+              qcStatuses={qcStatuses}
               isOpen={shouldShowFilters}
               setActiveFilterCount={setActiveFilterCount}
               setDataFilterFunc={setDataFilterFunc}

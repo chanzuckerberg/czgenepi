@@ -11,6 +11,6 @@ export const uploadCompletePathogenStrings: PathogenConfigType<UploadCompleteStr
       pathogenName: "SARS-CoV-2",
     },
     [Pathogen.MONKEY_POX]: {
-      pathogenName: "mpox",
+      pathogenName: "Mpox",
     },
   };

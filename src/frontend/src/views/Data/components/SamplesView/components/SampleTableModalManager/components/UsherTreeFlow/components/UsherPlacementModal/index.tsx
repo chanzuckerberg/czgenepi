@@ -40,10 +40,15 @@ import {
   Title,
   TreeNameInfoWrapper,
 } from "./style";
+import { BadQCSampleAlert } from "../../../CreateNSTreeModal/components/BadQCSampleAlert";
+import { useTreatments } from "@splitsoftware/splitio-react";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
+import { isUserFlagOn } from "src/components/Split";
 
 interface Props {
   checkedSampleIds: string[];
   failedSampleIds: string[];
+  badQCSampleIds: string[];
   open: boolean;
   onClose: () => void;
   onLinkCreateSuccess(
@@ -74,6 +79,7 @@ const getDefaultNumSamplesPerSubtree = (numSelected: number): number => {
 export const UsherPlacementModal = ({
   failedSampleIds,
   checkedSampleIds,
+  badQCSampleIds,
   onClose,
   onLinkCreateSuccess,
   open,
@@ -88,6 +94,14 @@ export const UsherPlacementModal = ({
   const [treeType, setTreeType] = useState<string>("");
   const [numSamplesPerSubtree, setNumSamplesPerSubtree] = useState<number>(
     SUGGESTED_MIN_SAMPLES
+  );
+
+  const nextcladeDownloadFlag = useTreatments([
+    USER_FEATURE_FLAGS.nextclade_download,
+  ]);
+  const usesNextcladeDownload = isUserFlagOn(
+    nextcladeDownloadFlag,
+    USER_FEATURE_FLAGS.nextclade_download
   );
 
   const defaultNumSamples = getDefaultNumSamplesPerSubtree(
@@ -334,6 +348,9 @@ export const UsherPlacementModal = ({
                 )}
               </StyledTextField>
               <FailedSampleAlert numFailedSamples={failedSampleIds?.length} />
+              {usesNextcladeDownload && (
+                <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
+              )}
             </div>
             <StyledButton
               sdsType="primary"

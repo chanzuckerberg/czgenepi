@@ -146,7 +146,7 @@ class SampleQCMetric(idbase):  # type: ignore
         ),
     )
 
-    sample_id = Column(Integer, ForeignKey("samples.id"), unique=True)
+    sample_id = Column(Integer, ForeignKey("samples.id"), nullable=False, unique=True)
     sample = relationship("Sample", back_populates="qc_metrics")  # type: ignore
     # What tool/method was used to produce this object of QC metrics.
     qc_caller = Column(

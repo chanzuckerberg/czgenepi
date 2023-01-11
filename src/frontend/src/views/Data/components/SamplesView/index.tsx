@@ -24,6 +24,7 @@ const SamplesView = (): JSX.Element => {
   const [activeFilterCount, setActiveFilterCount] = useState<number>(0);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
   const [lineages, setLineages] = useState<DefaultMenuSelectOption[]>([]);
+  const [qcStatuses, setQCStatuses] = useState<DefaultMenuSelectOption[]>([]);
   // filters rows for current search query
   const [searchResults, setSearchResults] = useState<IdMap<Sample>>({});
   // rows that are actually shown in the table
@@ -60,6 +61,17 @@ const SamplesView = (): JSX.Element => {
     setLineages(newLineages);
   }, [samples]);
 
+  // update list of qcStatuses to use in the filter panel on the left side of the screen
+  useEffect(() => {
+    const newQCStatuses = uniq(
+      compact(map(samples, (d) => d.qcMetrics[0]?.qc_status))
+    )
+      .sort()
+      .map((name) => ({ name }));
+
+    setQCStatuses(newQCStatuses);
+  }, [samples]);
+
   const toggleFilterPanel = () => {
     setIsFilterPanelOpen(!isFilterPanelOpen);
   };
@@ -75,6 +87,7 @@ const SamplesView = (): JSX.Element => {
       <Flex>
         <FilterPanel
           lineages={lineages}
+          qcStatuses={qcStatuses}
           isOpen={isFilterPanelOpen}
           setActiveFilterCount={setActiveFilterCount}
           setDataFilterFunc={setDataFilterFunc}

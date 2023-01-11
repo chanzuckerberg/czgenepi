@@ -13,6 +13,7 @@ from aspen.database.models import (
     Group,
     LineageType,
     Location,
+    MutationsCaller,
     Pathogen,
     PhyloRun,
     PhyloTree,
@@ -24,6 +25,7 @@ from aspen.database.models import (
     RepositoryDownloadWorkflow,
     Sample,
     SampleLineage,
+    SampleMutation,
     SampleQCMetric,
     TreeType,
     UploadedPathogenGenome,
@@ -168,7 +170,73 @@ def create_sample_lineage(session, sample):
     return sample_lineage
 
 
+def create_sample_mutations(session, sample):
+    # 3/4 of samples should have mutations
+    should_associate_data = random.choice(([True] * 3) + [False])
+    if not should_associate_data:
+        return None
+
+    found_row = (
+        session.query(SampleMutation).filter(SampleMutation.sample == sample).first()
+    )
+    if found_row:
+        print("SampleMutation already exists")
+        return found_row
+    print(f"Creating SampleMutation with sample private_id {sample.private_identifier}")
+
+    # TODO, we can probably 100% automatically generate fake data.
+    random_substitutions = [
+        "T128C,A204C,T466C,G475A,C630A,T720C,G749A,G994A,A1093G,C1201T,A1309G,A1504G,A1687G,A1813C,T1814G,T2086G,C2391A,T2554C,C2659T,T2688A",
+        "T46760C,A46895G,G47140T,T47181C,G47735T,G47966A,C48041T,G48062T,G48138A,C48148A,C48392T,A48527C,C48951T,C49139T,T49223G,G49859T,C49957T,C49994T,A50294G,C50595A",
+        "T74112C,G74303C,T74382C,A75351T,A75790G,C76021T,T76123C,A76198G,C76284T,A76648G,A76911G,A78461C,T78525C,A78641G,A78728C,A78942G",
+        "C162639T,A162720G,T162828C,T162852A,C163256T,T163467C,A163886G,T164848C,G164849A,G165006A,A165096G,T165304C,C165691T,C166006T,C166196T",
+    ]
+    random_insertions = [
+        "0:GTTAGTAAATTATATACATAATTTTATAATTAATTTA,629:AAGAGAG,755:ACA,1690:AA,2762:A,4597:T,6250:TT,6527:T,6966:TATCATTATGTATAATCATCACTGTCGC,6983:T",
+        "629:AAGAGAG,755:ACA,1690:AA,2762:A,4597:T,6250:TT,6527:T,6966:TATCATTATGTATAATCATCACTGTCGC",
+        "166090:AATAATT,168178:A,169526:T,169600:ATGA,169619:CAT,170009:A,170929:ATATCTGATATCTA,173154:T,173690:T,174461:T,177847:ATCTCAATCTCAATCTCA",
+    ]
+    random_deletions = [
+        "593-602,617,2237-2239,4693-4775,6429-6430",
+        "154351-154352,155417,156206,156370-158633,163190-163197",
+        "190198-190199,190396,192435-192517",
+    ]
+    random_aa_substitutions = [
+        "NBT03_gp174:S63A,NBT03_gp174:E80V,NBT03_gp174:D121E,NBT03_gp175:V4A,NBT03_gp175:L136F,NBT03_gp175:A273T,OPG002:I22L,OPG002:A121S",
+        "OPG085:F591V,OPG089:K213I,OPG089:D303E,OPG091:F18S,OPG091:V62I,OPG091:S73N,OPG092:I244N",
+        "OPG164:E117K,OPG164:Q137L,OPG164:Y217H,OPG165:D63G,OPG165:D106N",
+    ]
+    random_aa_insertions = [
+        "OPG047:476:WNGMG,OPG110:73:EEV",
+        "OPG110:73:EEV,OPG153:366:DD,OPG153:371:DDDDDDDDD",
+        "OPG153:371:DDDDDDDDD,OPG164:212:*Q*Q*",
+    ]
+    random_aa_deletions = [
+        "OPG002:V171-,OPG029:D150-,OPG029:D151-,OPG031:G258-",
+        "OPG049:R314-,OPG050:F71-,OPG157:Q60-,OPG159:N114-,OPG159:N115-",
+        "OPG197:E37-,OPG197:D38-,OPG197:I39-",
+    ]
+
+    new_row = SampleMutation(
+        sample=sample,
+        substitutions=random.choice(random_substitutions),
+        insertions=random.choice(random_insertions),
+        deletions=random.choice(random_deletions),
+        aa_substitutions=random.choice(random_aa_substitutions),
+        aa_insertions=random.choice(random_aa_insertions),
+        aa_deletions=random.choice(random_aa_deletions),
+        reference_sequence_accession="NC_063383.1",
+        mutations_caller=MutationsCaller.NEXTCLADE,
+    )
+
+    session.add(new_row)
+    return new_row
+
+
 def create_sample_qc_metrics(session, sample):
+    should_associate_data = random.choice(([True] * 3) + [False])
+    if not should_associate_data:
+        return None
 
     sample_qc_metric = (
         session.query(SampleQCMetric).filter(SampleQCMetric.sample == sample).first()
@@ -185,6 +253,9 @@ def create_sample_qc_metrics(session, sample):
         "mediocre": ["52.062500", "86.062500", "67.062500"],
         "bad": ["493.558728", "200.694444", "771.691989"],
         "failed": [
+            None,
+        ],
+        "invalid": [
             None,
         ],
     }
@@ -226,8 +297,11 @@ def create_sample(
     if sample:
         print("Sample already exists")
         # check if sample has associated sample_lineage or sample_qc_metrics
+        # Note - this isn't idempotent anymore since we're randomly choosing to assign
+        #        associated rows or not.
         create_sample_lineage(session, sample)
         create_sample_qc_metrics(session, sample)
+        create_sample_mutations(session, sample)
         return sample
     print(f"Creating sample {private_id}")
     sample = Sample(
@@ -252,6 +326,7 @@ def create_sample(
     )
     create_sample_lineage(session, sample)
     create_sample_qc_metrics(session, sample)
+    create_sample_mutations(session, sample)
     session.add(upg)
     session.add(sample)
     return sample

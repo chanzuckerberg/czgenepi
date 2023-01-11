@@ -1,5 +1,6 @@
 /* eslint-disable react/display-name */
 
+import { useTreatments } from "@splitsoftware/splitio-react";
 import { ChipProps, Icon } from "czifui";
 import {
   defaultSampleCellRenderer,
@@ -10,10 +11,14 @@ import {
   RowContent,
   TreeRowContent,
 } from "src/common/components/library/data_table/style";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { createTableCellRenderer } from "src/common/utils";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
+import { isUserFlagOn } from "src/components/Split";
+import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { CZ_BIOHUB_GROUP } from "src/views/Data/constants";
 import { LineageTooltip } from "./components/SamplesView/components/SamplesTable/components/LineageTooltip";
+import { StatusChip } from "./components/StatusChip";
 import { TreeActionMenu } from "./components/TreesView/components/TreesTable/components/TreeActionMenu";
 import TreeTableNameCell from "./components/TreesView/components/TreesTable/components/TreeTableNameCell";
 import { TreeTypeTooltip } from "./components/TreesView/components/TreesTable/components/TreeTypeTooltip";
@@ -22,7 +27,6 @@ import {
   GISAIDCell,
   PrivateIdValueWrapper,
   SampleIconWrapper,
-  StyledChip,
   StyledUploaderName,
   Subtext,
   UnderlinedCell,
@@ -34,18 +38,174 @@ const LABEL_STATUS: Record<
   { label: string; status: NonNullable<ChipProps["status"]> }
 > = {
   error: {
-    label: "failed",
+    label: "bad",
     status: "error",
   },
   success: {
+    label: "good",
+    status: "success",
+  },
+  warning: {
+    label: "mediocre",
+    status: "warning",
+  },
+  processing: {
+    label: "processing",
+    status: "pending",
+  },
+  failed: {
+    label: "failed",
+    status: "pending",
+  },
+  errorGenomeRecovery: {
+    label: "failed",
+    status: "error",
+  },
+  successGenomeRecovery: {
     label: "complete",
     status: "success",
   },
 };
 
+const PrivateId = ({
+  value,
+  item,
+}: {
+  value: string;
+  item: Sample;
+}): JSX.Element => {
+  const {
+    CZBFailedGenomeRecovery,
+    qcMetrics,
+    private: isPrivate,
+    submittingGroup,
+    uploadedBy,
+  } = item;
+  const nextcladeDownloadFlag = useTreatments([
+    USER_FEATURE_FLAGS.nextclade_download,
+  ]);
+  const usesNextcladeDownload = isUserFlagOn(
+    nextcladeDownloadFlag,
+    USER_FEATURE_FLAGS.nextclade_download
+  );
+
+  const labelCZBFailedGenomeRecovery = CZBFailedGenomeRecovery
+    ? LABEL_STATUS.errorGenomeRecovery
+    : LABEL_STATUS.successGenomeRecovery;
+
+  const PROCESSING_STATUS_TOOLTIP_TEXT = (
+    <div>
+      <div>
+        This sample doesn’t currently have a quality score because it is still
+        processing. Score will update when complete.
+      </div>
+    </div>
+  );
+
+  const GENERIC_STATUS_TOOLTIP_TEXT = (
+    <div>
+      <div>
+        <b>Quality Score: </b> Overall QC score from Nextclade which considers
+        genome completion and screens for potential contamination and sequencing
+        or bioinformatics errors.{" "}
+        <NewTabLink
+          href={
+            "https://docs.nextstrain.org/projects/nextclade/en/stable/user/algorithm/07-quality-control.html"
+          }
+        >
+          Learn more
+        </NewTabLink>
+      </div>
+    </div>
+  );
+
+  const FAILED_STATUS_TOOLTIP_TEXT = (
+    <div>
+      <div>
+        QC may fail when the sequence processing failed due to quality, or if
+        the uploaded sequence does not represent the correct pathogen
+      </div>
+    </div>
+  );
+
+  const labelQCStatus = () => {
+    const qcStatus = qcMetrics[0]?.qc_status;
+    switch (qcStatus.toLowerCase()) {
+      case "good":
+        return LABEL_STATUS.success;
+      case "bad":
+        return LABEL_STATUS.error;
+      case "mediocre":
+        return LABEL_STATUS.warning;
+      case "failed":
+        return LABEL_STATUS.failed;
+      default:
+        return LABEL_STATUS.processing;
+    }
+  };
+
+  const qcStatusLabel = labelQCStatus();
+
+  const LABEL_TO_TOOLTIP_TEXT: Record<string, JSX.Element> = {
+    processing: PROCESSING_STATUS_TOOLTIP_TEXT,
+    bad: GENERIC_STATUS_TOOLTIP_TEXT,
+    good: GENERIC_STATUS_TOOLTIP_TEXT,
+    mediocre: GENERIC_STATUS_TOOLTIP_TEXT,
+    failed: FAILED_STATUS_TOOLTIP_TEXT,
+  };
+
+  const label = usesNextcladeDownload
+    ? qcStatusLabel.label
+    : labelCZBFailedGenomeRecovery.label;
+
+  const status = usesNextcladeDownload
+    ? qcStatusLabel?.status
+    : labelCZBFailedGenomeRecovery.status;
+
+  const displayName =
+    submittingGroup?.name === CZ_BIOHUB_GROUP ? "CZ Biohub" : uploadedBy?.name;
+
+  return (
+    <RowContent>
+      <Cell>
+        <SampleIconWrapper>
+          {isPrivate ? (
+            <Icon
+              sdsIcon="flaskPrivate"
+              sdsSize="xl"
+              sdsType="static"
+              data-test-id="row-is-private"
+            />
+          ) : (
+            <Icon
+              sdsIcon="flaskPublic"
+              sdsSize="xl"
+              sdsType="static"
+              data-test-id="row-is-public"
+            />
+          )}
+        </SampleIconWrapper>
+        <PrivateIdValueWrapper>
+          <CenteredFlexContainer>
+            <span data-test-id="row-private-id">{value}</span>
+            <StatusChip
+              label={label}
+              status={status}
+              tooltipText={LABEL_TO_TOOLTIP_TEXT[label]}
+            />
+          </CenteredFlexContainer>
+          <StyledUploaderName data-test-id="row-user-name">
+            {displayName}
+          </StyledUploaderName>
+        </PrivateIdValueWrapper>
+      </Cell>
+    </RowContent>
+  );
+};
+
 const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
   collectionLocation: ({ value }): JSX.Element => {
-    const location = value.location ?? value.division;
+    const location = value.location ?? value.division ?? value.country;
     return (
       <RowContent>
         <Cell data-test-id="row-collectionLocation">{location}</Cell>
@@ -89,65 +249,8 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     );
   },
 
-  privateId: ({
-    value,
-    item,
-  }: {
-    value: string;
-    item: Sample;
-  }): JSX.Element => {
-    const {
-      CZBFailedGenomeRecovery,
-      private: isPrivate,
-      submittingGroup,
-      uploadedBy,
-    } = item;
-    const label = CZBFailedGenomeRecovery
-      ? LABEL_STATUS.error
-      : LABEL_STATUS.success;
-
-    const displayName =
-      submittingGroup?.name === CZ_BIOHUB_GROUP
-        ? "CZ Biohub"
-        : uploadedBy?.name;
-
-    return (
-      <RowContent>
-        <Cell>
-          <SampleIconWrapper>
-            {isPrivate ? (
-              <Icon
-                sdsIcon="flaskPrivate"
-                sdsSize="xl"
-                sdsType="static"
-                data-test-id="row-is-private"
-              />
-            ) : (
-              <Icon
-                sdsIcon="flaskPublic"
-                sdsSize="xl"
-                sdsType="static"
-                data-test-id="row-is-public"
-              />
-            )}
-          </SampleIconWrapper>
-          <PrivateIdValueWrapper>
-            <CenteredFlexContainer>
-              <span data-test-id="row-private-id">{value}</span>
-              <StyledChip
-                data-test-id="row-sample-status"
-                size="small"
-                label={label.label}
-                status={label.status}
-              />
-            </CenteredFlexContainer>
-            <StyledUploaderName data-test-id="row-user-name">
-              {displayName}
-            </StyledUploaderName>
-          </PrivateIdValueWrapper>
-        </Cell>
-      </RowContent>
-    );
+  privateId: ({ item, value }): JSX.Element => {
+    return <PrivateId value={value} item={item} />;
   },
 
   uploadDate: ({ value }): JSX.Element => {

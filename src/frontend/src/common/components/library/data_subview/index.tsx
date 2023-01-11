@@ -38,51 +38,6 @@ interface Props {
   dataFilterFunc?: (data: TableItem[]) => TableItem[];
 }
 
-export function tsvDataMap(
-  checkedSampleIds: string[],
-  tableData: TableItem[] | undefined,
-  headers: Header[]
-): [string[], string[][]] | undefined {
-  const headersDownload = [...headers];
-  headersDownload.push({
-    key: "CZBFailedGenomeRecovery",
-    sortKey: ["CZBFailedGenomeRecovery"],
-    text: "Genome Recovery",
-  });
-  if (tableData) {
-    const filteredTableData = tableData.filter((entry) =>
-      checkedSampleIds.includes(String(entry["publicId"]))
-    );
-    const tsvData = filteredTableData.map((entry) => {
-      return headersDownload.flatMap((header) => {
-        if (typeof entry[header.key] === "object" && header.subHeaders) {
-          const subEntry = entry[header.key] as Record<string, JSONPrimitive>;
-          return header.subHeaders.map((subHeader) =>
-            String(subEntry[subHeader.key])
-          );
-        }
-        if (header.key == "CZBFailedGenomeRecovery") {
-          if (entry[header.key]) {
-            return "Failed";
-          } else {
-            return "Success";
-          }
-        } else {
-          return String(entry[header.key]);
-        }
-      });
-    });
-    const tsvHeaders = headersDownload.flatMap((header) => {
-      if (header.subHeaders) {
-        return header.subHeaders.map((subHeader) => subHeader.text);
-      }
-      return header.text;
-    });
-
-    return [tsvHeaders, tsvData];
-  }
-}
-
 const DataSubview: FunctionComponent<Props> = ({
   data,
   defaultSortKey,
@@ -96,6 +51,7 @@ const DataSubview: FunctionComponent<Props> = ({
   const [checkedSampleIds, setCheckedSampleIds] = useState<string[]>([]);
   const [isDownloadModalOpen, setDownloadModalOpen] = useState(false);
   const [failedSampleIds, setFailedSampleIds] = useState<string[]>([]);
+  const [badQCSampleIds, setBadQCSampleIds] = useState<string[]>([]);
   const [isNSCreateTreeModalOpen, setIsNSCreateTreeModalOpen] =
     useState<boolean>(false);
   const [shouldStartUsherFlow, setShouldStartUsherFlow] =
@@ -135,6 +91,7 @@ const DataSubview: FunctionComponent<Props> = ({
 
   const handleDownloadClose = () => {
     setDownloadModalOpen(false);
+    setCheckedSampleIds([]);
   };
 
   useEffect(() => {
@@ -237,7 +194,6 @@ const DataSubview: FunctionComponent<Props> = ({
     const checkedSamples = compact(
       checkedSampleIds.map((id) => data?.[id]) as Sample[]
     );
-
     return (
       <>
         {tableData !== undefined && viewName === VIEWNAME.SAMPLES && (
@@ -251,12 +207,14 @@ const DataSubview: FunctionComponent<Props> = ({
               onClose={handleDownloadClose}
             />
             <CreateNSTreeModal
+              badQCSampleIds={badQCSampleIds}
               checkedSampleIds={checkedSampleIds}
               failedSampleIds={failedSampleIds}
               open={isNSCreateTreeModalOpen}
               onClose={handleCreateTreeClose}
             />
             <UsherTreeFlow
+              badQCSampleIds={badQCSampleIds}
               checkedSampleIds={checkedSampleIds}
               failedSampleIds={failedSampleIds}
               shouldStartUsherFlow={shouldStartUsherFlow}
@@ -300,6 +258,8 @@ const DataSubview: FunctionComponent<Props> = ({
               setCheckedSampleIds={setCheckedSampleIds}
               failedSampleIds={failedSampleIds}
               setFailedSampleIds={setFailedSampleIds}
+              badQCSampleIds={badQCSampleIds}
+              setBadQCSampleIds={setBadQCSampleIds}
               viewName={viewName}
               data={
                 dataFilterFunc && tableData
