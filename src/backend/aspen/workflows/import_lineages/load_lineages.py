@@ -1,15 +1,15 @@
-import io
-from typing import List, Optional
+from typing import Any, List
 
 import click
 import requests
 import sqlalchemy as sa
+
 from aspen.config.config import Config
 from aspen.database.connection import (
-    SqlAlchemyInterface,
     get_db_uri,
     init_db,
     session_scope,
+    SqlAlchemyInterface,
 )
 from aspen.database.models import Pathogen, PathogenLineage
 from aspen.util.pathogen_configs import get_lineage_urls
@@ -23,8 +23,6 @@ from aspen.workflows.shared_utils.database import (
 def download_lineages(
     url: str,
     format: str,
-    list_path: List[str],
-    lineage_keys: List[str],
     print_response: bool,
 ) -> List[str]:
     """Download lineages file from URL."""
@@ -33,12 +31,32 @@ def download_lineages(
         raise RuntimeError(f"Error downloading lineages file: {response.text}")
     if print_response:
         print(response.text)
+    if format == "json":
+        return response.json()
+    return response.text
+
+
+def get_formatted_lineages(
+    url: str,
+    format: str,
+    list_path: List[str],
+    lineage_keys: List[str],
+    print_response: bool,
+) -> List[str]:
+    """Download lineages file from URL."""
+    source_data = download_lineages(url, format, print_response)
+    formatted_data = format_lineage_data(source_data, format, list_path, lineage_keys)
+    return formatted_data
+
+
+def format_lineage_data(
+    source_data: Any, format: str, list_path: List[str], lineage_keys: List[str]
+):
     results = set()
     if format == "json":
-        data = response.json()
         for path in list_path:
-            data = data[path]
-        for item in data:
+            source_data = source_data[path]
+        for item in source_data:
             for item_key in lineage_keys:
                 if item_key in item:
                     results.add(item[item_key])
@@ -133,9 +151,7 @@ def cli(
     urls = get_lineage_urls(pathogen_slug)
 
     print("Parsing lineages data from file...")
-    lineages = download_lineages(
-        **urls[pathogen_slug], print_response=print_source_file
-    )
+    lineages = get_formatted_lineages(**urls, print_response=print_source_file)
     print(f"Found {len(lineages)} lineages in file")
 
     if parse_without_import:
