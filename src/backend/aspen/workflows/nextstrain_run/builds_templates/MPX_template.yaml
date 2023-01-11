@@ -41,102 +41,57 @@ mask:
 ## Subsampling schemas
 subsampling:
 
-  OVERVIEW:
-    root:
-      exclude: "--exclude-where 'root_ref!=yes'"
-
+  OVERVIEW:  # crowding penalty same as covid tree 
     group:
-      group_by: "year month"
-      max_sequences: 2000
-      query: --query "(location == '{location}') & (division == '{division}')"
+      subsample-max-sequences: 500
+      query: "(country == '{country}')"    # from location filter. only country level. Do we support region level builds? As long as the options in filter is consistent with yaml builder, all should be good.
+      min-length: 100000
 
-    state:
-      group_by: "location year month"
-      max_sequences: 500
-      query: --query "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
+    outside_group:
+      subsample-max-sequences: 400
+      query: --query "(country != '{country}')"  # optional to add: AND country is empty
       priorities:
         type: "proximity"
         focus: "group"
-
-    country:
-      group_by: "division year month"
-      max_sequences: 400
-      query: --query "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
-      priorities:
-        type: "proximity"
-        focus: "group"
-
-    international:
-      group_by: "region year month"
-      max_sequences: 100
-      query: --query "(country != '{country}')" # exclude add'l samples from USA
-      priorities:
-          type: "proximity"
-          focus: "group"
+      min-length: 100000
 
     international_serial_sampling:
-      group_by: "region year month"
-      seq_per_group: 2
-      query: --query "(country != '{country}')"
-
-
+      group-by: ["region", "year"]  # lots of samples have no "month" so in order to include them, we'll only go by "year"
+      sequences-per-group: 2
+      query: "(country != '{country}')"   # optional to add: AND country is empty
+      min-length: 100000
 
   TARGETED:
-    root:
-      exclude: "--exclude-where 'root_ref!=yes'"
-
     focal:
-      exclude: "--exclude-all"
+      exclude-all: true
+      include: config/include.txt
 
     closest:
-      max_sequences: 100
+      subsample-max-sequences: 10   # this changes with number of samples in include.txt and that's good
+      min-length: 10000
+      min-date: "2022-01-01"
       priorities:
         type: "proximity"
         focus: "focal"
 
     group:
-      group_by: "year month"
-      max_sequences: 25
-      query: --query "(location == '{location}') & (division == '{division}')"
+      subsample-max-sequences: 10   # this changes with number of samples in include.txt and that's good
+      query: "(country == '{country}')"
       priorities:
         type: "proximity"
         focus: "focal"
-
-    state:
-      group_by: "location year month"
-      max_sequences: 25
-      query: --query "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
-      priorities:
-        type: "proximity"
-        focus: "focal"
-
-    country:
-      group_by: "division year month"
-      max_sequences: 25
-      query: --query "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
-      priorities:
-        type: "proximity"
-        focus: "focal"
-
-    international:
-      group_by: "region year month"
-      max_sequences: 25
-      query: --query "(country != '{country}')" # exclude add'l samples from USA
-      priorities:
-        type: "proximity"
-        focus: "focal"
-
+      min-length: 100000
+      
     international_serial_sampling:
-      group_by: "region year month"
-      seq_per_group: 2
-      query: --query "(country != '{country}')"
+      group-by: ["region", "year"]
+      sequences-per-group: 2
+      query: "(country != '{country}')"
+      min-length: 100000
 
 
   NON_CONTEXTUALIZED:
-    root:
-      exclude: "--exclude-where 'root_ref!=yes'"
-
     group:
-      group_by: "year month"
-      max_sequences: 2000
-      query: --query "(location == '{location}') & (division == '{division}')"
+      group-by: "year"
+      subsample-max-sequences: 1000
+      query: "(country == '{country}')"
+      min-length: 100000
