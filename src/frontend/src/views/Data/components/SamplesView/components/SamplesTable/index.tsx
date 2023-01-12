@@ -62,7 +62,6 @@ const columns: ColumnDef<Sample, any>[] = [
           hideSortIcon
           style={generateWidthStyles(column)}
         >
-          {/* @ts-expect-error remove line when types fixed in sds */}
           <InputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellHeader>
       );
