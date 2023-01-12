@@ -17,7 +17,7 @@ import {
   TableHeader,
 } from "czifui";
 import { map } from "lodash";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "./components/LineageTooltip";
@@ -57,7 +57,11 @@ const columns: ColumnDef<Sample, any>[] = [
       const onChange = getToggleAllRowsSelectedHandler();
 
       return (
-        <CellHeader key={header.id} hideSortIcon style={generateWidthStyles(column)}>
+        <CellHeader
+          key={header.id}
+          hideSortIcon
+          style={generateWidthStyles(column)}
+        >
           {/* @ts-expect-error remove line when types fixed in sds */}
           <InputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellHeader>
@@ -409,4 +413,4 @@ const SamplesTable = ({
   );
 };
 
-export { SamplesTable };
+export default memo(SamplesTable);
