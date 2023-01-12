@@ -1,5 +1,4 @@
 import RadioGroup from "@mui/material/RadioGroup";
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon, Link } from "czifui";
 import { uniq } from "lodash";
 import Image from "next/image";
@@ -28,12 +27,9 @@ import {
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { Header } from "../DownloadModal/style";
-import { FailedSampleAlert } from "../FailedSampleAlert";
-import { BadQCSampleAlert } from "./components/BadQCSampleAlert";
+import { BadOrFailedQCSampleAlert } from "./components/BadQCSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
 import { MissingSampleAlert } from "./components/MissingSampleAlert";
 import {
@@ -72,16 +68,14 @@ export type ResetFiltersType = {
 
 interface Props {
   checkedSampleIds: string[];
-  failedSampleIds: string[];
-  badQCSampleIds: string[];
+  badOrFailedQCSampleIds: string[];
   open: boolean;
   onClose: () => void;
 }
 
 export const CreateNSTreeModal = ({
   checkedSampleIds,
-  failedSampleIds,
-  badQCSampleIds,
+  badOrFailedQCSampleIds,
   open,
   onClose,
 }: Props): JSX.Element => {
@@ -92,13 +86,6 @@ export const CreateNSTreeModal = ({
   const [missingInputSamples, setMissingInputSamples] = useState<string[]>([]);
   const [validatedInputSamples, setValidatedInputSamples] = useState<string[]>(
     []
-  );
-  const nextcladeDownloadFlag = useTreatments([
-    USER_FEATURE_FLAGS.nextclade_download,
-  ]);
-  const usesNextcladeDownload = isUserFlagOn(
-    nextcladeDownloadFlag,
-    USER_FEATURE_FLAGS.nextclade_download
   );
 
   const handleChangeTreeType = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,12 +125,6 @@ export const CreateNSTreeModal = ({
   // Filter based on date ranges
   const [startDate, setStartDate] = useState<FormattedDateType>();
   const [endDate, setEndDate] = useState<FormattedDateType>();
-
-  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isUserFlagOn(
-    flag,
-    USER_FEATURE_FLAGS.tree_location_filter
-  );
 
   const handleFilterChange = (onChangeFilter: () => void): void => {
     setIsFilterEnabled(true);
@@ -271,13 +252,12 @@ export const CreateNSTreeModal = ({
   );
 
   const allPossibleTreeSamples = checkedSampleIds.concat(validatedInputSamples);
-  const allFailedOrMissingSamples = failedSampleIds.concat(missingInputSamples);
   const allValidSamplesForTreeCreation = allPossibleTreeSamples.filter(
-    (id) => !allFailedOrMissingSamples.includes(id)
+    (id) => !missingInputSamples.includes(id)
   );
 
   const allSamplesRequestedTableAndInput = uniq(
-    allPossibleTreeSamples.concat(allFailedOrMissingSamples)
+    allPossibleTreeSamples.concat(missingInputSamples)
   );
 
   const handleSubmit = (evt: SyntheticEvent) => {
@@ -390,19 +370,16 @@ export const CreateNSTreeModal = ({
                 </StyledInfoIconWrapper>
               </StyledTooltip>
             </TreeNameInfoWrapper>
-            {isTreeLocationFilterFlagOn && (
-              <TreeTypeSubtext>
-                Samples already selected on the sample table or included by ID
-                in the bottom section will always be force-included on your
-                tree.{" "}
-                <Link
-                  href="https://help.czgenepi.org/hc/en-us/articles/6712563575956-Build-on-demand-trees#generating"
-                  target="_blank"
-                >
-                  Learn More.
-                </Link>
-              </TreeTypeSubtext>
-            )}
+            <TreeTypeSubtext>
+              Samples already selected on the sample table or included by ID in
+              the bottom section will always be force-included on your tree.{" "}
+              <Link
+                href="https://help.czgenepi.org/hc/en-us/articles/6712563575956-Build-on-demand-trees#generating"
+                target="_blank"
+              >
+                Learn More.
+              </Link>
+            </TreeTypeSubtext>
             <RadioGroup value={treeType} onChange={handleChangeTreeType}>
               <StyledFormControlLabel
                 value={TreeTypes.Overview}
@@ -472,10 +449,9 @@ export const CreateNSTreeModal = ({
             shouldReset={shouldReset}
           />
           <MissingSampleAlert missingSamples={missingInputSamples} />
-          <FailedSampleAlert numFailedSamples={failedSampleIds?.length} />
-          {usesNextcladeDownload && (
-            <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
-          )}
+          <BadOrFailedQCSampleAlert
+            numBadOrFailedQCSamples={badOrFailedQCSampleIds?.length}
+          />
         </StyledDialogContent>
         <StyledFooter>
           <CreateTreeButton

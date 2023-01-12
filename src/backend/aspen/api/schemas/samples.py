@@ -103,7 +103,6 @@ class SampleResponse(BaseResponse):
     id: int
     collection_date: datetime.date
     collection_location: LocationResponse
-    czb_failed_genome_recovery: bool
     gisaid: Optional[SampleGisaidResponse]
     pathogen: Optional[PathogenResponse]
     private: bool
@@ -188,7 +187,6 @@ class CreateSamplesBaseRequest(BaseRequest):
     host: Optional[str]
     purpose_of_sampling: Optional[str]
     specimen_processing: Optional[str]
-    czb_failed_genome_recovery: Optional[bool]
 
 
 class CreateSampleRequest(BaseRequest):

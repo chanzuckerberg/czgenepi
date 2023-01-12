@@ -77,9 +77,6 @@ test.describe("Samples page tests", () => {
      * This test currently failing and not sure status is coming null
      * commenting out until I investigate this in detail
      */
-    // verify status
-    //const status = sample.czb_failed_genome_recovery ? "failed" : "complete";
-    //expect(await base.findByTestId("sample-status")).toHaveText(status);
 
     // verify public ID
     expect(await base.findByTestId("row-publicId")).toHaveText(

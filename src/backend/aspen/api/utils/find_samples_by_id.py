@@ -22,9 +22,6 @@ def get_missing_and_found_sample_ids(
     """
     found_sample_ids = set()
     for sample in all_samples:
-        # Don't include failed samples in our list of potential matches!
-        if sample.czb_failed_genome_recovery:
-            continue
         found_sample_ids.add(sample.private_identifier)
         found_sample_ids.add(sample.public_identifier)
 

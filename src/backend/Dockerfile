@@ -1,4 +1,4 @@
-FROM python:3.9.1-slim AS build
+FROM python:3.10.1-slim-bullseye AS build
 ENV FLASK_APP=aspen.main
 RUN apt-get update && apt-get install -y vim build-essential libdigest-sha-perl wget unzip libdigest-sha-perl
 ENV POETRY_VERSION=1.1.15
@@ -17,11 +17,11 @@ RUN poetry config virtualenvs.create false && \
 # so for the moment we're installing the upstream oso library (which installs the Rust binaries)
 # and then clobbering the python interface with the code from our internal fork. We need to work on
 # a better way to build/maintain this module, but we're not there yet.
-RUN cp -r oso-czge-oso25/languages/python/oso/oso/* /usr/local/lib/python3.9/site-packages/oso/
-RUN cp -r oso-czge-oso25/languages/python/oso/polar/* /usr/local/lib/python3.9/site-packages/polar/
+RUN cp -r oso-czge-oso25/languages/python/oso/oso/* /usr/local/lib/python3.10/site-packages/oso/
+RUN cp -r oso-czge-oso25/languages/python/oso/polar/* /usr/local/lib/python3.10/site-packages/polar/
 
 # Separate base image so that we can use it to update the Pipfile.lock and requirements.txt file
-FROM python:3.9.1-slim AS base
+FROM python:3.10-slim-bullseye AS base
 ENV FLASK_APP=aspen.main
 EXPOSE 3000
 
@@ -46,7 +46,7 @@ COPY third-party ./third-party
 COPY --from=build sqlalchemy-oso ./sqlalchemy-oso
 RUN poetry config virtualenvs.create false
 # Copy poetry deps from the build image
-COPY --from=build /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
+COPY --from=build /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 COPY --from=build \
      /usr/local/bin/gunicorn \
      /usr/local/bin/aws \

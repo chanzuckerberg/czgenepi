@@ -1,9 +1,5 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
-import { Button, Icon } from "czifui";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
+import { Button } from "czifui";
 import { ResetFiltersType } from "../..";
-import { StyledTooltip } from "../../style";
 import { SampleFilteringTooltip } from "../SampleFilteringTooltip";
 import {
   CollectionDateFilter,
@@ -20,8 +16,6 @@ import {
   StyledContainer,
   StyledExplainerTitle,
   StyledFiltersSection,
-  StyledInfoIconWrapper,
-  StyledNewTabLink,
   StyledTitleContainer,
 } from "./style";
 
@@ -31,16 +25,6 @@ interface Props
     LineageFilterType,
     LocationFilterType,
     ResetFiltersType {}
-
-const SAMPLE_FILTERING_TOOLTIP_TEXT = (
-  <div>
-    Samples already selected on the sample table or included by ID in the box
-    below will still be force-included on your tree.{" "}
-    <StyledNewTabLink href="https://docs.google.com/document/d/1_iQgwl3hn_pjlZLX-n0alUbbhgSPZvpW_0620Hk_kB4/edit#heading=h.lmtbntly6tx9">
-      Learn More
-    </StyledNewTabLink>
-  </div>
-);
 
 /**
  * Provides filtering of samples that are automatically added to trees.
@@ -67,46 +51,25 @@ export function SampleFiltering({
   setStartDate,
   setEndDate,
 }: Props): JSX.Element {
-  const flag = useTreatments([USER_FEATURE_FLAGS.tree_location_filter]);
-  const isTreeLocationFilterFlagOn = isUserFlagOn(
-    flag,
-    USER_FEATURE_FLAGS.tree_location_filter
-  );
   return (
     <StyledContainer>
       <StyledTitleContainer>
-        {isTreeLocationFilterFlagOn ? (
-          <>
-            <StyledExplainerTitle>
-              Define samples of interest by:
-              <SampleFilteringTooltip />
-            </StyledExplainerTitle>
-            {isFilterEnabled && (
-              <Button
-                onClick={resetFilters}
-                sdsType="primary"
-                sdsStyle="minimal"
-                isAllCap
-              >
-                Reset all
-              </Button>
-            )}
-          </>
-        ) : (
+        <>
           <StyledExplainerTitle>
-            Limit samples from my jurisdiction to:
-            <StyledTooltip
-              arrow
-              leaveDelay={1000}
-              title={SAMPLE_FILTERING_TOOLTIP_TEXT}
-              placement="top"
-            >
-              <StyledInfoIconWrapper>
-                <Icon sdsIcon="infoCircle" sdsSize="xs" sdsType="static" />
-              </StyledInfoIconWrapper>
-            </StyledTooltip>
+            Define samples of interest by:
+            <SampleFilteringTooltip />
           </StyledExplainerTitle>
-        )}
+          {isFilterEnabled && (
+            <Button
+              onClick={resetFilters}
+              sdsType="primary"
+              sdsStyle="minimal"
+              isAllCap
+            >
+              Reset all
+            </Button>
+          )}
+        </>
       </StyledTitleContainer>
       <StyledFiltersSection>
         <LineageFilter
@@ -120,13 +83,11 @@ export function SampleFiltering({
           setStartDate={setStartDate}
           setEndDate={setEndDate}
         />
-        {isTreeLocationFilterFlagOn && (
-          <LocationFilter
-            namedLocations={namedLocations}
-            selectedLocation={selectedLocation}
-            setSelectedLocation={setSelectedLocation}
-          />
-        )}
+        <LocationFilter
+          namedLocations={namedLocations}
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+        />
       </StyledFiltersSection>
     </StyledContainer>
   );

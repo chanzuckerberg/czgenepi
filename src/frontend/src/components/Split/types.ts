@@ -20,9 +20,7 @@ export enum USER_FEATURE_FLAGS {
   internal_user = "internal_user",
   multi_pathogen = "multi_pathogen",
   table_refactor = "table_refactor",
-  tree_location_filter = "tree_location_filter",
   static_metadata_table = "static_metadata_table",
-  nextclade_download = "nextclade_download",
 }
 
 /**
