@@ -4,7 +4,7 @@ EXPOSE 3000
 
 # Install poetry
 RUN apt update && apt install -y libdigest-sha-perl wget
-ENV POETRY_VERSION=1.1.15
+ENV POETRY_VERSION=1.3.2
 RUN python3 -m pip install poetry==$POETRY_VERSION
 # install libffi-dev (needed for installing cffi with python 3.10-slim image)
 RUN apt-get --yes install libffi-dev
