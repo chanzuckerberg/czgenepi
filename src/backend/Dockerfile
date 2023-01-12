@@ -1,7 +1,7 @@
 FROM python:3.10.1-slim-bullseye AS build
 ENV FLASK_APP=aspen.main
 RUN apt-get update && apt-get install -y vim build-essential libdigest-sha-perl wget unzip libdigest-sha-perl
-ENV POETRY_VERSION=1.1.15
+ENV POETRY_VERSION=1.3.2
 RUN python3 -m pip install poetry==$POETRY_VERSION
 COPY pyproject.toml poetry.lock environment.yaml ./
 COPY third-party ./third-party
@@ -36,7 +36,7 @@ RUN apt install -y nginx-extras
 
 # FASTAPI: Install poetry
 RUN apt install -y libdigest-sha-perl
-ENV POETRY_VERSION=1.1.15
+ENV POETRY_VERSION=1.3.2
 RUN python3 -m pip install poetry==$POETRY_VERSION
 WORKDIR /usr/src/app
 
