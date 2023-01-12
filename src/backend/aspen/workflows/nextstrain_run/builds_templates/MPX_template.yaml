@@ -41,57 +41,89 @@ mask:
 ## Subsampling schemas
 subsampling:
 
-  OVERVIEW:  # crowding penalty same as covid tree 
+  OVERVIEW:
     group:
       subsample-max-sequences: 500
-      query: "(country == '{country}')"    # from location filter. only country level. Do we support region level builds? As long as the options in filter is consistent with yaml builder, all should be good.
+      query: "(location == '{location}') & (division == '{division}')" 
       min-length: 100000
-
-    outside_group:
-      subsample-max-sequences: 400
-      query: --query "(country != '{country}')"  # optional to add: AND country is empty
+      
+    state:
+      subsample-max-sequences: 300
+      query: "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
       priorities:
         type: "proximity"
         focus: "group"
       min-length: 100000
 
-    international_serial_sampling:
-      group-by: ["region", "year"]  # lots of samples have no "month" so in order to include them, we'll only go by "year"
-      sequences-per-group: 2
-      query: "(country != '{country}')"   # optional to add: AND country is empty
+    country:
+      subsample-max-sequences: 300
+      query: "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
+      priorities:
+        type: "proximity"
+        focus: "group"
       min-length: 100000
-
-  TARGETED:
-    focal:
-      exclude-all: true
-      include: config/include.txt
-
-    closest:
-      subsample-max-sequences: 10   # this changes with number of samples in include.txt and that's good
-      min-length: 10000
-      min-date: "2022-01-01"
+      
+    international:
+      subsample-max-sequences: 300
+      query: "(country != '{country}')" # this should capture samples that have no division or location info
       priorities:
-        type: "proximity"
-        focus: "focal"
-
-    group:
-      subsample-max-sequences: 10   # this changes with number of samples in include.txt and that's good
-      query: "(country == '{country}')"
-      priorities:
-        type: "proximity"
-        focus: "focal"
+          type: "proximity"
+          focus: "group"
       min-length: 100000
       
     international_serial_sampling:
-      group-by: ["region", "year"]
+      group-by: ["region", "year"]  # lots of samples have no "month" so in order to include them, we'll only go by "year"
       sequences-per-group: 2
       query: "(country != '{country}')"
       min-length: 100000
 
 
+  TARGETED:
+    focal:
+      exclude-all: true
+      include: config/include.txt
+      
+    closest:
+      subsample-max-sequences: 100   # this changes with number of samples in include.txt and that's good
+      priorities:
+        type: "proximity"
+        focus: "focal"
+      min-length: 10000
+       
+    state:
+      subsample-max-sequences: 25
+      query: "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
+      priorities:
+        type: "proximity"
+        focus: "focal"
+      min-length: 100000
+
+    country:
+      subsample-max-sequences: 25
+      query: "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
+      priorities:
+        type: "proximity"
+        focus: "focal"
+      min-length: 100000
+      
+    international:
+      subsample-max-sequences: 25
+      query: "(country != '{country}')" # this should capture samples that have no division or location info
+      priorities:
+          type: "proximity"
+          focus: "focal"
+      min-length: 100000
+      
+    international_serial_sampling:
+      group-by: ["region", "year"]  # lots of samples have no "month" so in order to include them, we'll only go by "year"
+      sequences-per-group: 2
+      query: "(country != '{country}')"
+      min-length: 100000
+      
+      
+
   NON_CONTEXTUALIZED:
     group:
       group-by: "year"
       subsample-max-sequences: 1000
-      query: "(country == '{country}')"
-      min-length: 100000
+      query: --query "(location == '{location}') & (division == '{division}')"
