@@ -1,4 +1,4 @@
-import { Getter } from "@tanstack/react-table";
+import { Cell, Getter } from "@tanstack/react-table";
 import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 import { StyledCellBasic } from "../../style";
 
@@ -7,11 +7,16 @@ import { StyledCellBasic } from "../../style";
 // * adding a custom display cell (ie: new component definition) for your column.
 
 interface DefaultCellProps {
+  cell: Cell;
   getValue: Getter<any>;
 }
 
-export const DefaultCell = ({ getValue }: DefaultCellProps): JSX.Element => (
+export const DefaultCell = ({
+  cell,
+  getValue,
+}: DefaultCellProps): JSX.Element => (
   <StyledCellBasic
+    key={cell.id}
     shouldTextWrap
     primaryText={getValue() || NO_CONTENT_FALLBACK}
     primaryTextWrapLineCount={2}
