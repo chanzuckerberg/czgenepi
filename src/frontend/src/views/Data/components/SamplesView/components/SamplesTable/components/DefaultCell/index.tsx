@@ -7,7 +7,7 @@ import { StyledCellBasic } from "../../style";
 // * adding a custom display cell (ie: new component definition) for your column.
 
 interface DefaultCellProps {
-  cell: Cell;
+  cell: Cell<Sample, any>;
   getValue: Getter<any>;
 }
 
