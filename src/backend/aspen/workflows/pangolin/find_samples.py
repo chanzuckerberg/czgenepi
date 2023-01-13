@@ -25,14 +25,10 @@ def check_latest_pangolin_version() -> str:
     return latest_version
 
 
-def should_sample_be_updated(sample: Sample, most_recent_pango_version) -> bool:
-    has_lineage = sample.lineages != []
-    if has_lineage:
-        if sample.lineages[0].lineage_software_version != most_recent_pango_version:
-            return True
-        return False
-    # sample has no lineage or the version is not most recent
-    return True
+def should_sample_be_updated(sample: Sample, most_recent_pango_version: str) -> bool:
+    if not sample.lineages:
+        return True
+    return sample.lineages[0].lineage_software_version != most_recent_pango_version
 
 
 def find_samples(pathogen: str) -> Collection[str]:
