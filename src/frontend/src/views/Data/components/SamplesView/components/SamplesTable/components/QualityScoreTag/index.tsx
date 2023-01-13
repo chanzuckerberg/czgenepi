@@ -2,12 +2,14 @@ import { ChipProps } from "czifui";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { StatusChip } from "src/views/Data/components/StatusChip";
 
-type StatusLabel = Record<
-  string,
-  { label: string; status: NonNullable<ChipProps["status"]> }
->;
+interface StatusLabel {
+  label: string;
+  status: NonNullable<ChipProps["status"]>;
+}
 
-const STATUS_LABELS: StatusLabel = {
+type StatusLabelMap = Record<string, StatusLabel>;
+
+const STATUS_LABELS: StatusLabelMap = {
   error: {
     label: "bad",
     status: "error",

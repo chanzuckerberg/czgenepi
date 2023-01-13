@@ -10,7 +10,6 @@ import {
 import {
   CellComponent,
   CellHeader,
-  Chip,
   Icon,
   InputCheckbox,
   Table,
