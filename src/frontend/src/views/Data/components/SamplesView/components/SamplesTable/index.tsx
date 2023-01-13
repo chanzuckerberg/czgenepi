@@ -360,7 +360,8 @@ const SamplesTable = ({
   const table = useReactTable({
     data: samples,
     defaultColumn: {
-      minSize: 150,
+      minSize: 50,
+      size: 50,
     },
     columns,
     enableMultiRowSelection: true,
