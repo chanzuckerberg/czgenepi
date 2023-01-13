@@ -102,7 +102,9 @@ export const DateFilterMenu: FC<Props> = ({
     setFieldValue(fieldKeyEnd, undefined);
 
     let start = undefined;
-    if (dateOption.numDaysStartOffset) {
+    // need to ccompare to undefined because `Today` offset is 0
+    // (which evaluates to false if used to check a conditional)
+    if (dateOption.numDaysStartOffset !== undefined) {
       start = new Date();
       start.setDate(start.getDate() - dateOption.numDaysStartOffset);
       start.setHours(0, 0, 0);
