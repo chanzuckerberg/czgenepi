@@ -89,6 +89,14 @@ subsampling:
         type: "proximity"
         focus: "focal"
       min-length: 10000
+
+    group:
+      subsample-max-sequences: 25
+      query: "(location == '{location}') & (division == '{division}')"
+      priorities:
+        type: "proximity"
+        focus: "focal"
+      min-length: 100000
        
     state:
       subsample-max-sequences: 25
