@@ -31,6 +31,7 @@ import {
 } from "./style";
 import { EmptyTable } from "src/views/Data/components/EmptyState";
 import { generateWidthStyles } from "src/common/utils";
+import { getLineageFromSampleLineages } from "src/common/utils/samples";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -223,7 +224,7 @@ const columns: ColumnDef<Sample, any>[] = [
   },
   {
     id: "lineage",
-    accessorKey: "lineage",
+    accessorKey: "lineages",
     header: ({ header, column }) => (
       <SortableHeader
         header={header}
@@ -241,13 +242,14 @@ const columns: ColumnDef<Sample, any>[] = [
         Lineage
       </SortableHeader>
     ),
-    cell: ({ getValue, cell }) => {
-      const lineage = getValue()?.lineage;
+    cell: ({ getValue }) => {
+      const lineages = getValue();
+      const lineage = getLineageFromSampleLineages(lineages);
       const CellContent = (
         <StyledCellBasic
           key={cell.id}
           shouldTextWrap
-          primaryText={lineage ?? "Not Yet Processed"}
+          primaryText={lineage?.lineage ?? "Not Yet Processed"}
           primaryTextWrapLineCount={2}
           shouldShowTooltipOnHover={false}
         />
