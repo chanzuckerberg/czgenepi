@@ -23,7 +23,12 @@ import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "./components/LineageTooltip";
 import { DefaultCell } from "./components/DefaultCell";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
-import { StyledCellBasic, StyledPrivateId, StyledTableRow } from "./style";
+import {
+  StyledCellBasic,
+  StyledInputCheckbox,
+  StyledPrivateId,
+  StyledTableRow,
+} from "./style";
 import { EmptyTable } from "src/views/Data/components/EmptyState";
 import { generateWidthStyles } from "src/common/utils";
 
@@ -62,7 +67,7 @@ const columns: ColumnDef<Sample, any>[] = [
           hideSortIcon
           style={generateWidthStyles(column)}
         >
-          <InputCheckbox stage={checkboxStage} onChange={onChange} />
+          <StyledInputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellHeader>
       );
     },
