@@ -17,7 +17,7 @@ import {
   TableHeader,
 } from "czifui";
 import { map } from "lodash";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "./components/LineageTooltip";
@@ -40,7 +40,7 @@ const columns: ColumnDef<Sample, any>[] = [
     id: "select",
     size: 40,
     minSize: 40,
-    header: ({ table, column }) => {
+    header: ({ table, column, header }) => {
       const {
         getIsAllRowsSelected,
         getIsSomeRowsSelected,
@@ -57,20 +57,23 @@ const columns: ColumnDef<Sample, any>[] = [
       const onChange = getToggleAllRowsSelectedHandler();
 
       return (
-        <CellHeader hideSortIcon style={generateWidthStyles(column)}>
-          {/* @ts-expect-error remove line when types fixed in sds */}
+        <CellHeader
+          key={header.id}
+          hideSortIcon
+          style={generateWidthStyles(column)}
+        >
           <InputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellHeader>
       );
     },
-    cell: ({ row }) => {
+    cell: ({ row, cell }) => {
       const { getIsSelected, getToggleSelectedHandler } = row;
 
       const checkboxStage = getIsSelected() ? "checked" : "unchecked";
       const onChange = getToggleSelectedHandler();
 
       return (
-        <CellComponent>
+        <CellComponent key={cell.id}>
           <InputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellComponent>
       );
@@ -93,12 +96,13 @@ const columns: ColumnDef<Sample, any>[] = [
         Private ID
       </SortableHeader>
     ),
-    cell: ({ getValue, row }) => {
+    cell: ({ getValue, row, cell }) => {
       const { uploadedBy, private: isPrivate } = row?.original;
       const uploader = uploadedBy?.name;
 
       return (
         <StyledPrivateId
+          key={cell.id}
           primaryText={getValue()}
           secondaryText={uploader}
           shouldTextWrap
@@ -154,10 +158,10 @@ const columns: ColumnDef<Sample, any>[] = [
         Quality Score
       </SortableHeader>
     ),
-    cell: ({ getValue }) => {
+    cell: ({ getValue, cell }) => {
       const didFailRecovery = getValue();
       return (
-        <CellComponent>
+        <CellComponent key={cell.id}>
           <Chip
             data-test-id="row-sample-status"
             size="small"
@@ -183,8 +187,9 @@ const columns: ColumnDef<Sample, any>[] = [
         Upload Date
       </SortableHeader>
     ),
-    cell: ({ getValue }) => (
+    cell: ({ getValue, cell }) => (
       <StyledCellBasic
+        key={cell.id}
         shouldTextWrap
         primaryText={datetimeWithTzToLocalDate(getValue())}
         primaryTextWrapLineCount={2}
@@ -231,10 +236,11 @@ const columns: ColumnDef<Sample, any>[] = [
         Lineage
       </SortableHeader>
     ),
-    cell: ({ getValue }) => {
+    cell: ({ getValue, cell }) => {
       const lineage = getValue()?.lineage;
       const CellContent = (
         <StyledCellBasic
+          key={cell.id}
           shouldTextWrap
           primaryText={lineage ?? "Not Yet Processed"}
           primaryTextWrapLineCount={2}
@@ -266,8 +272,9 @@ const columns: ColumnDef<Sample, any>[] = [
         Collection Location
       </SortableHeader>
     ),
-    cell: ({ getValue }) => (
+    cell: ({ getValue, cell }) => (
       <StyledCellBasic
+        key={cell.id}
         shouldTextWrap
         primaryText={
           getValue().location || getValue().division || getValue().country
@@ -313,10 +320,11 @@ const columns: ColumnDef<Sample, any>[] = [
         GISAID
       </SortableHeader>
     ),
-    cell: ({ getValue }) => {
+    cell: ({ getValue, cell }) => {
       const { gisaid_id, status } = getValue();
       return (
         <StyledCellBasic
+          key={cell.id}
           primaryText={status}
           secondaryText={gisaid_id}
           shouldShowTooltipOnHover={false}
@@ -404,4 +412,4 @@ const SamplesTable = ({
   );
 };
 
-export { SamplesTable };
+export default memo(SamplesTable);

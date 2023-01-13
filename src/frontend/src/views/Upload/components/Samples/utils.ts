@@ -257,3 +257,16 @@ export function hasSamples(samples: Samples | null): boolean {
 
   return Object.keys(samples).length > 0;
 }
+
+export function getBadOrFailedQCSampleIds(samples: Sample[]) {
+  return (
+    samples
+      // for now there should only ever be one qcMetrics entry per sample
+      .filter(
+        (s) =>
+          s.qcMetrics[0].qc_status === "Bad" ||
+          s.qcMetrics[0].qc_status === "Failed"
+      )
+      .map((s) => s.publicId)
+  );
+}

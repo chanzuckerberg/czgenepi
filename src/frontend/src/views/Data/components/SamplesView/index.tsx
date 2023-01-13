@@ -7,7 +7,7 @@ import { IdMap } from "src/common/utils/dataTransforms";
 import { FilterPanel } from "src/components/FilterPanel";
 import { SearchBar } from "src/components/Table/components/SearchBar";
 import { DataNavigation } from "../DataNavigation";
-import { SamplesTable } from "./components/SamplesTable";
+import SamplesTable from "./components/SamplesTable";
 import { SampleTableModalManager } from "./components/SampleTableModalManager";
 import { Flex, MaxWidth, StyledActionBar } from "./style";
 

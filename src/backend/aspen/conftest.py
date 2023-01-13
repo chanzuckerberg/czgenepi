@@ -9,5 +9,5 @@ from aspen.util.split import SplitClient
 
 
 @pytest.fixture()
-async def split_client() -> MagicMock:
+def split_client() -> MagicMock:
     return create_autospec(SplitClient)

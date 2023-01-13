@@ -8,7 +8,6 @@ export type SampleResponseData = {
     division: string;
     location: string;
   };
-  czb_failed_genome_recovery?: boolean;
   gisaid: {
     gisaid_id: string | null;
     status: string;

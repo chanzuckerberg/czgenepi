@@ -158,7 +158,6 @@ async def test_samples_list(
                         "division": location.division,
                         "location": location.location,
                     },
-                    "czb_failed_genome_recovery": False,
                     "gisaid": {
                         "status": "Accepted",
                         "gisaid_id": samples[i].accessions[0].accession,
@@ -343,7 +342,6 @@ async def test_samples_list_no_qc_status(
                         "division": location.division,
                         "location": location.location,
                     },
-                    "czb_failed_genome_recovery": False,
                     "gisaid": {
                         "status": "Accepted",
                         "gisaid_id": samples[i].accessions[0].accession,
@@ -445,7 +443,6 @@ async def test_samples_view_gisaid_rejected(
                     "division": location.division,
                     "location": location.location,
                 },
-                "czb_failed_genome_recovery": False,
                 "gisaid": {"status": "Not Found", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
@@ -506,7 +503,6 @@ async def test_samples_view_gisaid_no_info(
                     "division": location.division,
                     "location": location.location,
                 },
-                "czb_failed_genome_recovery": False,
                 "gisaid": {"status": "Not Found", "gisaid_id": None},
                 "private_identifier": sample.private_identifier,
                 "public_identifier": sample.public_identifier,
@@ -514,64 +510,6 @@ async def test_samples_view_gisaid_no_info(
                     uploaded_pathogen_genome.upload_date
                 ),
                 "sequencing_date": str(uploaded_pathogen_genome.sequencing_date),
-                "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
-                "private": False,
-                "submitting_group": {
-                    "id": group.id,
-                    "name": group.name,
-                },
-                "uploaded_by": {"id": user.id, "name": user.name},
-                "qc_metrics": [],
-                "lineages": [],
-            }
-        ]
-    }
-    assert response == expected
-
-
-async def test_samples_view_gisaid_not_eligible(
-    async_session: AsyncSession, http_client: AsyncClient
-):
-    group = group_factory()
-    user = await userrole_factory(async_session, group)
-    # Mark the sample as failed
-    location = location_factory(
-        "North America", "USA", "California", "Santa Barbara County"
-    )
-    sc2 = pathogen_factory("SC2", "SARS-Cov-2")
-    sample = sample_factory(
-        group, user, location, czb_failed_genome_recovery=True, pathogen=sc2
-    )
-    async_session.add(group)
-    await async_session.commit()
-
-    auth_headers = {"user_id": user.auth0_user_id}
-    res = await http_client.get(
-        f"/v2/orgs/{group.id}/pathogens/{sc2.slug}/samples/",
-        headers=auth_headers,
-    )
-    response = res.json()
-    expected = {
-        "samples": [
-            {
-                "id": sample.id,
-                "collection_date": str(sample.collection_date),
-                "collection_location": {
-                    "id": location.id,
-                    "region": location.region,
-                    "country": location.country,
-                    "division": location.division,
-                    "location": location.location,
-                },
-                "czb_failed_genome_recovery": True,
-                "gisaid": {"status": "Not Eligible", "gisaid_id": None},
-                "private_identifier": sample.private_identifier,
-                "public_identifier": sample.public_identifier,
-                "upload_date": None,
-                # In some cases, `sequencing_date` could actually still exist with a
-                # failed genome recovery, but for this test it's None because the sample
-                # has no underlying sequenced entity (no uploaded_pathogen_genome).
-                "sequencing_date": None,
                 "pathogen": {"id": sc2.id, "slug": sc2.slug, "name": sc2.name},
                 "private": False,
                 "submitting_group": {
@@ -697,7 +635,6 @@ async def test_samples_view_cansee_all(
                 "division": sample.collection_location.division,
                 "location": sample.collection_location.location,
             },
-            "czb_failed_genome_recovery": False,
             "gisaid": {
                 "status": "Accepted",
                 "gisaid_id": sample.accessions[0].accession,
@@ -766,7 +703,6 @@ async def test_samples_view_no_pangolin(
                     "division": location.division,
                     "location": location.location,
                 },
-                "czb_failed_genome_recovery": False,
                 "gisaid": {
                     "status": "Accepted",
                     "gisaid_id": sample.accessions[0].accession,

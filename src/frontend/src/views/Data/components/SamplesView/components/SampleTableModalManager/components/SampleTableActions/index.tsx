@@ -1,4 +1,4 @@
-import { Link } from "czifui";
+import NextLink from "next/link";
 import { ROUTES } from "src/common/routes";
 import { IconButton } from "../IconButton";
 import { MoreActionsMenu } from "./components/MoreActionMenu";
@@ -80,7 +80,7 @@ const SampleTableActions = ({
         onEditSelected={openEditSampleModal}
         data-test-id="sample-page-more-action-btn"
       />
-      <Link href={ROUTES.UPLOAD_STEP1} passHref>
+      <NextLink href={ROUTES.UPLOAD_STEP1} passHref>
         <StyledUploadButton
           component="a"
           href="passHref"
@@ -90,7 +90,7 @@ const SampleTableActions = ({
         >
           Upload
         </StyledUploadButton>
-      </Link>
+      </NextLink>
     </StyledWrapper>
   );
 };
