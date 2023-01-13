@@ -25,6 +25,16 @@ def check_latest_pangolin_version() -> str:
     return latest_version
 
 
+def should_sample_be_updated(sample: Sample, most_recent_pango_version) -> bool:
+    has_lineage = sample.lineages != []
+    if has_lineage:
+        if sample.lineages[0].lineage_software_version != most_recent_pango_version:
+            return True
+        return False
+    # sample has no lineage or the version is not most recent
+    return True
+
+
 def find_samples(pathogen: str) -> Collection[str]:
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     most_recent_pango_version: str = check_latest_pangolin_version()
@@ -34,7 +44,7 @@ def find_samples(pathogen: str) -> Collection[str]:
 
         all_samples: Collection[Sample] = (
             session.query(Sample)
-            .options(joinedload(Sample.uploaded_pathogen_genome))
+            .options(joinedload(Sample.lineages))
             .join(Sample.pathogen)
             .where(Pathogen.slug == pathogen)
         )
@@ -45,11 +55,7 @@ def find_samples(pathogen: str) -> Collection[str]:
         samples_to_be_updated: Collection[str] = [
             sample.public_identifier
             for sample in all_samples
-            if (
-                sample.uploaded_pathogen_genome is not None
-                and sample.uploaded_pathogen_genome.pangolin_version
-                != most_recent_pango_version
-            )
+            if should_sample_be_updated(sample, most_recent_pango_version)
         ]
 
         return samples_to_be_updated
