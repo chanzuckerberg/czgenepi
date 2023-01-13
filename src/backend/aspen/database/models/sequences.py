@@ -73,11 +73,6 @@ class PathogenGenome(Entity):
         server_default=text("'{}'::jsonb"),
     )
 
-    pangolin_lineage = Column(String, nullable=True)
-    pangolin_probability = Column(Float, nullable=True)
-    pangolin_version = Column(String, nullable=True)
-    pangolin_last_updated = Column(DateTime, nullable=True)
-
 
 class UploadedPathogenGenome(PathogenGenome):
     __tablename__ = "uploaded_pathogen_genomes"
