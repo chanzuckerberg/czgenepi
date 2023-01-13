@@ -54,7 +54,8 @@ RUN apt install -y libdigest-sha-perl
 ENV POETRY_VERSION=1.3.2
 RUN python3 -m pip install poetry==$POETRY_VERSION
 
-RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas arrow
+RUN pip3 install csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas arrow
+RUN pip3 uninstall -y pangoLEARN
 
 RUN mkdir /ncov && \
     cd /ncov && \

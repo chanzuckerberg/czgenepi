@@ -38,6 +38,7 @@ RUN python3 -m pip install poetry==$POETRY_VERSION
 ENV FLASK_ENV=development
 
 RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas
+RUN pip3 uninstall -y pangoLEARN
 
 RUN mkdir /ncov && \
     cd /ncov && \
