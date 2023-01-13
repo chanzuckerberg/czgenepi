@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from typing import Any, Dict, Iterable
 
 import click
@@ -56,6 +57,13 @@ from aspen.workflows.nextstrain_run.export import (
     help="How many GISAID ID's to include in the build",
 )
 @click.option(
+    "--template-args",
+    type=str,
+    required=False,
+    default="{}",
+    help="Which existing group to use for this build?",
+)
+@click.option(
     "--group-name",
     type=str,
     required=False,
@@ -81,6 +89,7 @@ def cli(
     sequences: int,
     selected: int,
     gisaid: int,
+    template_args: str,
     group_name: str,
     location: str,
     pathogen: str,
@@ -91,7 +100,7 @@ def cli(
         "non_contextualized": TreeType.NON_CONTEXTUALIZED,
     }
     build_type = tree_types[tree_type]
-    template_args: Dict[str, Any] = {}
+    template_args = json.loads(template_args)
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
     sequences_fh = open("sequences.fasta", "w")
@@ -123,6 +132,7 @@ def cli(
         context = {
             "num_sequences": num_sequences,
             "num_included_samples": num_included_samples,
+            "run_start_datetime": datetime.now(),
         }
         group_query = sa.select(Group)  # type: ignore
         if group_name:
@@ -148,7 +158,8 @@ def cli(
         builder.write_file(builds_file_fh)
 
         print("Wrote output files!")
-        print(json.dumps(context))
+        for k, v in resolved_template_args.items():
+            print(f"Resolved {k} to {v}")
         session.rollback()  # Don't save any changes to the DB.
 
 
