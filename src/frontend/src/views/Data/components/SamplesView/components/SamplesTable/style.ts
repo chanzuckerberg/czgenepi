@@ -1,5 +1,12 @@
 import styled from "@emotion/styled";
-import { CellBasic, getColors, getFontWeights, getSpaces, InputCheckbox, TableRow } from "czifui";
+import {
+  CellBasic,
+  getColors,
+  getFontWeights,
+  getSpaces,
+  InputCheckbox,
+  TableRow,
+} from "czifui";
 
 export const StyledPrivateId = styled(CellBasic)`
   ${(props) => {

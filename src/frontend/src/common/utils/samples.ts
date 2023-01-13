@@ -1,2 +1,2 @@
-export const getLineageFromSampleLineages = (lineages: Lineage[]): string =>
+export const getLineageFromSampleLineages = (lineages: Lineage[]): Lineage =>
   lineages?.[0];
