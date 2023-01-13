@@ -34,7 +34,8 @@ class TreeTypePlugin(BaseConfigPlugin):
                 build[field] = value
                 location_values.append(value)
             else:
-                del build[field]
+                if build.get(field):
+                    del build[field]
 
         # NOTE: <TreeTypePlugin>.subsampling_scheme is used in 3 places:
         #   - Its lowercase'd name is used to find a markdown file with an "about this tree" description
@@ -141,7 +142,8 @@ class OverviewPlugin(TreeTypePlugin):
         # Either due to being a scheduled run or no user selection
         # Put reference sequences in include.txt so tree run don't break
         if self.num_included_samples == 0:
-            del config["files"]["include"]
+            if config.get("files", {}).get("include"):
+                del config["files"]["include"]
 
 
 class NonContextualizedPlugin(TreeTypePlugin):

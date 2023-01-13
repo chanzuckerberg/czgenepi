@@ -22,6 +22,7 @@ from aspen.database.models import (
 )
 from aspen.workflows.nextstrain_run.build_config import TemplateBuilder
 from aspen.workflows.nextstrain_run.export import (
+    resolve_template_args,
     write_includes_file,
     write_sequences_files,
 )
@@ -129,14 +130,20 @@ def cli(
         group = session.execute(group_query).scalars().first()
         if not group:
             raise Exception("No group found")
+
+        resolved_template_args = resolve_template_args(
+            session, pathogen_model, template_args, group
+        )
         if location:
             (region, country, div, loc) = location.split("/")
             tree_location = Location(
                 region=region, country=country, division=div, location=loc
             )
             group.default_tree_location = tree_location
+            resolved_template_args["location"] = tree_location
+
         builder = TemplateBuilder(
-            build_type, pathogen_model, group, template_args, **context
+            build_type, pathogen_model, group, resolved_template_args, **context
         )
         builder.write_file(builds_file_fh)
 

@@ -133,9 +133,13 @@ def dump_yaml_template(
         context = {
             "num_sequences": num_sequences,
             "num_included_samples": num_included_samples,
+            "run_start_datetime": phylo_run.start_datetime,  # can be None
         }
+        resolved_template_args = resolve_template_args(
+            session, phylo_run.pathogen, phylo_run.template_args, group
+        )
         builder: TemplateBuilder = TemplateBuilder(
-            phylo_run.tree_type, group, phylo_run.template_args, **context
+            phylo_run.tree_type, phylo_run.group, resolved_template_args, **context
         )
         builder.write_file(builds_file_fh)
 
