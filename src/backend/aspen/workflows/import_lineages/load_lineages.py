@@ -24,7 +24,7 @@ def download_lineages(
     url: str,
     format: str,
     print_response: bool,
-) -> List[str]:
+) -> Any[str, List[str]]:
     """Download lineages file from URL."""
     response = requests.get(url)
     if response.status_code != 200:
