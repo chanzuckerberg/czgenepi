@@ -242,7 +242,7 @@ const columns: ColumnDef<Sample, any>[] = [
         Lineage
       </SortableHeader>
     ),
-    cell: ({ getValue }) => {
+    cell: ({ getValue, cell }) => {
       const lineages = getValue();
       const lineage = getLineageFromSampleLineages(lineages);
       const CellContent = (
