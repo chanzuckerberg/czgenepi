@@ -25,6 +25,7 @@ export const SortableHeader = ({
 
   return (
     <CellHeader
+      key={header.id}
       onClick={onClick}
       direction={sortDirection}
       active={Boolean(sortDirection)}

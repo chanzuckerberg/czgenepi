@@ -1,6 +1,7 @@
 from typing import Any, List
 
 import pytest
+import pytest_asyncio
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -30,7 +31,7 @@ pytestmark = pytest.mark.asyncio
 # User3 -- admin  --> Group3 -- viewer --> Group2
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def groups(async_session: AsyncSession) -> List[Group]:
     group0 = group_factory(name="Group0")
     group1 = group_factory(name="Group1")
@@ -51,7 +52,7 @@ async def groups(async_session: AsyncSession) -> List[Group]:
     return groups
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def users(async_session: AsyncSession, groups: List[Group]) -> List[User]:
     user0 = await userrole_factory(
         async_session,
@@ -87,7 +88,7 @@ async def users(async_session: AsyncSession, groups: List[Group]) -> List[User]:
     return users
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def appdata(
     async_session: AsyncSession, groups: List[Group], users: List[User]
 ) -> List[PhyloTree]:
@@ -141,7 +142,7 @@ async def make_authcontext(async_session: AsyncSession, group: Group, user: User
     return authzsession
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def azs(
     async_session: AsyncSession,
     groups: List[Group],
