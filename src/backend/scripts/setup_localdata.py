@@ -276,20 +276,14 @@ def create_sample_qc_metrics(session, sample):
     return sample_qc_metrics
 
 
-def create_sample(
-    session, group, pathogen, uploaded_by_user, location, suffix, is_failed=False
-):
+def create_sample(session, group, pathogen, uploaded_by_user, location, suffix):
     private_id = f"{group.prefix}-private_identifier_{suffix}_{pathogen.slug}"
     public_id = f"{group.prefix}-public_identifier_{suffix}_{pathogen.slug}"
-    if is_failed:
-        private_id += "_failed"
-        public_id += "_failed"
 
     sample = (
         session.query(Sample)
         .filter(Sample.private_identifier == private_id)
         .filter(Sample.submitting_group == group)
-        .filter(Sample.czb_failed_genome_recovery == is_failed)
         .filter(Sample.pathogen == pathogen)
         .order_by(Sample.id)
         .first()
@@ -312,7 +306,6 @@ def create_sample(
         pathogen=pathogen,
         public_identifier=public_id,
         collection_date=datetime.now(),
-        czb_failed_genome_recovery=is_failed,
         sample_collected_by="sample_collector",
         sample_collector_contact_address="sample_collector_address",
         collection_location=location,
@@ -504,13 +497,9 @@ def create_alignment_entity(session, pathogen, repository):
     session.add(aligned_workflow)
 
 
-def create_samples(
-    session, group, user, pathogen, location, num_successful, num_failures
-):
-    for suffix in range(num_successful):
+def create_samples(session, group, user, pathogen, location, num_total_samples):
+    for suffix in range(num_total_samples):
         _ = create_sample(session, group, user, pathogen, location, suffix)
-    for suffix in range(num_failures):
-        _ = create_sample(session, group, user, pathogen, location, suffix, True)
 
 
 def get_default_file(s3_resource):
@@ -569,7 +558,7 @@ def create_test_data(engine):
     group = create_test_group(session, "CZI", "CZI", location)
     user = create_test_user(session, "user1@czgenepi.org", group, "User1", "Test User")
     for pathogen in pathogens:
-        create_samples(session, group, pathogen, user, location, 10, 5)
+        create_samples(session, group, pathogen, user, location, 15)
         create_test_trees(session, group, pathogen, user)
 
     # Create db rows for another group
@@ -581,7 +570,7 @@ def create_test_data(engine):
         session, "tbktu@czgenepi.org", group2, "tbktu", "Timbuktu User"
     )
     for pathogen in pathogens:
-        create_samples(session, group2, pathogen, user2, location2, 10, 10)
+        create_samples(session, group2, pathogen, user2, location2, 15)
         create_test_trees(session, group2, pathogen, user2)
 
     upload_tree_files(session)

@@ -1,4 +1,3 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { Alert, Icon, Link } from "czifui";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -14,8 +13,6 @@ import {
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { DownloadButton } from "./components/DownloadButton";
 import { DownloadMenuSelection } from "./components/DownloadMenuSelection";
 import {
@@ -32,14 +29,12 @@ import {
 
 interface Props {
   checkedSamples: Sample[];
-  failedSampleIds: string[];
   open: boolean;
   onClose: () => void;
 }
 
 const DownloadModal = ({
   checkedSamples,
-  failedSampleIds,
   open,
   onClose,
 }: Props): JSX.Element => {
@@ -53,14 +48,6 @@ const DownloadModal = ({
   const pathogen = useSelector(selectCurrentPathogen);
   const isGisaidTemplateEnabled = pathogen === Pathogen.COVID;
 
-  const nextcladeDownloadFlag = useTreatments([
-    USER_FEATURE_FLAGS.nextclade_download,
-  ]);
-  const usesNextcladeDownload = isUserFlagOn(
-    nextcladeDownloadFlag,
-    USER_FEATURE_FLAGS.nextclade_download
-  );
-
   useEffect(() => {
     const noQCIds = checkedSamples
       // for now samples should only have one qcMetrics entry
@@ -69,17 +56,12 @@ const DownloadModal = ({
     setNoQCDataSampleIds(noQCIds);
   }, [checkedSamples]);
 
-  const completedSampleIds = checkedSamples
-    .filter((sample) => !failedSampleIds.includes(sample.publicId))
-    .map((s) => s.publicId);
+  const completedSampleIds = checkedSamples.map((s) => s.publicId);
 
   // only pass samples that have associated qc data to nextclade download
   const sampleIdsWQCData = checkedSamples
     .filter((sample) => !noQCDataSampleIds.includes(sample.publicId))
     .map((s) => s.publicId);
-
-  const nCompletedSampleIds = completedSampleIds.length;
-  const isFastaDisabled = nCompletedSampleIds === 0;
 
   const handleMetadataClick = function () {
     setMetadataSelected(!isMetadataSelected);
@@ -110,16 +92,6 @@ const DownloadModal = ({
     onClose();
   };
 
-  const FASTA_DISABLED_TOOLTIP_TEXT = (
-    <div>
-      <TooltipHeaderText>
-        No Consensus Genomes available for download
-      </TooltipHeaderText>
-      <TooltipDescriptionText>
-        Select at least 1 sample with successful genome recovery.
-      </TooltipDescriptionText>
-    </div>
-  );
   const NO_NEXTCLADE_DATA_TOOLTIP_TEXT = (
     <div>
       <TooltipHeaderText>No QC data available for download.</TooltipHeaderText>
@@ -153,12 +125,10 @@ const DownloadModal = ({
             <Container>
               <DownloadMenuSelection
                 id="download-fasta-checkbox"
-                isDisabled={isFastaDisabled}
                 isChecked={isFastaSelected}
                 onChange={handleFastaClick}
                 downloadTitle="Consensus Genome"
                 fileTypes=".fasta"
-                tooltipTitle={FASTA_DISABLED_TOOLTIP_TEXT}
               >
                 Download multiple consensus genomes in a single concatenated
                 file.
@@ -174,29 +144,25 @@ const DownloadModal = ({
                 Date, Sequencing Date, Lineage, GISAID Status, and ISL Accession
                 #.
               </DownloadMenuSelection>
-              {usesNextcladeDownload && (
-                <DownloadMenuSelection
-                  id="download-nextclade-checkbox"
-                  isChecked={isNextcladeDataSelected}
-                  isDisabled={
-                    noQCDataSampleIds.length === checkedSamples.length
+              <DownloadMenuSelection
+                id="download-nextclade-checkbox"
+                isChecked={isNextcladeDataSelected}
+                isDisabled={noQCDataSampleIds.length === checkedSamples.length}
+                tooltipTitle={NO_NEXTCLADE_DATA_TOOLTIP_TEXT}
+                onChange={handleNextcladeDataClick}
+                downloadTitle="Sample Mutations and QC Metrics"
+                fileTypes=".tsv"
+              >
+                Download a list of nucelotide and protein mutations and QC
+                metrics for the selected samples.{" "}
+                <NewTabLink
+                  href={
+                    "https://help.czgenepi.org/hc/en-us/articles/11569567939604-Download-QC-Metrics-and-Mutation-Data"
                   }
-                  tooltipTitle={NO_NEXTCLADE_DATA_TOOLTIP_TEXT}
-                  onChange={handleNextcladeDataClick}
-                  downloadTitle="Sample Mutations and QC Metrics"
-                  fileTypes=".tsv"
                 >
-                  Download a list of nucelotide and protein mutations and QC
-                  metrics for the selected samples.{" "}
-                  <NewTabLink
-                    href={
-                      "https://help.czgenepi.org/hc/en-us/articles/11569567939604-Download-QC-Metrics-and-Mutation-Data"
-                    }
-                  >
-                    Learn more
-                  </NewTabLink>
-                </DownloadMenuSelection>
-              )}
+                  Learn more
+                </NewTabLink>
+              </DownloadMenuSelection>
               {isGisaidTemplateEnabled && (
                 <DownloadMenuSelection
                   id="download-gisaid-checkbox"
@@ -234,21 +200,6 @@ const DownloadModal = ({
                 </Link>
               </DownloadMenuSelection>
             </Container>
-            {failedSampleIds.length > 0 &&
-              !isFastaDisabled && ( //ignore alert if fasta is already disabled
-                <Alert severity="warning">
-                  <AlertStrong>
-                    {failedSampleIds.length}{" "}
-                    {pluralize("sample", failedSampleIds.length)} will not be
-                    included in your Consensus Genome or Submission Template
-                    downloads
-                  </AlertStrong>{" "}
-                  <AlertBody>
-                    because they failed genome recovery. Failed samples will
-                    still be included in your Sample Metadata download.
-                  </AlertBody>
-                </Alert>
-              )}
             {isGisaidSelected && checkedSamples.length > 1000 && (
               <StyledCallout intent="warning">
                 The number of samples selected exceeds GISAID’s upload limit of

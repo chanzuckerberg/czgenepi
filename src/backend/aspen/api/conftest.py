@@ -6,6 +6,7 @@ from typing import AsyncGenerator
 from unittest.mock import create_autospec, MagicMock
 
 import pytest
+import pytest_asyncio
 from authlib.integrations.starlette_client import StarletteOAuth2App
 from fastapi import Depends, FastAPI, Request
 from httpx import AsyncClient
@@ -37,7 +38,7 @@ class AsyncPostgresDatabase:
         return f"postgresql+asyncpg://{USERNAME}:{PASSWORD}@database:{self.port}/{self.database_name}"
 
 
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def async_db() -> AsyncGenerator[AsyncPostgresDatabase, None]:
     """Creates a postgres test database named a random string with username/password user_rw/password_rw, yields it, and then drops it."""
 
@@ -81,7 +82,7 @@ async def async_db() -> AsyncGenerator[AsyncPostgresDatabase, None]:
     await admin_session.close()  # type: ignore
 
 
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def async_sqlalchemy_interface(
     async_db: AsyncPostgresDatabase,
 ) -> AsyncGenerator[aspen_connection.SqlAlchemyInterface, None]:
@@ -103,7 +104,7 @@ async def async_sqlalchemy_interface(
         await connection.close()
 
 
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def async_session(
     async_sqlalchemy_interface: aspen_connection.SqlAlchemyInterface,
 ) -> AsyncGenerator[AsyncSession, None]:
@@ -131,22 +132,22 @@ async def override_get_cookie_userid(
     return request.headers.get("user_id")
 
 
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def auth0_apiclient() -> MagicMock:
     return create_autospec(Auth0Client)
 
 
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def auth0_oauth() -> MagicMock:
     return create_autospec(StarletteOAuth2App)
 
 
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def split_client() -> MagicMock:
     return create_autospec(SplitClient)
 
 
-@pytest.fixture()
+@pytest_asyncio.fixture()
 async def api(
     async_db: AsyncPostgresDatabase,
     auth0_apiclient: MagicMock,
@@ -162,7 +163,7 @@ async def api(
     return api
 
 
-@pytest.fixture(scope="function")
+@pytest_asyncio.fixture(scope="function")
 async def http_client(api: FastAPI) -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(app=api, base_url="http://test") as client:
         yield client
