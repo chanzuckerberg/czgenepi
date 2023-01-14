@@ -475,3 +475,33 @@ def test_overview_config_country(mocker, session, postgres_database, split_clien
     assert (
         subsampling_scheme["group"]["query"] == f"(country == '{location.country}')"
     )
+
+
+# make sure we handle quotes sanely!!!
+def test_string_escapes(mocker, session, postgres_database, split_client):
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
+
+    tree_type = TreeType.NON_CONTEXTUALIZED
+    run, location = create_test_data(
+        session,
+        split_client,
+        tree_type,
+        10,
+        5,
+        5,
+        group_name="Group Without Location",
+        group_location="Cote d'Ivoire",
+        group_division="A'Zaz",
+    )
+    sequences, selected, metadata, nextstrain_config = generate_run(run.id)
+    subsampling_scheme = nextstrain_config["subsampling"]
+    assert (
+        subsampling_scheme["group"]["query"]
+        == f"(location == 'Cote d\\'Ivoire') & (division == 'A\\'Zaz')"
+    )
+
+    # Just some placeholder sanity-checks
+    assert subsampling_scheme["group"]["subsample-max-sequences"] == 1000
+    assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
+    assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
+    assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
