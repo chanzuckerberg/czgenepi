@@ -161,7 +161,8 @@ class NonContextualizedPlugin(TreeTypePlugin):
         # If there aren't any selected samples due to no user selection
         # Put reference sequences in include.txt so tree run don't break
         if self.num_included_samples == 0:
-            del config["files"]["include"]
+            if config.get("files", {}).get("include"):
+                del config["files"]["include"]
 
 
 # Set max_sequences for targeted builds.

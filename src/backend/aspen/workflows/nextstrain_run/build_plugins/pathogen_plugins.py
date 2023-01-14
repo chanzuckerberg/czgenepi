@@ -19,8 +19,8 @@ class MPXPlugin(PathogenPlugin):
             del config["builds"]
         except KeyError:
             pass
-        print(build_config)
         subsampling_scheme = config["subsampling_scheme"]
         for _, sample in config["subsampling"][subsampling_scheme].items():
             if sample.get("query"):
                 sample["query"] = sample["query"].format(**build_config)
+        config["subsampling"] = config["subsampling"][subsampling_scheme]
