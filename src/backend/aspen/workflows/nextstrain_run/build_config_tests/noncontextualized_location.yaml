@@ -1,0 +1,33 @@
+auspice_config: config/auspice_config_mpxv.json
+auspice_name: monkeypox_mpxv
+build_name: mpxv
+clades: config/clades.tsv
+clock_rate: 3e-6
+clock_std_dev: 6e-6
+colors: config/colors_mpxv.tsv
+description: config/description.md
+display_strain_field: strain_original
+exclude: config/exclude_accessions_mpxv.txt
+fix_tree: true
+genbank_reference: config/reference.gb
+genemap: config/genemap.gff
+lat_longs: config/lat_longs.tsv
+mask:
+  from_beginning: 1350
+  from_end: 6422
+  maskfile: config/mask_overview.bed
+max_indel: 10000
+recency: true
+reference: config/reference.fasta
+root: min_dev
+seed_spacing: 1000
+strain_id_field: accession
+subsampling:
+  NON_CONTEXTUALIZED:
+    group:
+      group-by: year
+      query: --query "(country == 'Mexico')"
+      subsample-max-sequences: 1000
+subsampling_scheme: NON_CONTEXTUALIZED
+timetree: false
+tree_mask: config/tree_mask.tsv
