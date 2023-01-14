@@ -39,7 +39,7 @@ subsampling:
     priorities:
       focus: focal
       type: proximity
-    query: --query "(country == 'Mexico')"
+    query: (country == 'Mexico')
     subsample-max-sequences: 25
   international:
     max_sequences: 100

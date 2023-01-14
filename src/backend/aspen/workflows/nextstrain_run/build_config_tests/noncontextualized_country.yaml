@@ -25,7 +25,7 @@ strain_id_field: accession
 subsampling:
   group:
     group-by: year
-    query: --query "(country == 'Mexico')"
+    query: (country == 'Mexico')
     subsample-max-sequences: 1000
 subsampling_scheme: NON_CONTEXTUALIZED
 timetree: false

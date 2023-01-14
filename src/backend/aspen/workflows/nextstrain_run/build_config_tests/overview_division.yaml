@@ -33,7 +33,7 @@ subsampling:
     subsample-max-sequences: 300
   group:
     min-length: 100000
-    query: --query "(division == 'Michoacan') & (country == 'Mexico')"
+    query: (division == 'Michoacan') & (country == 'Mexico')
     subsample-max-sequences: 500
   international:
     max_sequences: 200

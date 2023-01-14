@@ -25,7 +25,7 @@ strain_id_field: accession
 subsampling:
   group:
     min-length: 100000
-    query: --query "(country == 'Mexico')"
+    query: (country == 'Mexico')
     subsample-max-sequences: 500
   international:
     max_sequences: 1000

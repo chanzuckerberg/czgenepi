@@ -47,7 +47,7 @@ subsampling:
     priorities:
       focus: focal
       type: proximity
-    query: --query "(division == 'Michoacan') & (country == 'Mexico')"
+    query: (division == 'Michoacan') & (country == 'Mexico')
     subsample-max-sequences: 25
   international:
     max_sequences: 100

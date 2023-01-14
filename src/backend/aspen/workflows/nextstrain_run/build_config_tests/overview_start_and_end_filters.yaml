@@ -35,7 +35,7 @@ subsampling:
     max_date: --max-date 2023-01-14
     min-length: 100000
     min_date: --min-date 2022-10-14
-    query: --query "(division == 'Michoacan') & (country == 'Mexico')"
+    query: (division == 'Michoacan') & (country == 'Mexico')
     subsample-max-sequences: 500
   international:
     max_sequences: 200
