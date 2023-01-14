@@ -1,3 +1,5 @@
+import re
+
 from aspen.workflows.nextstrain_run.build_plugins.base_plugin import BaseConfigPlugin
 
 
@@ -20,7 +22,9 @@ class MPXPlugin(PathogenPlugin):
         except KeyError:
             pass
         subsampling_scheme = config["subsampling_scheme"]
+        escaped_config = {k: re.sub("'", "\\'", v) for k, v in build_config.items()}
+        print(escaped_config)
         for _, sample in config["subsampling"][subsampling_scheme].items():
             if sample.get("query"):
-                sample["query"] = sample["query"].format(**build_config)
+                sample["query"] = sample["query"].format(**escaped_config)
         config["subsampling"] = config["subsampling"][subsampling_scheme]

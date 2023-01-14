@@ -134,4 +134,4 @@ subsampling:
     group:
       group-by: "year"
       subsample-max-sequences: 1000
-      query: --query "(location == '{location}') & (division == '{division}')"
+      query: "(location == '{location}') & (division == '{division}')"

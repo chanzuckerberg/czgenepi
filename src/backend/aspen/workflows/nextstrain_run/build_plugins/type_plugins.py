@@ -121,9 +121,16 @@ class OverviewPlugin(TreeTypePlugin):
 
     def run_type_config(self, config, subsampling):
         if self.group.name == "Chicago Department of Public Health":
-            subsampling["group"][
-                "query"
-            ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
+            # SC2 format
+            if "--query" in subsampling["group"]["query"]:
+                subsampling["group"][
+                    "query"
+                ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
+            # MPX format
+            else:
+                subsampling["group"][
+                    "query"
+                ] = "(" + subsampling["group"]["query"] + ") | submitting_lab == 'RIPHL at Rush University Medical Center'"
 
         # Handle sampling date & pango lineage filters
         apply_filters(config, subsampling, self.template_args)
@@ -242,17 +249,24 @@ def update_subsampling_for_country(subsampling):
     if "country" in subsampling:
         del subsampling["country"]
     # Update our local group query
-    subsampling["group"]["query"] = '''--query "(country == '{country}')"'''
-
+    if "--query" in subsampling["group"]["query"]:
+        subsampling["group"]["query"] = '''--query "(country == '{country}')"'''
+    else:
+        subsampling["group"]["query"] = "(country == '{country}')"
 
 def update_subsampling_for_division(subsampling):
     # State isn't useful
     if "state" in subsampling:
         del subsampling["state"]
     # Update our local group query
-    subsampling["group"][
-        "query"
-    ] = '''--query "(division == '{division}') & (country == '{country}')"'''  # Keep the country filter in case of multiple divisions worldwide
+    if "--query" in subsampling["group"]["query"]:
+        subsampling["group"][
+            "query"
+        ] = '''--query "(division == '{division}') & (country == '{country}')"'''  # Keep the country filter in case of multiple divisions worldwide
+    else:
+        subsampling["group"][
+            "query"
+        ] = "(division == '{division}') & (country == '{country}')"  # Keep the country filter in case of multiple divisions worldwide
 
 
 def apply_filters(config, subsampling, template_args):
@@ -275,6 +289,10 @@ def apply_filters(config, subsampling, template_args):
         clean_values = [re.sub(r"[^0-9a-zA-Z.]", "", item) for item in pango_lineages]
         config["builds"]["aspen"]["pango_lineage"] = clean_values
         # Remove the last " from our old query so we can inject more filters
-        old_query = subsampling["group"]["query"][:-1]
+        end_string = ""
+        old_query = subsampling["group"]["query"]
+        if old_query.endswith('"'):
+            end_string = '"'
+            old_query = old_query[:-1]
         pango_query = " & (pango_lineage in {pango_lineage})"
-        subsampling["group"]["query"] = old_query + pango_query + '"'
+        subsampling["group"]["query"] = old_query + pango_query + end_string
