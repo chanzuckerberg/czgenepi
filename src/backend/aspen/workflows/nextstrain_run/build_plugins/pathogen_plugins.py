@@ -22,8 +22,12 @@ class MPXPlugin(PathogenPlugin):
         except KeyError:
             pass
         subsampling_scheme = config["subsampling_scheme"]
-        escaped_config = {k: re.sub("'", "\\'", v) for k, v in build_config.items()}
-        print(escaped_config)
+        escaped_config = {}
+        for k, v in build_config.items():
+            if type(v) == str:
+                escaped_config[k] = re.sub("'", "\\'", v)
+            else:
+                escaped_config[k] = v
         for _, sample in config["subsampling"][subsampling_scheme].items():
             if sample.get("query"):
                 sample["query"] = sample["query"].format(**escaped_config)
