@@ -15,7 +15,7 @@ import { QueryClient } from "@tanstack/react-query";
  * avoid direct use: for example, if you need queryClient data in a redux
  * reducer, you could have a dispatch from a React component include the
  * queryClient data you need as well as whatever other info is required for
- * the payload. But in a few cases, you it really, truly is better to directly
+ * the payload. But in a few cases, it really, truly is better to directly
  * import and use the queryClient.
  *
  * Finally, the reason this is separated out and not just in the same file
@@ -24,4 +24,17 @@ import { QueryClient } from "@tanstack/react-query";
  * there, it's easy to fall into circular deps. So we export it from a
  * separate file to make importing it other places less of a headache.
  */
-export const queryClient = new QueryClient();
+const fifteenMinutes = 60 * 15 * 1000;
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // don't refetch every single query just because the user navigates away and comes back
+      refetchOnWindowFocus: false,
+      // don't automatically mark data as immediately stale. Instead, prevent background api calls
+      // for up to 15 minutes.
+      staleTime: fifteenMinutes,
+      // don't clear the cache after 5 minutes. Instead, reuse data for up to 15 minutes.
+      cacheTime: fifteenMinutes,
+    },
+  },
+});

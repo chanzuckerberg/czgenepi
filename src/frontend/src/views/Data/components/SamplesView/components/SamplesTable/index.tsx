@@ -23,9 +23,15 @@ import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "./components/LineageTooltip";
 import { DefaultCell } from "./components/DefaultCell";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
-import { StyledCellBasic, StyledPrivateId, StyledTableRow } from "./style";
+import {
+  StyledCellBasic,
+  StyledInputCheckbox,
+  StyledPrivateId,
+  StyledTableRow,
+} from "./style";
 import { EmptyTable } from "src/views/Data/components/EmptyState";
 import { generateWidthStyles } from "src/common/utils";
+import { getLineageFromSampleLineages } from "src/common/utils/samples";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -62,7 +68,7 @@ const columns: ColumnDef<Sample, any>[] = [
           hideSortIcon
           style={generateWidthStyles(column)}
         >
-          <InputCheckbox stage={checkboxStage} onChange={onChange} />
+          <StyledInputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellHeader>
       );
     },
@@ -218,7 +224,7 @@ const columns: ColumnDef<Sample, any>[] = [
   },
   {
     id: "lineage",
-    accessorKey: "lineage",
+    accessorKey: "lineages",
     header: ({ header, column }) => (
       <SortableHeader
         header={header}
@@ -237,12 +243,13 @@ const columns: ColumnDef<Sample, any>[] = [
       </SortableHeader>
     ),
     cell: ({ getValue, cell }) => {
-      const lineage = getValue()?.lineage;
+      const lineages = getValue();
+      const lineage = getLineageFromSampleLineages(lineages);
       const CellContent = (
         <StyledCellBasic
           key={cell.id}
           shouldTextWrap
-          primaryText={lineage ?? "Not Yet Processed"}
+          primaryText={lineage?.lineage ?? "Not Yet Processed"}
           primaryTextWrapLineCount={2}
           shouldShowTooltipOnHover={false}
         />
@@ -360,7 +367,8 @@ const SamplesTable = ({
   const table = useReactTable({
     data: samples,
     defaultColumn: {
-      minSize: 150,
+      minSize: 50,
+      size: 50,
     },
     columns,
     enableMultiRowSelection: true,
