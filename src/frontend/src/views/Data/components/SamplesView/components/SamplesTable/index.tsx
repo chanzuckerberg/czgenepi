@@ -10,7 +10,6 @@ import {
 import {
   CellComponent,
   CellHeader,
-  Chip,
   Icon,
   InputCheckbox,
   Table,
@@ -32,6 +31,7 @@ import {
 import { EmptyTable } from "src/views/Data/components/EmptyState";
 import { generateWidthStyles } from "src/common/utils";
 import { getLineageFromSampleLineages } from "src/common/utils/samples";
+import { QualityScoreTag } from "./components/QualityScoreTag";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -150,7 +150,7 @@ const columns: ColumnDef<Sample, any>[] = [
   },
   {
     id: "qualityControl",
-    accessorKey: "CZBFailedGenomeRecovery",
+    accessorKey: "qcMetrics",
     header: ({ header, column }) => (
       <SortableHeader
         header={header}
@@ -165,17 +165,17 @@ const columns: ColumnDef<Sample, any>[] = [
       </SortableHeader>
     ),
     cell: ({ getValue, cell }) => {
-      const didFailRecovery = getValue();
+      const qcMetric = getValue()?.[0];
       return (
         <CellComponent key={cell.id}>
-          <Chip
-            data-test-id="row-sample-status"
-            size="small"
-            label={didFailRecovery ? "failed" : "complete"}
-            status={didFailRecovery ? "error" : "success"}
-          />
+          <QualityScoreTag qcMetric={qcMetric} />
         </CellComponent>
       );
+    },
+    sortingFn: (a, b) => {
+      const statusA = a.original.qcMetrics[0].qc_status;
+      const statusB = b.original.qcMetrics[0].qc_status;
+      return statusA > statusB ? -1 : 1;
     },
   },
   {
