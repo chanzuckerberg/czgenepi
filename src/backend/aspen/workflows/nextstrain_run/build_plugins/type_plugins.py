@@ -120,20 +120,23 @@ class OverviewPlugin(TreeTypePlugin):
     subsampling_scheme = "OVERVIEW"
 
     def run_type_config(self, config, subsampling):
-        if self.group.name == "Chicago Department of Public Health":
+        # MPX format
+        include_arguments_in_filters = False
+        if "--query" in subsampling["group"]["query"]:
             # SC2 format
-            if "--query" in subsampling["group"]["query"]:
+            include_arguments_in_filters = True
+        if self.group.name == "Chicago Department of Public Health":
+            if include_arguments_in_filters:
                 subsampling["group"][
                     "query"
                 ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
-            # MPX format
             else:
                 subsampling["group"][
                     "query"
                 ] = "(" + subsampling["group"]["query"] + ") | submitting_lab == 'RIPHL at Rush University Medical Center'"
 
         # Handle sampling date & pango lineage filters
-        apply_filters(config, subsampling, self.template_args)
+        apply_filters(config, subsampling, self.template_args, include_arguments_in_filters)
 
         # Update our sampling for state/country level builds if necessary
         update_subsampling_for_location(self.tree_build_level, subsampling)
@@ -269,7 +272,7 @@ def update_subsampling_for_division(subsampling):
         ] = "(division == '{division}') & (country == '{country}')"  # Keep the country filter in case of multiple divisions worldwide
 
 
-def apply_filters(config, subsampling, template_args):
+def apply_filters(config, subsampling, template_args, include_arguments_in_filters):
     filter_map = {"filter_start_date": "min_date", "filter_end_date": "max_date"}
     for filter_name, yaml_key in filter_map.items():
         value = template_args.get(filter_name)
@@ -277,9 +280,14 @@ def apply_filters(config, subsampling, template_args):
             continue  # This filter isn't set, skip it.
         # Support date expressions like "5 days ago" in our cron schedule.
         value = dateparser.parse(value).strftime("%Y-%m-%d")
-        subsampling["group"][
-            yaml_key
-        ] = f"--{yaml_key.replace('_', '-')} {value}"  # ex: --max-date 2020-01-01
+        if include_arguments_in_filters:
+            subsampling["group"][
+                yaml_key
+            ] = f"--{yaml_key.replace('_', '-')} {value}"  # ex: --max-date 2020-01-01
+        else:
+            subsampling["group"][
+                yaml_key.replace("_", "-")
+            ] = str(value)  # ex: max-date: 2020-01-01
 
     pango_lineages = template_args.get("filter_pango_lineages")
     if pango_lineages:
