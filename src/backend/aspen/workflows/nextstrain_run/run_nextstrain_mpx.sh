@@ -46,6 +46,7 @@ aligned_upstream_location=$(
            --sequences /mpox/data/sequences_czge.fasta                   \
            --metadata /mpox/data/metadata_czge.tsv                       \
            --selected /mpox/data/include.txt                             \
+           --sequence-type aligned                                       \
            --resolved-template-args "${RESOLVED_TEMPLATE_ARGS_SAVEFILE}" \
            --builds-file /mpox/config/build_czge.yaml                    \
            --reset-status

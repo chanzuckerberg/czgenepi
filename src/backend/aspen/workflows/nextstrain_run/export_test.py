@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Any, Dict, Iterable
+from typing import Iterable
 
 import click
 import sqlalchemy as sa

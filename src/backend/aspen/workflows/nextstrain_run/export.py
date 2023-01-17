@@ -28,7 +28,6 @@ from aspen.database.models import (
     PathogenLineage,
     PhyloRun,
     Sample,
-    UploadedPathogenGenome,
 )
 from aspen.database.models.workflow import WorkflowStatusType
 from aspen.util.lineage import expand_lineage_wildcards
@@ -86,6 +85,12 @@ METADATA_CSV_FIELDS = [
 )
 @click.option("--test", type=bool, is_flag=True)
 @click.option("--builds-file-only", type=bool, is_flag=True)
+@click.option(
+    "--sequence-type",
+    type=click.Choice(["aligned", "uploaded"]),
+    default="uploaded",
+    required=True,
+)
 def cli(
     phylo_run_id: int,
     sequences_fh: io.TextIOWrapper,
@@ -96,6 +101,7 @@ def cli(
     reset_status: bool,
     test: bool,
     builds_file_only: bool,
+    sequence_type: str,
 ):
     if builds_file_only:
         dump_yaml_template(phylo_run_id, builds_file_fh)
@@ -111,6 +117,7 @@ def cli(
         resolved_template_args_fh,
         builds_file_fh,
         reset_status,
+        sequence_type,
     )
     print(json.dumps(aligned_repo_data))
 
@@ -154,6 +161,7 @@ def export_run_config(
     resolved_template_args_fh: IO[str],
     builds_file_fh: io.TextIOBase,
     reset_status: bool = False,
+    sequence_type: Optional[str] = None,
 ):
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
@@ -169,7 +177,12 @@ def export_run_config(
         group: Group = phylo_run.group
 
         # Fetch all of a group's samples.
-        county_samples: List[PathogenGenome] = get_county_samples(session, group)
+        if sequence_type == "aligned":
+            county_samples: List[PathogenGenome] = get_aligned_county_samples(
+                session, group
+            )
+        else:
+            county_samples: List[PathogenGenome] = get_county_samples(session, group)
 
         # get the aligned gisaid run info.
         aligned_gisaid: AlignedRepositoryData = [
@@ -229,6 +242,21 @@ def get_county_samples(session, group: Group):
         )
     )
     pathogen_genomes = [sample.uploaded_pathogen_genome for sample in all_samples]
+    return pathogen_genomes
+
+
+def get_aligned_county_samples(session, group: Group):
+    # Get all samples for the group
+    all_samples: Iterable[Sample] = (
+        session.query(Sample)
+        .filter(Sample.submitting_group_id == group.id)
+        .options(
+            joinedload(Sample.aligned_pathogen_genome, innerjoin=True).undefer(
+                PathogenGenome.sequence
+            )
+        )
+    )
+    pathogen_genomes = [sample.aligned_pathogen_genome for sample in all_samples]
     return pathogen_genomes
 
 
@@ -343,9 +371,7 @@ def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
     num_includes = 0
     sample_ids: List[int] = [
-        pathogen_genome.sample_id
-        for pathogen_genome in pathogen_genomes
-        if isinstance(pathogen_genome, UploadedPathogenGenome)
+        pathogen_genome.sample_id for pathogen_genome in pathogen_genomes
     ]
 
     # Write an includes.txt with the sample ID's.
@@ -374,9 +400,7 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
     num_sequences = 0
     uploaded_pathogen_genomes = {
-        pathogen_genome
-        for pathogen_genome in pathogen_genomes
-        if isinstance(pathogen_genome, UploadedPathogenGenome)
+        pathogen_genome for pathogen_genome in pathogen_genomes
     }
 
     sample_ids = {
@@ -398,10 +422,7 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
     metadata_csv_fh.writeheader()
     for pathogen_genome in pathogen_genomes:
         # find the corresponding sample
-        if isinstance(pathogen_genome, UploadedPathogenGenome):
-            sample_id = pathogen_genome.sample_id
-        else:
-            raise ValueError("pathogen genome of unknown type")
+        sample_id = pathogen_genome.sample_id
         sample = sample_id_to_sample[sample_id]
         aspen_samples.add(sample.public_identifier)
 
