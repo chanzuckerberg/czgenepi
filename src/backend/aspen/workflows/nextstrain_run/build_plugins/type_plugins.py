@@ -121,14 +121,16 @@ class OverviewPlugin(TreeTypePlugin):
 
     def run_type_config(self, config, subsampling):
         if self.group.name == "Chicago Department of Public Health":
-            if "--query" in subsampling["group"]["query"]: # SC2 format
+            if "--query" in subsampling["group"]["query"]:  # SC2 format
                 subsampling["group"][
                     "query"
                 ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
-            else: # MPX format
-                subsampling["group"][
-                    "query"
-                ] = "(" + subsampling["group"]["query"] + ") | submitting_lab == 'RIPHL at Rush University Medical Center'"
+            else:  # MPX format
+                subsampling["group"]["query"] = (
+                    "("
+                    + subsampling["group"]["query"]
+                    + ") | submitting_lab == 'RIPHL at Rush University Medical Center'"
+                )
 
         # Handle sampling date & pango lineage filters
         apply_filters(config, subsampling, self.template_args)
@@ -251,6 +253,7 @@ def update_subsampling_for_country(subsampling):
         subsampling["group"]["query"] = '''--query "(country == '{country}')"'''
     else:
         subsampling["group"]["query"] = "(country == '{country}')"
+
 
 def update_subsampling_for_division(subsampling):
     # State isn't useful

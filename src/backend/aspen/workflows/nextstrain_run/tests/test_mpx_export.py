@@ -1,5 +1,3 @@
-import csv
-import json
 from io import StringIO
 from typing import List, Optional
 
@@ -361,7 +359,9 @@ def test_reset_status(mocker, session, postgres_database, split_client):
         {"should_reset": True, "result_status": WorkflowStatusType.STARTED},
     ]
     tree_type = TreeType.TARGETED
-    phylo_run, location = create_test_data(session, split_client, tree_type, 200, 110, 10)
+    phylo_run, location = create_test_data(
+        session, split_client, tree_type, 200, 110, 10
+    )
     for test in test_table:
         phylo_run.workflow_status = WorkflowStatusType.FAILED
         session.commit()
@@ -382,7 +382,9 @@ def test_targeted_config_large(mocker, session, postgres_database, split_client)
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     tree_type = TreeType.TARGETED
-    phylo_run, location = create_test_data(session, split_client, tree_type, 200, 110, 10)
+    phylo_run, location = create_test_data(
+        session, split_client, tree_type, 200, 110, 10
+    )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
     subsampling_scheme = nextstrain_config["subsampling"]
@@ -472,9 +474,7 @@ def test_overview_config_country(mocker, session, postgres_database, split_clien
     assert "state" not in subsampling_scheme.keys()
     assert "country" not in subsampling_scheme.keys()
     assert subsampling_scheme["international"]["subsample-max-sequences"] == 300
-    assert (
-        subsampling_scheme["group"]["query"] == f"(country == '{location.country}')"
-    )
+    assert subsampling_scheme["group"]["query"] == f"(country == '{location.country}')"
 
 
 # make sure we handle quotes sanely!!!
