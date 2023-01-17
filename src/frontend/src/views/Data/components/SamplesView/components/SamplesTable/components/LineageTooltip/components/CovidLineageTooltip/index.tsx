@@ -64,7 +64,7 @@ export const CovidLineageTooltip = ({
       width="wide"
       data-test-id="lineage-tooltip"
     >
-      <div>{children}</div>
+      {children}
     </Tooltip>
   );
 };
