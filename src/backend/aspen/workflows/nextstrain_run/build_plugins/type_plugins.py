@@ -289,7 +289,7 @@ def apply_filters(config, subsampling, template_args):
                 yaml_key
             ] = f"--{yaml_key.replace('_', '-')} {value}"  # ex: --max-date 2020-01-01
         else:
-            subsampling["group"][yaml_key] = str(value)  # ex: max-date: 2020-01-01
+            subsampling["group"][yaml_key.replace('_', '-')] = str(value)  # ex: max-date: 2020-01-01
 
     pango_lineages = template_args.get("filter_pango_lineages")
     if pango_lineages:
