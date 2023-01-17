@@ -120,23 +120,18 @@ class OverviewPlugin(TreeTypePlugin):
     subsampling_scheme = "OVERVIEW"
 
     def run_type_config(self, config, subsampling):
-        # MPX format
-        include_arguments_in_filters = False
-        if "--query" in subsampling["group"]["query"]:
-            # SC2 format
-            include_arguments_in_filters = True
         if self.group.name == "Chicago Department of Public Health":
-            if include_arguments_in_filters:
+            if "--query" in subsampling["group"]["query"]: # SC2 format
                 subsampling["group"][
                     "query"
                 ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
-            else:
+            else: # MPX format
                 subsampling["group"][
                     "query"
                 ] = "(" + subsampling["group"]["query"] + ") | submitting_lab == 'RIPHL at Rush University Medical Center'"
 
         # Handle sampling date & pango lineage filters
-        apply_filters(config, subsampling, self.template_args, include_arguments_in_filters)
+        apply_filters(config, subsampling, self.template_args)
 
         # Update our sampling for state/country level builds if necessary
         update_subsampling_for_location(self.tree_build_level, subsampling)
@@ -272,7 +267,13 @@ def update_subsampling_for_division(subsampling):
         ] = "(division == '{division}') & (country == '{country}')"  # Keep the country filter in case of multiple divisions worldwide
 
 
-def apply_filters(config, subsampling, template_args, include_arguments_in_filters):
+def apply_filters(config, subsampling, template_args):
+    # MPX format
+    include_arguments_in_filters = False
+    if "--query" in subsampling["group"]["query"]:
+        # SC2 format
+        include_arguments_in_filters = True
+
     filter_map = {"filter_start_date": "min_date", "filter_end_date": "max_date"}
     for filter_name, yaml_key in filter_map.items():
         value = template_args.get(filter_name)

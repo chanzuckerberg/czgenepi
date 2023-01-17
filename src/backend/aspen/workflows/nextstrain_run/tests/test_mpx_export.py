@@ -136,8 +136,8 @@ def test_overview_config_no_filters(mocker, session, postgres_database, split_cl
         subsampling_scheme["group"]["query"]
         == f"(location == '{location.location}') & (division == '{location.division}')"
     )
-    assert "min_date" not in subsampling_scheme["group"]
-    assert "max_date" not in subsampling_scheme["group"]
+    assert "min-date" not in subsampling_scheme["group"]
+    assert "max-date" not in subsampling_scheme["group"]
     assert "pango_lineage" not in subsampling_scheme["group"]["query"]
     assert len(selected.splitlines()) == 0  # No selected sequences
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
@@ -163,8 +163,8 @@ def test_overview_config_ondemand(mocker, session, postgres_database, split_clie
 
     max_date = dateparser.parse("10 days ago").strftime("%Y-%m-%d")
     # Order does not matter for lineages, just verify matched sets.
-    assert subsampling_scheme["group"]["min_date"] == "--min-date 2021-04-30"
-    assert subsampling_scheme["group"]["max_date"] == f"--max-date {max_date}"
+    assert subsampling_scheme["group"]["min-date"] == "2021-04-30"
+    assert subsampling_scheme["group"]["max-date"] == f"{max_date}"
     assert subsampling_scheme["group"]["subsample-max-sequences"] == 500
     filter_pango_lineages = "['" + "', '".join(query["filter_pango_lineages"]) + "']"
     assert (
