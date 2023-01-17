@@ -1,5 +1,4 @@
 import random
-from datetime import datetime
 from pathlib import Path, PosixPath
 from typing import Collection
 
@@ -153,16 +152,8 @@ def test_pangolin_save(mocker, session, postgres_database):
     for pathogen_genome in session.query(UploadedPathogenGenome).all():
         sample = pathogen_genome.sample
         if sample.pathogen.slug != pathogen_slug:
-            assert pathogen_genome.pangolin_lineage is None
-            assert pathogen_genome.pangolin_version is None
             assert len(pathogen_genome.sample.lineages) == 0
             continue
-        assert pathogen_genome.pangolin_lineage == "B"
-        assert pathogen_genome.pangolin_probability == 100.0
-        assert pathogen_genome.pangolin_last_updated == datetime.strptime(
-            "05-03-2021", "%m-%d-%Y"
-        )
-        assert pathogen_genome.pangolin_version == "PANGO-v1.2.133"
 
         sample_lineage = pathogen_genome.sample.lineages[0]
         assert sample_lineage.lineage == "B"

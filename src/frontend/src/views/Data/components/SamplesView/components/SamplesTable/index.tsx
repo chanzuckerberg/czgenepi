@@ -10,22 +10,28 @@ import {
 import {
   CellComponent,
   CellHeader,
-  Chip,
   Icon,
   InputCheckbox,
   Table,
   TableHeader,
 } from "czifui";
 import { map } from "lodash";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "./components/LineageTooltip";
 import { DefaultCell } from "./components/DefaultCell";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
-import { StyledCellBasic, StyledPrivateId, StyledTableRow } from "./style";
+import {
+  StyledCellBasic,
+  StyledInputCheckbox,
+  StyledPrivateId,
+  StyledTableRow,
+} from "./style";
 import { EmptyTable } from "src/views/Data/components/EmptyState";
 import { generateWidthStyles } from "src/common/utils";
+import { getLineageFromSampleLineages } from "src/common/utils/samples";
+import { QualityScoreTag } from "./components/QualityScoreTag";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -40,7 +46,7 @@ const columns: ColumnDef<Sample, any>[] = [
     id: "select",
     size: 40,
     minSize: 40,
-    header: ({ table, column }) => {
+    header: ({ table, column, header }) => {
       const {
         getIsAllRowsSelected,
         getIsSomeRowsSelected,
@@ -57,20 +63,23 @@ const columns: ColumnDef<Sample, any>[] = [
       const onChange = getToggleAllRowsSelectedHandler();
 
       return (
-        <CellHeader hideSortIcon style={generateWidthStyles(column)}>
-          {/* @ts-expect-error remove line when types fixed in sds */}
-          <InputCheckbox stage={checkboxStage} onChange={onChange} />
+        <CellHeader
+          key={header.id}
+          hideSortIcon
+          style={generateWidthStyles(column)}
+        >
+          <StyledInputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellHeader>
       );
     },
-    cell: ({ row }) => {
+    cell: ({ row, cell }) => {
       const { getIsSelected, getToggleSelectedHandler } = row;
 
       const checkboxStage = getIsSelected() ? "checked" : "unchecked";
       const onChange = getToggleSelectedHandler();
 
       return (
-        <CellComponent>
+        <CellComponent key={cell.id}>
           <InputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellComponent>
       );
@@ -93,12 +102,13 @@ const columns: ColumnDef<Sample, any>[] = [
         Private ID
       </SortableHeader>
     ),
-    cell: ({ getValue, row }) => {
+    cell: ({ getValue, row, cell }) => {
       const { uploadedBy, private: isPrivate } = row?.original;
       const uploader = uploadedBy?.name;
 
       return (
         <StyledPrivateId
+          key={cell.id}
           primaryText={getValue()}
           secondaryText={uploader}
           shouldTextWrap
@@ -140,7 +150,7 @@ const columns: ColumnDef<Sample, any>[] = [
   },
   {
     id: "qualityControl",
-    accessorKey: "CZBFailedGenomeRecovery",
+    accessorKey: "qcMetrics",
     header: ({ header, column }) => (
       <SortableHeader
         header={header}
@@ -154,18 +164,18 @@ const columns: ColumnDef<Sample, any>[] = [
         Quality Score
       </SortableHeader>
     ),
-    cell: ({ getValue }) => {
-      const didFailRecovery = getValue();
+    cell: ({ getValue, cell }) => {
+      const qcMetric = getValue()?.[0];
       return (
-        <CellComponent>
-          <Chip
-            data-test-id="row-sample-status"
-            size="small"
-            label={didFailRecovery ? "failed" : "complete"}
-            status={didFailRecovery ? "error" : "success"}
-          />
+        <CellComponent key={cell.id}>
+          <QualityScoreTag qcMetric={qcMetric} />
         </CellComponent>
       );
+    },
+    sortingFn: (a, b) => {
+      const statusA = a.original.qcMetrics[0].qc_status;
+      const statusB = b.original.qcMetrics[0].qc_status;
+      return statusA > statusB ? -1 : 1;
     },
   },
   {
@@ -183,8 +193,9 @@ const columns: ColumnDef<Sample, any>[] = [
         Upload Date
       </SortableHeader>
     ),
-    cell: ({ getValue }) => (
+    cell: ({ getValue, cell }) => (
       <StyledCellBasic
+        key={cell.id}
         shouldTextWrap
         primaryText={datetimeWithTzToLocalDate(getValue())}
         primaryTextWrapLineCount={2}
@@ -213,7 +224,7 @@ const columns: ColumnDef<Sample, any>[] = [
   },
   {
     id: "lineage",
-    accessorKey: "lineage",
+    accessorKey: "lineages",
     header: ({ header, column }) => (
       <SortableHeader
         header={header}
@@ -231,12 +242,14 @@ const columns: ColumnDef<Sample, any>[] = [
         Lineage
       </SortableHeader>
     ),
-    cell: ({ getValue }) => {
-      const lineage = getValue()?.lineage;
+    cell: ({ getValue, cell }) => {
+      const lineages = getValue();
+      const lineage = getLineageFromSampleLineages(lineages);
       const CellContent = (
         <StyledCellBasic
+          key={cell.id}
           shouldTextWrap
-          primaryText={lineage ?? "Not Yet Processed"}
+          primaryText={lineage?.lineage ?? "Not Yet Processed"}
           primaryTextWrapLineCount={2}
           shouldShowTooltipOnHover={false}
         />
@@ -266,8 +279,9 @@ const columns: ColumnDef<Sample, any>[] = [
         Collection Location
       </SortableHeader>
     ),
-    cell: ({ getValue }) => (
+    cell: ({ getValue, cell }) => (
       <StyledCellBasic
+        key={cell.id}
         shouldTextWrap
         primaryText={
           getValue().location || getValue().division || getValue().country
@@ -313,10 +327,11 @@ const columns: ColumnDef<Sample, any>[] = [
         GISAID
       </SortableHeader>
     ),
-    cell: ({ getValue }) => {
+    cell: ({ getValue, cell }) => {
       const { gisaid_id, status } = getValue();
       return (
         <StyledCellBasic
+          key={cell.id}
           primaryText={status}
           secondaryText={gisaid_id}
           shouldShowTooltipOnHover={false}
@@ -352,7 +367,8 @@ const SamplesTable = ({
   const table = useReactTable({
     data: samples,
     defaultColumn: {
-      minSize: 150,
+      minSize: 50,
+      size: 50,
     },
     columns,
     enableMultiRowSelection: true,
@@ -404,4 +420,4 @@ const SamplesTable = ({
   );
 };
 
-export { SamplesTable };
+export default memo(SamplesTable);

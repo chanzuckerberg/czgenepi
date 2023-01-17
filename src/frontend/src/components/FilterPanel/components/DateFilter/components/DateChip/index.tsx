@@ -12,11 +12,13 @@ const DateChip = ({
   if (!dateLabel) return null;
 
   return (
-    <StyledChip
-      size="medium"
-      label={dateLabel}
-      onDelete={deleteDateFilterFunc}
-    />
+    <div>
+      <StyledChip
+        size="medium"
+        label={dateLabel}
+        onDelete={deleteDateFilterFunc}
+      />
+    </div>
   );
 };
 

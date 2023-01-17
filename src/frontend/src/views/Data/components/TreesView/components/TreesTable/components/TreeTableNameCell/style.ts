@@ -32,7 +32,10 @@ export const StyledRowContent = styled(TreeRowContent, {
   ${(props) => {
     const { usesTableRefactor } = props;
     if (usesTableRefactor) {
-      return `width: 100%;`;
+      return `
+        width: 100%;
+        margin: 0;
+      `;
     } else {
       return `flex: 2 0 40%;`;
     }
@@ -91,7 +94,7 @@ export const StyledTreeIconWrapper = styled.div`
     const spaces = getSpaces(props);
 
     return `
-      margin: 0 ${spaces?.l}px;
+      margin: 0 ${spaces?.l}px 0 0;
     `;
   }}
 `;

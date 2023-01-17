@@ -359,6 +359,13 @@ def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
     return num_includes
 
 
+def get_lineage(sample: Sample):
+    if sample.lineages:
+        return sample.lineages[0].lineage
+
+    return None
+
+
 def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
     num_sequences = 0
@@ -378,6 +385,7 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
         for sample in session.query(Sample)
         .filter(Sample.id.in_(sample_ids))
         .options(joinedload(Sample.collection_location))
+        .options(joinedload(Sample.lineages))
     }
     aliased(Entity)
 
@@ -438,7 +446,7 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
             "originating_lab": sample.sample_collected_by,
             "submitting_lab": sample.submitting_group.name,
             "authors": ", ".join(sample.authors),
-            "pango_lineage": sample.uploaded_pathogen_genome.pangolin_lineage,
+            "pango_lineage": get_lineage(sample),
         }
 
         metadata_csv_fh.writerow(aspen_metadata_row)
