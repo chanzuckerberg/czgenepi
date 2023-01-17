@@ -407,7 +407,7 @@ const SamplesTable = ({
       </TableHeader>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <StyledTableRow key={row.id}>
+          <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
             {row
               .getVisibleCells()
               .map((cell) =>
