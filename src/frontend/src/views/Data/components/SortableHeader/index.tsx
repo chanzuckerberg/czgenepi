@@ -1,7 +1,7 @@
 import { Header } from "@tanstack/react-table";
-import { CellHeader } from "czifui";
 import { CSSProperties, ReactNode } from "react";
 import { TooltipText, TooltipTextType } from "./components/TooltipText";
+import { StyledCellHeader } from "./style";
 
 interface SortableProps {
   header: Header<any, any>;
@@ -24,7 +24,7 @@ export const SortableHeader = ({
   const shouldShowTooltip = Boolean(tooltipStrings);
 
   return (
-    <CellHeader
+    <StyledCellHeader
       key={header.id}
       onClick={onClick}
       direction={sortDirection}
@@ -35,10 +35,11 @@ export const SortableHeader = ({
         arrow: true,
         sdsStyle: "light",
         title: <TooltipText tooltipStrings={tooltipStrings} />,
+        enterDelay: 1000,
       }}
       {...props}
     >
       {children}
-    </CellHeader>
+    </StyledCellHeader>
   );
 };
