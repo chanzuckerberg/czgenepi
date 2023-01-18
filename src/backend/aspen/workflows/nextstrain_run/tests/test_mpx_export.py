@@ -161,8 +161,8 @@ def test_overview_config_ondemand(mocker, session, postgres_database, split_clie
 
     max_date = dateparser.parse("10 days ago").strftime("%Y-%m-%d")
     # Order does not matter for lineages, just verify matched sets.
-    assert subsampling_scheme["group"]["min_date"] == "2021-04-30"
-    assert subsampling_scheme["group"]["max_date"] == f"{max_date}"
+    assert subsampling_scheme["group"]["min-date"] == "2021-04-30"
+    assert subsampling_scheme["group"]["max-date"] == f"{max_date}"
     assert subsampling_scheme["group"]["subsample-max-sequences"] == 500
     filter_pango_lineages = "['" + "', '".join(query["filter_pango_lineages"]) + "']"
     assert (
@@ -284,8 +284,8 @@ def test_targeted_config_simple(mocker, session, postgres_database, split_client
 
     # Just some placeholder sanity-checks
     assert subsampling_scheme["closest"]["subsample-max-sequences"] == 100
-    assert subsampling_scheme["group"]["subsample-max-sequences"] == 25
-    assert subsampling_scheme["state"]["subsample-max-sequences"] == 25
+    assert subsampling_scheme["group"]["subsample-max-sequences"] == 50
+    assert subsampling_scheme["state"]["subsample-max-sequences"] == 50
     assert subsampling_scheme["country"]["subsample-max-sequences"] == 25
     assert subsampling_scheme["international"]["subsample-max-sequences"] == 25
     assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
@@ -343,8 +343,8 @@ def test_targeted_config_regions(mocker, session, postgres_database, split_clien
 
         # Just some placeholder sanity-checks
         assert subsampling_scheme["closest"]["subsample-max-sequences"] == 100
-        assert subsampling_scheme["group"]["subsample-max-sequences"] == 25
-        assert subsampling_scheme["international"]["subsample-max-sequences"] == 25
+        assert subsampling_scheme["group"]["subsample-max-sequences"] == 50
+        assert subsampling_scheme["international"]["subsample-max-sequences"] == 100
         assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
         assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
         assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
@@ -390,11 +390,11 @@ def test_targeted_config_large(mocker, session, postgres_database, split_client)
     subsampling_scheme = nextstrain_config["subsampling"]
 
     # Just some placeholder sanity-checks
-    assert subsampling_scheme["closest"]["subsample-max-sequences"] == 100
-    assert subsampling_scheme["group"]["subsample-max-sequences"] == 25
-    assert subsampling_scheme["state"]["subsample-max-sequences"] == 25
-    assert subsampling_scheme["country"]["subsample-max-sequences"] == 25
-    assert subsampling_scheme["international"]["subsample-max-sequences"] == 25
+    assert subsampling_scheme["closest"]["subsample-max-sequences"] == 120
+    assert subsampling_scheme["group"]["subsample-max-sequences"] == 60
+    assert subsampling_scheme["state"]["subsample-max-sequences"] == 60
+    assert subsampling_scheme["country"]["subsample-max-sequences"] == 30
+    assert subsampling_scheme["international"]["subsample-max-sequences"] == 30
     assert len(selected.splitlines()) == 120  # 10 gisaid samples + 110 selected samples
     assert len(metadata.splitlines()) == 201  # 200 samples + 1 header line
     assert len(sequences.splitlines()) == 400  # 200 county samples, @2 lines each
@@ -442,8 +442,8 @@ def test_overview_config_division(mocker, session, postgres_database, split_clie
     subsampling_scheme = nextstrain_config["subsampling"]
 
     # Make sure our query got updated properly
-    assert subsampling_scheme["country"]["subsample-max-sequences"] == 300
-    assert subsampling_scheme["international"]["subsample-max-sequences"] == 300
+    assert subsampling_scheme["country"]["subsample-max-sequences"] == 800
+    assert subsampling_scheme["international"]["subsample-max-sequences"] == 200
     assert "state" not in subsampling_scheme.keys()
     assert (
         subsampling_scheme["group"]["query"]
@@ -473,7 +473,7 @@ def test_overview_config_country(mocker, session, postgres_database, split_clien
     # Make sure our query got updated properly
     assert "state" not in subsampling_scheme.keys()
     assert "country" not in subsampling_scheme.keys()
-    assert subsampling_scheme["international"]["subsample-max-sequences"] == 300
+    assert subsampling_scheme["international"]["subsample-max-sequences"] == 1000
     assert subsampling_scheme["group"]["query"] == f"(country == '{location.country}')"
 
 
