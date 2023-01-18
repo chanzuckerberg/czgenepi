@@ -49,7 +49,7 @@ subsampling:
       
     state:
       subsample-max-sequences: 300
-      query: "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
+      query: "(location != '{location}' | location == '') & (division == '{division}')" # exclude add'l samples from {location}
       priorities:
         type: "proximity"
         focus: "group"
@@ -57,7 +57,7 @@ subsampling:
 
     country:
       subsample-max-sequences: 300
-      query: "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
+      query: "(division != '{division}' | division == '') & (country == '{country}')" # exclude add'l samples from CA
       priorities:
         type: "proximity"
         focus: "group"
@@ -100,7 +100,7 @@ subsampling:
        
     state:
       subsample-max-sequences: 25
-      query: "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
+      query: "(location != '{location}' | location == '') & (division == '{division}')" # exclude add'l samples from {location}
       priorities:
         type: "proximity"
         focus: "focal"
@@ -108,7 +108,7 @@ subsampling:
 
     country:
       subsample-max-sequences: 25
-      query: "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
+      query: "(division != '{division}' | division == '') & (country == '{country}')" # exclude add'l samples from CA
       priorities:
         type: "proximity"
         focus: "focal"
