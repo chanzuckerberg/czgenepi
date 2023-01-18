@@ -506,23 +506,31 @@ function useIsScrolling(ref: RefObject<HTMLElement>) {
     }, 3 * 100);
   }, []);
 
-  useEffect(() => {
-    const current = ref.current;
+  const current = ref.current;
 
+  useEffect(() => {
     if (!current) return;
 
     const scrollContainer = current.parentNode;
 
     if (!scrollContainer) return;
 
+    // DEBUG
+    // DEBUG
+    // DEBUG
+    console.log("---attaching scroll event listener");
     scrollContainer.addEventListener("scroll", throttledHandleScroll);
 
     return () => {
       if (scrollContainer) {
+        // DEBUG
+        // DEBUG
+        // DEBUG
+        console.log("---removing scroll event listener");
         scrollContainer.removeEventListener("scroll", throttledHandleScroll);
       }
     };
-  }, [ref, throttledHandleScroll]);
+  }, [current, throttledHandleScroll]);
 
   return isScrolling;
 
