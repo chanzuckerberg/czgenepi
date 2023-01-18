@@ -4,9 +4,7 @@ Create Date: 2023-01-17 20:26:29.073222
 
 """
 import enumtables  # noqa: F401
-import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = "20230117_202621"
