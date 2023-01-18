@@ -23,11 +23,10 @@ root: min_dev
 seed_spacing: 1000
 strain_id_field: accession
 subsampling:
-  NON_CONTEXTUALIZED:
-    group:
-      group-by: year
-      query: --query "(country == 'Mexico')"
-      subsample-max-sequences: 1000
+  group:
+    group-by: year
+    query: (location == 'Morelia') & (division == 'Michoacan')
+    subsample-max-sequences: 1000
 subsampling_scheme: NON_CONTEXTUALIZED
 timetree: false
 tree_mask: config/tree_mask.tsv
