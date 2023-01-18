@@ -86,6 +86,10 @@ Table "pathogen_genomes" {
   "num_unambiguous_sites" integer [not null]
   "num_missing_alleles" integer [not null]
   "num_mixed" integer [not null]
+  "pangolin_last_updated" "character varying"
+  "pangolin_lineage" "character varying"
+  "pangolin_probability" integer
+  "pangolin_version" "character varying"
 }
 
 Table "phylo_runs" {

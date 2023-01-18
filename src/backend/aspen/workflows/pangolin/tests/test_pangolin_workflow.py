@@ -37,6 +37,10 @@ def create_samples_for_pathogen(session, group, user, location, pathogen):
         pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
             sample,
             sequence="".join(sequence),
+            pangolin_lineage=None,
+            pangolin_probability=None,
+            pangolin_version=None,
+            pangolin_last_updated=None,
         )
         session.add(pathogen_genome)
         pathogen_genomes.append(pathogen_genome)
