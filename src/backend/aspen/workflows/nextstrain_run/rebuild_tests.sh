@@ -22,6 +22,6 @@ python export_test.py --sequences 10 --gisaid 0 --group-name CZI --location 'Nor
 python export_test.py --sequences 10 --gisaid 0 --group-name CZI --location 'North America/Mexico//' --pathogen MPX --tree-type overview && cp nextstrain_build.yaml build_config_tests/overview_country.yaml
 
 # Non-contextualized
-python export_test.py --sequences 10 --gisaid 0 --group-name CZI --location 'North America/Mexico/Michoacan/Morelia' --pathogen MPX --tree-type non_contextualized && cp nextstrain_build.yaml build_config_tests/noncontextualized_country.yaml
-python export_test.py --sequences 10 --gisaid 0 --group-name CZI --location 'North America/Mexico/Michoacan/' --pathogen MPX --tree-type non_contextualized && cp nextstrain_build.yaml build_config_tests/noncontextualized_country.yaml
+python export_test.py --sequences 10 --gisaid 0 --group-name CZI --location 'North America/Mexico/Michoacan/Morelia' --pathogen MPX --tree-type non_contextualized && cp nextstrain_build.yaml build_config_tests/noncontextualized_location.yaml
+python export_test.py --sequences 10 --gisaid 0 --group-name CZI --location 'North America/Mexico/Michoacan/' --pathogen MPX --tree-type non_contextualized && cp nextstrain_build.yaml build_config_tests/noncontextualized_division.yaml
 python export_test.py --sequences 10 --gisaid 0 --group-name CZI --location 'North America/Mexico//' --pathogen MPX --tree-type non_contextualized && cp nextstrain_build.yaml build_config_tests/noncontextualized_country.yaml
