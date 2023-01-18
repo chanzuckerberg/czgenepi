@@ -24,7 +24,7 @@ seed_spacing: 1000
 strain_id_field: accession
 subsampling:
   closest:
-    min-length: 10000
+    min-length: 100000
     priorities:
       focus: focal
       type: proximity

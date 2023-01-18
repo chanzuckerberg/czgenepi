@@ -25,6 +25,7 @@ strain_id_field: accession
 subsampling:
   group:
     group-by: year
+    min-length: 100000
     query: (division == 'Michoacan') & (country == 'Mexico')
     subsample-max-sequences: 1000
 subsampling_scheme: NON_CONTEXTUALIZED
