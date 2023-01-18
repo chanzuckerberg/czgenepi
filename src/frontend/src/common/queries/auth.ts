@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import { analyticsSendUserInfo } from "src/common/analytics/methods";
 import ENV from "src/common/constants/ENV";
 import { queryClient } from "src/common/queries/queryClient";
-import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
+import { API, DEFAULT_PUT_OPTIONS } from "../api";
 import { selectCurrentGroup } from "../redux/selectors";
 import { ensureValidGroup } from "../redux/utils/groupUtils";
 import { ROUTES } from "../routes";
@@ -50,7 +50,18 @@ export const mapUserData = (obj: RawUserRequest): User => {
 };
 
 export const fetchUserInfo = (): Promise<RawUserRequest> => {
-  return getBackendApiJson(API.USERDATA);
+  return Promise.resolve({
+    id: 80,
+    name: "mlila+timmy@chanzuckerberg.com",
+    agreed_to_tos: true,
+    acknowledged_policy_version: "2021-09-30",
+    split_id: "kck5gozg4fc5z43x3f09",
+    analytics_id: "e3rl94clf4sh7vzykjry",
+    gisaid_submitter_id: null,
+    groups: [{ id: 17, name: "admin", roles: ["member"] }],
+  } as unknown as RawUserRequest);
+
+  // return getBackendApiJson(API.USERDATA);
 };
 
 const updateUserInfo = (user: Partial<RawUserRequest>): Promise<Response> => {

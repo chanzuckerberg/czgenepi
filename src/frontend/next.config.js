@@ -11,6 +11,7 @@ const SCRIPT_SRC = [
   "https://cdn.cookielaw.org",
   "https://cdn.segment.com",
   "https://plausible.io",
+  "https://maya-feedback-backend.dev.czgenepi.org",
 ];
 
 module.exports = {

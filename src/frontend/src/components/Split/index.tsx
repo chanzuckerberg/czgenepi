@@ -34,8 +34,8 @@ import { TreatmentsWithConfig } from "@splitsoftware/splitio/types/splitio";
 import { useEffect, useState } from "react";
 import ENV from "src/common/constants/ENV";
 import { useUserInfo } from "src/common/queries/auth";
-import { isLocalSplitEnv } from "./util";
 import { SPLIT_SIMPLE_FLAG, USER_FEATURE_FLAGS } from "./types";
+import { isLocalSplitEnv } from "./util";
 
 /**
  * Creates a `features` object for when Split is running in "localhost" mode.
@@ -55,7 +55,7 @@ const createUserFlagsForLocal = () => {
 
   // TODO-TR (mlila): leave the table refactor flag off (locally) for now, since it seriously
   // TODO-TR          hinders use of the app and will be annoying.
-  simpleFlags.table_refactor = SPLIT_SIMPLE_FLAG.OFF;
+  // simpleFlags.table_refactor = SPLIT_SIMPLE_FLAG.OFF;
 
   return simpleFlags;
 };

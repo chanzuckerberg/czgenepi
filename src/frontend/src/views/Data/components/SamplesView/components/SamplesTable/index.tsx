@@ -15,23 +15,31 @@ import {
   Table,
   TableHeader,
 } from "czifui";
-import { map } from "lodash";
-import { memo, useEffect, useState } from "react";
+import { map, throttle } from "lodash";
+import {
+  memo,
+  RefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { generateWidthStyles } from "src/common/utils";
 import { IdMap } from "src/common/utils/dataTransforms";
+import { getLineageFromSampleLineages } from "src/common/utils/samples";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
-import { LineageTooltip } from "./components/LineageTooltip";
-import { DefaultCell } from "./components/DefaultCell";
+import { EmptyTable } from "src/views/Data/components/EmptyState";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
+import { DefaultCell } from "./components/DefaultCell";
+import { LineageTooltip } from "./components/LineageTooltip";
+import { QualityScoreTag } from "./components/QualityScoreTag";
 import {
   StyledCellBasic,
   StyledInputCheckbox,
   StyledPrivateId,
   StyledTableRow,
 } from "./style";
-import { EmptyTable } from "src/views/Data/components/EmptyState";
-import { generateWidthStyles } from "src/common/utils";
-import { getLineageFromSampleLineages } from "src/common/utils/samples";
-import { QualityScoreTag } from "./components/QualityScoreTag";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -121,8 +129,8 @@ const columns: ColumnDef<Sample, any>[] = [
             />
           }
           tooltipProps={{
-            sdsStyle: "light",
             arrow: false,
+            sdsStyle: "light",
           }}
         />
       );
@@ -357,11 +365,63 @@ const SamplesTable = ({
   ]);
 
   useEffect(() => {
-    if (!data) return;
+    if (!data || !Object.keys(data).length) return;
 
     const newSamples = map(data, (v) => v);
-    setSamples(newSamples);
+
+    setSamples(
+      [...Array(1500)].map((_, index) => {
+        const sample = newSamples[index % newSamples.length];
+
+        return {
+          ...sample,
+          privateId: sample.privateId + "-" + index,
+          id: index,
+        } as Sample;
+      })
+    );
   }, [data]);
+
+  const tableRef = useRef<HTMLTableElement>(null);
+
+  const isScrolling = useIsScrolling(tableRef);
+
+  // DEBUG
+  // DEBUG
+  // DEBUG
+  console.log("---component isScrolling", isScrolling);
+
+  const hoverListener = useCallback((event: MouseEvent) => {
+    // DEBUG
+    // DEBUG
+    // DEBUG
+    console.log("----stop propagation!");
+    event.stopPropagation();
+  }, []);
+
+  useEffect(() => {
+    const currentTable = tableRef.current;
+
+    if (isScrolling) {
+      currentTable?.addEventListener("mouseover", hoverListener);
+    } else {
+      // DEBUG
+      // DEBUG
+      // DEBUG
+      console.log("---restoring hover event");
+
+      currentTable?.removeEventListener("mouseover", hoverListener);
+    }
+
+    return () => {
+      // DEBUG
+      // DEBUG
+      // DEBUG
+      console.log("---restoring hover event");
+
+      currentTable?.removeEventListener("mouseover", hoverListener);
+    };
+  }, [isScrolling, tableRef, hoverListener]);
 
   // TODO-TR (mlila): add virtualization
   const table = useReactTable({
@@ -392,12 +452,24 @@ const SamplesTable = ({
     setCheckedSamples(newCheckedSamples);
   }, [rowSelection]);
 
+  const rows = table.getRowModel().rows;
+
+  const TableRows = useMemo(() => {
+    return rows.map((row) => (
+      <StyledTableRow key={row.id}>
+        {row.getVisibleCells().map((cell) => {
+          return flexRender(cell.column.columnDef.cell, cell.getContext());
+        })}
+      </StyledTableRow>
+    ));
+  }, [rows]);
+
   if (isLoading) {
     return <EmptyTable numOfColumns={columns.length} />;
   }
 
   return (
-    <Table>
+    <Table ref={tableRef}>
       <TableHeader>
         {table
           .getLeafHeaders()
@@ -405,19 +477,60 @@ const SamplesTable = ({
             flexRender(header.column.columnDef.header, header.getContext())
           )}
       </TableHeader>
-      <tbody>
-        {table.getRowModel().rows.map((row) => (
-          <StyledTableRow key={row.id}>
-            {row
-              .getVisibleCells()
-              .map((cell) =>
-                flexRender(cell.column.columnDef.cell, cell.getContext())
-              )}
-          </StyledTableRow>
-        ))}
-      </tbody>
+      <tbody>{TableRows}</tbody>
     </Table>
   );
 };
 
 export default memo(SamplesTable);
+
+function useIsScrolling(ref: RefObject<HTMLElement>) {
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  const throttledHandleScroll = useMemo(() => {
+    let scrollingTimeout: NodeJS.Timeout | null = null;
+
+    return throttle(() => {
+      console.log(
+        "--------- setting scrolling to true........ scrollingTimeout",
+        scrollingTimeout
+      );
+
+      setIsScrolling(true);
+
+      if (scrollingTimeout) {
+        clearTimeout(scrollingTimeout);
+      }
+
+      scrollingTimeout = setTimeout(handleScrollEnd, 4 * 100);
+    }, 3 * 100);
+  }, []);
+
+  useEffect(() => {
+    const current = ref.current;
+
+    if (!current) return;
+
+    const scrollContainer = current.parentNode;
+
+    if (!scrollContainer) return;
+
+    scrollContainer.addEventListener("scroll", throttledHandleScroll);
+
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener("scroll", throttledHandleScroll);
+      }
+    };
+  }, [ref, throttledHandleScroll]);
+
+  return isScrolling;
+
+  function handleScrollEnd() {
+    // DEBUG
+    // DEBUG
+    // DEBUG
+    console.log("--------- setting scrolling to FALSE........");
+    setIsScrolling(false);
+  }
+}

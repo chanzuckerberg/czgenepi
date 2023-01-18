@@ -93,7 +93,7 @@ const SamplesView = (): JSX.Element => {
           setDataFilterFunc={setDataFilterFunc}
           data-test-id="menu-item-sample-count"
         />
-        <MaxWidth>
+        <MaxWidth data-test-id="scroll-container">
           <StyledActionBar>
             <SearchBar
               tableData={samples}

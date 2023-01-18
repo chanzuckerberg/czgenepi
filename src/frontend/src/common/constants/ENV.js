@@ -1,6 +1,7 @@
 // (thuang): Every value needs a default, otherwise Next.js will not compile
 module.exports = {
-  API_URL: process.env.API_URL || "http://backend.genepinet.localdev:3000",
+  API_URL:
+    process.env.API_URL || "https://maya-feedback-backend.dev.czgenepi.org",
   BUILD_PATH: process.env.BUILD_PATH || "build",
   COMMIT_SHA: process.env.COMMIT_SHA || "unknown",
   DEPLOYMENT_STAGE: process.env.DEPLOYMENT_STAGE || "development",

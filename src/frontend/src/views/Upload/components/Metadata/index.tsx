@@ -3,10 +3,10 @@ import { Button, Link } from "czifui";
 import NextLink from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
-import { setApplyAllValueToPrevMetadata } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal/utils";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT, noop } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
+import { B } from "src/common/styles/basicStyle";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
 import { isUserFlagOn } from "src/components/Split";
 import { USER_FEATURE_FLAGS } from "src/components/Split/types";
@@ -16,8 +16,8 @@ import {
   SampleIdToMetadata,
   WARNING_CODE,
 } from "src/components/WebformTable/common/types";
+import { setApplyAllValueToPrevMetadata } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal/utils";
 import Progress from "../common/Progress";
-import { B } from "src/common/styles/basicStyle";
 import {
   ButtonWrapper,
   Content,
@@ -27,15 +27,15 @@ import {
   Subtitle,
   Title,
 } from "../common/style";
-import { SemiBold, StyledCallout } from "./style";
 import { Props } from "../common/types";
 import { initSampleMetadata } from "../common/utils";
 import ImportFile from "./components/ImportFile";
-import StaticTable from "./components/StaticTable";
 import {
   ParseResult,
   SampleIdToWarningMessages,
 } from "./components/ImportFile/parseFile";
+import StaticTable from "./components/StaticTable";
+import { SemiBold, StyledCallout } from "./style";
 
 export default function Metadata({
   samples,

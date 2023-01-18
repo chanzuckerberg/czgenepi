@@ -2,6 +2,7 @@ import { get, isEqual } from "lodash/fp";
 import {
   Fragment,
   FunctionComponent,
+  memo,
   useEffect,
   useReducer,
   useState,
@@ -11,6 +12,7 @@ import { FixedSizeList, ListChildComponentProps } from "react-window";
 import { noop } from "src/common/constants/empty";
 import { VIEWNAME } from "src/common/constants/types";
 import { EmptyState } from "src/views/Data/components/EmptyState";
+import { getBadOrFailedQCSampleIds } from "src/views/Upload/components/Samples/utils";
 import { HeaderRow } from "./components/HeaderRow";
 import {
   Cell,
@@ -21,7 +23,8 @@ import {
   TableRow,
   TreeRowContent,
 } from "./style";
-import { getBadOrFailedQCSampleIds } from "src/views/Upload/components/Samples/utils";
+
+let cacheTableData = null;
 
 interface Props {
   data?: TableItem[];
@@ -309,6 +312,18 @@ export const DataTable: FunctionComponent<Props> = ({
     // TODO          rendered with a function instead of a react component, it generates a new node
     // TODO          every time the parent rerenders, instead of only updating, eg, when props change
     function renderRow(props: ListChildComponentProps) {
+      // DEBUG
+      // DEBUG
+      // DEBUG
+      console.log("-----rendering row!----- cacheTableData", cacheTableData);
+      console.log("-----rendering row!----- tableData", tableData);
+      console.log(
+        "-----rendering row!----- cacheTableData === tableData",
+        cacheTableData === tableData
+      );
+
+      cacheTableData = tableData;
+
       const item = tableData[props.index];
       return (
         <TableRow style={props.style} data-test-id="table-row">
@@ -348,7 +363,7 @@ export const DataTable: FunctionComponent<Props> = ({
                   itemSize={ITEM_HEIGHT_PX}
                   width={width}
                 >
-                  {renderRow}
+                  {memo(renderRow)}
                 </FixedSizeList>
               );
             }}
