@@ -28,13 +28,12 @@ subsampling:
     query: (country == 'Mexico')
     subsample-max-sequences: 500
   international:
-    max_sequences: 1000
     min-length: 100000
     priorities:
       focus: group
       type: proximity
     query: (country != 'Mexico')
-    subsample-max-sequences: 300
+    subsample-max-sequences: 1000
   international_serial_sampling:
     group-by:
     - region

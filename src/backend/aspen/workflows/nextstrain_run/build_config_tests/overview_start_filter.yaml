@@ -31,7 +31,7 @@ subsampling:
     query: (division != 'Michoacan') & (country == 'Mexico')
     subsample-max-sequences: 300
   group:
-    min-date: '2022-10-17'
+    min-date: '2022-10-18'
     min-length: 100000
     query: (location == 'Morelia') & (division == 'Michoacan')
     subsample-max-sequences: 500

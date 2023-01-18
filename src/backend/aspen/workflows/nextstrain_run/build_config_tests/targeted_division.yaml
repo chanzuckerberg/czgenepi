@@ -24,14 +24,12 @@ seed_spacing: 1000
 strain_id_field: accession
 subsampling:
   closest:
-    max_sequences: 100
     min-length: 10000
     priorities:
       focus: focal
       type: proximity
     subsample-max-sequences: 100
   country:
-    max_sequences: 25
     min-length: 100000
     priorities:
       focus: focal
@@ -42,21 +40,19 @@ subsampling:
     exclude-all: true
     include: config/include.txt
   group:
-    max_sequences: 50
     min-length: 100000
     priorities:
       focus: focal
       type: proximity
     query: (division == 'Michoacan') & (country == 'Mexico')
-    subsample-max-sequences: 25
+    subsample-max-sequences: 50
   international:
-    max_sequences: 100
     min-length: 100000
     priorities:
       focus: focal
       type: proximity
     query: (country != 'Mexico')
-    subsample-max-sequences: 25
+    subsample-max-sequences: 100
   international_serial_sampling:
     group-by:
     - region
