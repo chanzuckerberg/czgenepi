@@ -20,7 +20,6 @@ export enum USER_FEATURE_FLAGS {
   internal_user = "internal_user",
   multi_pathogen = "multi_pathogen",
   table_refactor = "table_refactor",
-  static_metadata_table = "static_metadata_table",
 }
 
 /**
