@@ -31,4 +31,7 @@ class MPXPlugin(PathogenPlugin):
         for _, sample in config["subsampling"][subsampling_scheme].items():
             if sample.get("query"):
                 sample["query"] = sample["query"].format(**escaped_config)
+            if sample.get("max_sequences"):
+                sample["subsample-max-sequences"] = sample["max_sequences"]
+                del sample["max_sequences"]
         config["subsampling"] = config["subsampling"][subsampling_scheme]
