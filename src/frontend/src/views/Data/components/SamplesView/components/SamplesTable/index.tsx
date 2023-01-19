@@ -16,12 +16,12 @@ import {
   TableHeader,
 } from "czifui";
 import { map } from "lodash";
-import { useEffect, useRef, useState } from "react";
-import { useVirtual } from "react-virtual";
+import React, { useEffect, useRef, useState } from "react";
+import { useVirtual, VirtualItem } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "./components/LineageTooltip";
-import { DefaultCell } from "./components/DefaultCell";
+import DefaultCell from "./components/DefaultCell";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
 import {
   StyledCellBasic,
@@ -431,7 +431,7 @@ const SamplesTable = ({
         </TableHeader>
         <tbody>
           <VirtualBumper padding={paddingTop} />
-          {virtualRows.map((vRow) => {
+          {virtualRows.map((vRow: VirtualItem) => {
             const row = rows[vRow.index];
             return (
               <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
@@ -450,4 +450,4 @@ const SamplesTable = ({
   );
 };
 
-export default memo(SamplesTable);
+export default React.memo(SamplesTable);
