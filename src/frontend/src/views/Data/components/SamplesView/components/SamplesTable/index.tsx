@@ -16,7 +16,7 @@ import {
   TableHeader,
 } from "czifui";
 import { map } from "lodash";
-import { memo, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useVirtual } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
@@ -33,6 +33,7 @@ import { EmptyTable } from "src/views/Data/components/EmptyState";
 import { generateWidthStyles } from "src/common/utils";
 import { getLineageFromSampleLineages } from "src/common/utils/samples";
 import { QualityScoreTag } from "./components/QualityScoreTag";
+import { memo } from "src/common/utils/memo";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -103,7 +104,7 @@ const columns: ColumnDef<Sample, any>[] = [
         Private ID
       </SortableHeader>
     ),
-    cell: ({ getValue, row, cell }) => {
+    cell: memo(({ getValue, row, cell }) => {
       const { uploadedBy, private: isPrivate } = row?.original;
       const uploader = uploadedBy?.name;
 
@@ -127,7 +128,7 @@ const columns: ColumnDef<Sample, any>[] = [
           }}
         />
       );
-    },
+    }),
     enableSorting: true,
   },
   {
@@ -165,14 +166,14 @@ const columns: ColumnDef<Sample, any>[] = [
         Quality Score
       </SortableHeader>
     ),
-    cell: ({ getValue, cell }) => {
+    cell: memo(({ getValue, cell }) => {
       const qcMetric = getValue()?.[0];
       return (
         <CellComponent key={cell.id}>
           <QualityScoreTag qcMetric={qcMetric} />
         </CellComponent>
       );
-    },
+    }),
     sortingFn: (a, b) => {
       const statusA = a.original.qcMetrics[0].qc_status;
       const statusB = b.original.qcMetrics[0].qc_status;
@@ -194,7 +195,7 @@ const columns: ColumnDef<Sample, any>[] = [
         Upload Date
       </SortableHeader>
     ),
-    cell: ({ getValue, cell }) => (
+    cell: memo(({ getValue, cell }) => (
       <StyledCellBasic
         key={cell.id}
         shouldTextWrap
@@ -202,7 +203,7 @@ const columns: ColumnDef<Sample, any>[] = [
         primaryTextWrapLineCount={2}
         shouldShowTooltipOnHover={false}
       />
-    ),
+    )),
   },
   {
     id: "collectionDate",
@@ -243,7 +244,7 @@ const columns: ColumnDef<Sample, any>[] = [
         Lineage
       </SortableHeader>
     ),
-    cell: ({ getValue, cell }) => {
+    cell: memo(({ getValue, cell }) => {
       const lineages = getValue();
       const lineage = getLineageFromSampleLineages(lineages);
       const CellContent = (
@@ -261,7 +262,7 @@ const columns: ColumnDef<Sample, any>[] = [
       ) : (
         CellContent
       );
-    },
+    }),
     enableSorting: true,
   },
   {
@@ -280,7 +281,7 @@ const columns: ColumnDef<Sample, any>[] = [
         Collection Location
       </SortableHeader>
     ),
-    cell: ({ getValue, cell }) => (
+    cell: memo(({ getValue, cell }) => (
       <StyledCellBasic
         key={cell.id}
         shouldTextWrap
@@ -290,7 +291,7 @@ const columns: ColumnDef<Sample, any>[] = [
         primaryTextWrapLineCount={2}
         shouldShowTooltipOnHover={false}
       />
-    ),
+    )),
     enableSorting: true,
   },
   {
@@ -328,7 +329,7 @@ const columns: ColumnDef<Sample, any>[] = [
         GISAID
       </SortableHeader>
     ),
-    cell: ({ getValue, cell }) => {
+    cell: memo(({ getValue, cell }) => {
       const { gisaid_id, status } = getValue();
       return (
         <StyledCellBasic
@@ -338,7 +339,7 @@ const columns: ColumnDef<Sample, any>[] = [
           shouldShowTooltipOnHover={false}
         />
       );
-    },
+    }),
     enableSorting: true,
   },
 ];
