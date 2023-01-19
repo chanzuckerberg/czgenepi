@@ -16,7 +16,8 @@ import {
   TableHeader,
 } from "czifui";
 import { map } from "lodash";
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
+import { useVirtual } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "./components/LineageTooltip";
@@ -363,7 +364,6 @@ const SamplesTable = ({
     setSamples(newSamples);
   }, [data]);
 
-  // TODO-TR (mlila): add virtualization
   const table = useReactTable({
     data: samples,
     defaultColumn: {
@@ -382,6 +382,17 @@ const SamplesTable = ({
     onSortingChange: setSorting,
   });
 
+  // adds virtualization to the table
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const { rows } = table.getRowModel();
+  const rowVirtualizer = useVirtual({
+    parentRef: tableContainerRef,
+    size: rows.length,
+    overscan: 10,
+  });
+  const { virtualItems: virtualRows } = rowVirtualizer;
+
   useEffect(() => {
     // for each selected row in the table, map the react-table internal row to the data (Sample)
     // originally passed into the row
@@ -397,26 +408,31 @@ const SamplesTable = ({
   }
 
   return (
-    <Table>
-      <TableHeader>
-        {table
-          .getLeafHeaders()
-          .map((header) =>
-            flexRender(header.column.columnDef.header, header.getContext())
-          )}
-      </TableHeader>
-      <tbody>
-        {table.getRowModel().rows.map((row) => (
-          <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
-            {row
-              .getVisibleCells()
-              .map((cell) =>
-                flexRender(cell.column.columnDef.cell, cell.getContext())
-              )}
-          </StyledTableRow>
-        ))}
-      </tbody>
-    </Table>
+    <div ref={tableContainerRef}>
+      <Table>
+        <TableHeader>
+          {table
+            .getLeafHeaders()
+            .map((header) =>
+              flexRender(header.column.columnDef.header, header.getContext())
+            )}
+        </TableHeader>
+        <tbody>
+          {virtualRows.map((vRow) => {
+            const row = rows[vRow.index];
+            return (
+              <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
+                {row
+                  .getVisibleCells()
+                  .map((cell) =>
+                    flexRender(cell.column.columnDef.cell, cell.getContext())
+                  )}
+              </StyledTableRow>
+            );
+          })}
+        </tbody>
+      </Table>
+    </div>
   );
 };
 
