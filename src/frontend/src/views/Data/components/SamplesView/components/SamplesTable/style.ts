@@ -51,3 +51,9 @@ export const StyledInputCheckbox = styled(InputCheckbox)`
     `;
   }}
 `;
+
+// needed to keep search bar sticky
+export const StyledWrapper = styled.div`
+  flex: 1 1 auto;
+  overflow-y: auto;
+`;

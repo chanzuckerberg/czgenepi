@@ -28,12 +28,14 @@ import {
   StyledInputCheckbox,
   StyledPrivateId,
   StyledTableRow,
+  StyledWrapper,
 } from "./style";
 import { EmptyTable } from "src/views/Data/components/EmptyState";
 import { generateWidthStyles } from "src/common/utils";
 import { getLineageFromSampleLineages } from "src/common/utils/samples";
 import { QualityScoreTag } from "./components/QualityScoreTag";
 import { memo } from "src/common/utils/memo";
+import { VirtualBumper } from "./components/VirtualBumper";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -390,9 +392,18 @@ const SamplesTable = ({
   const rowVirtualizer = useVirtual({
     parentRef: tableContainerRef,
     size: rows.length,
-    overscan: 10,
+    // increasing the `overscan` number will enable smoother scrolling, but will also add more nodes
+    // to the DOM, and may impact performance of other things in view, such as filters and modals
+    overscan: 25,
   });
-  const { virtualItems: virtualRows } = rowVirtualizer;
+  const { virtualItems: virtualRows, totalSize } = rowVirtualizer;
+
+  const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0;
+  const paddingBottom =
+    virtualRows.length > 0
+      ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0)
+      : 0;
+  // end virtualization code
 
   useEffect(() => {
     // for each selected row in the table, map the react-table internal row to the data (Sample)
@@ -409,7 +420,7 @@ const SamplesTable = ({
   }
 
   return (
-    <div ref={tableContainerRef}>
+    <StyledWrapper ref={tableContainerRef}>
       <Table>
         <TableHeader>
           {table
@@ -419,6 +430,7 @@ const SamplesTable = ({
             )}
         </TableHeader>
         <tbody>
+          <VirtualBumper padding={paddingTop} />
           {virtualRows.map((vRow) => {
             const row = rows[vRow.index];
             return (
@@ -431,9 +443,10 @@ const SamplesTable = ({
               </StyledTableRow>
             );
           })}
+          <VirtualBumper padding={paddingBottom} />
         </tbody>
       </Table>
-    </div>
+    </StyledWrapper>
   );
 };
 
