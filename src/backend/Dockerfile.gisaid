@@ -85,5 +85,7 @@ LABEL branch=${HAPPY_BRANCH}
 LABEL commit=${HAPPY_COMMIT}
 ENV COMMIT_SHA=${HAPPY_COMMIT}
 ENV COMMIT_BRANCH=${HAPPY_BRANCH}
+# TODO - temporary workaround
+RUN pip install jsonschema==3.*
 
 WORKDIR /nextstrain

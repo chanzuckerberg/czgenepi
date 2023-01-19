@@ -65,4 +65,7 @@ COPY . .
 # Install the aspen package
 RUN poetry install
 
+# TODO - temporary workaround
+RUN pip install jsonschema==3.*
+
 WORKDIR /nextstrain

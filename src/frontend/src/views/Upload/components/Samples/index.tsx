@@ -1,6 +1,5 @@
 import { Button, Icon } from "czifui";
 import Link from "next/link";
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { HeadAppTitle } from "src/common/components";
@@ -8,8 +7,6 @@ import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { ROUTES } from "src/common/routes";
 import AlertAccordion from "src/components/AlertAccordion";
 import { CollapsibleInstructions } from "src/components/CollapsibleInstructions";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import Progress from "../common/Progress";
 import {
   ButtonWrapper,
@@ -50,21 +47,13 @@ export default function Samples({ samples, setSamples }: Props): JSX.Element {
   const [isLoadingFile, setIsLoadingFile] = useState(false);
   const [tooManySamples, setTooManySamples] = useState(false);
 
-  const flag = useTreatments([USER_FEATURE_FLAGS.static_metadata_table]);
-  const isStaticMetadataTableFlagOn = isUserFlagOn(
-    flag,
-    USER_FEATURE_FLAGS.static_metadata_table
-  );
-
   useEffect(() => {
     if (samples) {
       const counts = getUploadCounts(samples);
       setSampleCount(counts.sampleCount);
       setFileCount(counts.fileCount);
-      let tooManySamples = Object.keys(samples).length > 500;
-      if (isStaticMetadataTableFlagOn) {
-        tooManySamples = false;
-      }
+      const tooManySamples = Object.keys(samples).length > 500;
+
       setTooManySamples(tooManySamples);
     }
   }, [samples]);
