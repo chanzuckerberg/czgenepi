@@ -132,7 +132,8 @@ subsampling:
 
   NON_CONTEXTUALIZED:
     group:
-      group-by: "year"
+      group-by:
+        - "year"
       subsample-max-sequences: 1000
       query: "(location == '{location}') & (division == '{division}')"
       min-length: 100000

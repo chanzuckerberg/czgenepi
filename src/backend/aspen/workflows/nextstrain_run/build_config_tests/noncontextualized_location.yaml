@@ -24,7 +24,8 @@ seed_spacing: 1000
 strain_id_field: accession
 subsampling:
   group:
-    group-by: year
+    group-by:
+    - year
     min-length: 100000
     query: (location == 'Morelia') & (division == 'Michoacan')
     subsample-max-sequences: 1000
