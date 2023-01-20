@@ -24,5 +24,4 @@ jobs:
           tfe_token: ${{secrets.TFE_TOKEN}}
           # the default stale period to delete a stack is 2 weeks
           # override like this:
-          #time: 3 weeks
-          #time: 2 days
+          time: 5 days
