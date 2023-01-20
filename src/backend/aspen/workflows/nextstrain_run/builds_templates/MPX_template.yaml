@@ -81,7 +81,6 @@ subsampling:
   TARGETED:
     focal:
       exclude-all: true
-      include: config/include.txt
       
     closest:
       subsample-max-sequences: 100   # this changes with number of samples in include.txt and that's good
