@@ -83,11 +83,7 @@ async def test_samples_list(
                 pathogen=pathogen,
             )
         )
-        uploaded_pathogen_genomes.append(
-            uploaded_pathogen_genome_factory(
-                samples[i], pangolin_output=pangolin_output
-            )
-        )
+        uploaded_pathogen_genomes.append(uploaded_pathogen_genome_factory(samples[i]))
         qc_metrics.append(sample_qc_metrics_factory(samples[i], qc_score=f"{i}"))
         if pathogen.slug == "SC2":
             sample_lineages.append(
@@ -268,11 +264,7 @@ async def test_samples_list_no_qc_status(
                 pathogen=pathogen,
             )
         )
-        uploaded_pathogen_genomes.append(
-            uploaded_pathogen_genome_factory(
-                samples[i], pangolin_output=pangolin_output
-            )
-        )
+        uploaded_pathogen_genomes.append(uploaded_pathogen_genome_factory(samples[i]))
         if pathogen.slug == "SC2":
             sample_lineages.append(
                 sample_lineage_factory(samples[i], raw_lineage_output=pangolin_output)
