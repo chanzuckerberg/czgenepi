@@ -57,11 +57,7 @@ async def test_submission_template_download_gisaid(
                 public_identifier=f"public{i}",
             )
         )
-        async_session.add(
-            uploaded_pathogen_genome_factory(
-                samples[i]
-            )
-        )
+        async_session.add(uploaded_pathogen_genome_factory(samples[i]))
     samples.sort(key=lambda sample: sample.public_identifier)
     await async_session.commit()
 
@@ -137,11 +133,7 @@ async def test_submission_template_download_genbank_SC2(
                 public_identifier=f"public{i}",
             )
         )
-        async_session.add(
-            uploaded_pathogen_genome_factory(
-                samples[i]
-            )
-        )
+        async_session.add(uploaded_pathogen_genome_factory(samples[i]))
     samples.sort(key=lambda sample: sample.public_identifier)
     await async_session.commit()
 
@@ -218,11 +210,7 @@ async def test_submission_template_download_genbank_MPX(
                 public_identifier=f"public{i}",
             )
         )
-        async_session.add(
-            uploaded_pathogen_genome_factory(
-                samples[i]
-            )
-        )
+        async_session.add(uploaded_pathogen_genome_factory(samples[i]))
     samples.sort(key=lambda sample: sample.public_identifier)
     await async_session.commit()
 
@@ -291,11 +279,7 @@ async def test_submission_template_prefix_stripping(
                 public_identifier=f"hCoV-19/public{i}",
             )
         )
-        async_session.add(
-            uploaded_pathogen_genome_factory(
-                samples[i]
-            )
-        )
+        async_session.add(uploaded_pathogen_genome_factory(samples[i]))
     samples.sort(key=lambda sample: sample.public_identifier)
     await async_session.commit()
 
@@ -372,11 +356,7 @@ async def test_submission_template_incomplete_location(
                 public_identifier=f"{pathogen_repo_config.prefix}/public{i}",
             )
         )
-        async_session.add(
-            uploaded_pathogen_genome_factory(
-                samples[i]
-            )
-        )
+        async_session.add(uploaded_pathogen_genome_factory(samples[i]))
     samples.sort(key=lambda sample: sample.public_identifier)
     await async_session.commit()
 
