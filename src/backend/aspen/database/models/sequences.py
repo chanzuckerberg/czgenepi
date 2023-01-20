@@ -63,18 +63,6 @@ class PathogenGenome(Entity):
         ),
     )
     sequencing_date = Column(Date, nullable=True)
-    # Store a map of the fields in this pango output file
-    pangolin_output = Column(
-        JSONB,
-        nullable=True,
-        default=text("'{}'::jsonb"),
-        server_default=text("'{}'::jsonb"),
-    )
-
-    pangolin_lineage = Column(String, nullable=True)
-    pangolin_probability = Column(Float, nullable=True)
-    pangolin_version = Column(String, nullable=True)
-    pangolin_last_updated = Column(DateTime, nullable=True)
 
 
 class UploadedPathogenGenome(PathogenGenome):
