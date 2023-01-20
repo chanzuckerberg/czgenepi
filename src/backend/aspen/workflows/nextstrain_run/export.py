@@ -62,7 +62,6 @@ NCOV_CSV_FIELDS = [
     "date_submitted",
 ]
 GENBANK_CSV_FIELDS = [
-    "strain",
     "accession",
     "genbank_accession_rev",
     "strain",
