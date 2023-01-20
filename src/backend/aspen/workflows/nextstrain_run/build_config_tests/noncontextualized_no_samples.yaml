@@ -27,8 +27,8 @@ subsampling:
     group-by:
     - year
     min-length: 100000
-    query: (location == 'Morelia') & (division == 'Michoacan') & (pango_lineage in
-      ['A.1', 'BA.3'])
+    query: (location == 'Morelia') & (division == 'Michoacan') & (lineage in ['A.1',
+      'BA.3'])
     subsample-max-sequences: 1000
 subsampling_scheme: NON_CONTEXTUALIZED
 timetree: false

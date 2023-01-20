@@ -4,7 +4,7 @@ from typing import Iterable
 
 import click
 import sqlalchemy as sa
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, undefer
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -14,12 +14,14 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
+    AlignedPathogenGenome,
     Group,
     Location,
     Pathogen,
     PathogenGenome,
     Sample,
     TreeType,
+    UploadedPathogenGenome,
 )
 from aspen.workflows.nextstrain_run.build_config import TemplateBuilder
 from aspen.workflows.nextstrain_run.export import (
@@ -84,6 +86,12 @@ from aspen.workflows.nextstrain_run.export import (
     default="SC2",
     help="Pathogen to build a tree for",
 )
+@click.option(
+    "--sequence-type",
+    type=click.Choice(["aligned", "uploaded"]),
+    default="uploaded",
+    required=True,
+)
 def cli(
     tree_type: str,
     sequences: int,
@@ -93,6 +101,7 @@ def cli(
     group_name: str,
     location: str,
     pathogen: str,
+    sequence_type: str,
 ):
     tree_types = {
         "overview": TreeType.OVERVIEW,
@@ -112,10 +121,12 @@ def cli(
     num_included_samples = 0
 
     with session_scope(interface) as session:
-        pathogen_genomes = get_random_pathogen_genomes(session, sequences)
+        pathogen_genomes = get_random_pathogen_genomes(
+            session, sequences, sequence_type
+        )
 
         num_sequences = write_sequences_files(
-            session, pathogen_genomes, sequences_fh, metadata_fh
+            session, sequence_type, pathogen_genomes, sequences_fh, metadata_fh
         )
         if build_type != TreeType.OVERVIEW:
             gisaid_ids = generate_test_gisaid_ids(gisaid)
@@ -163,20 +174,19 @@ def cli(
         session.rollback()  # Don't save any changes to the DB.
 
 
-def get_random_pathogen_genomes(session, max_genomes):
-    all_samples: Iterable[Sample] = (
-        sa.select(Sample)  # type: ignore
+def get_random_pathogen_genomes(session, max_genomes, sequence_type):
+    sequence_model = UploadedPathogenGenome
+    if sequence_type == "aligned":
+        sequence_model = AlignedPathogenGenome
+    all_genomes: Iterable[Sample] = (
+        sa.select(sequence_model)  # type: ignore
         .options(
-            joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
-                PathogenGenome.sequence
-            )
+            joinedload(sequence_model.sample, innerjoin=True),
+            undefer(PathogenGenome.sequence),
         )
         .limit(max_genomes)
     )
-    pathogen_genomes = [
-        sample.uploaded_pathogen_genome
-        for sample in session.execute(all_samples).scalars()
-    ]
+    pathogen_genomes = [item for item in session.execute(all_genomes).scalars()]
     return pathogen_genomes
 
 

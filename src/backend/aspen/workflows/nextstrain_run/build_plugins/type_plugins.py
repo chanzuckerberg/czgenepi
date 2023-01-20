@@ -273,9 +273,11 @@ def update_subsampling_for_division(subsampling):
 def apply_filters(config, subsampling, template_args):
     # MPX format
     include_arguments_in_filters = False
+    lineage_field = "lineage"
     if "--query" in subsampling["group"]["query"]:
         # SC2 format
         include_arguments_in_filters = True
+        lineage_field = "pango_lineage"
 
     filter_map = {"filter_start_date": "min_date", "filter_end_date": "max_date"}
     for filter_name, yaml_key in filter_map.items():
@@ -289,7 +291,9 @@ def apply_filters(config, subsampling, template_args):
                 yaml_key
             ] = f"--{yaml_key.replace('_', '-')} {value}"  # ex: --max-date 2020-01-01
         else:
-            subsampling["group"][yaml_key.replace('_', '-')] = str(value)  # ex: max-date: 2020-01-01
+            subsampling["group"][yaml_key.replace("_", "-")] = str(
+                value
+            )  # ex: max-date: 2020-01-01
 
     pango_lineages = template_args.get("filter_pango_lineages")
     if pango_lineages:
@@ -305,5 +309,5 @@ def apply_filters(config, subsampling, template_args):
         if old_query.endswith('"'):
             end_string = '"'
             old_query = old_query[:-1]
-        pango_query = " & (pango_lineage in {pango_lineage})"
+        pango_query = " & (" + lineage_field + " in {pango_lineage})"
         subsampling["group"]["query"] = old_query + pango_query + end_string
