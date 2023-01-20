@@ -85,7 +85,7 @@ LABEL branch=${HAPPY_BRANCH}
 LABEL commit=${HAPPY_COMMIT}
 ENV COMMIT_SHA=${HAPPY_COMMIT}
 ENV COMMIT_BRANCH=${HAPPY_BRANCH}
-# TODO - temporary workaround
+# TODO - Mismatch between poetry and augur deps forces us to manually install jsonschema v3 here
 RUN pip install jsonschema==3.*
 
 WORKDIR /nextstrain
