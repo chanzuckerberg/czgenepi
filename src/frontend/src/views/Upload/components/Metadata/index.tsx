@@ -1,4 +1,3 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { Button, Link } from "czifui";
 import NextLink from "next/link";
 import { useCallback, useMemo, useState } from "react";
@@ -8,8 +7,6 @@ import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { EMPTY_OBJECT, noop } from "src/common/constants/empty";
 import { ROUTES } from "src/common/routes";
 import { createStringToLocationFinder } from "src/common/utils/locationUtils";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { WebformTable } from "src/components/WebformTable";
 import {
   Metadata as MetadataType,
@@ -49,22 +46,12 @@ export default function Metadata({
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
 
-  // Used for displaying a static metadata table
-  const flag = useTreatments([USER_FEATURE_FLAGS.static_metadata_table]);
-  const isStaticMetadataTableFlagOn = isUserFlagOn(
-    flag,
-    USER_FEATURE_FLAGS.static_metadata_table
-  );
-
   let numberOfDetectedSamples = 0;
   if (samples != null) {
     numberOfDetectedSamples = Object.keys(samples).length;
   }
 
-  let useStaticMetadataTable = false;
-  if (numberOfDetectedSamples >= 100 && isStaticMetadataTableFlagOn) {
-    useStaticMetadataTable = true;
-  }
+  const shouldUseStaticMetadataTable = numberOfDetectedSamples >= 100;
 
   // Used by file upload parser to convert location strings to Locations
   const stringToLocationFinder = useMemo(() => {
@@ -120,6 +107,7 @@ export default function Metadata({
       warningMessages.get(WARNING_CODE.AUTO_CORRECT) || EMPTY_OBJECT
     );
   }
+
   return (
     <>
       <HeadAppTitle subTitle="Metadata and Sharing" />
@@ -134,7 +122,7 @@ export default function Metadata({
         <Progress step="2" />
       </Header>
       <Content>
-        {useStaticMetadataTable && (
+        {shouldUseStaticMetadataTable && (
           <StyledCallout intent="info" autoDismiss={false} onClose={noop}>
             <B>Notice something different about this page?</B> When uploading
             100 or more samples, metadata must be imported from a TSV or CSV.
@@ -167,7 +155,7 @@ export default function Metadata({
           stringToLocationFinder={stringToLocationFinder}
         />
 
-        {useStaticMetadataTable && (
+        {shouldUseStaticMetadataTable && (
           <StaticTable
             metadata={metadata}
             setIsValid={setIsValid}
@@ -175,7 +163,7 @@ export default function Metadata({
           />
         )}
 
-        {!useStaticMetadataTable && (
+        {!shouldUseStaticMetadataTable && (
           <WebformTable
             setIsValid={setIsValid}
             metadata={metadata}
