@@ -9,10 +9,8 @@ from sqlalchemy import (
     func,
     Integer,
     String,
-    text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import backref, deferred, relationship
 
 from aspen.database.models.base import idbase
