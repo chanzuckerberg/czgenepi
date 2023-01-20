@@ -43,6 +43,11 @@ async def test_submission_template_download_gisaid(
     pathogen, _ = setup_gisaid_and_genbank_repo_configs(
         async_session, split_client=split_client, default_repo="GISAID"
     )
+    pangolin_output = {
+        "scorpio_call": "B.1.167",
+        "scorpio_support": "0.775",
+        "qc_status": "pass",
+    }
     # Make multiple samples
     samples: List[Sample] = []
     for i in range(2):
@@ -59,7 +64,7 @@ async def test_submission_template_download_gisaid(
         )
         async_session.add(
             uploaded_pathogen_genome_factory(
-                samples[i]
+                samples[i], pangolin_output=pangolin_output
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
@@ -123,6 +128,11 @@ async def test_submission_template_download_genbank_SC2(
         async_session, pathogen, split_client=split_client, default_repo="GenBank"
     )
 
+    pangolin_output = {
+        "scorpio_call": "B.1.167",
+        "scorpio_support": "0.775",
+        "qc_status": "pass",
+    }
     # Make multiple samples
     samples: List[Sample] = []
     for i in range(2):
@@ -139,7 +149,7 @@ async def test_submission_template_download_genbank_SC2(
         )
         async_session.add(
             uploaded_pathogen_genome_factory(
-                samples[i]
+                samples[i], pangolin_output=pangolin_output
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
@@ -220,7 +230,7 @@ async def test_submission_template_download_genbank_MPX(
         )
         async_session.add(
             uploaded_pathogen_genome_factory(
-                samples[i]
+                samples[i]  # , pangolin_output=pangolin_output
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
@@ -277,6 +287,11 @@ async def test_submission_template_prefix_stripping(
         async_session, split_client=split_client, default_repo="GISAID"
     )
 
+    pangolin_output = {
+        "scorpio_call": "B.1.167",
+        "scorpio_support": "0.775",
+        "qc_status": "pass",
+    }
     # Make multiple samples
     samples: List[Sample] = []
     for i in range(2):
@@ -293,7 +308,7 @@ async def test_submission_template_prefix_stripping(
         )
         async_session.add(
             uploaded_pathogen_genome_factory(
-                samples[i]
+                samples[i], pangolin_output=pangolin_output
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
@@ -358,6 +373,11 @@ async def test_submission_template_incomplete_location(
         async_session, split_client=split_client, default_repo="GISAID"
     )
 
+    pangolin_output = {
+        "scorpio_call": "B.1.167",
+        "scorpio_support": "0.775",
+        "qc_status": "pass",
+    }
     # Make multiple samples
     samples: List[Sample] = []
     for i in range(2):
@@ -374,7 +394,7 @@ async def test_submission_template_incomplete_location(
         )
         async_session.add(
             uploaded_pathogen_genome_factory(
-                samples[i]
+                samples[i], pangolin_output=pangolin_output
             )
         )
     samples.sort(key=lambda sample: sample.public_identifier)
