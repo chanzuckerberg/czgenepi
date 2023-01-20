@@ -134,9 +134,9 @@ def test_overview_config_no_filters(mocker, session, postgres_database, split_cl
         subsampling_scheme["group"]["query"]
         == f"(location == '{location.location}') & (division == '{location.division}')"
     )
-    assert "min_date" not in subsampling_scheme["group"]
-    assert "max_date" not in subsampling_scheme["group"]
-    assert "pango_lineage" not in subsampling_scheme["group"]["query"]
+    assert "min-date" not in subsampling_scheme["group"]
+    assert "max-date" not in subsampling_scheme["group"]
+    assert "lineage" not in subsampling_scheme["group"]["query"]
     assert len(selected.splitlines()) == 0  # No selected sequences
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
@@ -167,7 +167,7 @@ def test_overview_config_ondemand(mocker, session, postgres_database, split_clie
     filter_pango_lineages = "['" + "', '".join(query["filter_pango_lineages"]) + "']"
     assert (
         subsampling_scheme["group"]["query"]
-        == f"(location == '{location.location}') & (division == '{location.division}') & (pango_lineage in {filter_pango_lineages})"
+        == f"(location == '{location.location}') & (division == '{location.division}') & (lineage in {filter_pango_lineages})"
     )
     assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line

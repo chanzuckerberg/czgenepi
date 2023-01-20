@@ -9,6 +9,7 @@ from sqlalchemy.sql.expression import and_
 from aspen.config.docker_compose import DockerComposeConfig
 from aspen.database.connection import get_db_uri, init_db
 from aspen.database.models import (
+    AlignedPathogenGenome,
     AlignedRepositoryData,
     Group,
     LineageType,
@@ -317,10 +318,18 @@ def create_sample(session, group, pathogen, uploaded_by_user, location, suffix):
         sequencing_date=datetime.now(),
         upload_date=datetime.now(),
     )
+    apg: AlignedPathogenGenome = AlignedPathogenGenome(
+        sample=sample,
+        sequence="ATTAAAGCCCCCAAGTC",
+        sequencing_date=datetime.now(),
+        aligned_date=datetime.now(),
+        reference_name="ref_name",
+    )
     create_sample_lineage(session, sample)
     create_sample_qc_metrics(session, sample)
     create_sample_mutations(session, sample)
     session.add(upg)
+    session.add(apg)
     session.add(sample)
     return sample
 
