@@ -9,6 +9,8 @@ import {
 } from "czifui";
 
 export const StyledPrivateId = styled(CellBasic)`
+  padding-left: 0;
+
   ${(props) => {
     const fontWeights = getFontWeights(props);
     return `
