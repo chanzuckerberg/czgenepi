@@ -7,8 +7,9 @@ import io
 import json
 from enum import Enum
 from pathlib import Path
-from typing import Dict, IO, Iterable
+from typing import Dict, IO, Iterable, Optional
 import subprocess
+import sys
 
 import click
 import sqlalchemy as sa
@@ -33,6 +34,7 @@ class RunType(str, Enum):  # str mix-in gives nice == compare against strings
     # Get samples for pathogen with a stale call or no call, run against those
     REFRESH_STALE = "refresh-stale"
     # Call against all samples for pathogen, regardless of current state
+    # No immediate purpose, here in case we need it in the future.
     FORCE_ALL = "force-all"
 # `click` barfs on enums, so make a string list for it
 _run_type_click_choices = [item.value for item in RunType]
@@ -47,18 +49,19 @@ NEXTCLADE_TAG_FILENAME = "tag.json"
 @click.option("sample_ids_fh", "--sample-ids-file", type=click.File("r"), required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
 @click.option(
-    "pathogen_info_fh", "--pathogen-info-file", type=click.File("w"), required=True
+    "job_info_fh", "--job-info-file", type=click.File("w"), required=True
 )
 def cli(
     run_type: str,
     pathogen_slug: str,
     sample_ids_fh: io.TextIOBase,
     sequences_fh: io.TextIOBase,
-    pathogen_info_fh: IO[str],
+    job_info_fh: IO[str],
 ):
     """
     Writes out a FASTA for the specified samples.
 
+    - run_type: What kind of run this is. Look above at `RunType` for info.
     - pathogen_slug: Pathogen.slug for pathogen we are running Nextclade on
     - sample_ids_fh: A file of sample ID primary keys, one ID per line.
         Each sample must be for the same pathogen (all SARS-CoV-2, etc)
@@ -67,7 +70,7 @@ def cli(
         NOTE Resulting FASTA will have its id lines (>) be those primary keys,
         so anything that consumes these downstream results will be referring
         to samples by PK, not by private/public identifier.
-    - pathogen_info_fh: Write out pathogen info for later use in workflow
+    - job_info_fh: Write out info about job for later use in workflow
     """
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
@@ -103,8 +106,19 @@ def cli(
                 session,
                 target_pathogen,
             )
-        # TODO exit out gracefully if sample_ids is empty
-        # maybe wig out up above if it's a SPECIFIED_IDS_ONLY and empty?
+
+        # We should abandon this workflow run if there are no samples to run.
+        if sample_ids == []:
+            if run_type == RunType.REFRESH_STALE:
+                print("No samples were found that needed refreshing.")
+                save_job_info(job_info_fh, should_exit_because_no_samples=True)
+                sys.exit()
+            else:
+                print("No samples for Nextclade run! Aborting workflow!")
+                print(f"For RunType `{run_type}` this indicates usage error.")
+                print("Please investigate why no samples were found.")
+                raise RuntimeError("No samples for Nextclade run")
+
         print(f"{'=' * 30} BEGIN DEBUG PRINTING {'=' * 30}")  # REMOVE
         print('sample_ids')  # REMOVE
         print(sample_ids)  # REMOVE
@@ -112,12 +126,11 @@ def cli(
         print(len(sample_ids))  # REMOVE
         print(f"{'=' * 30}  END DEBUG PRINTING  {'=' * 30}")  # REMOVE
 
-        print(f"Getting pathogen data for {pathogen_slug}")
-        target_pathogen_query: Pathogen = sa.select(Pathogen).filter(
-            Pathogen.slug == pathogen_slug
-        )
-        target_pathogen = session.execute(target_pathogen_query).scalars().one()
-        save_pathogen_info(pathogen_info_fh, target_pathogen)
+        save_job_info(
+            job_info_fh,
+            pathogen_slug=target_pathogen.slug,
+            nextclade_dataset_name=target_pathogen.nextclade_dataset_name,
+            )
 
         print("Fetching and writing FASTA for sample ids:", sample_ids)
         # TODO update to SQLAlchemyV2 syntax
@@ -252,15 +265,28 @@ def get_all_sample_ids_for_pathogen(
     return [sample.id for sample in all_samples_for_pathogen]
 
 
-def save_pathogen_info(pathogen_info_fh: IO[str], pathogen: Pathogen):
-    """Write a JSON of important pathogen info for use later in workflow."""
-    pathogen_info = {
-        "pathogen_slug": pathogen.slug,
+def save_job_info(
+    job_info_fh: IO[str],
+    pathogen_slug: Optional[str] = None,
+    nextclade_dataset_name: Optional[str] = None,
+    should_exit_because_no_samples: bool = False,
+    ):
+    """Write a JSON of important info about job for use later in workflow.
+
+    Job info file can be used to signal we can stop workflow early. In that
+    case, the job info will not necessarily be complete with all values, but
+    that's okay, because we'll never get to a place where we need those.
+    """
+    job_info = {
+        "pathogen_slug": pathogen_slug,
         # Not all pathogens have a dataset once we get to generalized case.
         # When that happens, will be None/null
-        "nextclade_dataset_name": pathogen.nextclade_dataset_name,
+        "nextclade_dataset_name": nextclade_dataset_name,
+        # Possible for everything to be working as expected, but there's no
+        # need to keep running workflow because no samples need to be run.
+        "should_exit_because_no_samples": should_exit_because_no_samples,
     }
-    json.dump(pathogen_info, pathogen_info_fh)
+    json.dump(job_info, job_info_fh)
 
 
 if __name__ == "__main__":
