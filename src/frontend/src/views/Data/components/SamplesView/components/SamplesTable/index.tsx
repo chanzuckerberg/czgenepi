@@ -163,6 +163,10 @@ const columns: ColumnDef<Sample, any>[] = [
           boldText: "Quality Score",
           regularText:
             "Overall QC score from Nextclade which considers genome completion and screens for potential contamination and sequencing or bioinformatics errors.",
+          link: {
+            href: "https://docs.nextstrain.org/projects/nextclade/en/stable/user/algorithm/07-quality-control.html",
+            linkText: "Learn more",
+          },
         }}
       >
         Quality Score
@@ -237,7 +241,7 @@ const columns: ColumnDef<Sample, any>[] = [
           boldText: "Lineage",
           link: {
             href: "https://cov-lineages.org/pangolin.html",
-            linkText: "Learn more.",
+            linkText: "Learn more",
           },
           regularText:
             "A lineage is a named group of related sequences. A few lineages have been associated with changes in the epidemiological or biological characteristics of the virus. We continually update these lineages based on the evolving Pangolin designations. Lineages determined by Pangolin.",
