@@ -36,7 +36,7 @@ def create_samples_for_pathogen(session, group, user, location, pathogen):
         random.shuffle(sequence)
         pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
             sample,
-            sequence="".join(sequence)
+            sequence="".join(sequence),
         )
         session.add(pathogen_genome)
         pathogen_genomes.append(pathogen_genome)

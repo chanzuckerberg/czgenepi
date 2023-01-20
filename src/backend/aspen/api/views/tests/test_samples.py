@@ -675,9 +675,7 @@ async def test_samples_view_no_pangolin(
     )
     sc2 = pathogen_factory("SC2", "SARS-Cov-2")
     sample = sample_factory(group, user, location, pathogen=sc2)
-    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(
-        sample
-    )
+    uploaded_pathogen_genome = uploaded_pathogen_genome_factory(sample)
     async_session.add(group)
     await async_session.commit()
 
