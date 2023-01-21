@@ -40,14 +40,12 @@ class RunType(str, Enum):  # str mix-in gives nice == compare against strings
 _run_type_click_choices = [item.value for item in RunType]
 
 
-NEXTCLADE_DATASET_DIR = "nextclade_dataset_bundle"
-NEXTCLADE_TAG_FILENAME = "tag.json"
-
 @click.command("export")
 @click.option("run_type", "--run-type", type=click.Choice(_run_type_click_choices), default=RunType.SPECIFIED_IDS_ONLY)
 @click.option("pathogen_slug", "--pathogen-slug", type=str, required=True)
 @click.option("sample_ids_fh", "--sample-ids-file", type=click.File("r"), required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
+@click.option("nextclade_dataset_dir", "--nextclade-dataset-dir", type=click.Path(dir_okay=True, exists=False), required=True)
 @click.option(
     "job_info_fh", "--job-info-file", type=click.File("w"), required=True
 )
@@ -56,6 +54,7 @@ def cli(
     pathogen_slug: str,
     sample_ids_fh: io.TextIOBase,
     sequences_fh: io.TextIOBase,
+    nextclade_dataset_dir: str,
     job_info_fh: IO[str],
 ):
     """
@@ -70,6 +69,7 @@ def cli(
         NOTE Resulting FASTA will have its id lines (>) be those primary keys,
         so anything that consumes these downstream results will be referring
         to samples by PK, not by private/public identifier.
+    - nextclade_dataset_dir: Dir to save the Nextclade dataset we download.
     - job_info_fh: Write out info about job for later use in workflow
     """
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
@@ -84,8 +84,7 @@ def cli(
         # VOODOO TODO turn this back on, just want to avoid pointless download
         # nextclade_dataset_info = download_nextclade_dataset(
         #     target_pathogen.nextclade_dataset_name,
-        #     NEXTCLADE_DATASET_DIR,
-        #     NEXTCLADE_TAG_FILENAME,
+        #     nextclade_dataset_dir,
         #     )
         nextclade_dataset_info = {'name': 'hMPXV', 'accession': 'NC_063383.1', 'tag': '2022-11-03T12:00:00Z'}
 
@@ -168,7 +167,7 @@ def cli(
         print("Finished writing FASTA for samples.")
 
 
-def download_nextclade_dataset(dataset_name: str, output_dir: str, tag_filename: str) -> Dict[str, str]:
+def download_nextclade_dataset(dataset_name: str, output_dir: str) -> Dict[str, str]:
     """Downloads most recent Nextclade dataset, returns important tag info.
 
     We determine the staleness of previous Nextclade calls by comparing those
@@ -195,7 +194,9 @@ def download_nextclade_dataset(dataset_name: str, output_dir: str, tag_filename:
         timeout=60,  # Just in case the call hangs, blow up everything
         check=True,  # Raise and blow up everything if non-zero exit code
         )
-    with open(Path(output_dir, tag_filename)) as tag_fh:
+
+    NEXTCLADE_TAG_FILENAME = "tag.json"
+    with open(Path(output_dir, NEXTCLADE_TAG_FILENAME)) as tag_fh:
         return extract_dataset_info(tag_fh)
 
 

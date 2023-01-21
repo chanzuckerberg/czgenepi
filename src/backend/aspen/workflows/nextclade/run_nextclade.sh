@@ -17,6 +17,9 @@
 set -Eeuxo pipefail
 shopt -s inherit_errexit  # no silent breaking
 
+# This is where we will store Nextclade's dataset for the target pathogen.
+NEXTCLADE_DATASET_DIR=nextclade_dataset_bundle
+
 # Certain bits of info need to be passed around during the workflow.
 # A file is as an expedient way to pass them around to various processes.
 JOB_INFO_FILE=job_info.json
@@ -28,6 +31,7 @@ SEQUENCES_FILE=sequences.fasta
   --pathogen-slug "${PATHOGEN_SLUG}" \
   --sample-ids-file "${SAMPLE_IDS_FILENAME}" \
   --sequences "${SEQUENCES_FILE}" \
+  --nextclade-dataset-dir "${NEXTCLADE_DATASET_DIR}" \
   --job-info-file "${JOB_INFO_FILE}"
 
 # In some cases, we discover nothing is needed to be done, can exit early.
@@ -38,6 +42,8 @@ if [ "${should_exit_because_no_samples}" = true ] ; then
 fi
 
 # TODO REMOVE this chunk, download is inside prep_samples.py now
+# VOODOO also go verify that deleting the current dataset and re-running
+# does cause everything to pull correctly and work as desired
 nextclade_dataset_name=$(jq --raw-output ".nextclade_dataset_name" "${JOB_INFO_FILE}")
 echo "Pulling nextclade reference dataset with name ${nextclade_dataset_name}"
 NEXTCLADE_DATASET_DIR=nextclade_dataset_bundle
