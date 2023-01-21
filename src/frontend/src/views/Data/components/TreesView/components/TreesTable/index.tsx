@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
@@ -19,9 +19,13 @@ import {
   StyledTableRow,
 } from "../../../SamplesView/components/SamplesTable/style";
 import TreeTableNameCell from "./components/TreeTableNameCell";
-import { StyledSortableHeader } from "./style";
+import { StyledSortableHeader, StyledWrapper } from "./style";
 import { generateWidthStyles } from "src/common/utils";
 import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
+import { memo } from "src/common/utils/memo";
+// TODO-TR: move virtualbumper and update import
+import { VirtualBumper } from "../../../SamplesView/components/SamplesTable/components/VirtualBumper";
+import { useVirtual } from "react-virtual";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
@@ -46,11 +50,11 @@ const columns: ColumnDef<PhyloRun, any>[] = [
         Tree Name
       </StyledSortableHeader>
     ),
-    cell: ({ row }) => (
+    cell: memo(({ row }) => (
       <CellComponent>
         <TreeTableNameCell item={row.original} />
       </CellComponent>
-    ),
+    )),
     enableSorting: true,
     sortingFn: "alphanumeric",
   },
@@ -70,13 +74,13 @@ const columns: ColumnDef<PhyloRun, any>[] = [
         Creation Date
       </SortableHeader>
     ),
-    cell: ({ getValue }) => (
+    cell: memo(({ getValue }) => (
       <StyledCellBasic
         verticalAlign="center"
         shouldShowTooltipOnHover={false}
         primaryText={datetimeWithTzToLocalDate(getValue())}
       />
-    ),
+    )),
     enableSorting: true,
   },
   {
@@ -100,7 +104,7 @@ const columns: ColumnDef<PhyloRun, any>[] = [
         Tree Type
       </SortableHeader>
     ),
-    cell: ({ getValue }) => {
+    cell: memo(({ getValue }) => {
       const type = getValue();
       return (
         <TreeTypeTooltip value={type}>
@@ -111,7 +115,7 @@ const columns: ColumnDef<PhyloRun, any>[] = [
           />
         </TreeTypeTooltip>
       );
-    },
+    }),
     enableSorting: true,
   },
   {
@@ -122,11 +126,11 @@ const columns: ColumnDef<PhyloRun, any>[] = [
         {" "}
       </CellHeader>
     ),
-    cell: ({ row }) => (
+    cell: memo(({ row }) => (
       <CellComponent>
         <TreeActionMenu item={row.original} />
       </CellComponent>
-    ),
+    )),
   },
 ];
 
@@ -166,32 +170,53 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
     onSortingChange: setSorting,
   });
 
+  // adds virtualization to the table
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const { rows } = table.getRowModel();
+  const rowVirtualizer = useVirtual({
+    parentRef: tableContainerRef,
+    size: rows.length,
+    // increasing the `overscan` number will enable smoother scrolling, but will also add more nodes
+    // to the DOM, and may impact performance of other things in view, such as filters and modals
+    overscan: 25,
+  });
+  const { virtualItems: virtualRows, totalSize } = rowVirtualizer;
+  // end virtualization code
+
   if (isLoading) {
     return <div>Loading ...</div>;
   }
 
   // TODO-TR (mlila): pull out common structure from samples table
   return (
-    <Table>
-      <TableHeader>
-        {table
-          .getLeafHeaders()
-          .map((header) =>
-            flexRender(header.column.columnDef.header, header.getContext())
-          )}
-      </TableHeader>
-      <tbody>
-        {table.getRowModel().rows.map((row) => (
-          <StyledTableRow key={row.id}>
-            {row
-              .getVisibleCells()
-              .map((cell) =>
-                flexRender(cell.column.columnDef.cell, cell.getContext())
-              )}
-          </StyledTableRow>
-        ))}
-      </tbody>
-    </Table>
+    <StyledWrapper ref={tableContainerRef}>
+      <Table>
+        <TableHeader>
+          {table
+            .getLeafHeaders()
+            .map((header) =>
+              flexRender(header.column.columnDef.header, header.getContext())
+            )}
+        </TableHeader>
+        <tbody>
+          <VirtualBumper totalSize={totalSize} virtualRows={virtualRows}>
+            {virtualRows.map((vRow) => {
+              const row = rows[vRow.index];
+              return (
+                <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
+                  {row
+                    .getVisibleCells()
+                    .map((cell) =>
+                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                    )}
+                </StyledTableRow>
+              );
+            })}
+          </VirtualBumper>
+        </tbody>
+      </Table>
+    </StyledWrapper>
   );
 };
 
