@@ -401,12 +401,6 @@ const SamplesTable = ({
     overscan: 25,
   });
   const { virtualItems: virtualRows, totalSize } = rowVirtualizer;
-
-  const paddingTop = virtualRows.length > 0 ? virtualRows?.[0]?.start || 0 : 0;
-  const paddingBottom =
-    virtualRows.length > 0
-      ? totalSize - (virtualRows?.[virtualRows.length - 1]?.end || 0)
-      : 0;
   // end virtualization code
 
   useEffect(() => {
@@ -434,20 +428,20 @@ const SamplesTable = ({
             )}
         </TableHeader>
         <tbody>
-          <VirtualBumper padding={paddingTop} />
-          {virtualRows.map((vRow: VirtualItem) => {
-            const row = rows[vRow.index];
-            return (
-              <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
-                {row
-                  .getVisibleCells()
-                  .map((cell) =>
-                    flexRender(cell.column.columnDef.cell, cell.getContext())
-                  )}
-              </StyledTableRow>
-            );
-          })}
-          <VirtualBumper padding={paddingBottom} />
+          <VirtualBumper totalSize={totalSize} virtualRows={virtualRows}>
+            {virtualRows.map((vRow: VirtualItem) => {
+              const row = rows[vRow.index];
+              return (
+                <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
+                  {row
+                    .getVisibleCells()
+                    .map((cell) =>
+                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                    )}
+                </StyledTableRow>
+              );
+            })}
+          </VirtualBumper>
         </tbody>
       </Table>
     </StyledWrapper>
