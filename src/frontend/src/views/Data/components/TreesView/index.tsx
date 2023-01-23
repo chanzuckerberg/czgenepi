@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { IdMap } from "src/common/utils/dataTransforms";

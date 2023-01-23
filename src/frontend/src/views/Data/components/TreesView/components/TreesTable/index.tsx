@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
@@ -25,7 +25,7 @@ import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 import { memo } from "src/common/utils/memo";
 // TODO-TR: move virtualbumper and update import
 import { VirtualBumper } from "../../../SamplesView/components/SamplesTable/components/VirtualBumper";
-import { useVirtual } from "react-virtual";
+import { useVirtual, VirtualItem } from "react-virtual";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
@@ -143,7 +143,7 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
   ]);
 
   const phyloRuns = useMemo(() => {
-    if (!data) return;
+    if (!data) return [];
 
     return map(data, (v) => v);
   }, [data]);
@@ -199,7 +199,7 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
         </TableHeader>
         <tbody>
           <VirtualBumper totalSize={totalSize} virtualRows={virtualRows}>
-            {virtualRows.map((vRow) => {
+            {virtualRows.map((vRow: VirtualItem) => {
               const row = rows[vRow.index];
               return (
                 <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
