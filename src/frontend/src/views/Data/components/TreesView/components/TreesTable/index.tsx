@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
@@ -135,7 +135,6 @@ const columns: ColumnDef<PhyloRun, any>[] = [
 ];
 
 const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
-  const [phyloRuns, setPhyloRuns] = useState<PhyloRun[]>([]);
   const [sorting, setSorting] = useState<SortingState>([
     {
       id: "startedDate",
@@ -143,11 +142,10 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
     },
   ]);
 
-  useEffect(() => {
+  const phyloRuns = useMemo(() => {
     if (!data) return;
 
-    const newRuns = map(data, (v) => v);
-    setPhyloRuns(newRuns);
+    return map(data, (v) => v);
   }, [data]);
 
   const table = useReactTable({
@@ -220,4 +218,4 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
   );
 };
 
-export { TreesTable };
+export default React.memo(TreesTable);
