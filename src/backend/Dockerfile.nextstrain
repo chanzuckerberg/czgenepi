@@ -76,4 +76,7 @@ RUN poetry install
 RUN chmod a+w /ncov/auspice /ncov/logs
 RUN chmod a+w /mpox/ /mpox/config
 
+# TODO - Mismatch between poetry and augur deps forces us to manually install jsonschema v3 here
+RUN pip install jsonschema==3.*
+
 WORKDIR /nextstrain

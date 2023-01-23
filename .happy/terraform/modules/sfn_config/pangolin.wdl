@@ -43,7 +43,7 @@ task pangolin_workflow {
 
     cd /usr/src/app/aspen/workflows/pangolin
     ./update_pangolin.sh
-    /usr/local/bin/python3.9 find_samples.py --output-file "${SAMPLE_IDS_FILE}"
+    /usr/local/bin/python3 find_samples.py --output-file "${SAMPLE_IDS_FILE}"
     ./run_pangolin.sh
     >>>
 

@@ -10,14 +10,9 @@ def uploaded_pathogen_genome_factory(
     num_unambiguous_sites=1,
     num_missing_alleles=0,
     num_mixed=0,
-    pangolin_lineage="B.1.590",
-    pangolin_probability=1.0,
-    pangolin_version="2021-04-23",
-    pangolin_last_updated=datetime.datetime.now(),
     sequencing_depth=0.1,
     sequencing_date=datetime.date.today(),
     upload_date=datetime.datetime.now(),
-    pangolin_output={},
 ):
     uploaded_pathogen_genome = UploadedPathogenGenome(
         sample=sample,
@@ -25,14 +20,9 @@ def uploaded_pathogen_genome_factory(
         num_unambiguous_sites=num_unambiguous_sites,
         num_missing_alleles=num_missing_alleles,
         num_mixed=num_mixed,
-        pangolin_lineage=pangolin_lineage,
-        pangolin_probability=pangolin_probability,
-        pangolin_version=pangolin_version,
-        pangolin_last_updated=pangolin_last_updated,
         sequencing_depth=sequencing_depth,
         sequencing_date=sequencing_date,
         upload_date=upload_date,
-        pangolin_output=pangolin_output,
     )
 
     return uploaded_pathogen_genome
@@ -53,10 +43,6 @@ def uploaded_pathogen_genome_multifactory(
         )
         pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
             sample,
-            pangolin_lineage=None,
-            pangolin_probability=None,
-            pangolin_version=None,
-            pangolin_last_updated=None,
         )
         pathogen_genomes.append(pathogen_genome)
     return pathogen_genomes

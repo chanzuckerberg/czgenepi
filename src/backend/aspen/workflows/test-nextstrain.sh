@@ -5,3 +5,4 @@ python3 /usr/src/app/aspen/workflows/nextstrain_run/error.py --test --phylo-run-
 touch test.txt
 touch /tmp/test.json
 python3 /usr/src/app/aspen/workflows/nextstrain_run/save.py --test --aspen-workflow-rev test --aspen-creation-rev test --ncov-rev test --aspen-docker-image-version test --end-time 1234 --phylo-run-id 1234 --bucket test --key test --resolved-template-args /tmp/test.json --tree-path test.txt
+augur filter --help
