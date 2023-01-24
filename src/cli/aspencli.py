@@ -156,12 +156,13 @@ class ApiClient:
           default the pathogen (currently to SC2).
         """
         if not self.org_id:
-            err_msg = ("The endpoint this command uses requires an org_id.\n"
+            err_msg = (
+                "The endpoint this command uses requires an org_id.\n"
                 "You need to use the `--org` option with the primary key id "
                 "(or set a CZGE_ORG env var\nwith the id) for the desired org. "
                 "You can see what orgs your user account can access by\n"
                 "running the aspencli `user me` command and looking at `groups`."
-                )
+            )
             raise click.UsageError(err_msg)
         if not self.pathogen_slug:
             err_msg = ("The endpoint this command uses requires a pathogen slug.\n"
@@ -196,21 +197,25 @@ class ApiClient:
     def get(self, path, **kwargs):
         headers = self.get_headers()
         url = f"{self.url}{path}"
+        logging.debug(f"GET {url}")
         return requests.get(url, headers=headers, allow_redirects=False, **kwargs)
 
     def delete(self, path, **kwargs):
         headers = self.get_headers()
         url = f"{self.url}{path}"
+        logging.debug(f"DELETE {url}")
         return requests.delete(url, headers=headers, allow_redirects=False, **kwargs)
 
     def put(self, path, **kwargs):
         headers = self.get_headers()
         url = f"{self.url}{path}"
+        logging.debug(f"PUT {url}")
         return requests.put(url, headers=headers, allow_redirects=False, **kwargs)
 
     def post(self, path, **kwargs):
         headers = self.get_headers()
         url = f"{self.url}{path}"
+        logging.debug(f"POST {url}")
         return requests.post(url, headers=headers, allow_redirects=False, **kwargs)
 
 
@@ -238,6 +243,12 @@ class CliConfig:
         "default": {
             "auth_url": "https://covidtracker-staging.auth0.com",
             "client_id": "YIKBzdeiwgSoMZ88Fo1F65Ebd16Rj5mP",
+            "verify": True,
+            "oauth_api_config": default_oauth_api,
+        },
+        "rdev": {
+            "auth_url": "https://czgenepi-rdev.us.auth0.com",
+            "client_id": "nMAEvqOwOcBkZIGzKxjL40ve2kO83DlC",
             "verify": True,
             "oauth_api_config": default_oauth_api,
         },
@@ -303,6 +314,12 @@ class CliConfig:
     help="Pathogen context for requests. If not provided, uses default.",
 )
 @click.option(
+    "--debug",
+    is_flag=True,
+    default=False,
+    help="Enable debug output",
+)
+@click.option(
     "--api",
     help="Aspen API endpoint to use - this overrides the default value chosen by the --env flag",
 )
@@ -311,7 +328,11 @@ class CliConfig:
     help="Aspen rdev stack to query",
 )
 @click.pass_context
-def cli(ctx, env, org, pathogen_slug, api, stack):
+def cli(ctx, env, org, pathogen_slug, debug, api, stack):
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    if debug:
+        logger.setLevel(logging.DEBUG)
     ctx.ensure_object(dict)
     config = CliConfig(env, api, stack)
     ctx.obj["config"] = config
@@ -327,10 +348,12 @@ def usher():
 @click.argument("sample_ids", nargs=-1)
 @click.argument("sample_count", nargs=1)
 @click.pass_context
-def get_link(ctx, sample_ids, sample_count = 50):
+def get_link(ctx, sample_ids, sample_count=50):
     api_client = ctx.obj["api_client"]
     payload = {"samples": sample_ids, "downstream_consumer": "USHER"}
-    resp = api_client.post_with_org_and_pathogen("/v2/sequences/getfastaurl", json=payload)
+    resp = api_client.post_with_org_and_pathogen(
+        "/v2/sequences/getfastaurl", json=payload
+    )
     resp_info = resp.json()
     s3_url = resp_info["url"]
     print(
@@ -553,7 +576,9 @@ def download_tree(ctx, tree_id, public_ids):
         params["id_style"] = "public"
     else:
         params["id_style"] = "private"
-    resp = api_client.get_with_org_and_pathogen(f"/v2/phylo_trees/{tree_id}/download", params=params)
+    resp = api_client.get_with_org_and_pathogen(
+        f"/v2/phylo_trees/{tree_id}/download", params=params
+    )
     print(resp.text)
 
 
@@ -666,7 +691,10 @@ def list_samples(ctx):
 @samples.command(name="download")
 @click.argument("sample_ids", nargs=-1)
 @click.option(
-    "--repository", required=False, type=str, help="Public repository to format sample names for"
+    "--repository",
+    required=False,
+    type=str,
+    help="Public repository to format sample names for",
 )
 @click.pass_context
 def download_samples(ctx, sample_ids, repository):
@@ -689,7 +717,9 @@ def delete_samples(ctx, sample_ids):
         print(resp.headers)
         print(resp.text)
         return
-    resp = api_client.delete_with_org_and_pathogen(f"/v2/samples/", json={"ids": sample_ids})
+    resp = api_client.delete_with_org_and_pathogen(
+        f"/v2/samples/", json={"ids": sample_ids}
+    )
     print(resp.headers)
     print(resp.text)
 
@@ -735,7 +765,9 @@ def update_samples(
 ):
     api_client = ctx.obj["api_client"]
     if json:
-        resp = api_client.put_with_org_and_pathogen(f"/v2/samples/", json=json.loads(json_data))
+        resp = api_client.put_with_org_and_pathogen(
+            f"/v2/samples/", json=json.loads(json_data)
+        )
         print(resp.text)
     else:
         if collection_date:
@@ -758,7 +790,9 @@ def update_samples(
             sample["public_identifier"] = public_id
         if private_id:
             sample["private_identifier"] = private_id
-        resp = api_client.put_with_org_and_pathogen(f"/v2/samples/", json={"samples": [sample]})
+        resp = api_client.put_with_org_and_pathogen(
+            f"/v2/samples/", json={"samples": [sample]}
+        )
         print(resp.text)
 
 
@@ -879,7 +913,9 @@ def update_phylorun(ctx, run_id, name):
 def validate_sample_ids(ctx, sample_ids, show_headers):
     api_client = ctx.obj["api_client"]
     payload = {"sample_ids": sample_ids}
-    resp = api_client.post_with_org_and_pathogen("/v2/samples/validate_ids/", json=payload)
+    resp = api_client.post_with_org_and_pathogen(
+        "/v2/samples/validate_ids/", json=payload
+    )
     if show_headers:
         print(resp.headers)
     print(resp.text)
