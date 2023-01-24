@@ -96,11 +96,6 @@ def cli(pangolin_fh: io.TextIOBase, pangolin_last_updated: datetime):
             pango_info: Mapping[
                 str, Union[str, float, None, Mapping]
             ] = taxon_to_pango_info[entity_id]
-            pathogen_genome.pangolin_last_updated = pangolin_last_updated
-            pathogen_genome.pangolin_lineage = pango_info["lineage"]  # type: ignore
-            pathogen_genome.pangolin_probability = pango_info["probability"]  # type: ignore
-            pathogen_genome.pangolin_version = pango_info["version"]  # type: ignore
-            pathogen_genome.pangolin_output = pango_info["full_output"]  # type: ignore
             current_chunk_size += 1
 
             # Support populating the sample_lineages table.

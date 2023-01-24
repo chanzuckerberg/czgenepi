@@ -1,4 +1,5 @@
 import { Cell, Getter } from "@tanstack/react-table";
+import { memo } from "react";
 import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 import { StyledCellBasic } from "../../style";
 
@@ -11,10 +12,7 @@ interface DefaultCellProps {
   getValue: Getter<any>;
 }
 
-export const DefaultCell = ({
-  cell,
-  getValue,
-}: DefaultCellProps): JSX.Element => (
+const DefaultCell = ({ cell, getValue }: DefaultCellProps): JSX.Element => (
   <StyledCellBasic
     key={cell.id}
     shouldTextWrap
@@ -23,3 +21,5 @@ export const DefaultCell = ({
     shouldShowTooltipOnHover={false}
   />
 );
+
+export default memo(DefaultCell);

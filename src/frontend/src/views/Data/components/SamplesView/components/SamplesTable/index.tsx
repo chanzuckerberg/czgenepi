@@ -10,22 +10,32 @@ import {
 import {
   CellComponent,
   CellHeader,
-  Chip,
   Icon,
   InputCheckbox,
   Table,
   TableHeader,
 } from "czifui";
 import { map } from "lodash";
-import { memo, useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useVirtual, VirtualItem } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "./components/LineageTooltip";
-import { DefaultCell } from "./components/DefaultCell";
+import DefaultCell from "./components/DefaultCell";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
-import { StyledCellBasic, StyledPrivateId, StyledTableRow } from "./style";
+import {
+  StyledCellBasic,
+  StyledInputCheckbox,
+  StyledPrivateId,
+  StyledTableRow,
+  StyledWrapper,
+} from "./style";
 import { EmptyTable } from "src/views/Data/components/EmptyState";
 import { generateWidthStyles } from "src/common/utils";
+import { getLineageFromSampleLineages } from "src/common/utils/samples";
+import { QualityScoreTag } from "./components/QualityScoreTag";
+import { memo } from "src/common/utils/memo";
+import { VirtualBumper } from "./components/VirtualBumper";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -62,7 +72,7 @@ const columns: ColumnDef<Sample, any>[] = [
           hideSortIcon
           style={generateWidthStyles(column)}
         >
-          <InputCheckbox stage={checkboxStage} onChange={onChange} />
+          <StyledInputCheckbox stage={checkboxStage} onChange={onChange} />
         </CellHeader>
       );
     },
@@ -96,7 +106,7 @@ const columns: ColumnDef<Sample, any>[] = [
         Private ID
       </SortableHeader>
     ),
-    cell: ({ getValue, row, cell }) => {
+    cell: memo(({ getValue, row, cell }) => {
       const { uploadedBy, private: isPrivate } = row?.original;
       const uploader = uploadedBy?.name;
 
@@ -120,7 +130,7 @@ const columns: ColumnDef<Sample, any>[] = [
           }}
         />
       );
-    },
+    }),
     enableSorting: true,
   },
   {
@@ -144,7 +154,7 @@ const columns: ColumnDef<Sample, any>[] = [
   },
   {
     id: "qualityControl",
-    accessorKey: "CZBFailedGenomeRecovery",
+    accessorKey: "qcMetrics",
     header: ({ header, column }) => (
       <SortableHeader
         header={header}
@@ -153,23 +163,27 @@ const columns: ColumnDef<Sample, any>[] = [
           boldText: "Quality Score",
           regularText:
             "Overall QC score from Nextclade which considers genome completion and screens for potential contamination and sequencing or bioinformatics errors.",
+          link: {
+            href: "https://docs.nextstrain.org/projects/nextclade/en/stable/user/algorithm/07-quality-control.html",
+            linkText: "Learn more",
+          },
         }}
       >
         Quality Score
       </SortableHeader>
     ),
-    cell: ({ getValue, cell }) => {
-      const didFailRecovery = getValue();
+    cell: memo(({ getValue, cell }) => {
+      const qcMetric = getValue()?.[0];
       return (
         <CellComponent key={cell.id}>
-          <Chip
-            data-test-id="row-sample-status"
-            size="small"
-            label={didFailRecovery ? "failed" : "complete"}
-            status={didFailRecovery ? "error" : "success"}
-          />
+          <QualityScoreTag qcMetric={qcMetric} />
         </CellComponent>
       );
+    }),
+    sortingFn: (a, b) => {
+      const statusA = a.original.qcMetrics[0].qc_status;
+      const statusB = b.original.qcMetrics[0].qc_status;
+      return statusA > statusB ? -1 : 1;
     },
   },
   {
@@ -187,7 +201,7 @@ const columns: ColumnDef<Sample, any>[] = [
         Upload Date
       </SortableHeader>
     ),
-    cell: ({ getValue, cell }) => (
+    cell: memo(({ getValue, cell }) => (
       <StyledCellBasic
         key={cell.id}
         shouldTextWrap
@@ -195,7 +209,7 @@ const columns: ColumnDef<Sample, any>[] = [
         primaryTextWrapLineCount={2}
         shouldShowTooltipOnHover={false}
       />
-    ),
+    )),
   },
   {
     id: "collectionDate",
@@ -218,7 +232,7 @@ const columns: ColumnDef<Sample, any>[] = [
   },
   {
     id: "lineage",
-    accessorKey: "lineage",
+    accessorKey: "lineages",
     header: ({ header, column }) => (
       <SortableHeader
         header={header}
@@ -227,7 +241,7 @@ const columns: ColumnDef<Sample, any>[] = [
           boldText: "Lineage",
           link: {
             href: "https://cov-lineages.org/pangolin.html",
-            linkText: "Learn more.",
+            linkText: "Learn more",
           },
           regularText:
             "A lineage is a named group of related sequences. A few lineages have been associated with changes in the epidemiological or biological characteristics of the virus. We continually update these lineages based on the evolving Pangolin designations. Lineages determined by Pangolin.",
@@ -236,13 +250,14 @@ const columns: ColumnDef<Sample, any>[] = [
         Lineage
       </SortableHeader>
     ),
-    cell: ({ getValue, cell }) => {
-      const lineage = getValue()?.lineage;
+    cell: memo(({ getValue, cell }) => {
+      const lineages = getValue();
+      const lineage = getLineageFromSampleLineages(lineages);
       const CellContent = (
         <StyledCellBasic
           key={cell.id}
           shouldTextWrap
-          primaryText={lineage ?? "Not Yet Processed"}
+          primaryText={lineage?.lineage ?? "Not Yet Processed"}
           primaryTextWrapLineCount={2}
           shouldShowTooltipOnHover={false}
         />
@@ -253,7 +268,7 @@ const columns: ColumnDef<Sample, any>[] = [
       ) : (
         CellContent
       );
-    },
+    }),
     enableSorting: true,
   },
   {
@@ -272,7 +287,7 @@ const columns: ColumnDef<Sample, any>[] = [
         Collection Location
       </SortableHeader>
     ),
-    cell: ({ getValue, cell }) => (
+    cell: memo(({ getValue, cell }) => (
       <StyledCellBasic
         key={cell.id}
         shouldTextWrap
@@ -282,7 +297,7 @@ const columns: ColumnDef<Sample, any>[] = [
         primaryTextWrapLineCount={2}
         shouldShowTooltipOnHover={false}
       />
-    ),
+    )),
     enableSorting: true,
   },
   {
@@ -320,7 +335,7 @@ const columns: ColumnDef<Sample, any>[] = [
         GISAID
       </SortableHeader>
     ),
-    cell: ({ getValue, cell }) => {
+    cell: memo(({ getValue, cell }) => {
       const { gisaid_id, status } = getValue();
       return (
         <StyledCellBasic
@@ -330,7 +345,7 @@ const columns: ColumnDef<Sample, any>[] = [
           shouldShowTooltipOnHover={false}
         />
       );
-    },
+    }),
     enableSorting: true,
   },
 ];
@@ -356,11 +371,11 @@ const SamplesTable = ({
     setSamples(newSamples);
   }, [data]);
 
-  // TODO-TR (mlila): add virtualization
   const table = useReactTable({
     data: samples,
     defaultColumn: {
-      minSize: 150,
+      minSize: 50,
+      size: 50,
     },
     columns,
     enableMultiRowSelection: true,
@@ -373,6 +388,20 @@ const SamplesTable = ({
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
   });
+
+  // adds virtualization to the table
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  const { rows } = table.getRowModel();
+  const rowVirtualizer = useVirtual({
+    parentRef: tableContainerRef,
+    size: rows.length,
+    // increasing the `overscan` number will enable smoother scrolling, but will also add more nodes
+    // to the DOM, and may impact performance of other things in view, such as filters and modals
+    overscan: 25,
+  });
+  const { virtualItems: virtualRows, totalSize } = rowVirtualizer;
+  // end virtualization code
 
   useEffect(() => {
     // for each selected row in the table, map the react-table internal row to the data (Sample)
@@ -389,27 +418,34 @@ const SamplesTable = ({
   }
 
   return (
-    <Table>
-      <TableHeader>
-        {table
-          .getLeafHeaders()
-          .map((header) =>
-            flexRender(header.column.columnDef.header, header.getContext())
-          )}
-      </TableHeader>
-      <tbody>
-        {table.getRowModel().rows.map((row) => (
-          <StyledTableRow key={row.id}>
-            {row
-              .getVisibleCells()
-              .map((cell) =>
-                flexRender(cell.column.columnDef.cell, cell.getContext())
-              )}
-          </StyledTableRow>
-        ))}
-      </tbody>
-    </Table>
+    <StyledWrapper ref={tableContainerRef}>
+      <Table>
+        <TableHeader>
+          {table
+            .getLeafHeaders()
+            .map((header) =>
+              flexRender(header.column.columnDef.header, header.getContext())
+            )}
+        </TableHeader>
+        <tbody>
+          <VirtualBumper totalSize={totalSize} virtualRows={virtualRows}>
+            {virtualRows.map((vRow: VirtualItem) => {
+              const row = rows[vRow.index];
+              return (
+                <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
+                  {row
+                    .getVisibleCells()
+                    .map((cell) =>
+                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                    )}
+                </StyledTableRow>
+              );
+            })}
+          </VirtualBumper>
+        </tbody>
+      </Table>
+    </StyledWrapper>
   );
 };
 
-export default memo(SamplesTable);
+export default React.memo(SamplesTable);

@@ -6,7 +6,7 @@ import { SearchBar } from "src/components/Table/components/SearchBar";
 import { DataNavigation } from "../DataNavigation";
 import { MaxWidth } from "../SamplesView/style";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
-import { TreesTable } from "./components/TreesTable";
+import TreesTable from "./components/TreesTable";
 import { Flex } from "./style";
 
 const TreesView = (): JSX.Element => {
