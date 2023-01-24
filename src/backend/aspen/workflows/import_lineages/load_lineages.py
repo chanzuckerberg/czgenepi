@@ -1,4 +1,5 @@
-from typing import Any, List
+import json
+from typing import List, Union
 
 import click
 import requests
@@ -22,17 +23,14 @@ from aspen.workflows.shared_utils.database import (
 
 def download_lineages(
     url: str,
-    format: str,
     print_response: bool,
-) -> Any[str, List[str]]:
+) -> Union[str, List[str]]:
     """Download lineages file from URL."""
     response = requests.get(url)
     if response.status_code != 200:
         raise RuntimeError(f"Error downloading lineages file: {response.text}")
     if print_response:
         print(response.text)
-    if format == "json":
-        return response.json()
     return response.text
 
 
@@ -44,16 +42,33 @@ def get_formatted_lineages(
     print_response: bool,
 ) -> List[str]:
     """Download lineages file from URL."""
-    source_data = download_lineages(url, format, print_response)
+    source_data = download_lineages(url, print_response)
     formatted_data = format_lineage_data(source_data, format, list_path, lineage_keys)
     return formatted_data
 
 
 def format_lineage_data(
-    source_data: Any, format: str, list_path: List[str], lineage_keys: List[str]
+    source_data: str,
+    response_format: str,
+    list_path: List[str],
+    lineage_keys: List[str],
 ):
+    """Reformat a lineage endpoint datastructure into a list of lineages.
+    This method is expected to grow to handle multiple response formats
+    over time, but it currently supports json responses.
+
+    Inputs:
+    - source_data: the text of the upstream lineage response
+    - response_format: how we're going to process the response
+    - list_path: if the list of lineages is nested inside another set of objects, this is the path to that list.
+      For example, given the structure:
+        {"name": "pathogen x", "more_info": {"lineages": {"lineage_name": "a.1"}, {"lineage_name", "b.2"}]}}
+      the path to the lineage list is ["more_info"]["lineages"]
+    - lineage_keys: Assuming each lineage is represented as a dict, look for these keys within that dict and add them to our results list. In the case of the example above, lineage_keys is ["lineage_name"]
+    """
     results = set()
-    if format == "json":
+    if response_format == "json":
+        source_data = json.loads(source_data)
         for path in list_path:
             source_data = source_data[path]
         for item in source_data:
@@ -123,7 +138,7 @@ def load_lineages_data(pathogen_slug, lineages: list[str]) -> None:
     "--print-source-file",
     type=bool,
     is_flag=True,
-    help="Print the list of lineages we got from the remote url",
+    help="Print raw text of the upstream linage api endpoint.",
 )
 @click.option(
     "--parse-without-import",

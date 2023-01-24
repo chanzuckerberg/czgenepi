@@ -1,3 +1,5 @@
+import json
+
 import sqlalchemy as sa
 
 from aspen.database.models import Pathogen, PathogenLineage
@@ -20,24 +22,26 @@ def mock_remote_db_uri(mocker, test_postgres_db_uri):
 def test_format_lineage_response(mocker, session, split_client, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
-    test_data = {
-        "$schema": "https://foo.bar",
-        "lineages": [
-            {
-                "alias": "B",
-                "defining_snps": [],
-                "designation_date": "2022-06-10",
-                "name": "A.1.1",
-                "parent": "A.1",
-                "reference_sequences": [],
-                "unaliased_name": "A.1.1",
-            },
-            {"name": "A.1", "parent": "A", "unaliased_name": "A.1"},
-            {"name": "A.2.1", "parent": "A.2", "unaliased_name": "A.2.1"},
-            {"name": "A.2", "parent": "A", "unaliased_name": "A.2"},
-            {"bad": "data", "here": "should", "be": "ignored"},
-        ],
-    }
+    test_data = json.dumps(
+        {
+            "$schema": "https://foo.bar",
+            "lineages": [
+                {
+                    "alias": "B",
+                    "defining_snps": [],
+                    "designation_date": "2022-06-10",
+                    "name": "A.1.1",
+                    "parent": "A.1",
+                    "reference_sequences": [],
+                    "unaliased_name": "A.1.1",
+                },
+                {"name": "A.1", "parent": "A", "unaliased_name": "A.1"},
+                {"name": "A.2.1", "parent": "A.2", "unaliased_name": "A.2.1"},
+                {"name": "A.2", "parent": "A", "unaliased_name": "A.2"},
+                {"bad": "data", "here": "should", "be": "ignored"},
+            ],
+        }
+    )
     res = format_lineage_data(test_data, "json", ["lineages"], ["name", "alias"])
     assert set(res) == {"A.1.1", "A.1", "B", "A.2.1", "A.2"}
 
