@@ -131,7 +131,7 @@ async def kick_off_phylo_run(
         sentry_sdk.capture_message(
             "No Aligned Gisaid Dump found! Cannot create PhyloRun!", "fatal"
         )
-        raise ex.ServerException("No aligned upsteram dump for run")
+        raise ex.ServerException("No aligned upstream dump for run")
 
     # 4C build our PhyloRun object
     start_datetime = datetime.datetime.now()
