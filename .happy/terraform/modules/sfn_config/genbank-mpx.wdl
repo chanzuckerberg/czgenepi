@@ -6,7 +6,6 @@ workflow LoadGenBankMPX {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
-        String genbank_sequences_url = "https://data.nextstrain.org/files/workflows/monkeypox/sequences.fasta.xz"
         String genbank_metadata_url = "https://data.nextstrain.org/files/workflows/monkeypox/metadata.tsv.gz"
         String genbank_alignment_url = "https://data.nextstrain.org/files/workflows/monkeypox/alignment.fasta.xz"
     }
@@ -40,15 +39,6 @@ workflow LoadGenBankMPX {
         processed_gisaid_object_id = TransformGenBankMPX.entity_id,
     }
 
-    call ImportGISAID {
-        input:
-        docker_image_id = docker_image_id,
-        aws_region = aws_region,
-        genepi_config_secret_name = genepi_config_secret_name,
-        remote_dev_prefix = remote_dev_prefix,
-        gisaid_metadata = AlignGISAID.gisaid_metadata,
-    }
-
     call ImportLocations {
         input:
         docker_image_id = docker_image_id,
@@ -67,15 +57,6 @@ workflow LoadGenBankMPX {
         import_locations_complete = ImportLocations.import_locations_complete,
     }
 
-    call ImportISLs {
-        input:
-        docker_image_id = docker_image_id,
-        aws_region = aws_region,
-        genepi_config_secret_name = genepi_config_secret_name,
-        remote_dev_prefix = remote_dev_prefix,
-        gisaid_import_complete = ImportGISAID.gisaid_import_complete,
-    }
-
     output {
         Array[File] snakemake_logs = AlignGISAID.snakemake_logs
         File align_log = AlignGISAID.align_log
@@ -85,13 +66,12 @@ workflow LoadGenBankMPX {
     }
 }
 
-task IngestMPX {
+task IngestGenBankMPX {
     input {
         String docker_image_id
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
-        String genbank_sequences_url
         String genbank_alignment_url
     }
 
@@ -115,7 +95,6 @@ task IngestMPX {
     aspen_creation_rev=$COMMIT_SHA
 
     # S3 target locations
-    sequences_key="raw_nextstrain_mpx_dump/${build_id}/sequences.fasta.zst"
     metadata_key="raw_nextstrain_mpx_dump/${build_id}/metadata.tsv.zst"
     alignment_key="raw_nextstrain_mpx_dump/${build_id}/aligntment.fasta.zst"
 
