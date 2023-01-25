@@ -1,6 +1,5 @@
-import { DefaultMenuSelectOption } from "czifui";
 import { compact, map, uniq } from "lodash";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 import { IdMap } from "src/common/utils/dataTransforms";
@@ -23,54 +22,44 @@ const SamplesView = (): JSX.Element => {
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState<boolean>(true);
   const [activeFilterCount, setActiveFilterCount] = useState<number>(0);
   const [dataFilterFunc, setDataFilterFunc] = useState<any>();
-  const [lineages, setLineages] = useState<DefaultMenuSelectOption[]>([]);
-  const [qcStatuses, setQCStatuses] = useState<DefaultMenuSelectOption[]>([]);
   // filters rows for current search query
   const [searchResults, setSearchResults] = useState<IdMap<Sample>>({});
-  // rows that are actually shown in the table
-  const [displayedRows, setDisplayedRows] = useState<IdMap<Sample>>({});
 
   // load sample data from server
   const { data: samples, isLoading } = useSampleInfo();
 
-  // only display rows that match the current search and the current filters
-  useEffect(() => {
+  // only display rows that match the current search and the current filters.
+  // what's returned here will be the rows that are actually shown in the table.
+  const displayedRows = useMemo(() => {
     const hasSearchFilteredRows = Object.keys(searchResults).length > 0;
     if (!hasSearchFilteredRows) {
-      setDisplayedRows({});
-      return;
+      return {};
     }
 
     if (!dataFilterFunc) {
-      setDisplayedRows(searchResults);
-      return;
+      return searchResults;
     }
 
-    const filteredRows = dataFilterFunc(searchResults);
-    setDisplayedRows(filteredRows);
+    return dataFilterFunc(searchResults);
   }, [searchResults, dataFilterFunc]);
 
   // update list of lineages to use in the filter panel on the left side of the screen
-  useEffect(() => {
-    const newLineages = uniq(
-      compact(map(samples, (d) => d.lineages[0]?.lineage))
-    )
-      .sort()
-      .map((name) => ({ name }));
-
-    setLineages(newLineages);
-  }, [samples]);
+  const lineages = useMemo(
+    () =>
+      uniq(compact(map(samples, (d) => d.lineages[0]?.lineage)))
+        .sort()
+        .map((name) => ({ name })),
+    [samples]
+  );
 
   // update list of qcStatuses to use in the filter panel on the left side of the screen
-  useEffect(() => {
-    const newQCStatuses = uniq(
-      compact(map(samples, (d) => d.qcMetrics[0]?.qc_status))
-    )
-      .sort()
-      .map((name) => ({ name }));
-
-    setQCStatuses(newQCStatuses);
-  }, [samples]);
+  const qcStatuses = useMemo(
+    () =>
+      uniq(compact(map(samples, (d) => d.qcMetrics[0]?.qc_status)))
+        .sort()
+        .map((name) => ({ name })),
+    [samples]
+  );
 
   const toggleFilterPanel = () => {
     setIsFilterPanelOpen(!isFilterPanelOpen);

@@ -34,4 +34,4 @@ s3_destination="s3://${ASPEN_S3_DB_BUCKET}/${lineages_key}"
 $aws s3 cp $filename $s3_destination
 
 # Parse lineages file and load into DB
-python3 ./load_lineages.py --lineages-file $filename
+python3 ./load_pango_lineages.py --lineages-file $filename

@@ -36,6 +36,7 @@ export const SortableHeader = ({
         sdsStyle: "light",
         title: <TooltipText tooltipStrings={tooltipStrings} />,
         enterDelay: 1000,
+        enterNextDelay: 300,
       }}
       {...props}
     >
