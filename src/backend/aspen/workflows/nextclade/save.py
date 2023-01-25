@@ -48,10 +48,15 @@ def cli(
     # Track info about the dataset that was used to produce results being saved
     dataset_info = extract_dataset_info(nextclade_tag_fh)
 
+    # This can be a lot of samples, so batch up commits as we go.
+    COMMIT_CHUNK_SIZE = 1000  # This number has worked fine in manual running.
+    entry_count_so_far = 0  # Final value will be total count.
+
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
         nextclade_csv: csv.DictReader = csv.DictReader(nextclade_fh, delimiter=";")
         for row in nextclade_csv:
+            entry_count_so_far += 1
             # For entire workflow, we use sample id primary keys for names.
             sample_id = int(row["seqName"])
             sample_q = sa.select(Sample).where(Sample.id == sample_id)
@@ -167,8 +172,14 @@ def cli(
                     sample_lineage.reference_dataset_tag = dataset_info["tag"]
                 session.add(sample_lineage)
 
-        # TODO: commit session after 1000 entries to limit transaction size
+            if entry_count_so_far % COMMIT_CHUNK_SIZE == 0:
+                session.commit()
+        # Don't forget to commit the last chunk of entries that remain!
+        session.commit()
+
     print("Finished saving Nextclade results to DB.")
+    print(f"Total count of samples run and saved: {entry_count_so_far}")
+
 
 def is_nextclade_result_valid(nextclade_csv_row: Dict[str, str]) -> bool:
     """Not all sequences succeed in run. Results with errors should be ignored.
