@@ -105,7 +105,10 @@ def cli(
         # Figure out which samples we need to run Nextclade on
         sample_ids: list[int] = []
         if run_type == RunType.SPECIFIED_IDS_ONLY:
-            sample_ids = [int(id_line) for id_line in sample_ids_fh]
+            # In case of "empty" sample IDs file, it still contains a newline
+            # because of how we build file. Easiest way to handle empty case
+            # is to just ignore lines of only "\n" newline.
+            sample_ids = [int(id_line) for id_line in sample_ids_fh if id_line != "\n"]
         elif run_type == RunType.REFRESH_STALE:
             sample_ids = get_sample_ids_to_refresh(
                 session,
