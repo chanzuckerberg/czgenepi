@@ -1,6 +1,6 @@
 import { ChipProps, Tooltip } from "czifui";
 import { useState } from "react";
-import { StyledChip } from "../../style";
+import { StyledChip } from "./style";
 
 interface Props {
   label: string;

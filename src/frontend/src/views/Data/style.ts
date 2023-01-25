@@ -1,6 +1,5 @@
 import styled from "@emotion/styled";
 import {
-  Chip,
   CommonThemeProps,
   fontBodyXs,
   fontBodyXxs,
@@ -16,6 +15,13 @@ export const Container = styled(PageContent)`
   display: flex;
   flex-flow: column wrap;
   align-content: flex-start;
+`;
+
+export const StyledView = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
 `;
 
 export const Subtext = styled.div`
@@ -45,16 +51,6 @@ export const UnderlinedRowContent = styled(RowContent)`
       }}
     }
   }
-`;
-
-export const StyledChip = styled(Chip)`
-  ${(props: CommonThemeProps) => {
-    const spaces = getSpaces(props);
-
-    return `
-      margin-left: ${spaces?.xs}px;
-    `;
-  }}
 `;
 
 export const GISAIDCell = styled.div`
@@ -194,11 +190,4 @@ export const StyledMenuItem = styled.li`
       margin: 0 ${spaces?.m}px;
     `;
   }}
-`;
-
-export const StyledView = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
 `;

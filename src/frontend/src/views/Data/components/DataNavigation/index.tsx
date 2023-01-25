@@ -7,7 +7,7 @@ import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
 import { ROUTES } from "src/common/routes";
-import { DataCategory } from "src/common/types/data";
+import { TabData } from "src/common/types/data";
 import { FilterPanelToggle } from "./FilterPanelToggle";
 import { Navigation, StyledTabs } from "./style";
 
@@ -33,7 +33,7 @@ const DataNavigation = ({
 }: Props): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
   const [currentTab, setCurrentTab] = useState<ROUTES>(ROUTES.DATA_SAMPLES);
-  const [tabData, setTabData] = useState<Partial<DataCategory>[]>([]);
+  const [tabData, setTabData] = useState<TabData[]>([]);
 
   const router = useRouter();
   const { asPath: currentPath } = router;
