@@ -44,6 +44,7 @@ def cli(
     pathogen_slug: str,
 ):
     """Go through results from nextclade run, save to DB for each sample."""
+    print("Beginning to save Nextclade results to DB.")
     # Track info about the dataset that was used to produce results being saved
     dataset_info = extract_dataset_info(nextclade_tag_fh)
 
@@ -167,7 +168,7 @@ def cli(
                 session.add(sample_lineage)
 
         # TODO: commit session after 1000 entries to limit transaction size
-
+    print("Finished saving Nextclade results to DB.")
 
 def is_nextclade_result_valid(nextclade_csv_row: Dict[str, str]) -> bool:
     """Not all sequences succeed in run. Results with errors should be ignored.

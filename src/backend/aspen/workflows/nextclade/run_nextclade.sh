@@ -19,6 +19,8 @@ shopt -s inherit_errexit  # no silent breaking
 
 # This is where we will store Nextclade's dataset for the target pathogen.
 NEXTCLADE_DATASET_DIR=nextclade_dataset_bundle
+# Inside the dataset, Nextclade uses this file to tag the dataset.
+NEXTCLADE_TAG_FILENAME=tag.json
 
 # Certain bits of info need to be passed around during the workflow.
 # A file is as an expedient way to pass them around to various processes.
@@ -32,6 +34,7 @@ SEQUENCES_FILE=sequences.fasta
   --sample-ids-file "${SAMPLE_IDS_FILENAME}" \
   --sequences "${SEQUENCES_FILE}" \
   --nextclade-dataset-dir "${NEXTCLADE_DATASET_DIR}" \
+  --nextclade-tag-filename "${NEXTCLADE_TAG_FILENAME}" \
   --job-info-file "${JOB_INFO_FILE}"
 
 # In some cases, we discover nothing is needed to be done, can exit early.
@@ -40,18 +43,6 @@ if [ "${should_exit_because_no_samples}" = true ] ; then
     echo "No samples to run Nextclade against. Exiting workflow."
     exit 0
 fi
-
-# TODO REMOVE this chunk, download is inside prep_samples.py now
-# VOODOO also go verify that deleting the current dataset and re-running
-# does cause everything to pull correctly and work as desired
-nextclade_dataset_name=$(jq --raw-output ".nextclade_dataset_name" "${JOB_INFO_FILE}")
-echo "Pulling nextclade reference dataset with name ${nextclade_dataset_name}"
-NEXTCLADE_DATASET_DIR=nextclade_dataset_bundle
-nextclade dataset get \
-  --name "${nextclade_dataset_name}" \
-  --output-dir "${NEXTCLADE_DATASET_DIR}"
-# Inside bundle, this file has info about the bundle we want to capture.
-DATASET_TAG_FILE=tag.json
 
 echo "Starting nextclade run"
 NEXTCLADE_OUTPUT_DIR=output
@@ -65,6 +56,6 @@ pathogen_slug=$(jq --raw-output ".pathogen_slug" "${JOB_INFO_FILE}")
 # save results back to db
 /usr/local/bin/python3.10 /usr/src/app/aspen/workflows/nextclade/save.py \
     --nextclade-csv "${NEXTCLADE_OUTPUT_DIR}/nextclade.csv" \
-    --nextclade-dataset-tag "${NEXTCLADE_DATASET_DIR}/${DATASET_TAG_FILE}" \
+    --nextclade-dataset-tag "${NEXTCLADE_DATASET_DIR}/${NEXTCLADE_TAG_FILENAME}" \
     --nextclade-version "$(nextclade --version)" \
     --pathogen-slug "${pathogen_slug}"

@@ -46,6 +46,7 @@ _run_type_click_choices = [item.value for item in RunType]
 @click.option("sample_ids_fh", "--sample-ids-file", type=click.File("r"), required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
 @click.option("nextclade_dataset_dir", "--nextclade-dataset-dir", type=click.Path(dir_okay=True, exists=False), required=True)
+@click.option("nextclade_tag_filename", "--nextclade-tag-filename", type=str, required=True)
 @click.option(
     "job_info_fh", "--job-info-file", type=click.File("w"), required=True
 )
@@ -55,6 +56,7 @@ def cli(
     sample_ids_fh: io.TextIOBase,
     sequences_fh: io.TextIOBase,
     nextclade_dataset_dir: str,
+    nextclade_tag_filename: str,
     job_info_fh: IO[str],
 ):
     """
@@ -70,7 +72,18 @@ def cli(
         so anything that consumes these downstream results will be referring
         to samples by PK, not by private/public identifier.
     - nextclade_dataset_dir: Dir to save the Nextclade dataset we download.
+    - nextclade_tag_filename: Name of file that Nextclade uses to tag datasets.
     - job_info_fh: Write out info about job for later use in workflow
+
+    TODO (Vince): It would be nice if this process batched up pulling the FASTA
+    data over the samples. As it is, if a lot of samples need running, it just
+    grabs all the sequence data in one big go and writes it to a very large
+    FASTA. We haven't seen this approach cause issues so far -- it's how the
+    Pangolin job has been doing it when refreshing stale samples -- but it
+    could cause troubles as our sample count continues to grow and/or we are
+    dealing with much larger genomes. Long-term, it might be better to grab
+    chunks of samples from the DB, like 1k-10k at a time, so we don't have a
+    single, huge query result coming in from the DB.
     """
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
@@ -85,6 +98,7 @@ def cli(
         # nextclade_dataset_info = download_nextclade_dataset(
         #     target_pathogen.nextclade_dataset_name,
         #     nextclade_dataset_dir,
+        #     nextclade_tag_filename,
         #     )
         nextclade_dataset_info = {'name': 'hMPXV', 'accession': 'NC_063383.1', 'tag': '2022-11-03T12:00:00Z'}
 
@@ -167,7 +181,7 @@ def cli(
         print("Finished writing FASTA for samples.")
 
 
-def download_nextclade_dataset(dataset_name: str, output_dir: str) -> Dict[str, str]:
+def download_nextclade_dataset(dataset_name: str, output_dir: str, tag_filename: str) -> Dict[str, str]:
     """Downloads most recent Nextclade dataset, returns important tag info.
 
     We determine the staleness of previous Nextclade calls by comparing those
@@ -189,14 +203,14 @@ def download_nextclade_dataset(dataset_name: str, output_dir: str) -> Dict[str, 
     that seemed reasonable to me. But if downloading here causes problems,
     try switching to just fetching the tag JSON and parsing it.
     """
+    print(f"Downloading nextclade reference dataset with name {dataset_name}.")
     subprocess.run(
         ['nextclade', 'dataset', 'get', '--name', dataset_name, '--output-dir', output_dir],
         timeout=60,  # Just in case the call hangs, blow up everything
         check=True,  # Raise and blow up everything if non-zero exit code
         )
 
-    NEXTCLADE_TAG_FILENAME = "tag.json"
-    with open(Path(output_dir, NEXTCLADE_TAG_FILENAME)) as tag_fh:
+    with open(Path(output_dir, tag_filename)) as tag_fh:
         return extract_dataset_info(tag_fh)
 
 
@@ -269,7 +283,6 @@ def get_all_sample_ids_for_pathogen(
 def save_job_info(
     job_info_fh: IO[str],
     pathogen_slug: Optional[str] = None,
-    nextclade_dataset_name: Optional[str] = None,
     should_exit_because_no_samples: bool = False,
     ):
     """Write a JSON of important info about job for use later in workflow.
@@ -280,9 +293,6 @@ def save_job_info(
     """
     job_info = {
         "pathogen_slug": pathogen_slug,
-        # Not all pathogens have a dataset once we get to generalized case.
-        # When that happens, will be None/null
-        "nextclade_dataset_name": nextclade_dataset_name,
         # Possible for everything to be working as expected, but there's no
         # need to keep running workflow because no samples need to be run.
         "should_exit_because_no_samples": should_exit_because_no_samples,
