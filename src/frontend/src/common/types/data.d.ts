@@ -6,15 +6,8 @@ interface Transform {
   method: (inputs: any[]) => any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
-// TODO-TR (mlila): remove this type
-interface DataCategory {
+interface TabData {
   count?: number;
-  data: SampleMapType | TreeMapType;
-  defaultSortKey: string[];
-  headers: Header[];
-  isDataLoading: boolean;
-  renderer?: CustomRenderer;
   text: VIEWNAME;
   to: ROUTES;
-  transforms?: Transform[];
 }
