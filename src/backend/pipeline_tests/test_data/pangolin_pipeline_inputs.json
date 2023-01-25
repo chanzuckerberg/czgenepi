@@ -1,0 +1,6 @@
+{
+"docker_image_id": "${DOCKER_REPO}genepi-pangolin:latest",
+"aws_region": "us-west-2",
+"genepi_config_secret_name": "genepi-config",
+"samples": ["OCPH20", "OCPH21", "OCPH22", "OCPH23", "OCPH24"]
+}
