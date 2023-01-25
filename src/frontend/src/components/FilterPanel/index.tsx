@@ -1,10 +1,12 @@
 import { filter, forEach, isEqual } from "lodash";
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import {
   AnalyticsSamplesFilter,
   EVENT_TYPES,
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import { LineageFilter } from "./components/LineageFilter";
 import { QCStatusFilter } from "./components/QCStatusFilter";
@@ -131,6 +133,7 @@ const FilterPanel: FC<Props> = ({
   setActiveFilterCount,
   setDataFilterFunc,
 }) => {
+  const pathogen = useSelector(selectCurrentPathogen);
   const [dataFilters, setDataFilters] = useState<FiltersType>(DATA_FILTER_INIT);
   const [activeFilters, setActiveFilters] = useState<FilterType[]>([]);
 
@@ -167,6 +170,7 @@ const FilterPanel: FC<Props> = ({
           collectionDate?.params.start?.toLocaleDateString("en-CA"),
         collection_date_end:
           collectionDate?.params.end?.toLocaleDateString("en-CA"),
+        pathogen: pathogen,
       });
     }
   }, [activeFilters]);
