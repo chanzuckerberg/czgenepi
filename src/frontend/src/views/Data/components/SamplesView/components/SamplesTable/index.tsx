@@ -43,6 +43,8 @@ interface Props {
   setCheckedSamples(samples: Sample[]): void;
 }
 
+// (mlila): The group that represents sample uploads or tree
+// generations made by CZI
 const CZ_BIOHUB_GROUP = "CZI";
 
 // TODO-TR (ehoops): Use config from src/views/Data/table-headers/sampleHeadersConfig.tsx
@@ -109,8 +111,11 @@ const columns: ColumnDef<Sample, any>[] = [
       </SortableHeader>
     ),
     cell: memo(({ getValue, row, cell }) => {
-      const { uploadedBy, private: isPrivate } = row?.original;
-      const uploader = uploadedBy?.name;
+      const { uploadedBy, private: isPrivate, submittingGroup } = row?.original;
+      const uploader =
+        submittingGroup?.name === CZ_BIOHUB_GROUP
+          ? "CZ Biohub"
+          : uploadedBy?.name;
 
       return (
         <StyledPrivateId
