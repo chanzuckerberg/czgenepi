@@ -2,13 +2,12 @@ version 1.1
 
 workflow pangolin {
     input {
-        String docker_image_id = "pangolin:latest"
+        String docker_image_id = "genepi-pangolin:latest"
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
         Array[String] samples
     }
-
     call pangolin_workflow {
         input:
         docker_image_id = docker_image_id,
@@ -29,6 +28,7 @@ task pangolin_workflow {
     }
 
     command <<<
+    export AWS_REGION="~{aws_region}"
     export GENEPI_CONFIG_SECRET_NAME="~{genepi_config_secret_name}"
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"

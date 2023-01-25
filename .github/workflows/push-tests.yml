@@ -224,6 +224,7 @@ jobs:
           make local-init LOCALDEV_PROFILE=gisaid
           python3 -m pip install miniwdl
           make pipeline-test-gisaid
+          make pipeline-test-pangolin
   build-push-images:
     if: github.ref == 'refs/heads/trunk'
     runs-on: ubuntu-20.04
