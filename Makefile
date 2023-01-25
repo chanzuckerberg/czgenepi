@@ -269,6 +269,18 @@ pipeline-test-gisaid:
 	miniwdl run --cfg miniwdl.cfg --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env BOTO_ENDPOINT_URL --input test_inputs.json --verbose -o output.json ../../../.happy/terraform/modules/sfn_config/gisaid.wdl
 	$(docker_compose) run --no-deps --rm backend make pipeline-test-gisaid
 
+.PHONY: pipeline-test-pangolin
+pipeline-test-pangolin:
+	source .env.ecr; \
+	export DOCKER_REPO; \
+	export BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566; \
+	export AWS_ACCESS_KEY_ID=NONCE; \
+	export AWS_SECRET_ACCESS_KEY=NONCE; \
+	export MINIWDL_CFG=miniwdl.cfg; \
+	cd src/backend/pipeline_tests; \
+	cat test_data/pangolin_pipeline_inputs.json | envsubst > test_inputs.json; \
+	miniwdl run --debug --cfg miniwdl.cfg --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env BOTO_ENDPOINT_URL --input test_inputs.json --verbose -o output.json ../../../.happy/terraform/modules/sfn_config/pangolin-ondemand.wdl
+	$(docker_compose) run --no-deps --rm backend make pipeline-test-pangolin
 
 ### WDL ###################################################
 .PHONY: wdl-lint
