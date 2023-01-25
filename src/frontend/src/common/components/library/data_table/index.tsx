@@ -19,7 +19,6 @@ import {
   RowContent,
   TableContent,
   TableRow,
-  TreeRowContent,
 } from "./style";
 import { getBadOrFailedQCSampleIds } from "src/views/Upload/components/Samples/utils";
 
@@ -45,7 +44,7 @@ const LOADING_STATE_ROW_COUNT = 10;
 
 export const UNDEFINED_TEXT = "-";
 
-export function defaultSampleCellRenderer({
+function defaultSampleCellRenderer({
   value,
   header,
 }: CustomTableRenderProps): JSX.Element {
@@ -55,19 +54,6 @@ export function defaultSampleCellRenderer({
     <RowContent header={header}>
       <Cell data-test-id={`row-${header.key}`}>{String(displayData)}</Cell>
     </RowContent>
-  );
-}
-
-export function defaultTreeCellRenderer({
-  value,
-  header,
-}: CustomTableRenderProps): JSX.Element {
-  const displayData = value || UNDEFINED_TEXT;
-
-  return (
-    <TreeRowContent>
-      <Cell data-test-id={`row-${header.key}`}>{String(displayData)}</Cell>
-    </TreeRowContent>
   );
 }
 
