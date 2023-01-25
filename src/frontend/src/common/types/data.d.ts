@@ -1,5 +1,6 @@
 import { ROUTES } from "../routes";
 
+// TODO-TR: move these types to the dorectories where they are used
 interface Transform {
   key: string;
   inputs: string[];
