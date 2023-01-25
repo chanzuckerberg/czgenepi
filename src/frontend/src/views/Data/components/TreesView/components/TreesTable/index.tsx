@@ -20,7 +20,7 @@ import {
 } from "../../../SamplesView/components/SamplesTable/style";
 import TreeTableNameCell from "./components/TreeTableNameCell";
 import { StyledSortableHeader, StyledWrapper } from "./style";
-import { generateWidthStyles } from "src/common/utils";
+import { generateWidthStyles } from "src/common/utils/tableUtils";
 import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 import { memo } from "src/common/utils/memo";
 // TODO-TR: move virtualbumper and update import

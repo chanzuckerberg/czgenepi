@@ -31,7 +31,7 @@ import {
   StyledWrapper,
 } from "./style";
 import { EmptyTable } from "src/views/Data/components/EmptyState";
-import { generateWidthStyles } from "src/common/utils";
+import { generateWidthStyles } from "src/common/utils/tableUtils";
 import { getLineageFromSampleLineages } from "src/common/utils/samples";
 import { QualityScoreTag } from "./components/QualityScoreTag";
 import { memo } from "src/common/utils/memo";
