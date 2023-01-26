@@ -1,6 +1,3 @@
-import datetime
-from aspen.database.models.repository_workflows import AlignedRepositoryData
-
 import click
 import sqlalchemy as sa
 
@@ -12,6 +9,7 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import Pathogen, PublicRepository
+from aspen.database.models.repository_workflows import AlignedRepositoryData
 
 
 @click.command("save")
@@ -44,7 +42,7 @@ def cli(
             public_repository=public_repository_obj,
             s3_bucket=genbank_s3_bucket,
             sequences_s3_key=genbank_sequences_s3_key,
-            metadata_s3_key=genbank_metadata_s3_key
+            metadata_s3_key=genbank_metadata_s3_key,
         )
 
         session.add(aligned_data_entity)
