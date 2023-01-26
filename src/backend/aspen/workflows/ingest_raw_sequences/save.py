@@ -1,4 +1,5 @@
 import datetime
+from aspen.database.models.repository_workflows import AlignedRepositoryData
 
 import click
 import sqlalchemy as sa
@@ -12,44 +13,46 @@ from aspen.database.connection import (
 )
 from aspen.database.models import Pathogen, PublicRepository, RawRepositoryData
 
+def trim_metadata(metadata: str, aligned: str) -> str:
+
 
 @click.command("save")
 @click.option("--start-time", type=int, required=True)
-@click.option("--gisaid-s3-bucket", type=str, required=True)
-@click.option("--gisaid-s3-key", type=str, required=True)
-@click.option("--pathogen", type=str, default="SC2")
-@click.option("--public_repository", type=str, default="GISAID")
+@click.option("--genbank-s3-bucket", type=str, required=True)
+@click.option("--genbank-sequences-s3-key", type=str, required=True)
+@click.option("--genbank-metadata-s3-key", type=str, required=True)
+@click.option("--pathogen-slug", type=str, default="MPX")
+@click.option("--public_repository", type=str, default="GenBank")
 @click.option("--test", type=bool, is_flag=True)
 def cli(
-    start_time: int,
-    gisaid_s3_bucket: str,
-    gisaid_s3_key: str,
-    pathogen: str,
+    genbank_s3_bucket: str,
+    genbank_sequences_s3_key: str,
+    genbank_metadata_s3_key: str,
+    pathogen_slug: str,
     public_repository: str,
     test: bool,
 ):
     if test:
         print("Success!")
         return
-    start_time_datetime = datetime.datetime.fromtimestamp(start_time)
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
-    with session_scope(interface) as session:
 
-        pathogen_obj = session.execute(sa.select(Pathogen).where(Pathogen.slug == pathogen)).scalars().one()  # type: ignore
+    with session_scope(interface) as session:
+        pathogen_obj = Pathogen.get_by_slug(session, pathogen_slug)
         public_repository_obj = session.execute(sa.select(PublicRepository).where(PublicRepository.name == public_repository)).scalars().one()  # type: ignore
-        entity: RawRepositoryData = RawRepositoryData(
+        aligned_data_entity = AlignedRepositoryData(
             pathogen=pathogen_obj,
             public_repository=public_repository_obj,
-            download_date=start_time_datetime,
-            s3_bucket=gisaid_s3_bucket,
-            s3_key=gisaid_s3_key,
+            s3_bucket=genbank_s3_bucket,
+            sequences_s3_key=genbank_sequences_s3_key,
+            metadata_s3_key=genbank_metadata_s3_key
         )
 
-        session.add(entity)
+        session.add(aligned_data_entity)
         session.flush()
 
-        print(entity.entity_id)
+        print(aligned_data_entity.entity_id)
 
 
 if __name__ == "__main__":
