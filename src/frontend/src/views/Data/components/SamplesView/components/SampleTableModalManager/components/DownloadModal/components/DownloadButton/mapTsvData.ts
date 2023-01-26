@@ -5,6 +5,7 @@ import {
   SAMPLE_HEADERS,
   SAMPLE_HEADERS_TSV_ONLY,
 } from "src/views/Data/tableHeaders/sampleHeadersConfig";
+import { Header } from "src/views/Data/tableHeaders/types";
 
 export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   const state = store.getState();

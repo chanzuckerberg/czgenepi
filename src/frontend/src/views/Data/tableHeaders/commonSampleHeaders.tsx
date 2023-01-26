@@ -1,3 +1,5 @@
+import { Header } from "./types";
+
 export const PRIVATE_ID_HEADER: Header = {
   key: "privateId",
   sortKey: ["privateId"],

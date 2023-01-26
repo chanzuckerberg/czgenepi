@@ -1,3 +1,5 @@
+import { Header } from "./tableHeaders/types";
+
 // TODO: (ehoops) - we should refactor this config to follow the same pattern as the samples table
 export const TREE_HEADERS: Header[] = [
   {

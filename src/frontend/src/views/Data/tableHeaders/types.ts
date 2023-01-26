@@ -1,5 +1,6 @@
-interface SubHeader extends Header {
-  sortKey?: string[];
+interface SubHeader {
+  key?: string;
+  text?: string;
 }
 
 export type TooltipTextType = {

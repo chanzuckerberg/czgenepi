@@ -11,6 +11,7 @@ import {
   SEQUENCING_DATE_HEADER,
   UPLOAD_DATE_HEADER,
 } from "./commonSampleHeaders";
+import { Header } from "./types";
 
 const covidPublicIdTooltip = {
   boldText: "Public ID",
