@@ -1,12 +1,9 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { ButtonIcon, Icon, Menu, MenuItem, Tooltip } from "czifui";
 import { MouseEventHandler, useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
 import { useUserInfo } from "src/common/queries/auth";
 import { StyledMenuItemWrapper } from "src/common/styles/menuStyle";
 import { getCurrentGroupFromUserInfo } from "src/common/utils/userInfo";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { DeleteTreeConfirmationModal } from "./components/DeleteTreeConfirmationModal";
 import { EditTreeConfirmationModal } from "./components/EditTreeConfirmationModal";
 import {
@@ -15,24 +12,11 @@ import {
   StyledTrashIconWrapper,
 } from "./style";
 
-// TODO-TR (mlila): remove optional props when refactor complete
 interface Props {
-  item: PhyloRun;
-  onDeleteTreeModalOpen?(t: PhyloRun): void;
-  onEditTreeModalOpen?(t: PhyloRun): void;
+  phyloRun: PhyloRun;
 }
 
-const MoreActionsMenu = ({
-  item,
-  onDeleteTreeModalOpen,
-  onEditTreeModalOpen,
-}: Props): JSX.Element => {
-  const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
-  const usesTableRefactor = isUserFlagOn(
-    tableRefactorFlag,
-    USER_FEATURE_FLAGS.table_refactor
-  );
-
+const MoreActionsMenu = ({ phyloRun }: Props): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
   const [isEditTreeModalOpen, setIsEditTreeModalOpen] =
     useState<boolean>(false);
@@ -41,7 +25,7 @@ const MoreActionsMenu = ({
 
   const { data: userInfo } = useUserInfo();
   const currentGroup = getCurrentGroupFromUserInfo(userInfo);
-  const { group, name, status } = item;
+  const { group, name, status } = phyloRun;
 
   const isAutoBuild = group?.name === "";
   const isTreeInUserOrg = currentGroup?.name === group?.name;
@@ -69,39 +53,27 @@ const MoreActionsMenu = ({
   };
 
   const handleOpenEditModal = () => {
-    if (usesTableRefactor) {
-      setIsEditTreeModalOpen(true);
-    } else {
-      onEditTreeModalOpen && onEditTreeModalOpen(item);
-    }
+    setIsEditTreeModalOpen(true);
   };
 
   const handleOpenDeleteModal = () => {
-    if (usesTableRefactor) {
-      setIsDeleteTreeModalOpen(true);
-    } else {
-      onDeleteTreeModalOpen && onDeleteTreeModalOpen(item);
-    }
+    setIsDeleteTreeModalOpen(true);
   };
 
   const open = Boolean(anchorEl);
 
   return (
     <>
-      {usesTableRefactor && (
-        <>
-          <EditTreeConfirmationModal
-            open={isEditTreeModalOpen}
-            phyloRun={item}
-            onClose={() => setIsEditTreeModalOpen(false)}
-          />
-          <DeleteTreeConfirmationModal
-            open={isDeleteTreeModalOpen}
-            phyloRun={item}
-            onClose={() => setIsDeleteTreeModalOpen(false)}
-          />
-        </>
-      )}
+      <EditTreeConfirmationModal
+        open={isEditTreeModalOpen}
+        phyloRun={phyloRun}
+        onClose={() => setIsEditTreeModalOpen(false)}
+      />
+      <DeleteTreeConfirmationModal
+        open={isDeleteTreeModalOpen}
+        phyloRun={phyloRun}
+        onClose={() => setIsDeleteTreeModalOpen(false)}
+      />
       <Tooltip
         arrow
         sdsStyle={isDisabled ? "light" : "dark"}

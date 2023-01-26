@@ -19,7 +19,6 @@ export enum USER_FEATURE_FLAGS {
   // my_flag_name = "my_flag_name", (<-- format example)
   internal_user = "internal_user",
   multi_pathogen = "multi_pathogen",
-  table_refactor = "table_refactor",
 }
 
 /**

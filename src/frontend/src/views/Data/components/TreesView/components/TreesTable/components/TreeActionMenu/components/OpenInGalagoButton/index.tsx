@@ -9,12 +9,12 @@ import { TREE_STATUS } from "src/common/constants/types";
 import { GalagoConfirmationModal } from "./components/GalagoConfirmationModal";
 
 interface Props {
-  item: PhyloRun;
+  phyloRun: PhyloRun;
 }
 
-const OpenInGalagoButton = ({ item }: Props): JSX.Element => {
+const OpenInGalagoButton = ({ phyloRun }: Props): JSX.Element => {
   const [open, setOpen] = useState(false);
-  const { status, phyloTree } = item;
+  const { status, phyloTree } = phyloRun;
   const treeId = phyloTree?.id;
   const isDisabled = status !== TREE_STATUS.Completed || !treeId;
 

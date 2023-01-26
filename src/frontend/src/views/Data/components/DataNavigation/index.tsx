@@ -7,9 +7,9 @@ import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
 import { ROUTES } from "src/common/routes";
-import { TabData } from "src/common/types/data";
 import { FilterPanelToggle } from "./FilterPanelToggle";
 import { Navigation, StyledTabs } from "./style";
+import { TabData } from "../../types";
 
 // either all the props for sample filter panel are passed
 // or no props are passed

@@ -11,9 +11,6 @@ import { SampleTableModalManager } from "./components/SampleTableModalManager";
 import { Flex, MaxWidth, StyledActionBar } from "./style";
 
 const SamplesView = (): JSX.Element => {
-  // initialize state
-  // TODO-TR (mlilia): types
-
   // TODO-TR (mlila): consider restructuring table, modalmanager, and view to better manage
   // TODO             checked sample state
 

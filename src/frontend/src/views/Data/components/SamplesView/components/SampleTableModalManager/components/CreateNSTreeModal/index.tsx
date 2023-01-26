@@ -113,6 +113,7 @@ export const CreateNSTreeModal = ({
   // If we have the group's location, use this as the default for the filter
   const [selectedLocation, setSelectedLocation] =
     useState<NamedGisaidLocation | null>(
+      // TODO-TR: we need to make this DRY, it shows up multiple times in code base
       groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
     );
 

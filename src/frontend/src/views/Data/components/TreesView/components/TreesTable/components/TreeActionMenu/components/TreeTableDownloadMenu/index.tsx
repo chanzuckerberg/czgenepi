@@ -13,10 +13,17 @@ import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { stringGuard } from "src/common/utils";
 
 interface Props {
-  item: PhyloRun;
+  phyloRun: PhyloRun;
 }
 
-const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
+const TreeTableDownloadMenu = ({ phyloRun }: Props): JSX.Element => {
+  const {
+    accessionsLink,
+    downloadLinkIdStylePrivateIdentifiers,
+    downloadLinkIdStylePublicIdentifiers,
+    status,
+  } = phyloRun;
+
   const pathogen = useSelector(selectCurrentPathogen);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
@@ -34,7 +41,7 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
   const handleCloseWithTreeAnalytics = (
     sampleIdType: AnalyticsTreeDownloadTreeFile["sample_id_type"]
   ) => {
-    const { treeId, phyloRunWorkflowId } = analyticsGetData(item);
+    const { treeId, phyloRunWorkflowId } = analyticsGetData(phyloRun);
     analyticsTrackEvent<AnalyticsTreeDownloadTreeFile>(
       EVENT_TYPES.TREE_DOWNLOAD_TREE_FILE,
       {
@@ -49,7 +56,7 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
 
   // TSV template download: close menu and fire analytics event.
   const handleCloseWithTsvAnalytics = () => {
-    const { treeId, phyloRunWorkflowId } = analyticsGetData(item);
+    const { treeId, phyloRunWorkflowId } = analyticsGetData(phyloRun);
     analyticsTrackEvent<AnalyticsTreeDownloadSelectedSamplesTemplate>(
       EVENT_TYPES.TREE_DOWNLOAD_SELECTED_SAMPLES_TEMPLATE,
       {
@@ -62,13 +69,13 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
   };
 
   const jsonLinkIdStylePrivateIdentifiers = stringGuard(
-    item["downloadLinkIdStylePrivateIdentifiers"]
+    downloadLinkIdStylePrivateIdentifiers
   );
   const jsonLinkIdStylePublicIdentifiers = stringGuard(
-    item["downloadLinkIdStylePublicIdentifiers"]
+    downloadLinkIdStylePublicIdentifiers
   );
-  const tsvDownloadLink = stringGuard(item["accessionsLink"]);
-  const disabled = item?.status !== TREE_STATUS.Completed;
+  const tsvDownloadLink = stringGuard(accessionsLink);
+  const disabled = status !== TREE_STATUS.Completed;
   // TODO (mlila): This is necessary due to an sds bug -- MUI tooltips should not display
   // TODO          without content, but that functionality was accidentally removed here.
   // TODO          https://app.shortcut.com/sci-design-system/story/176947
@@ -160,10 +167,12 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
  * row item, it could be missing/undefined. In either case, downstream event
  * sending handles what to do when one/both undefined.
  */
-function analyticsGetData(item: Props["item"]) {
+function analyticsGetData(phyloRun: PhyloRun) {
+  const { phyloTree, id } = phyloRun;
+
   return {
-    treeId: item.phyloTree?.id,
-    phyloRunWorkflowId: item.id,
+    treeId: phyloTree?.id,
+    phyloRunWorkflowId: id,
   };
 }
 

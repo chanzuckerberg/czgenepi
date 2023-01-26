@@ -52,7 +52,7 @@ const columns: ColumnDef<PhyloRun, any>[] = [
     ),
     cell: memo(({ row }) => (
       <CellComponent>
-        <TreeTableNameCell item={row.original} />
+        <TreeTableNameCell phyloRun={row.original} />
       </CellComponent>
     )),
     enableSorting: true,
@@ -128,7 +128,7 @@ const columns: ColumnDef<PhyloRun, any>[] = [
     ),
     cell: memo(({ row }) => (
       <CellComponent>
-        <TreeActionMenu item={row.original} />
+        <TreeActionMenu phyloRun={row.original} />
       </CellComponent>
     )),
   },
