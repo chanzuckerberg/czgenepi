@@ -76,7 +76,7 @@ aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .meta
 $aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" /ncov/results/
 $aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" /ncov/results/
 
-# Build break if include.txt is empty. If we don't have any selected samples,
+# Tree builds break if include.txt is empty. If we don't have any selected samples,
 # then copy in nextstrain's defaults.
 if [ ! -s /ncov/data/include.txt ]; then
     cp /ncov/defaults/include.txt /ncov/data/include.txt
