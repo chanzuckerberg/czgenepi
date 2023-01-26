@@ -280,7 +280,6 @@ pipeline-test-genbank-mpx:
 	cd src/backend/pipeline_tests; \
 	cat test_data/genbank_mpx_pipeline_inputs.json | envsubst > test_inputs.json; \
 	miniwdl run --cfg miniwdl.cfg --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env BOTO_ENDPOINT_URL --input test_inputs.json --verbose -o output.json ../../../.happy/terraform/modules/sfn_config/genbank-mpx.wdl
-	$(docker_compose) run --no-deps --rm backend make pipeline-test-genbank-mpx
 
 
 ### WDL ###################################################
