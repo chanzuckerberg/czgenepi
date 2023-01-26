@@ -11,7 +11,7 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Pathogen, PublicRepository, RawRepositoryData
+from aspen.database.models import Pathogen, PublicRepository
 
 
 @click.command("save")
