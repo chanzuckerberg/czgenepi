@@ -9,6 +9,8 @@ import {
 } from "czifui";
 
 export const StyledPrivateId = styled(CellBasic)`
+  padding-left: 0;
+
   ${(props) => {
     const fontWeights = getFontWeights(props);
     return `
@@ -50,4 +52,14 @@ export const StyledInputCheckbox = styled(InputCheckbox)`
       padding-bottom: ${spaces?.xxs}px;
     `;
   }}
+`;
+
+// needed to keep search bar sticky
+export const StyledWrapper = styled.div`
+  flex: 1 1 auto;
+  overflow-y: auto;
+
+  & > div {
+    overflow: auto;
+  }
 `;

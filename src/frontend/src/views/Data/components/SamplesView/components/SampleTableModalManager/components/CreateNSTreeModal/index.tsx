@@ -20,7 +20,8 @@ import {
 } from "src/common/queries/locations";
 import { RawTreeCreationWithId, useCreateTree } from "src/common/queries/trees";
 import { addNotification } from "src/common/redux/actions";
-import { useDispatch } from "src/common/redux/hooks";
+import { useDispatch, useSelector } from "src/common/redux/hooks";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
@@ -79,6 +80,7 @@ export const CreateNSTreeModal = ({
   open,
   onClose,
 }: Props): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
   const [treeName, setTreeName] = useState<string>("");
   const [isInputInEditMode, setIsInputInEditMode] = useState<boolean>(false);
   const [shouldReset, setShouldReset] = useState<boolean>(false);
@@ -217,6 +219,7 @@ export const CreateNSTreeModal = ({
           selected_lineages: JSON.stringify(selectedLineages),
           start_date: startDate || null,
           end_date: endDate || null,
+          pathogen: pathogen,
         }
       );
 

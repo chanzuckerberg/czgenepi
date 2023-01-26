@@ -65,4 +65,7 @@ COPY . .
 # Install the aspen package
 RUN poetry install
 
+# TODO - Mismatch between poetry and augur deps forces us to manually install jsonschema v3 here
+RUN pip install jsonschema==3.*
+
 WORKDIR /nextstrain
