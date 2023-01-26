@@ -48,7 +48,6 @@ RUN mkdir /ncov && \
     git reset --hard FETCH_HEAD
 
 # Add support for our custom mpox workflow
-RUN echo 1
 RUN mkdir /mpox && \
     cd /mpox && \
     git init && \
