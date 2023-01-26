@@ -62,6 +62,9 @@ export enum EVENT_TYPES {
 
   // User is in multiple groups and is changing which group they are acting in.
   ACTIVE_GROUP_CHANGE = "ACTIVE_GROUP_CHANGE",
+
+  // User has filtered data on the Samples page
+  SAMPLES_FILTER = "SAMPLES_FILTER",
 }
 
 /**
@@ -131,6 +134,8 @@ type JsonString = string;
 export type AnalyticsTreeViewNextstrain = {
   // Tree that user is being sent to view
   tree_id: number;
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: string;
 };
 
 /** EVENT_TYPES.TREE_CREATION_NEXTSTRAIN */
@@ -149,6 +154,8 @@ export type AnalyticsTreeCreationNextstrain = {
   // group was not successfully fetched before they created a tree. This
   // generally shouldn't happen.
   group_location_id: number | null;
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: string;
   // Lineages selected for tree creation. json stringified list of strings.
   // "[]" indicates "All lineages"
   selected_lineages: JsonString;
@@ -181,6 +188,8 @@ export type AnalyticsTreeDownloadTreeFile = {
   // is downloading it. Mostly here to make TS happy, but if we ever get null
   // in this event for tree_id, it very likely indicates a bug with app.
   tree_id: number | null;
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: string;
   // PK of the workflow that kicked off the creation of this tree.
   // Should never be null, but TS for underlying item does not guarantee it, so
   // the null possibility is mostly to keep TS happy. If null, app has a bug.
@@ -200,6 +209,8 @@ export type AnalyticsTreeDownloadSelectedSamplesTemplate = {
   // Tree user is downloading template in regards to.
   // Can download template before tree done or tree failed. Null indicates such
   tree_id: number | null;
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: string;
   // PK of the workflow that kicked off the creation of this tree.
   // Should never be null, but TS for underlying item does not guarantee it, so
   // the null possibility is mostly to keep TS happy. If null, app has a bug.
@@ -213,6 +224,8 @@ export type AnalyticsSamplesUploadPageChange = {
   prev_route: string;
   // The Samples Upload route user has just gone to.
   new_route: string;
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: string;
   // Random ID generated at start of a given Samples Upload process.
   // This allows us to correlate all the steps in a single Upload process into
   // a unified "flow". If a new Upload is started in same browser session, this
@@ -229,6 +242,8 @@ export type AnalyticsSamplesUploadSuccess = {
   // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
   // For an Upload "flow" that ends in successful upload, this will match up.
   upload_flow_uuid: string;
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: string;
 };
 
 /** EVENT_TYPES.SAMPLES_DOWNLOAD_FILE*/
@@ -249,6 +264,8 @@ export type AnalyticsSamplesDownloadFile = {
   includes_nextclade_data: boolean;
   // User downloaded info on metadata for these samples
   includes_sample_metadata: boolean;
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: string;
 };
 
 /** EVENT_TYPES.ACTIVE_GROUP_CHANGE*/
@@ -260,4 +277,28 @@ export type AnalyticsActiveGroupChange = {
   previous_group_id: number;
   // The group ID that the user is switching to viewing/acting as.
   new_group_id: number;
+};
+
+/** EVENT_TYPES.SAMPLES_FILTER */
+export type AnalyticsSamplesFilter = {
+  // User is filtering by uploadDate
+  filtering_by_upload_date: boolean;
+  // User is filtering by collectionDate
+  filtering_by_collection_date: boolean;
+  // User is filtering by lineage
+  filtering_by_lineage: boolean;
+  // User is filtering by qcStatus
+  filtering_by_qc_status: boolean;
+  // Upload dates that user is filtering on
+  upload_date_start: FormattedDateType | null;
+  upload_date_end: FormattedDateType | null;
+  // Collection dates that user is filtering on
+  collection_date_start: FormattedDateType | null;
+  collection_date_end: FormattedDateType | null;
+  // JSON array of all the lineages user is filtering on
+  lineages: JsonString;
+  // JSON array of all the qc statuses that user is filtering on
+  qc_statuses: JsonString;
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: string;
 };

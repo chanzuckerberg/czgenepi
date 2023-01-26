@@ -27,7 +27,7 @@ const pathogenTrafficFlagConfig: PathogenTrafficFlagConfig = {
   },
   [PATHOGEN_FEATURE_FLAGS.nextstrain_enabled]: {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
-    [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.OFF,
+    [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.ON,
   },
   [PATHOGEN_FEATURE_FLAGS.public_repository]: {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,

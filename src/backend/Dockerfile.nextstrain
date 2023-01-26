@@ -32,12 +32,13 @@ RUN apt-get -qq update && apt-get -qq -y install \
 
 # Install poetry
 RUN apt install -y libdigest-sha-perl
-ENV POETRY_VERSION=1.1.15
+ENV POETRY_VERSION=1.3.2
 RUN python3 -m pip install poetry==$POETRY_VERSION
 
 ENV FLASK_ENV=development
 
 RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas
+RUN pip3 uninstall -y pangoLEARN
 
 RUN mkdir /ncov && \
     cd /ncov && \
@@ -63,5 +64,8 @@ ENV PYTHONPATH=.
 COPY . .
 # Install the aspen package
 RUN poetry install
+
+# TODO - Mismatch between poetry and augur deps forces us to manually install jsonschema v3 here
+RUN pip install jsonschema==3.*
 
 WORKDIR /nextstrain

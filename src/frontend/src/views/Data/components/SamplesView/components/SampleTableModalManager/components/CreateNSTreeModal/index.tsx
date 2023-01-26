@@ -1,5 +1,4 @@
 import RadioGroup from "@mui/material/RadioGroup";
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon, Link } from "czifui";
 import { uniq } from "lodash";
 import Image from "next/image";
@@ -21,19 +20,17 @@ import {
 } from "src/common/queries/locations";
 import { RawTreeCreationWithId, useCreateTree } from "src/common/queries/trees";
 import { addNotification } from "src/common/redux/actions";
-import { useDispatch } from "src/common/redux/hooks";
+import { useDispatch, useSelector } from "src/common/redux/hooks";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { Header } from "../DownloadModal/style";
-import { FailedSampleAlert } from "../FailedSampleAlert";
-import { BadQCSampleAlert } from "./components/BadQCSampleAlert";
+import { BadOrFailedQCSampleAlert } from "./components/BadQCSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
 import { MissingSampleAlert } from "./components/MissingSampleAlert";
 import {
@@ -72,19 +69,18 @@ export type ResetFiltersType = {
 
 interface Props {
   checkedSampleIds: string[];
-  failedSampleIds: string[];
-  badQCSampleIds: string[];
+  badOrFailedQCSampleIds: string[];
   open: boolean;
   onClose: () => void;
 }
 
 export const CreateNSTreeModal = ({
   checkedSampleIds,
-  failedSampleIds,
-  badQCSampleIds,
+  badOrFailedQCSampleIds,
   open,
   onClose,
 }: Props): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
   const [treeName, setTreeName] = useState<string>("");
   const [isInputInEditMode, setIsInputInEditMode] = useState<boolean>(false);
   const [shouldReset, setShouldReset] = useState<boolean>(false);
@@ -92,13 +88,6 @@ export const CreateNSTreeModal = ({
   const [missingInputSamples, setMissingInputSamples] = useState<string[]>([]);
   const [validatedInputSamples, setValidatedInputSamples] = useState<string[]>(
     []
-  );
-  const nextcladeDownloadFlag = useTreatments([
-    USER_FEATURE_FLAGS.nextclade_download,
-  ]);
-  const usesNextcladeDownload = isUserFlagOn(
-    nextcladeDownloadFlag,
-    USER_FEATURE_FLAGS.nextclade_download
   );
 
   const handleChangeTreeType = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -230,6 +219,7 @@ export const CreateNSTreeModal = ({
           selected_lineages: JSON.stringify(selectedLineages),
           start_date: startDate || null,
           end_date: endDate || null,
+          pathogen: pathogen,
         }
       );
 
@@ -265,13 +255,12 @@ export const CreateNSTreeModal = ({
   );
 
   const allPossibleTreeSamples = checkedSampleIds.concat(validatedInputSamples);
-  const allFailedOrMissingSamples = failedSampleIds.concat(missingInputSamples);
   const allValidSamplesForTreeCreation = allPossibleTreeSamples.filter(
-    (id) => !allFailedOrMissingSamples.includes(id)
+    (id) => !missingInputSamples.includes(id)
   );
 
   const allSamplesRequestedTableAndInput = uniq(
-    allPossibleTreeSamples.concat(allFailedOrMissingSamples)
+    allPossibleTreeSamples.concat(missingInputSamples)
   );
 
   const handleSubmit = (evt: SyntheticEvent) => {
@@ -463,10 +452,9 @@ export const CreateNSTreeModal = ({
             shouldReset={shouldReset}
           />
           <MissingSampleAlert missingSamples={missingInputSamples} />
-          <FailedSampleAlert numFailedSamples={failedSampleIds?.length} />
-          {usesNextcladeDownload && (
-            <BadQCSampleAlert numBadQCSamples={badQCSampleIds?.length} />
-          )}
+          <BadOrFailedQCSampleAlert
+            numBadOrFailedQCSamples={badOrFailedQCSampleIds?.length}
+          />
         </StyledDialogContent>
         <StyledFooter>
           <CreateTreeButton

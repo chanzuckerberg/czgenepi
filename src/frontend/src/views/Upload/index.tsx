@@ -18,6 +18,8 @@ import Review from "./components/Review";
 import Samples from "./components/Samples";
 import { StyledPageContent } from "./style";
 import { useNavigationPrompt } from "./useNavigationPrompt";
+import { useSelector } from "react-redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 
 type Routes = ROUTES.UPLOAD_STEP1 | ROUTES.UPLOAD_STEP2 | ROUTES.UPLOAD_STEP3;
 
@@ -30,6 +32,7 @@ const INITIAL_MATCHED_PATH = ""; // Default case, no path matched to component
 
 export default function Upload(): JSX.Element | null {
   const { data, isLoading } = useProtectedRoute();
+  const pathogen = useSelector(selectCurrentPathogen);
   const [samples, setSamples] = useState<ISamples | null>(null);
   const [metadata, setMetadata] = useState<SampleIdToMetadata | null>(null);
   /**
@@ -114,6 +117,7 @@ export default function Upload(): JSX.Element | null {
             prev_route: analyticsLastSeenRoute,
             new_route: matchedPath,
             upload_flow_uuid: analyticsFlowUuid,
+            pathogen: pathogen,
           }
         );
         setAnalyticsLastSeenRoute(matchedPath);

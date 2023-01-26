@@ -1,5 +1,6 @@
 import { ButtonIcon, Icon, Menu, MenuItem, Tooltip } from "czifui";
 import { MouseEventHandler, ReactNode, useState } from "react";
+import { useSelector } from "react-redux";
 import {
   AnalyticsTreeDownloadSelectedSamplesTemplate,
   AnalyticsTreeDownloadTreeFile,
@@ -8,6 +9,7 @@ import {
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import { TREE_STATUS } from "src/common/constants/types";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { stringGuard } from "src/common/utils";
 
 interface Props {
@@ -15,6 +17,7 @@ interface Props {
 }
 
 const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
   const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
   const handleClick: MouseEventHandler = (event) => {
@@ -38,6 +41,7 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
         tree_id: treeId || null,
         phylo_run_workflow_id: phyloRunWorkflowId || null,
         sample_id_type: sampleIdType,
+        pathogen: pathogen,
       }
     );
     baseHandleClose();
@@ -51,6 +55,7 @@ const TreeTableDownloadMenu = ({ item }: Props): JSX.Element => {
       {
         tree_id: treeId || null,
         phylo_run_workflow_id: phyloRunWorkflowId || null,
+        pathogen: pathogen,
       }
     );
     baseHandleClose();

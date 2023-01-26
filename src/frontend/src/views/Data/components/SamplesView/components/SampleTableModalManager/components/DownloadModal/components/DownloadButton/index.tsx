@@ -97,6 +97,7 @@ const DownloadButton = ({
         includes_gisaid_template: isGisaidSelected,
         includes_nextclade_data: isNextcladeDataSelected,
         includes_sample_metadata: isMetadataSelected,
+        pathogen: pathogen,
         sample_count: completedSampleIds.length,
         sample_public_ids: JSON.stringify(completedSampleIds),
       }
