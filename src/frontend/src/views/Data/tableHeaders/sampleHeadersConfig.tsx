@@ -46,7 +46,6 @@ export const SAMPLE_HEADERS: PathogenConfigType<Header[]> = {
 export const SAMPLE_HEADERS_TSV_ONLY = [
   {
     key: "CZBFailedGenomeRecovery",
-    sortKey: ["CZBFailedGenomeRecovery"],
     text: "Genome Recovery",
   },
   QC_METRICS_HEADER,

@@ -15,7 +15,6 @@ export type TooltipTextType = {
 export interface Header {
   text: string;
   key: string;
-  sortKey: string[];
   align?: string;
   subHeaders?: SubHeader[];
   tooltip?: TooltipTextType;

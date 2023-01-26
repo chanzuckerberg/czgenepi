@@ -4,7 +4,6 @@ import { Header } from "./tableHeaders/types";
 export const TREE_HEADERS: Header[] = [
   {
     key: "name",
-    sortKey: ["name"],
     text: "Tree Name",
     tooltip: {
       boldText: "Tree Name",
@@ -14,7 +13,6 @@ export const TREE_HEADERS: Header[] = [
   },
   {
     key: "startedDate",
-    sortKey: ["startedDate"],
     // using startedDate instead of creationDate,
     // startedDate is populated for all phylorun statuses, creationDate only applies to completed trees
     text: "Creation Date",
@@ -25,7 +23,6 @@ export const TREE_HEADERS: Header[] = [
   },
   {
     key: "treeType",
-    sortKey: ["treeType"],
     text: "Tree Type",
     tooltip: {
       boldText: "Tree Type",
@@ -39,7 +36,6 @@ export const TREE_HEADERS: Header[] = [
   },
   {
     key: "actionMenu",
-    sortKey: [],
     text: "",
   },
 ];

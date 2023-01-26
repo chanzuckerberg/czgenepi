@@ -2,7 +2,6 @@ import { Header } from "./types";
 
 export const PRIVATE_ID_HEADER: Header = {
   key: "privateId",
-  sortKey: ["privateId"],
   text: "Private ID",
   tooltip: {
     boldText: "Private ID",
@@ -13,7 +12,6 @@ export const PRIVATE_ID_HEADER: Header = {
 
 export const PUBLIC_ID_HEADER: Header = {
   key: "publicId",
-  sortKey: ["publicId"],
   text: "Public ID",
   tooltip: {
     boldText: "Public ID",
@@ -24,7 +22,6 @@ export const PUBLIC_ID_HEADER: Header = {
 
 export const COLLECTION_DATE_HEADER: Header = {
   key: "collectionDate",
-  sortKey: ["collectionDate"],
   text: "Collection Date",
   tooltip: {
     boldText: "Collection Date",
@@ -35,7 +32,6 @@ export const COLLECTION_DATE_HEADER: Header = {
 
 export const LINEAGE_HEADER: Header = {
   key: "lineages",
-  sortKey: ["lineage", "lineage"],
   subHeaders: [
     {
       key: "lineage",
@@ -92,7 +88,6 @@ export const LINEAGE_HEADER: Header = {
 
 export const QC_METRICS_HEADER: Header = {
   key: "qcMetrics",
-  sortKey: ["lineage", "lineage"],
   subHeaders: [
     {
       key: "qc_caller",
@@ -125,7 +120,6 @@ export const QC_METRICS_HEADER: Header = {
 
 export const UPLOAD_DATE_HEADER: Header = {
   key: "uploadDate",
-  sortKey: ["uploadDate"],
   text: "Upload Date",
   tooltip: {
     boldText: "Upload Date",
@@ -135,7 +129,6 @@ export const UPLOAD_DATE_HEADER: Header = {
 
 export const COLLECTION_LOCATION_HEADER: Header = {
   key: "collectionLocation",
-  sortKey: ["collectionLocation"],
   subHeaders: [
     {
       key: "region",
@@ -164,7 +157,6 @@ export const COLLECTION_LOCATION_HEADER: Header = {
 
 export const SEQUENCING_DATE_HEADER = {
   key: "sequencingDate",
-  sortKey: ["sequencingDate"],
   text: "Sequencing Date",
   tooltip: {
     boldText: "Sequencing Date",
@@ -174,7 +166,6 @@ export const SEQUENCING_DATE_HEADER = {
 
 export const GISAID_HEADER = {
   key: "gisaid",
-  sortKey: ["gisaid", "status"],
   subHeaders: [
     {
       key: "status",
@@ -196,7 +187,6 @@ export const GISAID_HEADER = {
 // Not used yet, but added here to keep the tooltip and header updates in one place
 export const GENBANK_HEADER = {
   key: "genbank",
-  sortKey: ["genbank", "status"],
   subHeaders: [
     {
       key: "status",
