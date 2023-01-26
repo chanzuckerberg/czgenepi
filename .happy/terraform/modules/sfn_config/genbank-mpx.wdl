@@ -101,7 +101,7 @@ task IngestGenBankMPX {
             --genbank-s3-bucket "${aspen_s3_db_bucket}"        \
             --genbank-sequences-s3-key "${alignment_key}"  \
             --genbank-metadata-s3-key "${metadata_key}"   \
-            --pathogen "MPX"                                       \
+            --pathogen-slug "MPX"                                       \
             --public-repository "GenBank" > entity_id 
 
     >>>
