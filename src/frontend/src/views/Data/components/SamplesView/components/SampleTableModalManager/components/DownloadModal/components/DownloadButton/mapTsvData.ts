@@ -34,7 +34,6 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   }: {
     subHeaders: SubHeader[];
     value: any;
-    // value: Sample[keyof Sample]; // the type here must be one of the valid value type for a Sample
   }): string[] => {
     return subHeaders.map((subHeader) => {
       const subHeaderValue = value[subHeader.key];
