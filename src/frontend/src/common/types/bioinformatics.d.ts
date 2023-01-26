@@ -79,14 +79,14 @@ interface PhyloRun {
   type: "Tree";
   id?: number;
   name: string;
-  pathogenGenomeCount: number;
-  creationDate: string;
   startedDate: string;
   workflowId: string;
   status: TREE_STATUS;
   templateArgs: TemplateArgs;
+  accessionsLink?: string;
   downloadLinkIdStylePrivateIdentifiers?: string;
   downloadLinkIdStylePublicIdentifiers?: string;
+  treeType?: TreeType;
   user: {
     name: string;
     id: number;
