@@ -19,6 +19,14 @@ workflow LoadGenBankMPX {
         genbank_metadata_url = genbank_metadata_url,
         genbank_alignment_url = genbank_alignment_url,
     }
+    call ImportGenbankMPX {
+        input:
+        docker_image_id = docker_image_id,
+        aws_region = aws_region,
+        genepi_config_secret_name = genepi_config_secret_name,
+        remote_dev_prefix = remote_dev_prefix,
+        genbank_metadata = IngestGenBankMPX.genbank_metadata,
+    }
 
     call ImportLocations {
         input:
@@ -26,7 +34,25 @@ workflow LoadGenBankMPX {
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
-        entity_id = IngestGenBankMPX.entity_id,
+        genbank_import_complete = ImportGenbankMPX.genbank_import_complete,
+    }
+
+    call ImportLatlongs {
+        input:
+        docker_image_id = docker_image_id,
+        aws_region = aws_region,
+        genepi_config_secret_name = genepi_config_secret_name,
+        remote_dev_prefix = remote_dev_prefix,
+        import_locations_complete = ImportLocations.import_locations_complete,
+    }
+
+    call ImportISLs {
+        input:
+        docker_image_id = docker_image_id,
+        aws_region = aws_region,
+        genepi_config_secret_name = genepi_config_secret_name,
+        remote_dev_prefix = remote_dev_prefix,
+        genbank_import_complete = ImportGenbankMPX.genbank_import_complete,
     }
 
     output {
@@ -65,20 +91,20 @@ task IngestGenBankMPX {
     aspen_creation_rev=$COMMIT_SHA
 
     # S3 target locations
-    metadata_key="raw_nextstrain_mpx_dump/${build_id}/metadata.tsv.zst"
-    alignment_key="raw_nextstrain_mpx_dump/${build_id}/aligntment.fasta.zst"
+    metadata_key="raw_nextstrain_mpx_dump/${build_id}/metadata.tsv.xz"
+    alignment_key="raw_nextstrain_mpx_dump/${build_id}/aligntment.fasta.xz"
 
     # fetch the nextstrain mpx sequences and save them to s3.
     wget "~{genbank_alignment_url}" --continue --tries=2 -O alignment.fasta.xz
-    xzcat alignment.fasta.xz | zstd -o alignment.fasta.zst
-    ${aws} s3 cp alignment.fasta.zst "s3://${aspen_s3_db_bucket}/${alignment_key}"
+    # xzcat alignment.fasta.xz | zstd -o alignment.fasta.zst
+    ${aws} s3 cp alignment.fasta.xz "s3://${aspen_s3_db_bucket}/${alignment_key}"
 
     # fetch the nextstrain mpx metadata
     wget "~{genbank_metadata_url}" --continue --tries=2 -O metadata.tsv.gz
     gunzip metadata.tsv.gz
 
     # get a list of all identifiers from alignment file, remove the reverse complement suffix, strip leading and trailing whitespace, and remove duplicates
-    zstdcat alignment.fasta.zst | grep "^>" | sed 's/>//g' | sed 's/ |(reverse complement)//g' | awk '{$1=$1};1' | uniq > identifiers.txt
+    xzcat alignment.fasta.xz | grep "^>" | sed 's/>//g' | sed 's/ |(reverse complement)//g' | awk '{$1=$1};1' | uniq > identifiers.txt
     
     # filter the metadata file to only include the identifiers from the alignment file
     awk -F"\t" 'FNR==NR{a[$0];next} ($1 in a)' identifiers.txt metadata.tsv > filtered_metadata.tsv
@@ -91,10 +117,13 @@ task IngestGenBankMPX {
     fi
     
     # remove old metadata file and replace with filtered metadata file
-    rm metadata.tsv
-    zstd -o metadata.tsv.zst filtered_metadata.tsv
+
+    cp filtered_metadata.tsv metadata.tsv
+    xz filtered_metadata.tsv
+    mv filtered_metadata.tsv.xz metadata.tsv.xz 
+
     # save filtered metadata file to s3
-    ${aws} s3 cp metadata.tsv.zst "s3://${aspen_s3_db_bucket}/${metadata_key}"
+    ${aws} s3 cp metadata.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
 
     # create the objects
     python3 /usr/src/app/aspen/workflows/ingest_raw_sequences/save.py  \
@@ -108,19 +137,55 @@ task IngestGenBankMPX {
 
     output {
         String entity_id = read_string("entity_id")
+        File genbank_metadata = "metadata.tsv"
     }
 
     runtime {
         docker: docker_image_id
     }
 }
+task ImportGenbankMPX {
+    input {
+        String docker_image_id
+        String aws_region
+        String genepi_config_secret_name
+        String remote_dev_prefix
+        File genbank_metadata
+    }
+
+    command <<<
+    set -Eeuo pipefail
+    aws configure set region ~{aws_region}
+
+    export GENEPI_CONFIG_SECRET_NAME=~{genepi_config_secret_name}
+    if [ "~{remote_dev_prefix}" != "" ]; then
+        export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
+    fi
+
+    export PYTHONUNBUFFERED=true
+    python3 /usr/src/app/aspen/workflows/import_gisaid/save.py       \
+            --metadata-file ~{genbank_metadata} \
+            --pathogen-slug "MPX"  \
+            --public-repository "GenBank" 1>&2
+    echo done > genbank_import_complete
+    >>>
+
+    output {
+        String genbank_import_complete = read_string("genbank_import_complete")
+    }
+
+    runtime {
+        docker: docker_image_id
+    }
+}
+
 task ImportLocations {
     input {
         String docker_image_id
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
-        String entity_id
+        String genbank_import_complete
     }
     command <<<
     set -Eeuo pipefail
@@ -138,6 +203,64 @@ task ImportLocations {
     output {
         String import_locations_complete = read_string("import_locations_complete")
     }
+    runtime {
+        docker: docker_image_id
+    }
+}
+task ImportLatlongs {
+    input {
+        String docker_image_id
+        String aws_region
+        String genepi_config_secret_name
+        String remote_dev_prefix
+        String import_locations_complete
+    }
+
+    command <<<
+    set -Eeuo pipefail
+    aws configure set region ~{aws_region}
+
+    export GENEPI_CONFIG_SECRET_NAME=~{genepi_config_secret_name}
+    if [ "~{remote_dev_prefix}" != "" ]; then
+        export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
+    fi
+
+    export PYTHONUNBUFFERED=true
+    python3 /usr/src/app/aspen/workflows/import_location_latlongs/save.py 1>&2
+    echo done > import_latlongs_complete
+    >>>
+
+    output {
+        String import_latlongs_complete = read_string("import_latlongs_complete")
+    }
+
+    runtime {
+        docker: docker_image_id
+    }
+}
+
+task ImportISLs {
+    input {
+        String docker_image_id
+        String aws_region
+        String genepi_config_secret_name
+        String remote_dev_prefix
+        String gisaid_import_complete
+    }
+
+    command <<<
+    set -Eeuo pipefail
+    aws configure set region ~{aws_region}
+
+    export GENEPI_CONFIG_SECRET_NAME=~{genepi_config_secret_name}
+    if [ "~{remote_dev_prefix}" != "" ]; then
+        export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
+    fi
+
+    export PYTHONUNBUFFERED=true
+    python3 /usr/src/app/aspen/workflows/import_gisaid_isls/save.py --pathogen-slug "MPX" --public-repository "GenBank" 1>&2
+    >>>
+
     runtime {
         docker: docker_image_id
     }

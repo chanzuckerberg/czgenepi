@@ -3,6 +3,7 @@
 # that use it to compile to the intended SQL, which is why tell flake8 to
 # ignore rule E711 at the top of this file
 
+from aspen.database.models.public_repositories import PublicRepository
 import click
 import sqlalchemy as sa
 from sqlalchemy import func
@@ -21,10 +22,13 @@ from aspen.database.models import (
     AccessionType,
     PublicRepositoryMetadata,
     Sample,
+    Pathogen,
+    PublicRepository,
+    PathogenRepoConfig
 )
 
 
-def save():
+def save(pathogen_slug, public_repository):
     config = Config()
     interface: SqlAlchemyInterface = init_db(get_db_uri(config))
 
@@ -33,10 +37,25 @@ def save():
         # PostgreSQL expression will have single-quotes around it, since we are
         # SELECTing on a string literal (this is done in order to give every row in this subquery
         # the value 'GISAID_ISL' in the 'accession_type' column.)
+        pathogen_obj = session.execute(sa.select(Pathogen).where(Pathogen.slug == pathogen_slug)).scalars().one()  # type: ignore
+        pathogen_repo_config_obj = session.execute(
+            sa.select(PathogenRepoConfig)
+            .join(PathogenRepoConfig.pathogen)
+            .join(PathogenRepoConfig.public_repository).where(
+            Pathogen.slug == pathogen_slug, PublicRepository.name == public_repository
+            )).scalars().one()  # type: ignore
+        prefix = f"^{pathogen_repo_config_obj.prefix}/"
+
+        if public_repository == "GISAID":
+            accession_type = AccessionType.GISAID_ISL.value
+
+        if public_repository == "GenBank":
+            accession_type = AccessionType.GENBANK.value
+
         subquery = (
             sa.select(
                 Sample.id,
-                literal_column(f"'{AccessionType.GISAID_ISL.value}'").label(
+                literal_column(f"'{accession_type}'").label(
                     "accession_type"
                 ),
                 PublicRepositoryMetadata.isl,
@@ -44,8 +63,11 @@ def save():
             .select_from(Sample)
             .join(
                 PublicRepositoryMetadata,
-                func.regexp_replace(Sample.public_identifier, "^hcov-19/", "", "i")
+                func.regexp_replace(Sample.public_identifier, prefix, "", "i")
                 == PublicRepositoryMetadata.strain,
+            )
+            .where(
+                Sample.pathogen_id == pathogen_obj.id
             )
             .subquery()
         )
@@ -68,11 +90,13 @@ def save():
 
 @click.command("save")
 @click.option("--test", type=bool, is_flag=True)
-def cli(test: bool):
+@click.option("--pathogen-slug", type=str, default="SC2")
+@click.option("--public-repository", type=str, default="GISAID")
+def cli(test: bool, pathogen_slug: str, public_repository: str):
     if test:
         print("Success!")
         return
-    save()
+    save(pathogen_slug, public_repository)
 
 
 if __name__ == "__main__":

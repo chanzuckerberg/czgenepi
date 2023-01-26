@@ -24,29 +24,48 @@ from aspen.workflows.shared_utils.database import (
 @click.command("save")
 @click.option("metadata_fh", "--metadata-file", type=click.File("r"), required=True)
 @click.option("--test", type=bool, is_flag=True)
+@click.option("--pathogen-slug", type=str, default="SC2")
+@click.option("--public-repository", type=str, default="GISAID")
 def cli(
     metadata_fh: io.TextIOBase,
+    pathogen_slug: str,
+    public_repository,
     test: bool,
 ):
     if test:
         print("Success!")
         return
-    write_table(metadata_fh, "SC2", "GISAID")
+    write_table(metadata_fh, pathogen_slug, public_repository)
 
 
 def write_table(metadata_fh, pathogen_slug: str, public_repository_name: str):
     data = csv.DictReader(metadata_fh, delimiter="\t")
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
-    fields_to_import = {
-        "strain": "strain",
-        "pango_lineage": "lineage",
-        "gisaid_epi_isl": "isl",
-        "region": "region",
-        "country": "country",
-        "division": "division",
-        "location": "location",
-    }
+
+    if public_repository_name == "GISAID":
+        fields_to_import = {
+            "strain": "strain",
+            "pango_lineage": "lineage",
+            "gisaid_epi_isl": "isl",
+            "region": "region",
+            "country": "country",
+            "division": "division",
+            "location": "location",
+            "date": "date",
+        }
+    if public_repository_name == "GenBank":
+        fields_to_import = {
+            "genbank_accession_rev": "strain", # TODO: this is not a strain, it's an accession, strain was wierd
+            "lineage": "lineage",
+            "accession": "isl",
+            "region": "region",
+            "country": "country",
+            "division": "division",
+            "location": "location",
+            "date": "date",
+        }
+
     num_rows = 0
     with session_scope(interface) as session:
         pathogen = session.query(Pathogen).filter(Pathogen.slug == pathogen_slug).one()  # type: ignore
