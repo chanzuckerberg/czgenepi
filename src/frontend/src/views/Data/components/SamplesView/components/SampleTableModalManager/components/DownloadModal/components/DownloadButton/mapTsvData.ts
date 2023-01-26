@@ -4,7 +4,7 @@ import { selectCurrentPathogen } from "src/common/redux/selectors";
 import {
   SAMPLE_HEADERS,
   SAMPLE_HEADERS_TSV_ONLY,
-} from "src/views/Data/table-headers/sampleHeadersConfig";
+} from "src/views/Data/tableHeaders/sampleHeadersConfig";
 
 export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   const state = store.getState();
