@@ -13,8 +13,6 @@ from aspen.database.connection import (
 )
 from aspen.database.models import Pathogen, PublicRepository, RawRepositoryData
 
-def trim_metadata(metadata: str, aligned: str) -> str:
-
 
 @click.command("save")
 @click.option("--start-time", type=int, required=True)
