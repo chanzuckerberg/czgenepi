@@ -14,15 +14,14 @@ const TreeActionMenu = ({ phyloRun }: Props): JSX.Element => (
     aria-label={`${phyloRun?.name} tree actions`}
   >
     <StyledActionWrapper>
-      <OpenInNextstrainButton tree={phyloRun} />
+      <OpenInNextstrainButton phyloRun={phyloRun} />
     </StyledActionWrapper>
     <StyledActionWrapper>
-      <OpenInGalagoButton tree={phyloRun} />
+      <OpenInGalagoButton phyloRun={phyloRun} />
     </StyledActionWrapper>
 
     <StyledActionWrapper>
-      // TODO-TR: tree= ... update prop name
-      <TreeTableDownloadMenu tree={phyloRun} />
+      <TreeTableDownloadMenu phyloRun={phyloRun} />
     </StyledActionWrapper>
     <StyledActionWrapper>
       <MoreActionsMenu phyloRun={phyloRun} />
