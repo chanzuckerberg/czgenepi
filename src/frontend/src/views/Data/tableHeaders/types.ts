@@ -1,6 +1,6 @@
 interface SubHeader {
-  key?: string;
-  text?: string;
+  key: string;
+  text: string;
 }
 
 export type TooltipTextType = {

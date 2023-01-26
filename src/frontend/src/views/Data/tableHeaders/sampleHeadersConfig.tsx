@@ -43,10 +43,4 @@ export const SAMPLE_HEADERS: PathogenConfigType<Header[]> = {
 };
 
 // This is for headers we want in the TSV, but not in the table
-export const SAMPLE_HEADERS_TSV_ONLY = [
-  {
-    key: "CZBFailedGenomeRecovery",
-    text: "Genome Recovery",
-  },
-  QC_METRICS_HEADER,
-];
+export const SAMPLE_HEADERS_TSV_ONLY = [QC_METRICS_HEADER];

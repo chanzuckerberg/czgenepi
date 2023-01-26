@@ -61,12 +61,7 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
         }
       }
 
-      // otherwise, return a single value for this column
-      if (key == "CZBFailedGenomeRecovery") {
-        return value ? "Failed" : "Success";
-      } else {
-        return String(value);
-      }
+      return String(value);
     });
   });
 
