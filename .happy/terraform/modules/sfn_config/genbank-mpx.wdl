@@ -20,8 +20,18 @@ workflow LoadGenBankMPX {
         genbank_alignment_url = genbank_alignment_url,
     }
 
+    call ImportLocations {
+        input:
+        docker_image_id = docker_image_id,
+        aws_region = aws_region,
+        genepi_config_secret_name = genepi_config_secret_name,
+        remote_dev_prefix = remote_dev_prefix,
+        entity_id = IngestGenBankMPX.entity_id,
+    }
+
     output {
         String entity_id = IngestGenBankMPX.entity_id
+        String import_locations_complete = ImportLocations.import_locations_complete
     }
 }
 
@@ -94,12 +104,41 @@ task IngestGenBankMPX {
             --genbank-metadata-s3-key "${metadata_key}"   \
             --pathogen "MPX"                                       \
             --public-repository "GenBank" > entity_id 
+
     >>>
 
     output {
         String entity_id = read_string("entity_id")
     }
 
+    runtime {
+        docker: docker_image_id
+    }
+}
+task ImportLocations {
+    input {
+        String docker_image_id
+        String aws_region
+        String genepi_config_secret_name
+        String remote_dev_prefix
+        String entity_id
+    }
+    command <<<
+    set -Eeuo pipefail
+    aws configure set region ~{aws_region}
+    export GENEPI_CONFIG_SECRET_NAME=~{genepi_config_secret_name}
+    if [ "~{remote_dev_prefix}" != "" ]; then
+        export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
+    fi
+
+    export PYTHONUNBUFFERED=true
+    python3 /usr/src/app/aspen/workflows/import_locations/save.py --pathogen MPX 1>&2
+    echo done > import_locations_complete
+    >>>
+
+    output {
+        String import_locations_complete = read_string("import_locations_complete")
+    }
     runtime {
         docker: docker_image_id
     }
