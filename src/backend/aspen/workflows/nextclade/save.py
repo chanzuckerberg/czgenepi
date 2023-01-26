@@ -1,6 +1,5 @@
 import csv
 import io
-import json
 from typing import Dict, IO, Optional
 
 import click

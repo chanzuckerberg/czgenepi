@@ -3,6 +3,7 @@
 import json
 from typing import Dict, IO
 
+
 def extract_dataset_info(nextclade_tag_fh: IO[str]) -> Dict[str, str]:
     """Extracts important info from `tag.json` file of a nextclade dataset.
 

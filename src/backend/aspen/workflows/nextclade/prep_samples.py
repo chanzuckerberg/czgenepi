@@ -1,15 +1,27 @@
 """
 Writes out a FASTA for the sample PK ids specified by file.
 
-Core approach here is a copy of what's in workflows/pangolin/export.py.
+Intent is to provide a FASTA of all the samples we want to run Nextclade
+against, then we can point Nextclade at that FASTA for all those samples.
+
+This script can be run under a few different `RunType`s. See details below,
+but the two main flavors are 1) taking an explicit list of samples and 2) doing
+a "refresh" on any stale calls where the underlying Nextclade dataset has
+changed since the last time Nextclade was run on the sample.
+
+NOTE: Some of the process here is **very** tied to Nextclade being the only
+QCMetricCaller we currently support. If we eventually start to support
+other types of QC calling tool, make sure to go through this script carefully
+if you're tweaking it to support multiple tools. Especially look closely at
+the function `get_sample_ids_to_refresh` in here.
 """
 import io
 import json
+import subprocess
+import sys
 from enum import Enum
 from pathlib import Path
 from typing import Dict, IO, Iterable, Optional
-import subprocess
-import sys
 
 import click
 import sqlalchemy as sa
@@ -23,7 +35,13 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Pathogen, Sample, SampleQCMetric, UploadedPathogenGenome, QCMetricCaller
+from aspen.database.models import (
+    Pathogen,
+    QCMetricCaller,
+    Sample,
+    SampleQCMetric,
+    UploadedPathogenGenome,
+)
 from aspen.workflows.nextclade.utils import extract_dataset_info
 
 
@@ -36,6 +54,8 @@ class RunType(str, Enum):  # str mix-in gives nice == compare against strings
     # Call against all samples for pathogen, regardless of current state
     # No immediate purpose, here in case we need it in the future.
     FORCE_ALL = "force-all"
+
+
 # `click` barfs on enums, so make a string list for it
 _run_type_click_choices = [item.value for item in RunType]
 
@@ -45,11 +65,16 @@ _run_type_click_choices = [item.value for item in RunType]
 @click.option("pathogen_slug", "--pathogen-slug", type=str, required=True)
 @click.option("sample_ids_fh", "--sample-ids-file", type=click.File("r"), required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
-@click.option("nextclade_dataset_dir", "--nextclade-dataset-dir", type=click.Path(dir_okay=True, exists=False), required=True)
-@click.option("nextclade_tag_filename", "--nextclade-tag-filename", type=str, required=True)
 @click.option(
-    "job_info_fh", "--job-info-file", type=click.File("w"), required=True
+    "nextclade_dataset_dir",
+    "--nextclade-dataset-dir",
+    type=click.Path(dir_okay=True, exists=False),
+    required=True,
 )
+@click.option(
+    "nextclade_tag_filename", "--nextclade-tag-filename", type=str, required=True
+)
+@click.option("job_info_fh", "--job-info-file", type=click.File("w"), required=True)
 def cli(
     run_type: str,
     pathogen_slug: str,
@@ -93,14 +118,16 @@ def cli(
         target_pathogen_query: Pathogen = sa.select(Pathogen).filter(
             Pathogen.slug == pathogen_slug
         )
-        target_pathogen: Pathogen = session.execute(target_pathogen_query).scalars().one()
+        target_pathogen: Pathogen = (
+            session.execute(target_pathogen_query).scalars().one()
+        )
 
         # This downloads the dataset info to disk for later use by Nextclade.
         nextclade_dataset_info = download_nextclade_dataset(
             target_pathogen.nextclade_dataset_name,
             nextclade_dataset_dir,
             nextclade_tag_filename,
-            )
+        )
 
         # Figure out which samples we need to run Nextclade on
         sample_ids: list[int] = []
@@ -180,7 +207,9 @@ def cli(
         print("Finished writing FASTA for samples.")
 
 
-def download_nextclade_dataset(dataset_name: str, output_dir: str, tag_filename: str) -> Dict[str, str]:
+def download_nextclade_dataset(
+    dataset_name: str, output_dir: str, tag_filename: str
+) -> Dict[str, str]:
     """Downloads most recent Nextclade dataset, returns important tag info.
 
     We determine the staleness of previous Nextclade calls by comparing those
@@ -204,10 +233,18 @@ def download_nextclade_dataset(dataset_name: str, output_dir: str, tag_filename:
     """
     print(f"Downloading nextclade reference dataset with name {dataset_name}.")
     subprocess.run(
-        ['nextclade', 'dataset', 'get', '--name', dataset_name, '--output-dir', output_dir],
+        [
+            "nextclade",
+            "dataset",
+            "get",
+            "--name",
+            dataset_name,
+            "--output-dir",
+            output_dir,
+        ],
         timeout=60,  # Just in case the call hangs, blow up everything
         check=True,  # Raise and blow up everything if non-zero exit code
-        )
+    )
 
     with open(Path(output_dir, tag_filename)) as tag_fh:
         return extract_dataset_info(tag_fh)
@@ -236,31 +273,60 @@ def get_sample_ids_to_refresh(
             tag, but it's possible for a bug or future change to accidentally
             break this assumption and leave those cols as NULL. In that case,
             we should consider the qc_metric stale and refresh the sample.
+
+    FIXME (Vince): As currently written (Jan 2023), this function only works
+    so long as Nextclade is our sole QCMetricCaller. Because a Sample can have
+    multiple child `qc_metrics` from different callers, things get messy when
+    a sample has been called some other tool but not in Nextclade. Right now,
+    the query that pulls samples will ignore trying to refresh a sample that
+    has at least one qc_metric but no qc_metrics from Nextclade.
+        However, since we do not currently support any other QCMetricCaller
+    than Nextclade, I'm just going to leave this as is. We'll have to update
+    a bunch of other things about this workflow if we add in a new way to call
+    QC metrics anyway, so dealing with this aspect then seems acceptable.
+        In case that future does come to pass, one approach that /would/ work
+    is to just pull all samples for a given pathogen along with all their
+    qc_metrics in a joinedload (avoid pulling the `raw_qc_output`, it's the
+    biggest part and not useful for determining staleness), then iterate and
+    look for samples that are missing Nextclade in their qc_metrics (or some
+    other QC caller) or that do have a Nextclade call, but the associated tag
+    for the call is stale.
+        Above approach is okay, but it feels like a better SQL approach could
+    be figured out given more time and effort. So I'm going to leave the
+    current SQL approach in place in hopes that it can be built on instead
+    of falling back to above and just iterating everything in Python code.
     """
     # The outer join here lets us also filter on samples with no qc_metric
-    refresh_samples_q = sa.select(Sample).join(Sample.qc_metrics, isouter=True).filter(
-        Sample.pathogen_id == target_pathogen.id,
-        sa.or_(
-            # B/c outer join, if no qc_metric, then no values, so id is NULL
-            SampleQCMetric.id == None,
-            sa.and_(
-                SampleQCMetric.qc_caller == QCMetricCaller.NEXTCLADE,
-                sa.or_(
-                    # The dual comparisons against not being the given value or
-                    # being None/NULL is due to the fact that SQL comparisons
-                    # ignore NULL when comparing values. If we want to check
-                    # against NULL as well, we have to explicitly check both.
-                    SampleQCMetric.reference_dataset_name != latest_dataset_name,
-                    SampleQCMetric.reference_dataset_name == None,
-                    SampleQCMetric.reference_sequence_accession != latest_sequence_accession,
-                    SampleQCMetric.reference_sequence_accession == None,
-                    SampleQCMetric.reference_dataset_tag != latest_dataset_tag,
-                    SampleQCMetric.reference_dataset_tag == None,
-                )
-            )
+    refresh_samples_q = (
+        sa.select(Sample)
+        .join(Sample.qc_metrics, isouter=True)
+        .filter(
+            Sample.pathogen_id == target_pathogen.id,
+            sa.or_(
+                # B/c outer join, if no qc_metric, then no values, so id is NULL
+                SampleQCMetric.id == None,
+                sa.and_(
+                    SampleQCMetric.qc_caller == QCMetricCaller.NEXTCLADE,
+                    sa.or_(
+                        # The dual comparisons against not being the given value or
+                        # being None/NULL is due to the fact that SQL comparisons
+                        # ignore NULL when comparing values. If we want to check
+                        # against NULL as well, we have to explicitly check both.
+                        SampleQCMetric.reference_dataset_name != latest_dataset_name,
+                        SampleQCMetric.reference_dataset_name == None,
+                        SampleQCMetric.reference_sequence_accession
+                        != latest_sequence_accession,
+                        SampleQCMetric.reference_sequence_accession == None,
+                        SampleQCMetric.reference_dataset_tag != latest_dataset_tag,
+                        SampleQCMetric.reference_dataset_tag == None,
+                    ),
+                ),
+            ),
         )
     )
-    samples_to_refresh: list[Sample] = session.execute(refresh_samples_q).unique().scalars()
+    samples_to_refresh: list[Sample] = (
+        session.execute(refresh_samples_q).unique().scalars()
+    )
     return [sample.id for sample in samples_to_refresh]
 
 
@@ -274,8 +340,11 @@ def get_all_sample_ids_for_pathogen(
     when it's a RunType.FORCE_ALL.
     """
     all_samples_for_pathogen_q = sa.select(Sample).filter(
-        Sample.pathogen_id == target_pathogen.id)
-    all_samples_for_pathogen: list[Sample] = session.execute(all_samples_for_pathogen_q).scalars()
+        Sample.pathogen_id == target_pathogen.id
+    )
+    all_samples_for_pathogen: list[Sample] = session.execute(
+        all_samples_for_pathogen_q
+    ).scalars()
     return [sample.id for sample in all_samples_for_pathogen]
 
 
@@ -283,7 +352,7 @@ def save_job_info(
     job_info_fh: IO[str],
     pathogen_slug: Optional[str] = None,
     should_exit_because_no_samples: bool = False,
-    ):
+):
     """Write a JSON of important info about job for use later in workflow.
 
     Job info file can be used to signal we can stop workflow early. In that
