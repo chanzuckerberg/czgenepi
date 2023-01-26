@@ -99,7 +99,7 @@ task IngestGenBankMPX {
     # create the objects
     python3 /usr/src/app/aspen/workflows/ingest_raw_sequences/save.py  \
             --genbank-s3-bucket "${aspen_s3_db_bucket}"        \
-            --genbank-sequences-s3-key "${sequences_key}"  \
+            --genbank-sequences-s3-key "${alignment_key}"  \
             --genbank-metadata-s3-key "${metadata_key}"   \
             --pathogen "MPX"                                       \
             --public-repository "GenBank" > entity_id 
