@@ -11,6 +11,7 @@ import {
   foldInLocationName,
   useNamedLocationsById,
 } from "src/common/queries/locations";
+// TODO-TR: fix import
 import NextstrainConfirmationModal from "src/views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/OpenInNextstrainButton/components/NextstrainConfirmationModal";
 import { NO_CONTENT_FALLBACK } from "src/views/Upload/components/common/constants";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
@@ -26,28 +27,26 @@ import {
   StyledTreeIconWrapper,
 } from "./style";
 
-// TODO-TR: remove `value` and rename `item` after table refactor
 interface Props {
-  value?: string;
-  item: PhyloRun;
+  phyloRun: PhyloRun;
 }
 
-const getDateRangeString = (item: PhyloRun): string => {
+const getDateRangeString = (phyloRun: PhyloRun): string => {
+  const { templateArgs, startedDate } = phyloRun;
   // NOTE: The start date default is covid-specific. We will need to update for
   // other pathogens
   // Unless otherwise specified, we use all Covid samples. The first covid sample
   // that we have is from 2019-12-23.
-  const startDate = item.templateArgs?.filterStartDate || "2019-12-23";
+  const startDate = templateArgs?.filterStartDate || "2019-12-23";
   // If no end date is specified, the last day is the day the tree was created
-  const endDate =
-    item.templateArgs?.filterEndDate || item.startedDate.slice(0, 10);
+  const endDate = templateArgs?.filterEndDate || startedDate.slice(0, 10);
 
   return `${startDate} to ${endDate}`;
 };
 
-const TreeTableNameCell = ({ item }: Props): JSX.Element => {
+const TreeTableNameCell = ({ phyloRun }: Props): JSX.Element => {
   const [open, setOpen] = useState(false);
-  const { name, phyloTree, status, user } = item;
+  const { name, phyloTree, status, templateArgs, user } = phyloRun;
   const treeId = phyloTree?.id;
   const userName = user?.name;
   const isDisabled = status !== TREE_STATUS.Completed || !treeId;
@@ -56,7 +55,7 @@ const TreeTableNameCell = ({ item }: Props): JSX.Element => {
   const { data: groupInfo } = useGroupInfo();
 
   const getLocationName = () => {
-    const templateLocationId = item.templateArgs?.locationId;
+    const templateLocationId = templateArgs?.locationId;
     // If there is no locationId in templateArgs, either this is an old
     // tree or it was created with the default (group) location. If the
     // tree was created with the default location, we don't need to wait
@@ -100,10 +99,10 @@ const TreeTableNameCell = ({ item }: Props): JSX.Element => {
       label: "Location",
       value: getLocationName(),
     },
-    { label: "Date Range", value: getDateRangeString(item) },
+    { label: "Date Range", value: getDateRangeString(phyloRun) },
     {
       label: "Lineages",
-      value: item.templateArgs?.filterPangoLineages?.join(", ") || "All",
+      value: templateArgs?.filterPangoLineages?.join(", ") || "All",
     },
   ];
 
