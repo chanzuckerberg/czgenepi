@@ -5,7 +5,7 @@ import {
   SAMPLE_HEADERS,
   SAMPLE_HEADERS_TSV_ONLY,
 } from "src/views/Data/tableHeaders/sampleHeadersConfig";
-import { Header } from "src/views/Data/tableHeaders/types";
+import { Header, SubHeader } from "src/views/Data/tableHeaders/types";
 
 export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   const state = store.getState();
@@ -27,40 +27,40 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   });
 
   const defaultEmptyValue = "";
+
+  const expandSubHeaders = ({
+    subHeaders,
+    value,
+  }: {
+    subHeaders: SubHeader[];
+    value: any;
+  }) => {
+    return subHeaders.map((subHeader) => {
+      const subHeaderValue = value[subHeader.key];
+      return subHeaderValue ? String(subHeaderValue) : defaultEmptyValue;
+    });
+  };
+
   // define table data
   const tsvData = checkedSamples.map((sample) => {
     // for each sample, generate an array of values, one column at a time
     return allHeaders.flatMap((header) => {
-      const { key } = header;
+      const { key, subHeaders } = header;
       const value = sample[key];
 
-      // break this piece of data into multiple columns, if necessary
-      if (header.subHeaders && typeof value === "object") {
-        if (key === "qcMetrics" || key === "lineages") {
-          // qcMetrics and lineages can contain multiple entries, for now
-          // we are just taking the first entry since no entry should have more
-          // than one value at the current moment (Dec. 2022)
-          const firstValue = value && value[0];
-          if (firstValue) {
-            return header.subHeaders.map((subHeader) => {
-              const entry = firstValue[subHeader.key];
-              if (entry) {
-                return String(entry);
-              } else {
-                return defaultEmptyValue;
-              }
-            });
-          } else {
-            // fill row with default values if qcMetrics or lineages is empty
-            return header.subHeaders.map(() => defaultEmptyValue);
-          }
-        } else {
-          return header.subHeaders.map((subHeader) =>
-            String(value[subHeader.key])
-          );
-        }
+      // break this piece of data into multiple columns, if there are subheaders
+      // for the tsv exports
+      if (subHeaders && typeof value === "object") {
+        // qcMetrics and lineage arrays can contain multiple values. for now,
+        // we are just taking the first entry since no column should have more
+        // than one value at the current moment (Dec. 2022)
+        const shouldUseArrayFirstForExport = value instanceof Array;
+        return shouldUseArrayFirstForExport
+          ? expandSubHeaders({ subHeader, value: value[0] })
+          : expandSubHeaders({ subHeader, value });
       }
 
+      // this is just a regular key-value pair. Return a plain string.
       return String(value);
     });
   });

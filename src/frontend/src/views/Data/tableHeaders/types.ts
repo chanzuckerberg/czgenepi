@@ -1,4 +1,4 @@
-interface SubHeader {
+export interface SubHeader {
   key: string;
   text: string;
 }
