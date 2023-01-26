@@ -304,7 +304,7 @@ def get_sample_ids_to_refresh(
             Sample.pathogen_id == target_pathogen.id,
             sa.or_(
                 # B/c outer join, if no qc_metric, then no values, so id is NULL
-                SampleQCMetric.id == None,
+                SampleQCMetric.id.is_(None),
                 sa.and_(
                     SampleQCMetric.qc_caller == QCMetricCaller.NEXTCLADE,
                     sa.or_(
@@ -313,12 +313,12 @@ def get_sample_ids_to_refresh(
                         # ignore NULL when comparing values. If we want to check
                         # against NULL as well, we have to explicitly check both.
                         SampleQCMetric.reference_dataset_name != latest_dataset_name,
-                        SampleQCMetric.reference_dataset_name == None,
+                        SampleQCMetric.reference_dataset_name.is_(None),
                         SampleQCMetric.reference_sequence_accession
                         != latest_sequence_accession,
-                        SampleQCMetric.reference_sequence_accession == None,
+                        SampleQCMetric.reference_sequence_accession.is_(None),
                         SampleQCMetric.reference_dataset_tag != latest_dataset_tag,
-                        SampleQCMetric.reference_dataset_tag == None,
+                        SampleQCMetric.reference_dataset_tag.is_(None),
                     ),
                 ),
             ),
