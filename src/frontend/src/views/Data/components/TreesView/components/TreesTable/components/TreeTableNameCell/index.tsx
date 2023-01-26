@@ -1,4 +1,3 @@
-import { useTreatments } from "@splitsoftware/splitio-react";
 import { Icon, Tooltip, TooltipTable } from "czifui";
 import { SyntheticEvent, useState } from "react";
 import {
@@ -12,8 +11,6 @@ import {
   foldInLocationName,
   useNamedLocationsById,
 } from "src/common/queries/locations";
-import { isUserFlagOn } from "src/components/Split";
-import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import NextstrainConfirmationModal from "src/views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/OpenInNextstrainButton/components/NextstrainConfirmationModal";
 import { NO_CONTENT_FALLBACK } from "src/views/Upload/components/common/constants";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
@@ -57,12 +54,6 @@ const TreeTableNameCell = ({ item }: Props): JSX.Element => {
   const { data: namedLocationsById } = useNamedLocationsById();
 
   const { data: groupInfo } = useGroupInfo();
-
-  const tableRefactorFlag = useTreatments([USER_FEATURE_FLAGS.table_refactor]);
-  const usesTableRefactor = isUserFlagOn(
-    tableRefactorFlag,
-    USER_FEATURE_FLAGS.table_refactor
-  );
 
   const getLocationName = () => {
     const templateLocationId = item.templateArgs?.locationId;
@@ -131,11 +122,7 @@ const TreeTableNameCell = ({ item }: Props): JSX.Element => {
           treeId={treeId}
         />
       )}
-      <StyledRowContent
-        onClick={handleClickOpen}
-        disabled={isDisabled}
-        usesTableRefactor={usesTableRefactor}
-      >
+      <StyledRowContent onClick={handleClickOpen} disabled={isDisabled}>
         <CellWrapper data-test-id="tree-name-cell">
           <StyledTreeIconWrapper>
             <Icon sdsIcon="treeHorizontal" sdsSize="xl" sdsType="static" />

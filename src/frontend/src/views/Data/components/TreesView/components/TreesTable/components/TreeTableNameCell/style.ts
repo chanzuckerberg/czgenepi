@@ -7,7 +7,6 @@ import {
   getSpaces,
   Tooltip,
 } from "czifui";
-import { TreeRowContent } from "src/common/components/library/data_table/style";
 import {
   iconFillGray,
   iconFillGrayHoverPrimary,
@@ -15,12 +14,11 @@ import {
 
 export interface ExtraProps extends CommonThemeProps {
   disabled?: boolean;
-  usesTableRefactor?: boolean;
 }
 
-const doNotForwardProps = ["disabled", "usesTableRefactor"];
+const doNotForwardProps = ["disabled"];
 
-export const StyledRowContent = styled(TreeRowContent, {
+export const StyledRowContent = styled("div", {
   shouldForwardProp: (prop) => !doNotForwardProps.includes(prop as string),
 })`
   ${fontHeaderXs}
@@ -28,18 +26,8 @@ export const StyledRowContent = styled(TreeRowContent, {
   display: flex;
   align-items: center;
   justify-content: left;
-
-  ${(props) => {
-    const { usesTableRefactor } = props;
-    if (usesTableRefactor) {
-      return `
-        width: 100%;
-        margin: 0;
-      `;
-    } else {
-      return `flex: 2 0 40%;`;
-    }
-  }}
+  width: 100%;
+  margin: 0;
 
   ${(props: ExtraProps) => {
     const { disabled } = props;
