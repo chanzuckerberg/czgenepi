@@ -10,6 +10,7 @@ import { ROUTES } from "src/common/routes";
 import { FilterPanelToggle } from "./FilterPanelToggle";
 import { Navigation, StyledTabs } from "./style";
 import { TabData } from "../../types";
+import { VIEWNAME } from "src/common/constants/types";
 
 // either all the props for sample filter panel are passed
 // or no props are passed
@@ -46,12 +47,12 @@ const DataNavigation = ({
     const newTabData = [
       {
         count: samples && Object.keys(samples).length,
-        text: "Samples",
+        text: VIEWNAME.SAMPLES,
         to: ROUTES.DATA_SAMPLES,
       },
       {
         count: phyloRuns && Object.keys(phyloRuns).length,
-        text: "Phylogenetics Trees",
+        text: VIEWNAME.TREES,
         to: ROUTES.PHYLO_TREES,
       },
     ];

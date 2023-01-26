@@ -1,6 +1,7 @@
 import { Header } from "@tanstack/react-table";
 import { CSSProperties, ReactNode } from "react";
-import { TooltipText, TooltipTextType } from "./components/TooltipText";
+import { TooltipTextType } from "../../tableHeaders/types";
+import { TooltipText } from "./components/TooltipText";
 import { StyledCellHeader } from "./style";
 
 interface SortableProps {
