@@ -21,10 +21,11 @@ const TreeActionMenu = ({ phyloRun }: Props): JSX.Element => (
     </StyledActionWrapper>
 
     <StyledActionWrapper>
+      // TODO-TR: tree= ... update prop name
       <TreeTableDownloadMenu tree={phyloRun} />
     </StyledActionWrapper>
     <StyledActionWrapper>
-      <MoreActionsMenu tree={phyloRun} />
+      <MoreActionsMenu phyloRun={phyloRun} />
     </StyledActionWrapper>
   </StyledTreeActionMenu>
 );
