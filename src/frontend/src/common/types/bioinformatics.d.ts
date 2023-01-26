@@ -1,8 +1,5 @@
-interface BioinformaticsType {
-  [index: string]: JSONPrimitive;
-  type: "BioinformaticsType";
-}
-
+// TODO-TR: write mapping functions for the following 3 types to reduce snake case
+// TODO-TR: variable in the front end. They don't belong here
 interface GISAID {
   status: "submitted" | "not_eligible" | "accepted" | "rejected" | "no_info";
   gisaid_id?: string;
@@ -38,7 +35,7 @@ enum TREE_STATUS {
   Started = "STARTED",
 }
 
-interface Sample extends BioinformaticsType {
+interface Sample {
   id: number;
   type: "Sample";
   privateId: string;
@@ -78,7 +75,7 @@ interface TemplateArgs {
  * A run is generated any time we make an attempt to make a tree, but not all runs have trees
  * associated with them (for example, while a run is in progress, or when a run has failed).
  */
-interface PhyloRun extends BioinformaticsType {
+interface PhyloRun {
   type: "Tree";
   id?: number;
   name: string;
@@ -100,17 +97,3 @@ interface PhyloRun extends BioinformaticsType {
   };
   phyloTree?: Tree;
 }
-
-// TODO-TR (mlila): remove these types after removing transforms from Data/index.tsx
-type BioinformaticsData = Sample | PhyloRun;
-type BioinformaticsDataArray = Array<Sample> | Array<PhyloRun>;
-
-interface SampleMap {
-  [key: string]: Sample;
-}
-
-interface PhyloRunMap {
-  [key: string]: PhyloRun;
-}
-
-type BioinformaticsMap = SampleMap | PhyloRunMap;

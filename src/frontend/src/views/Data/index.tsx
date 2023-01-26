@@ -1,12 +1,12 @@
 import { useRouter } from "next/router";
 import { FunctionComponent } from "react";
 import { useProtectedRoute } from "src/common/queries/auth";
-import { TabData } from "src/common/types/data";
 import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
 import { SamplesView } from "./components/SamplesView";
 import { TreesView } from "./components/TreesView";
 import { Container, StyledView } from "./style";
+import { TabData } from "./types";
 
 const Data: FunctionComponent = () => {
   useProtectedRoute();
