@@ -71,7 +71,7 @@ task IngestGenBankMPX {
     # fetch the nextstrain mpx sequences and save them to s3.
     wget "~{genbank_alignment_url}" --continue --tries=2 -O alignment.fasta.xz
     xzcat alignment.fasta.xz | zstd -o alignment.fasta.zst
-    ${aws} s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    ${aws} s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${alignment_key}"
 
     # fetch the nextstrain mpx metadata
     wget "~{genbank_metadata_url}" --continue --tries=2 -O metadata.tsv.gz
