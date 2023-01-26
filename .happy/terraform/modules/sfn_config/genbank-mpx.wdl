@@ -73,7 +73,7 @@ task IngestGenBankMPX {
     xzcat alignment.fasta.xz | zstd -o alignment.fasta.zst
     ${aws} s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
 
-    # fetch the nextstrain mpx metadata and save them to s3.
+    # fetch the nextstrain mpx metadata
     wget "~{genbank_metadata_url}" --continue --tries=2 -O metadata.tsv.gz
     gunzip metadata.tsv.gz
 
@@ -93,9 +93,8 @@ task IngestGenBankMPX {
     # remove old metadata file and replace with filtered metadata file
     rm metadata.tsv
     zstd -o metadata.tsv.zst filtered_metadata.tsv
+    # save filtered metadata file to s3
     ${aws} s3 cp metadata.tsv.zst "s3://${aspen_s3_db_bucket}/${metadata_key}"
-
-    end_time=$(date +%s)
 
     # create the objects
     python3 /usr/src/app/aspen/workflows/ingest_raw_sequences/save.py  \
