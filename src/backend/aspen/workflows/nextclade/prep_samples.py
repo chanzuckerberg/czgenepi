@@ -41,7 +41,7 @@ _run_type_click_choices = [item.value for item in RunType]
 
 
 @click.command("export")
-@click.option("run_type", "--run-type", type=click.Choice(_run_type_click_choices), default=RunType.SPECIFIED_IDS_ONLY)
+@click.option("run_type", "--run-type", type=click.Choice(_run_type_click_choices))
 @click.option("pathogen_slug", "--pathogen-slug", type=str, required=True)
 @click.option("sample_ids_fh", "--sample-ids-file", type=click.File("r"), required=True)
 @click.option("sequences_fh", "--sequences", type=click.File("w"), required=True)
@@ -65,10 +65,12 @@ def cli(
     - run_type: What kind of run this is. Look above at `RunType` for info.
     - pathogen_slug: Pathogen.slug for pathogen we are running Nextclade on
     - sample_ids_fh: A file of sample ID primary keys, one ID per line.
-        Each sample must be for the same pathogen (all SARS-CoV-2, etc)
+        NOTE: This file is ONLY used for a RunType.SPECIFIED_IDS_ONLY.
+        It will be ignored for any other type of run. If it is being used,
+        each sample in it must be the same pathogen (all SARS-CoV-2, etc)
         and match against whatever `pathogen_slug` is.
     - sequences_fh: Output file to write FASTA for above samples.
-        NOTE Resulting FASTA will have its id lines (>) be those primary keys,
+        NOTE Resulting FASTA will have its id lines (>) be sample primary keys,
         so anything that consumes these downstream results will be referring
         to samples by PK, not by private/public identifier.
     - nextclade_dataset_dir: Dir to save the Nextclade dataset we download.
@@ -93,21 +95,19 @@ def cli(
         )
         target_pathogen: Pathogen = session.execute(target_pathogen_query).scalars().one()
 
-        # This downloads the dataset info to disk for later use by nextclade.
-        # VOODOO TODO turn this back on, just want to avoid pointless download
-        # nextclade_dataset_info = download_nextclade_dataset(
-        #     target_pathogen.nextclade_dataset_name,
-        #     nextclade_dataset_dir,
-        #     nextclade_tag_filename,
-        #     )
-        nextclade_dataset_info = {'name': 'hMPXV', 'accession': 'NC_063383.1', 'tag': '2022-11-03T12:00:00Z'}
+        # This downloads the dataset info to disk for later use by Nextclade.
+        nextclade_dataset_info = download_nextclade_dataset(
+            target_pathogen.nextclade_dataset_name,
+            nextclade_dataset_dir,
+            nextclade_tag_filename,
+            )
 
         # Figure out which samples we need to run Nextclade on
         sample_ids: list[int] = []
         if run_type == RunType.SPECIFIED_IDS_ONLY:
             # In case of "empty" sample IDs file, it still contains a newline
-            # because of how we build file. Easiest way to handle empty case
-            # is to just ignore lines of only "\n" newline.
+            # because of how we build file upstream. Easiest way to handle
+            # empty case is to just ignore lines of only "\n" newline.
             sample_ids = [int(id_line) for id_line in sample_ids_fh if id_line != "\n"]
         elif run_type == RunType.REFRESH_STALE:
             sample_ids = get_sample_ids_to_refresh(
@@ -142,11 +142,7 @@ def cli(
         print(len(sample_ids))  # REMOVE
         print(f"{'=' * 30}  END DEBUG PRINTING  {'=' * 30}")  # REMOVE
 
-        save_job_info(
-            job_info_fh,
-            pathogen_slug=target_pathogen.slug,
-            nextclade_dataset_name=target_pathogen.nextclade_dataset_name,
-            )
+        save_job_info(job_info_fh, pathogen_slug=target_pathogen.slug)
 
         print("Fetching and writing FASTA for sample ids:", sample_ids)
         # TODO update to SQLAlchemyV2 syntax

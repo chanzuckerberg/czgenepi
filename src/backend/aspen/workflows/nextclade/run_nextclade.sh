@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Environmental vars required for script to run
-# (Either set by WDL for on-demand_or by orchestrating process for scheduled.)
+# Environmental vars required for script to run:
 # PATHOGEN_SLUG
 #   The Pathogen.slug for whatever pathogen we want to run Nextclade on.
 # RUN_TYPE
@@ -9,9 +8,10 @@
 #   specific samples and for doing a scheduled refresh job. Setting this value
 #   controls which type. See `prep_samples.py` for allowed values.
 # SAMPLE_IDS_FILENAME
-#   Samples to run Nextclade against and save results for.
-#   Plain text file of sample PK ids, one per line.
-#   All samples must be for the same pathogen, same as PATHOGEN_SLUG above
+#   If RUN_TYPE is a run against specified ids, this file has which samples to
+#   run Nextclade on and save results for. If other run type, file is ignored.
+#   If it's being used, it's a plain text file of sample PK ids, one per line.
+#   All samples must be for the same pathogen, same as PATHOGEN_SLUG above.
 
 # TODO: fix pipefail flags to be informative
 set -Eeuxo pipefail
@@ -23,10 +23,11 @@ NEXTCLADE_DATASET_DIR=nextclade_dataset_bundle
 NEXTCLADE_TAG_FILENAME=tag.json
 
 # Certain bits of info need to be passed around during the workflow.
-# A file is as an expedient way to pass them around to various processes.
+# Using JSON file as an easy way to pass them around to various processes.
 JOB_INFO_FILE=job_info.json
 
 # Pull sequences from DB and write them out. Capture other necessary info too.
+# As part of running, will download the reference dataset for the pathogen.
 SEQUENCES_FILE=sequences.fasta
 /usr/local/bin/python3.10 /usr/src/app/aspen/workflows/nextclade/prep_samples.py \
   --run-type "${RUN_TYPE}" \
@@ -37,7 +38,7 @@ SEQUENCES_FILE=sequences.fasta
   --nextclade-tag-filename "${NEXTCLADE_TAG_FILENAME}" \
   --job-info-file "${JOB_INFO_FILE}"
 
-# In some cases, we discover nothing is needed to be done, can exit early.
+# In some cases, we discover nothing needs to be done, can exit early.
 should_exit_because_no_samples=$(jq --raw-output ".should_exit_because_no_samples" "${JOB_INFO_FILE}")
 if [ "${should_exit_because_no_samples}" = true ] ; then
     echo "No samples to run Nextclade against. Exiting workflow."
