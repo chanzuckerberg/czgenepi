@@ -1,7 +1,11 @@
-import { Header } from "./tableHeaders/types";
+import { TableHeader } from "./tableHeaders/types";
+
+type TreeTableHeader = Omit<TableHeader<PhyloRun>, "key"> & {
+  key: keyof PhyloRun | "actionMenu";
+};
 
 // TODO: (ehoops) - we should refactor this config to follow the same pattern as the samples table
-export const TREE_HEADERS: Header[] = [
+export const TREE_HEADERS: TreeTableHeader[] = [
   {
     key: "name",
     text: "Tree Name",

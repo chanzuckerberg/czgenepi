@@ -5,12 +5,12 @@ import {
   SAMPLE_HEADERS,
   SAMPLE_HEADERS_TSV_ONLY,
 } from "src/views/Data/tableHeaders/sampleHeadersConfig";
-import { Header, SubHeader } from "src/views/Data/tableHeaders/types";
+import { TableHeader, SubHeader } from "src/views/Data/tableHeaders/types";
 
 export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   const state = store.getState();
   const pathogen = selectCurrentPathogen(state);
-  const allHeaders: Header[] = [
+  const allHeaders: TableHeader<Sample>[] = [
     ...SAMPLE_HEADERS[pathogen],
     ...SAMPLE_HEADERS_TSV_ONLY,
   ];
@@ -34,7 +34,8 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   }: {
     subHeaders: SubHeader[];
     value: any;
-  }) => {
+    // value: Sample[keyof Sample]; // the type here must be one of the valid value type for a Sample
+  }): string[] => {
     return subHeaders.map((subHeader) => {
       const subHeaderValue = value[subHeader.key];
       return subHeaderValue ? String(subHeaderValue) : defaultEmptyValue;
@@ -56,8 +57,8 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
         // than one value at the current moment (Dec. 2022)
         const shouldUseArrayFirstForExport = value instanceof Array;
         return shouldUseArrayFirstForExport
-          ? expandSubHeaders({ subHeader, value: value[0] })
-          : expandSubHeaders({ subHeader, value });
+          ? expandSubHeaders({ subHeaders, value: value[0] })
+          : expandSubHeaders({ subHeaders, value });
       }
 
       // this is just a regular key-value pair. Return a plain string.

@@ -12,9 +12,9 @@ export type TooltipTextType = {
   };
 };
 
-export interface Header {
+export interface TableHeader<T> {
   text: string;
-  key: string;
+  key: keyof T;
   align?: string;
   subHeaders?: SubHeader[];
   tooltip?: TooltipTextType;
