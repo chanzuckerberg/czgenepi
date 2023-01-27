@@ -1,4 +1,6 @@
-"""Runs a refresh stale job for every pathogen."""
+"""Runs a refresh stale job for every pathogen.
+
+Intent is to be run ~weekly by a scheduled job."""
 import sqlalchemy as sa
 
 from aspen.api.settings import CLISettings

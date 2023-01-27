@@ -29,7 +29,7 @@ task lineage_qc_autorun_workflow {
     set -Euxo pipefail
     # All the `1>&2` below is so miniwdl will log our messages since stdout
     # is effectively ignored in preference of only logging stderr
-    echo "Starting task for processing lineage QC" 1>&2
+    echo "Starting task for kicking off autorun lineage QC jobs" 1>&2
 
     # Setup env vars for configs that expect them to be there.
     export AWS_REGION="~{aws_region}"
@@ -39,13 +39,13 @@ task lineage_qc_autorun_workflow {
     fi
 
     # Ensure we start in an empty directory for entire process.
+    # (For current use case, eh, this is unnecessary, but also doesn't hurt
+    # in case we do something complicated later and could trip over files.)
     WORKING_DIR=nextclade_autorun
     mkdir "${WORKING_DIR}"
     cd "${WORKING_DIR}"
 
-    # TODO Implement an autorun process, this is just temporary setup for the
-    # rest of the boilerplate until we get around to coding this.
-    echo "TODO implement autorun of nextclade" 1>&2
+    python3 /usr/src/app/aspen/workflows/nextclade/launch_refresh_jobs.py 1>&2
     >>>
 
     runtime {
