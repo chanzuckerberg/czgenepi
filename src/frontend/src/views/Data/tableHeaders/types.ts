@@ -17,5 +17,4 @@ export interface TableHeader<T> {
   key: keyof T;
   align?: string;
   subHeaders?: SubHeader[];
-  tooltip?: TooltipTextType;
 }
