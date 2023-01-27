@@ -56,6 +56,7 @@ export default function Upload({
           sample_count: createdIds.length,
           sample_ids: JSON.stringify(createdIds),
           upload_flow_uuid: analyticsFlowUuid,
+          pathogen: pathogen,
         }
       );
 
