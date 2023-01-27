@@ -71,7 +71,7 @@ fi;
 
 # Persist the build config we generated.
 $aws s3 cp /mpox/config/build_czge.yaml "${s3_prefix}/build_czge.yaml"
-$aws s3 cp /mpox/config/include.txt "${s3_prefix}/include.txt"
+$aws s3 cp /mpox/data/include.txt "${s3_prefix}/include.txt"
 
 # run snakemake, if run fails export the logs from snakemake to s3
 (cd /mpox && snakemake --printshellcmds --configfile config/build_czge.yaml --resources=mem_mb=312320) || { $aws s3 cp /mpox/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /mpox/results/mpxv/filter.log "${s3_prefix}/logs/mpox/" --recursive ; }
