@@ -23,10 +23,9 @@ import { StyledSortableHeader, StyledWrapper } from "./style";
 import { generateWidthStyles } from "src/common/utils/tableUtils";
 import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 import { memo } from "src/common/utils/memo";
-// TODO-TR: move virtualbumper and update import
-import { VirtualBumper } from "../../../SamplesView/components/SamplesTable/components/VirtualBumper";
 import { useVirtual, VirtualItem } from "react-virtual";
 import { EmptyTable } from "../../../EmptyState";
+import { VirtualBumper } from "src/components/Table/components/VirtualBumper";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
