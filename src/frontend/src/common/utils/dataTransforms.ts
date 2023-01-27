@@ -1,5 +1,6 @@
 import { generateOrgSpecificUrl, ORG_API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
+import { TreeType } from "../constants/types";
 
 const { API_URL } = ENV;
 
@@ -64,8 +65,9 @@ export const getDownloadLinks = (phyloRun: PhyloRun): PhyloRunLinks => {
 /**
  * Converts a completely uppercase tree type to a capitalcase tree type.
  */
+type PhyloTreeManipulationType = PhyloRun & { tree_type?: TreeType };
 export const getCapitalCaseTreeType = (
-  phyloRun: PhyloRun
+  phyloRun: PhyloTreeManipulationType
 ): string | undefined => {
   const { tree_type: treeType } = phyloRun;
 

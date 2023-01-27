@@ -5,11 +5,12 @@ import {
   getSortedRowModel,
   RowSelectionState,
   SortingState,
+  TableOptions,
   useReactTable,
 } from "@tanstack/react-table";
 import { Table as SDSTable, TableHeader } from "czifui";
 import { map } from "lodash";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useVirtual, VirtualItem } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { StyledTableRow, StyledWrapper } from "./style";
@@ -17,10 +18,10 @@ import { EmptyTable } from "src/views/Data/components/EmptyState";
 import { VirtualBumper } from "./components/VirtualBumper";
 import { rowSelectionColumn } from "./columnDefinitions/RowSelectionColumn";
 
-interface Props extends Table<T> {
-  columns: ColumnDef[];
+interface Props<T> {
+  columns: ColumnDef<T, any>[];
   tableData: IdMap<T> | undefined;
-  initialSortKey?: "string";
+  initialSortKey?: string;
   isLoading?: boolean;
   onSetCheckedRows?(rowData: T[]): void;
 }
@@ -33,26 +34,31 @@ interface Props extends Table<T> {
  * full power and potential of React Table v8!
  * https://tanstack.com/table/v8/docs/api/core/table
  */
-const Table = ({
+const Table = <T extends any>({
   columns,
   tableData,
   initialSortKey,
   isLoading,
   onSetCheckedRows,
   ...props
-}: Props): JSX.Element => {
+}: Props<T> & Partial<TableOptions<any>>): JSX.Element => {
   const { enableMultiRowSelection } = props;
 
-  const [data, setData] = useState<Sample[]>([]);
+  const [data, setData] = useState<T[]>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      id: initialSortKey, // TODO-TR this won't work
-      desc: true,
-    },
-  ]);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
-  // map data tot he correct format to pass to react table
+  // initialize sort state value; only run once
+  useEffect(() => {
+    setSorting([
+      {
+        id: initialSortKey ?? "",
+        desc: true,
+      },
+    ]);
+  }, []);
+
+  // map data to the correct format to pass to react table
   useEffect(() => {
     if (!tableData) return;
 
@@ -142,4 +148,4 @@ const Table = ({
   );
 };
 
-export default React.memo(Table);
+export default Table;

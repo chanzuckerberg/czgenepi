@@ -1,8 +1,6 @@
 import { CellComponent, CellHeader } from "czifui";
 import { ColumnDef } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
-import { map } from "lodash";
-import { useMemo } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
@@ -122,7 +120,7 @@ const columns: ColumnDef<PhyloRun, any>[] = [
   },
 ];
 
-const defaultColumn = {
+const defaultColumn: Partial<ColumnDef<PhyloRun, any>> = {
   cell: ({ getValue }) => (
     <StyledCellBasic
       verticalAlign="center"
@@ -133,16 +131,10 @@ const defaultColumn = {
 };
 
 const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
-  const phyloRuns = useMemo(() => {
-    if (!data) return [];
-
-    return map(data, (v) => v);
-  }, [data]);
-
   return (
     <Table<PhyloRun>
       columns={columns}
-      tableData={phyloRuns}
+      tableData={data}
       isLoading={isLoading}
       initialSortKey="startedDate"
       defaultColumn={defaultColumn}

@@ -1,9 +1,10 @@
+import { ColumnDef } from "@tanstack/react-table";
 import { CellComponent, CellHeader, InputCheckbox } from "czifui";
 import { generateWidthStyles } from "src/common/utils/tableUtils";
 import { StyledInputCheckbox } from "./style";
 
 // Note: this is a React Table column definition, not a component
-export const rowSelectionColumn = {
+export const rowSelectionColumn: ColumnDef<any, any> = {
   id: "select",
   size: 40,
   minSize: 40,
