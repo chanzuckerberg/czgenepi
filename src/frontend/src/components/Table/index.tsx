@@ -146,6 +146,8 @@ const Table = ({
   // end virtualization code
 
   useEffect(() => {
+    if (!onSetCheckedRows) return;
+
     // for each selected row in the table, map the react-table internal row to the data
     // originally passed into the row
     const newCheckedRows = table

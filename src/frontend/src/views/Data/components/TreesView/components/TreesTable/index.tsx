@@ -1,31 +1,19 @@
-import { CellComponent, CellHeader, Table, TableHeader } from "czifui";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
+import { CellComponent, CellHeader } from "czifui";
+import { ColumnDef } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { map } from "lodash";
-import React, { useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { TreeActionMenu } from "./components/TreeActionMenu";
 import { TreeTypeTooltip } from "./components/TreeTypeTooltip";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
-import {
-  StyledCellBasic,
-  StyledTableRow,
-} from "../../../SamplesView/components/SamplesTable/style";
+import { StyledCellBasic } from "../../../SamplesView/components/SamplesTable/style";
 import TreeTableNameCell from "./components/TreeTableNameCell";
-import { StyledSortableHeader, StyledWrapper } from "./style";
+import { StyledSortableHeader } from "./style";
 import { generateWidthStyles } from "src/common/utils/tableUtils";
 import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 import { memo } from "src/common/utils/memo";
-import { useVirtual, VirtualItem } from "react-virtual";
-import { EmptyTable } from "../../../EmptyState";
-import { VirtualBumper } from "src/components/Table/components/VirtualBumper";
+import Table from "src/components/Table";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
@@ -134,88 +122,32 @@ const columns: ColumnDef<PhyloRun, any>[] = [
   },
 ];
 
-const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      id: "startedDate",
-      desc: true,
-    },
-  ]);
+const defaultColumn = {
+  cell: ({ getValue }) => (
+    <StyledCellBasic
+      verticalAlign="center"
+      shouldShowTooltipOnHover={false}
+      primaryText={(getValue() || NO_CONTENT_FALLBACK) as string}
+    />
+  ),
+};
 
+const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
   const phyloRuns = useMemo(() => {
     if (!data) return [];
 
     return map(data, (v) => v);
   }, [data]);
 
-  const table = useReactTable({
-    data: phyloRuns,
-    defaultColumn: {
-      cell: ({ getValue }) => (
-        <StyledCellBasic
-          verticalAlign="center"
-          shouldShowTooltipOnHover={false}
-          primaryText={(getValue() || NO_CONTENT_FALLBACK) as string}
-        />
-      ),
-    },
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    state: {
-      sorting,
-    },
-    onSortingChange: setSorting,
-  });
-
-  // adds virtualization to the table
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-
-  const { rows } = table.getRowModel();
-  const rowVirtualizer = useVirtual({
-    parentRef: tableContainerRef,
-    size: rows.length,
-    // increasing the `overscan` number will enable smoother scrolling, but will also add more nodes
-    // to the DOM, and may impact performance of other things in view, such as filters and modals
-    overscan: 25,
-  });
-  const { virtualItems: virtualRows, totalSize } = rowVirtualizer;
-  // end virtualization code
-
-  if (isLoading) {
-    return <EmptyTable numOfColumns={columns.length} />;
-  }
-
-  // TODO-TR (mlila): pull out common structure from samples table
   return (
-    <StyledWrapper ref={tableContainerRef}>
-      <Table>
-        <TableHeader>
-          {table
-            .getLeafHeaders()
-            .map((header) =>
-              flexRender(header.column.columnDef.header, header.getContext())
-            )}
-        </TableHeader>
-        <tbody>
-          <VirtualBumper totalSize={totalSize} virtualRows={virtualRows}>
-            {virtualRows.map((vRow: VirtualItem) => {
-              const row = rows[vRow.index];
-              return (
-                <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
-                  {row
-                    .getVisibleCells()
-                    .map((cell) =>
-                      flexRender(cell.column.columnDef.cell, cell.getContext())
-                    )}
-                </StyledTableRow>
-              );
-            })}
-          </VirtualBumper>
-        </tbody>
-      </Table>
-    </StyledWrapper>
+    <Table<PhyloRun>
+      columns={columns}
+      tableData={phyloRuns}
+      isLoading={isLoading}
+      initialSortKey="startedDate"
+      defaultColumn={defaultColumn}
+    />
   );
 };
 
-export default React.memo(TreesTable);
+export { TreesTable };

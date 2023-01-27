@@ -38,7 +38,7 @@ const getDateRangeString = (phyloRun: PhyloRun): string => {
   // that we have is from 2019-12-23.
   const startDate = templateArgs?.filterStartDate || "2019-12-23";
   // If no end date is specified, the last day is the day the tree was created
-  const endDate = templateArgs?.filterEndDate || startedDate.slice(0, 10);
+  const endDate = templateArgs?.filterEndDate || startedDate?.slice(0, 10);
 
   return `${startDate} to ${endDate}`;
 };
