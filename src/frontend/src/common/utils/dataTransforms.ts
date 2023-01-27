@@ -67,7 +67,7 @@ export const getDownloadLinks = (phyloRun: PhyloRun): PhyloRunLinks => {
 export const getCapitalCaseTreeType = (
   phyloRun: PhyloRun
 ): string | undefined => {
-  const { treeType } = phyloRun;
+  const { tree_type: treeType } = phyloRun;
 
   if (typeof treeType !== "string" || treeType.toLowerCase() == "unknown") {
     return undefined;
