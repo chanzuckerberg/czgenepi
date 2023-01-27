@@ -162,13 +162,6 @@ def cli(
                 print("Please investigate why no samples were found.")
                 raise RuntimeError("No samples for Nextclade run")
 
-        print(f"{'=' * 30} BEGIN DEBUG PRINTING {'=' * 30}")  # REMOVE
-        print('sample_ids')  # REMOVE
-        print(sample_ids)  # REMOVE
-        print('len(sample_ids)')  # REMOVE
-        print(len(sample_ids))  # REMOVE
-        print(f"{'=' * 30}  END DEBUG PRINTING  {'=' * 30}")  # REMOVE
-
         save_job_info(job_info_fh, pathogen_slug=target_pathogen.slug)
 
         print("Fetching and writing FASTA for sample ids:", sample_ids)

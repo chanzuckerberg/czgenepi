@@ -45,5 +45,5 @@ def launch_refresh_jobs(pathogen_slugs: list[str]):
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     launch_refresh_jobs_for_all_pathogens()

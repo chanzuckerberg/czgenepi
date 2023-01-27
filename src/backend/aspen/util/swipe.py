@@ -97,7 +97,9 @@ class LineageQcJob(SwipeJob):
     def get_sfn_config(self):
         return self.settings.AWS_LINEAGE_QC_SFN_PARAMETERS
 
-    def run(self, group: Optional[Group], pathogen_slug: str, sample_ids: List[int] = []):
+    def run(
+        self, group: Optional[Group], pathogen_slug: str, sample_ids: List[int] = []
+    ):
         extra_params = {
             "pathogen_slug": pathogen_slug,
             # See workflow's `prep_samples.py` for allowed values of run_type
@@ -110,7 +112,9 @@ class LineageQcJob(SwipeJob):
         group_prefix = ""
         if group is not None:
             group_prefix = f"{group.prefix}-"
-        execution_name = f"{group_prefix}{self.job_type}-{pathogen_slug}-lineage-qc-{str(now)}"
+        execution_name = (
+            f"{group_prefix}{self.job_type}-{pathogen_slug}-lineage-qc-{str(now)}"
+        )
         return self._start(execution_name, output_suffix, extra_params)
 
 
