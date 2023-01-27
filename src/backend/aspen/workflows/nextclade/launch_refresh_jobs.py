@@ -14,8 +14,12 @@ from aspen.util.swipe import LineageQcScheduledJob
 
 
 def launch_refresh_jobs_for_all_pathogens():
+    print("Preparing to launch refresh jobs for all pathogens.")
+    print("Getting slugs for all pathogens.")
     all_pathogen_slugs = get_all_pathogen_slugs()
+    print(f"Found following pathogen slugs: {all_pathogen_slugs}")
     launch_refresh_jobs(all_pathogen_slugs)
+    print("Done.")
 
 
 def get_all_pathogen_slugs() -> list[str]:
@@ -31,6 +35,7 @@ def launch_refresh_jobs(pathogen_slugs: list[str]):
     """Kicks off a refresh stale job for each pathogen provided."""
     settings = CLISettings()
     for pathogen_slug in pathogen_slugs:
+        print(f"Launching refresh job for pathogen {pathogen_slug}")
         job = LineageQcScheduledJob(settings)
         job.run(
             group=None,
