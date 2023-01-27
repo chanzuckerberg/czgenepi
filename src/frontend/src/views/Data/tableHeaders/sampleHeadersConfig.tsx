@@ -11,9 +11,11 @@ import {
   SEQUENCING_DATE_HEADER,
   UPLOAD_DATE_HEADER,
 } from "./commonSampleHeaders";
-import { TableHeader } from "./types";
+import { MetadataExportHeader } from "./types";
 
-export const SAMPLE_HEADERS: PathogenConfigType<TableHeader<Sample>[]> = {
+export const SAMPLE_HEADERS: PathogenConfigType<
+  MetadataExportHeader<Sample>[]
+> = {
   [Pathogen.COVID]: [
     PRIVATE_ID_HEADER,
     PUBLIC_ID_HEADER,

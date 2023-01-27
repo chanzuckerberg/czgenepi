@@ -4,12 +4,15 @@ import {
   SAMPLE_HEADERS,
   SAMPLE_HEADERS_TSV_ONLY,
 } from "src/views/Data/tableHeaders/sampleHeadersConfig";
-import { TableHeader, SubHeader } from "src/views/Data/tableHeaders/types";
+import {
+  MetadataExportHeader,
+  SubHeader,
+} from "src/views/Data/tableHeaders/types";
 
 export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
   const state = store.getState();
   const pathogen = selectCurrentPathogen(state);
-  const allHeaders: TableHeader<Sample>[] = [
+  const allHeaders: MetadataExportHeader<Sample>[] = [
     ...SAMPLE_HEADERS[pathogen],
     ...SAMPLE_HEADERS_TSV_ONLY,
   ];

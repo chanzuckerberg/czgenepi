@@ -1,21 +1,21 @@
-import { TableHeader } from "./types";
+import { MetadataExportHeader } from "./types";
 
-export const PRIVATE_ID_HEADER: TableHeader<Sample> = {
+export const PRIVATE_ID_HEADER: MetadataExportHeader<Sample> = {
   key: "privateId",
   text: "Private ID",
 };
 
-export const PUBLIC_ID_HEADER: TableHeader<Sample> = {
+export const PUBLIC_ID_HEADER: MetadataExportHeader<Sample> = {
   key: "publicId",
   text: "Public ID",
 };
 
-export const COLLECTION_DATE_HEADER: TableHeader<Sample> = {
+export const COLLECTION_DATE_HEADER: MetadataExportHeader<Sample> = {
   key: "collectionDate",
   text: "Collection Date",
 };
 
-export const LINEAGE_HEADER: TableHeader<Sample> = {
+export const LINEAGE_HEADER: MetadataExportHeader<Sample> = {
   key: "lineages",
   subHeaders: [
     {
@@ -62,7 +62,7 @@ export const LINEAGE_HEADER: TableHeader<Sample> = {
   text: "Lineage",
 };
 
-export const QC_METRICS_HEADER: TableHeader<Sample> = {
+export const QC_METRICS_HEADER: MetadataExportHeader<Sample> = {
   key: "qcMetrics",
   subHeaders: [
     {
@@ -85,12 +85,12 @@ export const QC_METRICS_HEADER: TableHeader<Sample> = {
   text: "QC Metrics",
 };
 
-export const UPLOAD_DATE_HEADER: TableHeader<Sample> = {
+export const UPLOAD_DATE_HEADER: MetadataExportHeader<Sample> = {
   key: "uploadDate",
   text: "Upload Date",
 };
 
-export const COLLECTION_LOCATION_HEADER: TableHeader<Sample> = {
+export const COLLECTION_LOCATION_HEADER: MetadataExportHeader<Sample> = {
   key: "collectionLocation",
   subHeaders: [
     {
@@ -110,14 +110,15 @@ export const COLLECTION_LOCATION_HEADER: TableHeader<Sample> = {
       text: "Location",
     },
   ],
+  text: "Collection Location",
 };
 
-export const SEQUENCING_DATE_HEADER: TableHeader<Sample> = {
+export const SEQUENCING_DATE_HEADER: MetadataExportHeader<Sample> = {
   key: "sequencingDate",
   text: "Sequencing Date",
 };
 
-export const GISAID_HEADER: TableHeader<Sample> = {
+export const GISAID_HEADER: MetadataExportHeader<Sample> = {
   key: "gisaid",
   subHeaders: [
     {
@@ -133,7 +134,7 @@ export const GISAID_HEADER: TableHeader<Sample> = {
 };
 
 // Not used yet, but added here to keep the tooltip and header updates in one place
-export const GENBANK_HEADER: TableHeader<Sample> = {
+export const GENBANK_HEADER: MetadataExportHeader<Sample> = {
   key: "genbank",
   subHeaders: [
     {
