@@ -109,7 +109,7 @@ def cli(
         "non_contextualized": TreeType.NON_CONTEXTUALIZED,
     }
     build_type = tree_types[tree_type]
-    template_args = json.loads(template_args)
+    template_data = json.loads(template_args)
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
     sequences_fh = open("sequences.fasta", "w")
@@ -153,7 +153,7 @@ def cli(
             raise Exception("No group found")
 
         resolved_template_args = resolve_template_args(
-            session, pathogen_model, template_args, group
+            session, pathogen_model, template_data, group
         )
         if location:
             (region, country, div, loc) = location.split("/")

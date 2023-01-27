@@ -142,13 +142,13 @@ def cli(
         return
     aligned_repo_data = export_run_config(
         phylo_run_id,
+        sequence_type,
         sequences_fh,
         selected_fh,
         metadata_fh,
         resolved_template_args_fh,
         builds_file_fh,
         reset_status,
-        sequence_type,
     )
     print(json.dumps(aligned_repo_data))
 
@@ -186,13 +186,13 @@ def dump_yaml_template(
 
 def export_run_config(
     phylo_run_id: int,
+    sequence_type: str,
     sequences_fh: io.TextIOBase,
     selected_fh: io.TextIOBase,
     metadata_fh: io.TextIOBase,
     resolved_template_args_fh: IO[str],
     builds_file_fh: io.TextIOBase,
     reset_status: bool = False,
-    sequence_type: Optional[str] = None,
 ):
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
@@ -208,12 +208,11 @@ def export_run_config(
         group: Group = phylo_run.group
 
         # Fetch all of a group's samples.
+        county_samples: List[PathogenGenome] = []
         if sequence_type == "aligned":
-            county_samples: List[PathogenGenome] = get_aligned_county_samples(
-                session, group
-            )
+            county_samples = get_aligned_county_samples(session, group)
         else:
-            county_samples: List[PathogenGenome] = get_county_samples(session, group)
+            county_samples = get_county_samples(session, group)
 
         # get the aligned gisaid run info.
         aligned_gisaid: AlignedRepositoryData = [
