@@ -1,4 +1,3 @@
-// TODO-TR (mlila): consider moving or restructuring this blob
 import { store } from "src/common/redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import {
