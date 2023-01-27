@@ -63,4 +63,4 @@ function EmptyTable({ numOfColumns }: Props): JSX.Element {
   );
 }
 
-export { EmptyState, EmptyTable };
+export { EmptyTable };

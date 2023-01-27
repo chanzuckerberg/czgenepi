@@ -26,6 +26,7 @@ import { memo } from "src/common/utils/memo";
 // TODO-TR: move virtualbumper and update import
 import { VirtualBumper } from "../../../SamplesView/components/SamplesTable/components/VirtualBumper";
 import { useVirtual, VirtualItem } from "react-virtual";
+import { EmptyTable } from "../../../EmptyState";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
@@ -183,7 +184,7 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
   // end virtualization code
 
   if (isLoading) {
-    return <div>Loading ...</div>;
+    return <EmptyTable numOfColumns={columns.length} />;
   }
 
   // TODO-TR (mlila): pull out common structure from samples table
