@@ -27,9 +27,7 @@ interface Props {
   lineages: DefaultMenuSelectOption[];
   qcStatuses: DefaultMenuSelectOption[];
   setActiveFilterCount: (count: number) => void;
-  setDataFilterFunc: Dispatch<
-    SetStateAction<(data: TableItem[]) => TableItem[]>
-  >;
+  setDataFilterFunc: Dispatch<SetStateAction<(data: Sample[]) => Sample[]>>;
 }
 
 interface FilterParamsType {
@@ -87,7 +85,7 @@ const DATA_FILTER_INIT = {
   },
 };
 
-const applyFilter = (data: TableItem[], dataFilter: FilterType) => {
+const applyFilter = (data: Sample[], dataFilter: FilterType) => {
   if (!data) return [];
 
   const { key, params, transform, type } = dataFilter;
@@ -178,7 +176,7 @@ const FilterPanel: FC<Props> = ({
   useEffect(() => {
     const wrappedFilterFunc = () => {
       const filterFunc = (filters: FiltersType) => {
-        return (data: TableItem[]) => {
+        return (data: Sample[]) => {
           let filteredData = [...data];
           forEach(filters, (filter: FilterType) => {
             filteredData = applyFilter(filteredData, filter);

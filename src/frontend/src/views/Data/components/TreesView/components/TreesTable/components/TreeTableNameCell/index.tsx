@@ -11,9 +11,8 @@ import {
   foldInLocationName,
   useNamedLocationsById,
 } from "src/common/queries/locations";
-// TODO-TR: fix import
-import NextstrainConfirmationModal from "src/views/Data/components/TreesView/components/TreesTable/components/TreeActionMenu/components/OpenInNextstrainButton/components/NextstrainConfirmationModal";
 import { NO_CONTENT_FALLBACK } from "src/views/Upload/components/common/constants";
+import NextstrainConfirmationModal from "../NextstrainConfirmationModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
 import {
   CellWrapper,

@@ -240,11 +240,9 @@ export interface PhyloRunResponse extends APIResponse {
   phylo_trees: PhyloRun[];
 }
 const PHYLO_RUN_MAP = new Map<string, keyof PhyloRun>([
-  ["end_datetime", "endDate"],
   ["phylo_tree", "phyloTree"],
   ["start_datetime", "startedDate"],
   ["template_args", "templateArgs"],
-  ["tree_type", "treeType"],
   ["workflow_id", "workflowId"],
   ["workflow_status", "status"],
 ]);

@@ -9,6 +9,7 @@ export const MaxWidth = styled.div`
   margin: 0 auto;
   flex: 1 1 0;
   min-width: 0;
+  width: 100%;
 
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);

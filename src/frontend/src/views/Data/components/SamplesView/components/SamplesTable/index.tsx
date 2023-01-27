@@ -47,7 +47,7 @@ interface Props {
 // generations made by CZI
 const CZ_BIOHUB_GROUP = "CZI";
 
-// TODO-TR (ehoops): Use config from src/views/Data/table-headers/sampleHeadersConfig.tsx
+// TODO-TR (ehoops): Use config from src/views/Data/tableHeaders/sampleHeadersConfig.tsx
 // and move the config if necessary
 const columns: ColumnDef<Sample, any>[] = [
   {

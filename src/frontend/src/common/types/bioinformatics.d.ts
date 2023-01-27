@@ -5,6 +5,11 @@ interface GISAID {
   gisaid_id?: string;
 }
 
+interface Genbank {
+  status: string;
+  genbank_accession: string;
+}
+
 interface Lineage {
   lineage: string;
   lineage_type: string;
@@ -53,6 +58,7 @@ interface Sample {
     name: string;
   };
   gisaid: GISAID;
+  genbank: Genbank;
   lineages: [Lineage];
   qcMetrics: [QCMetrics];
   private?: boolean;
@@ -79,14 +85,14 @@ interface PhyloRun {
   type: "Tree";
   id?: number;
   name: string;
-  pathogenGenomeCount: number;
-  creationDate: string;
   startedDate: string;
   workflowId: string;
   status: TREE_STATUS;
   templateArgs: TemplateArgs;
+  accessionsLink?: string;
   downloadLinkIdStylePrivateIdentifiers?: string;
   downloadLinkIdStylePublicIdentifiers?: string;
+  treeType?: TreeType;
   user: {
     name: string;
     id: number;
