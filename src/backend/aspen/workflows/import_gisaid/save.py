@@ -56,7 +56,7 @@ def write_table(metadata_fh, pathogen_slug: str, public_repository_name: str):
         }
     if public_repository_name == "GenBank":
         fields_to_import = {
-            "genbank_accession_rev": "strain", # TODO: this is not a strain, it's an accession, strain was wierd
+            "genbank_accession_rev": "strain",  # TODO: Strains have duplicate values!
             "lineage": "lineage",
             "accession": "isl",
             "region": "region",

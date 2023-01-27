@@ -103,11 +103,14 @@ task IngestGenBankMPX {
     wget "~{genbank_metadata_url}" --continue --tries=2 -O metadata.tsv.gz
     gunzip metadata.tsv.gz
 
+    # Add the column headers to the output metadata file
+    head -n 1 metadata.tsv > filtered_metadata.tsv
+
     # get a list of all identifiers from alignment file, remove the reverse complement suffix, strip leading and trailing whitespace, and remove duplicates
     xzcat alignment.fasta.xz | grep "^>" | sed 's/>//g' | sed 's/ |(reverse complement)//g' | awk '{$1=$1};1' | uniq > identifiers.txt
     
     # filter the metadata file to only include the identifiers from the alignment file
-    awk -F"\t" 'FNR==NR{a[$0];next} ($1 in a)' identifiers.txt metadata.tsv > filtered_metadata.tsv
+    awk -F"\t" 'FNR==NR{a[$0];next} ($1 in a)' identifiers.txt metadata.tsv >> filtered_metadata.tsv
     
     # check which rows were filtered out
     dropped_records=$(awk -F"\t" 'FNR==NR{a[$1]=$1;next} !($1 in a) {print $1}' filtered_metadata.tsv metadata.tsv)
@@ -245,7 +248,7 @@ task ImportISLs {
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
-        String gisaid_import_complete
+        String genbank_import_complete
     }
 
     command <<<
