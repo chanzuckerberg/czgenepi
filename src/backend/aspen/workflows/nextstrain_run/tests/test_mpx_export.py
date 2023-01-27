@@ -19,7 +19,7 @@ from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory
 from aspen.test_infra.models.repository import random_default_repo_factory
-from aspen.test_infra.models.sequences import uploaded_pathogen_genome_multifactory
+from aspen.test_infra.models.sequences import aligned_pathogen_genome_multifactory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 from aspen.test_infra.models.workflow import aligned_repo_data_factory
 from aspen.workflows.nextstrain_run.export import export_run_config
@@ -78,7 +78,7 @@ def create_test_data(
         f"fake_gisaid_id{i}" for i in range(num_gisaid_samples)
     ]
 
-    pathogen_genomes = uploaded_pathogen_genome_multifactory(
+    pathogen_genomes = aligned_pathogen_genome_multifactory(
         group, pathogen, uploaded_by_user, location, num_county_samples
     )
 
@@ -408,6 +408,7 @@ def generate_run(phylo_run_id, reset_status=False):
     builds_file_fh = StringIO()
     export_run_config(
         phylo_run_id,
+        "aligned",
         sequences_fh,
         selected_fh,
         metadata_fh,

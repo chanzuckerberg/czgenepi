@@ -286,7 +286,7 @@ def get_aligned_county_samples(session, group: Group):
             )
         )
     )
-    pathogen_genomes = [sample.aligned_pathogen_genome for sample in all_samples]
+    pathogen_genomes = [sample.aligned_pathogen_genome[0] for sample in all_samples]
     return pathogen_genomes
 
 
@@ -496,14 +496,9 @@ def write_sequences_files(
 ):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
     num_sequences = 0
-    uploaded_pathogen_genomes = {
-        pathogen_genome for pathogen_genome in pathogen_genomes
-    }
+    sequences = {sequence for sequence in pathogen_genomes}
 
-    sample_ids = {
-        uploaded_pathogen_genome.sample_id
-        for uploaded_pathogen_genome in uploaded_pathogen_genomes
-    }
+    sample_ids = {sequence.sample_id for sequence in sequences}
 
     sample_id_to_sample: Mapping[int, Sample] = {
         sample.id: sample
