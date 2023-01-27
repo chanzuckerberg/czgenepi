@@ -14,7 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { useVirtual, VirtualItem } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { StyledTableRow, StyledWrapper } from "./style";
-import { EmptyTable } from "src/views/Data/components/EmptyState";
+import { EmptyTable } from "./components/EmptyState";
 import { VirtualBumper } from "./components/VirtualBumper";
 import { rowSelectionColumn } from "./columnDefinitions/RowSelectionColumn";
 
