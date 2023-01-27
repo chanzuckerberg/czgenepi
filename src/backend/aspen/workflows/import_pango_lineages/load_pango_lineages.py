@@ -38,6 +38,9 @@ def extract_lineage_from_line(line: str, exclude_withdrawn=True) -> Optional[str
     Returns:
         str OR None: Lineage for the line OR None if line should be ignored
     """
+    # Just skip empty lines.
+    if not line.strip():
+        return None
     lineage_chunk = line.split()[0]
     if exclude_withdrawn and lineage_chunk[0] == "*":
         return None
