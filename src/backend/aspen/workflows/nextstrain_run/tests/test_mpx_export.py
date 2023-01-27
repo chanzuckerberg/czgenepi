@@ -497,7 +497,7 @@ def test_string_escapes(mocker, session, postgres_database, split_client):
     subsampling_scheme = nextstrain_config["subsampling"]
     assert (
         subsampling_scheme["group"]["query"]
-        == f"(location == 'Cote d\\'Ivoire') & (division == 'A\\'Zaz')"
+        == "(location == 'Cote d\\'Ivoire') & (division == 'A\\'Zaz')"
     )
 
     # Just some placeholder sanity-checks
