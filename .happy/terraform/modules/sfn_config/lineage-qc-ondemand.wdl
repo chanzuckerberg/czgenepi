@@ -8,7 +8,7 @@ workflow lineage_qc_ondemand {
         String remote_dev_prefix = ""
         String pathogen_slug
         # `run_type`: See workflow's `prep_samples.py` for allowed values
-        String run_type = "specified-ids-only"
+        String run_type
         # `sample_ids` is ignored for run types that are not specified-ids-only
         Array[Int] sample_ids = []
     }
