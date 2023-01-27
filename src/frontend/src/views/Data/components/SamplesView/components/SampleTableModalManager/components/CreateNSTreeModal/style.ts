@@ -4,7 +4,6 @@ import {
   CommonThemeProps,
   fontBodyS,
   fontBodyXxs,
-  fontBodyXxxs,
   fontHeaderM,
   getColors,
   getPalette,
@@ -13,28 +12,10 @@ import {
 } from "czifui";
 import DialogContent from "src/common/components/library/Dialog/components/DialogContent";
 import DialogTitle from "src/common/components/library/Dialog/components/DialogTitle";
-import NextstrainLogoImg from "src/common/images/nextstrain-inline.svg";
 import { P, transparentScrollbars } from "src/common/styles/basicStyle";
 import { iconFillGrayHoverPrimary } from "src/common/styles/iconStyle";
 import { MAX_MODAL_WIDTH } from "src/common/styles/mixins/global";
 import Dialog from "src/components/Dialog";
-
-export const Attribution = styled.p`
-  ${fontBodyS}
-
-  display: flex;
-  align-items: center;
-
-  ${(props) => {
-    const colors = getColors(props);
-    const spaces = getSpaces(props);
-
-    return `
-      color: ${colors?.gray[600]};
-      margin: 0 0 ${spaces?.m}px;
-    `;
-  }}
-`;
 
 const gray500 = (props: CommonThemeProps) => {
   const colors = getColors(props);
@@ -43,39 +24,6 @@ const gray500 = (props: CommonThemeProps) => {
     color: ${colors?.gray[500]};
   `;
 };
-
-export const Acknowledgements = styled.p`
-  margin: 0;
-  ${fontBodyXxxs}
-  ${gray500}
-`;
-
-export const SpacedAcknowledgements = styled(Acknowledgements)`
-  ${(props) => {
-    const spaces = getSpaces(props);
-
-    return `
-      margin: 0 0 ${spaces?.s}px;
-    `;
-  }}
-`;
-
-export const NextstrainLogo = styled(NextstrainLogoImg)`
-  width: 90px;
-`;
-
-export const ImageSizer = styled.div`
-  display: flex;
-  width: 42px;
-
-  ${(props: CommonThemeProps) => {
-    const spaces = getSpaces(props);
-
-    return `
-      margin-top: ${spaces?.xxxs}px;
-    `;
-  }}
-`;
 
 export const StyledDialog = styled(Dialog)`
   display: flex;
