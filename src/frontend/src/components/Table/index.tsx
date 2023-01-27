@@ -7,65 +7,15 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  CellComponent,
-  CellHeader,
-  InputCheckbox,
-  Table as SDSTable,
-  TableHeader,
-} from "czifui";
+import { Table as SDSTable, TableHeader } from "czifui";
 import { map } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { useVirtual, VirtualItem } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
-import { StyledInputCheckbox, StyledTableRow, StyledWrapper } from "./style";
+import { StyledTableRow, StyledWrapper } from "./style";
 import { EmptyTable } from "src/views/Data/components/EmptyState";
 import { VirtualBumper } from "./components/VirtualBumper";
-import { generateWidthStyles } from "src/common/utils/tableUtils";
-
-const rowSelectionColumn = {
-  id: "select",
-  size: 40,
-  minSize: 40,
-  header: ({ table, column, header }) => {
-    const {
-      getIsAllRowsSelected,
-      getIsSomeRowsSelected,
-      getToggleAllRowsSelectedHandler,
-    } = table;
-    const isChecked = getIsAllRowsSelected();
-    const isIndeterminate = getIsSomeRowsSelected();
-    const checkboxStage = isChecked
-      ? "checked"
-      : isIndeterminate
-      ? "indeterminate"
-      : "unchecked";
-
-    const onChange = getToggleAllRowsSelectedHandler();
-
-    return (
-      <CellHeader
-        key={header.id}
-        hideSortIcon
-        style={generateWidthStyles(column)}
-      >
-        <StyledInputCheckbox stage={checkboxStage} onChange={onChange} />
-      </CellHeader>
-    );
-  },
-  cell: ({ row, cell }) => {
-    const { getIsSelected, getToggleSelectedHandler } = row;
-
-    const checkboxStage = getIsSelected() ? "checked" : "unchecked";
-    const onChange = getToggleSelectedHandler();
-
-    return (
-      <CellComponent key={cell.id}>
-        <InputCheckbox stage={checkboxStage} onChange={onChange} />
-      </CellComponent>
-    );
-  },
-};
+import { rowSelectionColumn } from "./columnDefinitions/RowSelectionColumn";
 
 interface Props extends Table<T> {
   columns: ColumnDef[];

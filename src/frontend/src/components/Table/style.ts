@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, getSpaces, InputCheckbox, TableRow } from "czifui";
+import { getColors, TableRow } from "czifui";
 
 // needed to keep search bar sticky
 export const StyledWrapper = styled.div`
@@ -9,15 +9,6 @@ export const StyledWrapper = styled.div`
   & > div {
     overflow: auto;
   }
-`;
-
-export const StyledInputCheckbox = styled(InputCheckbox)`
-  ${(props) => {
-    const spaces = getSpaces(props);
-    return `
-      padding-bottom: ${spaces?.xxs}px;
-    `;
-  }}
 `;
 
 export const StyledTableRow = styled(TableRow)`
