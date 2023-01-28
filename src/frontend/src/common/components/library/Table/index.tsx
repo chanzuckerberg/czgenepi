@@ -11,6 +11,9 @@ interface Props {
   rows: ReactNode[][];
 }
 
+// * This is an old table component, please do not use it.
+// * Prefer to use src/frontend/src/components/Table/index.tsx.
+
 const Table = ({ headers, rows }: Props): JSX.Element => (
   <Container>
     <Row cells={headers} isHeader />

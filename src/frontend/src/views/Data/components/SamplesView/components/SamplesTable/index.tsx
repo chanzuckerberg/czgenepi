@@ -1,47 +1,16 @@
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  RowSelectionState,
-  SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
-  CellComponent,
-  CellHeader,
-  Icon,
-  InputCheckbox,
-  Table,
-  TableHeader,
-} from "czifui";
-import { map } from "lodash";
-import React, { useEffect, useRef, useState } from "react";
-import { useVirtual, VirtualItem } from "react-virtual";
+import { ColumnDef } from "@tanstack/react-table";
+import { CellComponent, Icon } from "czifui";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { datetimeWithTzToLocalDate } from "src/common/utils/timeUtils";
 import { LineageTooltip } from "./components/LineageTooltip";
 import DefaultCell from "./components/DefaultCell";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
-import {
-  StyledCellBasic,
-  StyledInputCheckbox,
-  StyledPrivateId,
-  StyledTableRow,
-  StyledWrapper,
-} from "./style";
-import { EmptyTable } from "src/views/Data/components/EmptyState";
+import { StyledCellBasic, StyledPrivateId } from "./style";
 import { generateWidthStyles } from "src/common/utils/tableUtils";
 import { getLineageFromSampleLineages } from "src/common/utils/samples";
 import { QualityScoreTag } from "./components/QualityScoreTag";
 import { memo } from "src/common/utils/memo";
-import { VirtualBumper } from "./components/VirtualBumper";
-
-interface Props {
-  data: IdMap<Sample> | undefined;
-  isLoading: boolean;
-  setCheckedSamples(samples: Sample[]): void;
-}
+import Table from "src/components/Table";
 
 // (mlila): The group that represents sample uploads or tree
 // generations made by CZI
@@ -50,49 +19,6 @@ const CZ_BIOHUB_GROUP = "CZI";
 // TODO-TR (ehoops): Use config from src/views/Data/tableHeaders/sampleHeadersConfig.tsx
 // and move the config if necessary
 const columns: ColumnDef<Sample, any>[] = [
-  {
-    id: "select",
-    size: 40,
-    minSize: 40,
-    header: ({ table, column, header }) => {
-      const {
-        getIsAllRowsSelected,
-        getIsSomeRowsSelected,
-        getToggleAllRowsSelectedHandler,
-      } = table;
-      const isChecked = getIsAllRowsSelected();
-      const isIndeterminate = getIsSomeRowsSelected();
-      const checkboxStage = isChecked
-        ? "checked"
-        : isIndeterminate
-        ? "indeterminate"
-        : "unchecked";
-
-      const onChange = getToggleAllRowsSelectedHandler();
-
-      return (
-        <CellHeader
-          key={header.id}
-          hideSortIcon
-          style={generateWidthStyles(column)}
-        >
-          <StyledInputCheckbox stage={checkboxStage} onChange={onChange} />
-        </CellHeader>
-      );
-    },
-    cell: ({ row, cell }) => {
-      const { getIsSelected, getToggleSelectedHandler } = row;
-
-      const checkboxStage = getIsSelected() ? "checked" : "unchecked";
-      const onChange = getToggleSelectedHandler();
-
-      return (
-        <CellComponent key={cell.id}>
-          <InputCheckbox stage={checkboxStage} onChange={onChange} />
-        </CellComponent>
-      );
-    },
-  },
   {
     id: "privateId",
     accessorKey: "privateId",
@@ -356,102 +282,27 @@ const columns: ColumnDef<Sample, any>[] = [
   },
 ];
 
+interface Props {
+  data: IdMap<Sample> | undefined;
+  isLoading: boolean;
+  setCheckedSamples(samples: Sample[]): void;
+}
+
 const SamplesTable = ({
   data,
   isLoading,
   setCheckedSamples,
 }: Props): JSX.Element => {
-  const [samples, setSamples] = useState<Sample[]>([]);
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      id: "uploadDate",
-      desc: true,
-    },
-  ]);
-
-  useEffect(() => {
-    if (!data) return;
-
-    const newSamples = map(data, (v) => v);
-    setSamples(newSamples);
-  }, [data]);
-
-  const table = useReactTable({
-    data: samples,
-    defaultColumn: {
-      minSize: 50,
-      size: 50,
-    },
-    columns,
-    enableMultiRowSelection: true,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    state: {
-      rowSelection,
-      sorting,
-    },
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-  });
-
-  // adds virtualization to the table
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-
-  const { rows } = table.getRowModel();
-  const rowVirtualizer = useVirtual({
-    parentRef: tableContainerRef,
-    size: rows.length,
-    // increasing the `overscan` number will enable smoother scrolling, but will also add more nodes
-    // to the DOM, and may impact performance of other things in view, such as filters and modals
-    overscan: 25,
-  });
-  const { virtualItems: virtualRows, totalSize } = rowVirtualizer;
-  // end virtualization code
-
-  useEffect(() => {
-    // for each selected row in the table, map the react-table internal row to the data (Sample)
-    // originally passed into the row
-    const newCheckedSamples = table
-      .getSelectedRowModel()
-      .rows.map((r) => r.original);
-
-    setCheckedSamples(newCheckedSamples);
-  }, [rowSelection]);
-
-  if (isLoading) {
-    return <EmptyTable numOfColumns={columns.length} />;
-  }
-
   return (
-    <StyledWrapper ref={tableContainerRef}>
-      <Table>
-        <TableHeader>
-          {table
-            .getLeafHeaders()
-            .map((header) =>
-              flexRender(header.column.columnDef.header, header.getContext())
-            )}
-        </TableHeader>
-        <tbody>
-          <VirtualBumper totalSize={totalSize} virtualRows={virtualRows}>
-            {virtualRows.map((vRow: VirtualItem) => {
-              const row = rows[vRow.index];
-              return (
-                <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
-                  {row
-                    .getVisibleCells()
-                    .map((cell) =>
-                      flexRender(cell.column.columnDef.cell, cell.getContext())
-                    )}
-                </StyledTableRow>
-              );
-            })}
-          </VirtualBumper>
-        </tbody>
-      </Table>
-    </StyledWrapper>
+    <Table<Sample>
+      columns={columns}
+      isLoading={isLoading}
+      initialSortKey="uploadDate"
+      tableData={data}
+      onSetCheckedRows={setCheckedSamples}
+      enableMultiRowSelection
+    />
   );
 };
 
-export default React.memo(SamplesTable);
+export { SamplesTable };
