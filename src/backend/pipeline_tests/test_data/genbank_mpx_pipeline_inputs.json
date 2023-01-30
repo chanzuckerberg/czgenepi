@@ -1,0 +1,7 @@
+{
+"docker_image_id": "${DOCKER_REPO}genepi-gisaid:latest",
+"aws_region": "us-west-2",
+"genepi_config_secret_name": "genepi-config",
+"genbank_metadata_url": "https://data.nextstrain.org/files/workflows/monkeypox/metadata.tsv.gz",
+"genbank_alignment_url": "https://data.nextstrain.org/files/workflows/monkeypox/alignment.fasta.xz"
+}
