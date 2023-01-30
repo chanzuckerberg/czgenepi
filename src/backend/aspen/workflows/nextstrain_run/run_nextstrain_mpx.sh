@@ -31,7 +31,7 @@ echo "* set \$aspen_s3_db_bucket"
 aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 set -x
 
-mkdir -p /mpox/data /mpox/results /mpox/logs
+mkdir -p /mpox/data
 key_prefix="phylo_run/${S3_FILESTEM}/${WORKFLOW_ID}"
 s3_prefix="s3://${aspen_s3_db_bucket}/${key_prefix}"
 
@@ -71,14 +71,14 @@ fi;
 
 # Persist the build config we generated.
 $aws s3 cp /mpox/config/build_czge.yaml "${s3_prefix}/build_czge.yaml"
-$aws s3 cp /mpox/config/include.txt "${s3_prefix}/include.txt"
+$aws s3 cp /mpox/data/include.txt "${s3_prefix}/include.txt"
 
 # run snakemake, if run fails export the logs from snakemake to s3
-(cd /mpox && snakemake --printshellcmds --configfile config/build_czge.yaml --resources=mem_mb=312320) || { $aws s3 cp /mpox/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /mpox/logs/ "${s3_prefix}/logs/mpox/" --recursive ; }
+(cd /mpox && snakemake --printshellcmds --configfile config/build_czge.yaml --resources=mem_mb=312320) || { $aws s3 cp /mpox/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /mpox/results/mpxv/filter.log "${s3_prefix}/logs/mpox/" --recursive ; }
 
 # upload the tree to S3. The variable key is created to use later
 key="${key_prefix}/mpx_czge.json"
-$aws s3 cp /mpox/results/mpxv/tree.json "s3://${aspen_s3_db_bucket}/${key}"
+$aws s3 cp /mpox/auspice/monkeypox_mpxv.json "s3://${aspen_s3_db_bucket}/${key}"
 
 # update aspen
 aspen_workflow_rev=WHATEVER
@@ -97,4 +97,4 @@ python3 /usr/src/app/aspen/workflows/nextstrain_run/save.py                 \
     --bucket "${aspen_s3_db_bucket}"                                        \
     --key "${key}"                                                          \
     --resolved-template-args "${RESOLVED_TEMPLATE_ARGS_SAVEFILE}"           \
-    --tree-path /ncov/auspice/ncov_aspen.json                                \
+    --tree-path /mpox/auspice/monkeypox_mpxv.json                           \
