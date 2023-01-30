@@ -71,7 +71,7 @@ const Table = <T extends any>({
     data,
     defaultColumn: {
       minSize: 50,
-      size: 50,
+      size: "auto",
     },
     columns: enableMultiRowSelection
       ? [rowSelectionColumn, ...columns]

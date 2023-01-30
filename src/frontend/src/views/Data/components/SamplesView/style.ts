@@ -4,7 +4,7 @@ import { CommonThemeProps, getSpaces } from "czifui";
 export const MaxWidth = styled.div`
   display: flex;
   flex-direction: column;
-  max-width: 1300px;
+  max-width: 1600px;
   overflow-y: auto;
   margin: 0 auto;
   flex: 1 1 0;

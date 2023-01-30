@@ -22,7 +22,7 @@ const columns: ColumnDef<Sample, any>[] = [
   {
     id: "privateId",
     accessorKey: "privateId",
-    size: 250,
+    size: 350,
     header: ({ header, column }) => (
       <SortableHeader
         header={header}
