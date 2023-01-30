@@ -51,7 +51,7 @@ def get_fields_to_import(public_repository_name: str) -> Dict[str, str]:
             "date": "date",
         },
         "GenBank": {
-            "genbank_accession_rev": "strain",  # TODO: Strains have duplicate values!
+            "accession": "strain",  # Strains have duplicate values, using accession instead
             "lineage": "lineage",
             "accession": "isl",
             "region": "region",
