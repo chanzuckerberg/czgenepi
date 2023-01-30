@@ -43,13 +43,15 @@ const columns: ColumnDef<Sample, any>[] = [
           ? "CZ Biohub"
           : uploadedBy?.name;
 
+      const privateId = getValue();
       return (
         <StyledPrivateId
           key={cell.id}
-          primaryText={getValue()}
+          primaryText={privateId}
           secondaryText={uploader}
           shouldTextWrap
           primaryTextWrapLineCount={1}
+          shouldShowTooltipOnHover={Boolean(privateId)}
           icon={
             <Icon
               sdsIcon={isPrivate ? "flaskPrivate" : "flaskPublic"}
