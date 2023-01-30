@@ -181,8 +181,8 @@ const columns: ColumnDef<Sample, any>[] = [
       );
     }),
     sortingFn: (a, b) => {
-      const statusA = a.original.qcMetrics[0].qc_status;
-      const statusB = b.original.qcMetrics[0].qc_status;
+      const statusA = a.original.qcMetrics[0].qcStatus;
+      const statusB = b.original.qcMetrics[0].qcStatus;
       return statusA > statusB ? -1 : 1;
     },
   },

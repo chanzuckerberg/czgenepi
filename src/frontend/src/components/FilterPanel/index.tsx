@@ -56,7 +56,7 @@ const DATA_FILTER_INIT = {
     params: {
       multiSelected: [],
     },
-    transform: (d: Sample) => d.qcMetrics[0]?.qc_status,
+    transform: (d: Sample) => d.qcMetrics[0]?.qcStatus,
     type: TypeFilterType.Multiple,
   },
   collectionDate: {

@@ -217,6 +217,45 @@ export async function putBackendApiJson<T>(
 export interface SampleResponse extends APIResponse {
   samples: Sample[];
 }
+
+const GENBANK_SUBMAP = new Map<string, keyof Genbank>([
+  ["genbank_accession", "genbankAccession"],
+]);
+
+const GISAID_SUBMAP = new Map<string, keyof GISAID>([
+  ["gisaid_id", "gisaidId"],
+]);
+
+const LINEAGE_SUBMAP = new Map<string, keyof Lineage>([
+  ["lineage_type", "lineageType"],
+  ["lineage_software_version", "lineageSoftwareVersion"],
+  ["lineage_probability", "lineageProbability"],
+  ["last_updated", "lastUpdated"],
+  ["reference_dataset_name", "referenceDatasetName"],
+  ["reference_sequence_accession", "referenceSequenceAccession"],
+  ["reference_dataset_tag", "referenceDatasetTag"],
+  ["scorpio_call", "scorpioCall"],
+  ["scorpio_support", "scorpioSupport"],
+  ["qc_status", "qcStatus"],
+]);
+
+const QC_SUBMAP = new Map<string, keyof QCMetrics>([
+  ["qc_score", "qcScore"],
+  ["qc_software_version", "qcSoftwareVersion"],
+  ["qc_status", "qcStatus"],
+  ["qc_caller", "qcCaller"],
+  ["reference_dataset_name", "referenceDatasetName"],
+  ["reference_sequence_accession", "referenceSequenceAccession"],
+  ["reference_dataset_tag", "referenceDatasetTag"],
+]);
+
+const SAMPLE_SUBMAP = new Map<string, Map<string, string>>([
+  ["genbank", GENBANK_SUBMAP],
+  ["gisaid", GISAID_SUBMAP],
+  ["lineage", LINEAGE_SUBMAP],
+  ["qcMetrics", QC_SUBMAP],
+]);
+
 const SAMPLE_MAP = new Map<string, keyof Sample>([
   ["collection_date", "collectionDate"],
   ["collection_location", "collectionLocation"],
@@ -233,7 +272,8 @@ export const fetchSamples = (): Promise<SampleResponse> =>
   apiResponse<SampleResponse>(
     ["samples"],
     [SAMPLE_MAP],
-    generateOrgSpecificUrl(ORG_API.SAMPLES)
+    generateOrgSpecificUrl(ORG_API.SAMPLES),
+    [SAMPLE_SUBMAP]
   );
 
 export interface PhyloRunResponse extends APIResponse {

@@ -338,8 +338,8 @@ function prepareTestData() {
     defaults.lineages = [
       {
         lineage: "BA.1.15",
-        lineage_type: "PANGOLIN",
-        lineage_software_version: "1.0.0",
+        lineageType: "PANGOLIN",
+        lineageSoftwareVersion: "1.0.0",
       },
     ];
     mockResponseData.push(getSampleResponseData(defaults));
@@ -408,15 +408,15 @@ function getDefaults(): Partial<SampleResponseDefaults> {
     lineages: [
       {
         lineage: "QA.1.15",
-        lineage_type: "PANGOLIN",
-        lineage_software_version: "1.0.0",
+        lineageType: "PANGOLIN",
+        lineageSoftwareVersion: "1.0.0",
       },
     ],
     qc_metrics: [
       {
-        qc_software_version: "1.0.0",
-        qc_status: "good",
-        qc_caller: "PANGOLIN",
+        qcSoftwareVersion: "1.0.0",
+        qcStatus: "good",
+        qcCaller: "PANGOLIN",
       },
     ],
     private: false,
