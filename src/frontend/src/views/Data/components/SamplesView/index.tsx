@@ -11,9 +11,6 @@ import { SampleTableModalManager } from "./components/SampleTableModalManager";
 import { Flex, MaxWidth, StyledActionBar } from "./style";
 
 const SamplesView = (): JSX.Element => {
-  // TODO-TR (mlila): consider restructuring table, modalmanager, and view to better manage
-  // TODO             checked sample state
-
   // TODO-TR: when samples are cleared after closing a modal, the UI doesn't update
   const [checkedSamples, setCheckedSamples] = useState<Sample[]>([]);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState<boolean>(true);
