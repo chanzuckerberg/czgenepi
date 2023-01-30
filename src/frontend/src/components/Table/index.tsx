@@ -8,12 +8,12 @@ import {
   TableOptions,
   useReactTable,
 } from "@tanstack/react-table";
-import { Table as SDSTable, TableHeader } from "czifui";
+import { Table as SDSTable, TableHeader, TableRow } from "czifui";
 import { map } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { useVirtual, VirtualItem } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
-import { StyledTableRow, StyledWrapper } from "./style";
+import { StyledWrapper } from "./style";
 import { EmptyTable } from "./components/EmptyState";
 import { VirtualBumper } from "./components/VirtualBumper";
 import { rowSelectionColumn } from "./columnDefinitions/RowSelectionColumn";
@@ -132,13 +132,13 @@ const Table = <T extends any>({
             {virtualRows.map((vRow: VirtualItem) => {
               const row = rows[vRow.index];
               return (
-                <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
+                <TableRow key={row.id} shouldShowTooltipOnHover={false}>
                   {row
                     .getVisibleCells()
                     .map((cell) =>
                       flexRender(cell.column.columnDef.cell, cell.getContext())
                     )}
-                </StyledTableRow>
+                </TableRow>
               );
             })}
           </VirtualBumper>

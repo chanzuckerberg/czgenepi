@@ -9,13 +9,11 @@ export const StyledWrapper = styled.div`
   & > div {
     overflow: auto;
   }
-`;
 
-export const StyledTableRow = styled(TableRow)`
   ${(props) => {
     const colors = getColors(props);
     return `
-      &:hover {
+      tr:hover {
         background-color: ${colors?.primary[100]};
       }
     `;
