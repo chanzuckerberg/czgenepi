@@ -38,7 +38,7 @@ def cli(
     write_table(metadata_fh, pathogen_slug, public_repository)
 
 
-def get_fields_to_import(public_repository_name: str) -> Dict[str, Dict[str, str]]:
+def get_fields_to_import(public_repository_name: str) -> Dict[str, str]:
     repository_to_fields_to_import = {
         "GISAID": {
             "strain": "strain",
