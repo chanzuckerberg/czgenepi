@@ -81,6 +81,7 @@ class NextstrainJob(SwipeJob):
         execution_name = f"{group.prefix}-{self.job_type}-nextstrain-{str(now)}"
         extra_params = {
             "s3_filestem": f"{group.location}/{run.tree_type}",
+            "pathogen_slug": run.pathogen.slug,
             "workflow_id": run.id,
         }
         return self._start(execution_name, output_suffix, extra_params)

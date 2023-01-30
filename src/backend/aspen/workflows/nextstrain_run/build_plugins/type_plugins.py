@@ -13,6 +13,9 @@ class TreeTypePlugin(BaseConfigPlugin):
     subsampling_scheme: str = "NONE"
 
     def _update_config_params(self, config):
+        if not config.get("builds"):
+            # TODO, force MPX structure to look more like SC2's
+            config["builds"] = {"aspen": {}}
         build = config["builds"]["aspen"]
 
         location = self.template_args["location"]
@@ -31,7 +34,8 @@ class TreeTypePlugin(BaseConfigPlugin):
                 build[field] = value
                 location_values.append(value)
             else:
-                del build[field]
+                if build.get(field):
+                    del build[field]
 
         # NOTE: <TreeTypePlugin>.subsampling_scheme is used in 3 places:
         #   - Its lowercase'd name is used to find a markdown file with an "about this tree" description
@@ -61,10 +65,12 @@ class TreeTypePlugin(BaseConfigPlugin):
                 end_date=end_date,
             )
 
-        config["files"]["description"] = config["files"]["description"].format(
-            tree_type=self.subsampling_scheme.lower()
-        )
-        config["priorities"]["crowding_penalty"] = self.crowding_penalty
+        if config.get("files"):
+            config["files"]["description"] = config["files"]["description"].format(
+                tree_type=self.subsampling_scheme.lower()
+            )
+        if config.get("priorities"):
+            config["priorities"]["crowding_penalty"] = self.crowding_penalty
 
     def _get_formatted_tree_end_date(self):
         """Returns appropriate YYYY-MM-DD for tree's end date or "--" if none.
@@ -115,9 +121,16 @@ class OverviewPlugin(TreeTypePlugin):
 
     def run_type_config(self, config, subsampling):
         if self.group.name == "Chicago Department of Public Health":
-            subsampling["group"][
-                "query"
-            ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
+            if "--query" in subsampling["group"]["query"]:  # SC2 format
+                subsampling["group"][
+                    "query"
+                ] = '''--query "((location == '{location}') & (division == '{division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
+            else:  # MPX format
+                subsampling["group"]["query"] = (
+                    "("
+                    + subsampling["group"]["query"]
+                    + ") | submitting_lab == 'RIPHL at Rush University Medical Center'"
+                )
 
         # Handle sampling date & pango lineage filters
         apply_filters(config, subsampling, self.template_args)
@@ -136,7 +149,8 @@ class OverviewPlugin(TreeTypePlugin):
         # Either due to being a scheduled run or no user selection
         # Put reference sequences in include.txt so tree run don't break
         if self.num_included_samples == 0:
-            del config["files"]["include"]
+            if config.get("files", {}).get("include"):
+                del config["files"]["include"]
 
 
 class NonContextualizedPlugin(TreeTypePlugin):
@@ -154,7 +168,8 @@ class NonContextualizedPlugin(TreeTypePlugin):
         # If there aren't any selected samples due to no user selection
         # Put reference sequences in include.txt so tree run don't break
         if self.num_included_samples == 0:
-            del config["files"]["include"]
+            if config.get("files", {}).get("include"):
+                del config["files"]["include"]
 
 
 # Set max_sequences for targeted builds.
@@ -234,7 +249,10 @@ def update_subsampling_for_country(subsampling):
     if "country" in subsampling:
         del subsampling["country"]
     # Update our local group query
-    subsampling["group"]["query"] = '''--query "(country == '{country}')"'''
+    if "--query" in subsampling["group"]["query"]:
+        subsampling["group"]["query"] = '''--query "(country == '{country}')"'''
+    else:
+        subsampling["group"]["query"] = "(country == '{country}')"
 
 
 def update_subsampling_for_division(subsampling):
@@ -242,12 +260,25 @@ def update_subsampling_for_division(subsampling):
     if "state" in subsampling:
         del subsampling["state"]
     # Update our local group query
-    subsampling["group"][
-        "query"
-    ] = '''--query "(division == '{division}') & (country == '{country}')"'''  # Keep the country filter in case of multiple divisions worldwide
+    if "--query" in subsampling["group"]["query"]:
+        subsampling["group"][
+            "query"
+        ] = '''--query "(division == '{division}') & (country == '{country}')"'''  # Keep the country filter in case of multiple divisions worldwide
+    else:
+        subsampling["group"][
+            "query"
+        ] = "(division == '{division}') & (country == '{country}')"  # Keep the country filter in case of multiple divisions worldwide
 
 
 def apply_filters(config, subsampling, template_args):
+    # MPX format
+    include_arguments_in_filters = False
+    lineage_field = "lineage"
+    if "--query" in subsampling["group"]["query"]:
+        # SC2 format
+        include_arguments_in_filters = True
+        lineage_field = "pango_lineage"
+
     filter_map = {"filter_start_date": "min_date", "filter_end_date": "max_date"}
     for filter_name, yaml_key in filter_map.items():
         value = template_args.get(filter_name)
@@ -255,9 +286,14 @@ def apply_filters(config, subsampling, template_args):
             continue  # This filter isn't set, skip it.
         # Support date expressions like "5 days ago" in our cron schedule.
         value = dateparser.parse(value).strftime("%Y-%m-%d")
-        subsampling["group"][
-            yaml_key
-        ] = f"--{yaml_key.replace('_', '-')} {value}"  # ex: --max-date 2020-01-01
+        if include_arguments_in_filters:
+            subsampling["group"][
+                yaml_key
+            ] = f"--{yaml_key.replace('_', '-')} {value}"  # ex: --max-date 2020-01-01
+        else:
+            subsampling["group"][yaml_key.replace("_", "-")] = str(
+                value
+            )  # ex: max-date: 2020-01-01
 
     pango_lineages = template_args.get("filter_pango_lineages")
     if pango_lineages:
@@ -265,8 +301,13 @@ def apply_filters(config, subsampling, template_args):
         # values in the pango_lineages key. Before modifying please see
         # https://discussion.nextstrain.org/t/failure-when-specifying-multiple-pango-lineages-in-a-build/670
         clean_values = [re.sub(r"[^0-9a-zA-Z.]", "", item) for item in pango_lineages]
+        clean_values.sort()
         config["builds"]["aspen"]["pango_lineage"] = clean_values
         # Remove the last " from our old query so we can inject more filters
-        old_query = subsampling["group"]["query"][:-1]
-        pango_query = " & (pango_lineage in {pango_lineage})"
-        subsampling["group"]["query"] = old_query + pango_query + '"'
+        end_string = ""
+        old_query = subsampling["group"]["query"]
+        if old_query.endswith('"'):
+            end_string = '"'
+            old_query = old_query[:-1]
+        pango_query = " & (" + lineage_field + " in {pango_lineage})"
+        subsampling["group"]["query"] = old_query + pango_query + end_string

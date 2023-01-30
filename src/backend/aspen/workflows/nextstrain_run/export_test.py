@@ -1,9 +1,10 @@
 import json
-from typing import Any, Dict, Iterable
+from datetime import datetime
+from typing import Iterable
 
 import click
 import sqlalchemy as sa
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, undefer
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -13,15 +14,18 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
+    AlignedPathogenGenome,
     Group,
     Location,
     Pathogen,
     PathogenGenome,
     Sample,
     TreeType,
+    UploadedPathogenGenome,
 )
 from aspen.workflows.nextstrain_run.build_config import TemplateBuilder
 from aspen.workflows.nextstrain_run.export import (
+    resolve_template_args,
     write_includes_file,
     write_sequences_files,
 )
@@ -55,6 +59,13 @@ from aspen.workflows.nextstrain_run.export import (
     help="How many GISAID ID's to include in the build",
 )
 @click.option(
+    "--template-args",
+    type=str,
+    required=False,
+    default="{}",
+    help="Which existing group to use for this build?",
+)
+@click.option(
     "--group-name",
     type=str,
     required=False,
@@ -75,14 +86,22 @@ from aspen.workflows.nextstrain_run.export import (
     default="SC2",
     help="Pathogen to build a tree for",
 )
+@click.option(
+    "--sequence-type",
+    type=click.Choice(["aligned", "uploaded"]),
+    default="uploaded",
+    required=True,
+)
 def cli(
     tree_type: str,
     sequences: int,
     selected: int,
     gisaid: int,
+    template_args: str,
     group_name: str,
     location: str,
     pathogen: str,
+    sequence_type: str,
 ):
     tree_types = {
         "overview": TreeType.OVERVIEW,
@@ -90,7 +109,7 @@ def cli(
         "non_contextualized": TreeType.NON_CONTEXTUALIZED,
     }
     build_type = tree_types[tree_type]
-    template_args: Dict[str, Any] = {}
+    template_data = json.loads(template_args)
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
 
     sequences_fh = open("sequences.fasta", "w")
@@ -102,10 +121,12 @@ def cli(
     num_included_samples = 0
 
     with session_scope(interface) as session:
-        pathogen_genomes = get_random_pathogen_genomes(session, sequences)
+        pathogen_genomes = get_random_pathogen_genomes(
+            session, sequences, sequence_type
+        )
 
         num_sequences = write_sequences_files(
-            session, pathogen_genomes, sequences_fh, metadata_fh
+            session, sequence_type, pathogen_genomes, sequences_fh, metadata_fh
         )
         if build_type != TreeType.OVERVIEW:
             gisaid_ids = generate_test_gisaid_ids(gisaid)
@@ -122,6 +143,7 @@ def cli(
         context = {
             "num_sequences": num_sequences,
             "num_included_samples": num_included_samples,
+            "run_start_datetime": datetime.now(),
         }
         group_query = sa.select(Group)  # type: ignore
         if group_name:
@@ -129,36 +151,42 @@ def cli(
         group = session.execute(group_query).scalars().first()
         if not group:
             raise Exception("No group found")
+
+        resolved_template_args = resolve_template_args(
+            session, pathogen_model, template_data, group
+        )
         if location:
             (region, country, div, loc) = location.split("/")
             tree_location = Location(
                 region=region, country=country, division=div, location=loc
             )
             group.default_tree_location = tree_location
+            resolved_template_args["location"] = tree_location
+
         builder = TemplateBuilder(
-            build_type, pathogen_model, group, template_args, **context
+            build_type, pathogen_model, group, resolved_template_args, **context
         )
         builder.write_file(builds_file_fh)
 
         print("Wrote output files!")
-        print(json.dumps(context))
+        for k, v in resolved_template_args.items():
+            print(f"Resolved {k} to {v}")
         session.rollback()  # Don't save any changes to the DB.
 
 
-def get_random_pathogen_genomes(session, max_genomes):
-    all_samples: Iterable[Sample] = (
-        sa.select(Sample)  # type: ignore
+def get_random_pathogen_genomes(session, max_genomes, sequence_type):
+    sequence_model = UploadedPathogenGenome
+    if sequence_type == "aligned":
+        sequence_model = AlignedPathogenGenome
+    all_genomes: Iterable[Sample] = (
+        sa.select(sequence_model)  # type: ignore
         .options(
-            joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
-                PathogenGenome.sequence
-            )
+            joinedload(sequence_model.sample, innerjoin=True),
+            undefer(PathogenGenome.sequence),
         )
         .limit(max_genomes)
     )
-    pathogen_genomes = [
-        sample.uploaded_pathogen_genome
-        for sample in session.execute(all_samples).scalars()
-    ]
+    pathogen_genomes = [item for item in session.execute(all_genomes).scalars()]
     return pathogen_genomes
 
 

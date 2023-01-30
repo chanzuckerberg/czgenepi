@@ -1,6 +1,6 @@
 import datetime
 
-from aspen.database.models import Sample, UploadedPathogenGenome
+from aspen.database.models import AlignedPathogenGenome, Sample, UploadedPathogenGenome
 from aspen.test_infra.models.sample import sample_factory
 
 
@@ -42,6 +42,42 @@ def uploaded_pathogen_genome_multifactory(
             public_identifier=f"public_identifier_{i}",
         )
         pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
+            sample,
+        )
+        pathogen_genomes.append(pathogen_genome)
+    return pathogen_genomes
+
+
+def aligned_pathogen_genome_factory(
+    sample,
+    sequence=">test1\nNTCGGCG",
+    reference_name="ref_name",
+    aligned_date=datetime.datetime.now(),
+):
+    aligned_pathogen_genome = AlignedPathogenGenome(
+        sample=sample,
+        sequence=sequence,
+        reference_name=reference_name,
+        aligned_date=aligned_date,
+    )
+
+    return aligned_pathogen_genome
+
+
+def aligned_pathogen_genome_multifactory(
+    group, pathogen, uploaded_by_user, location, num_genomes
+):
+    pathogen_genomes = []
+    for i in range(num_genomes):
+        sample: Sample = sample_factory(
+            group,
+            uploaded_by_user,
+            location,
+            pathogen=pathogen,
+            private_identifier=f"private_identifier_{i}",
+            public_identifier=f"public_identifier_{i}",
+        )
+        pathogen_genome: AlignedPathogenGenome = aligned_pathogen_genome_factory(
             sample,
         )
         pathogen_genomes.append(pathogen_genome)
