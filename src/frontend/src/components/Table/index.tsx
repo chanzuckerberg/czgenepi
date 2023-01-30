@@ -71,6 +71,9 @@ const Table = <T extends any>({
     data,
     defaultColumn: {
       minSize: 50,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - (mlila) this is a fix for a table spacing problem we had
+      // https://github.com/TanStack/table/discussions/3192
       size: "auto",
     },
     columns: enableMultiRowSelection
