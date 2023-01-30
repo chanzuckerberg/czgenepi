@@ -202,6 +202,27 @@ module gisaid_sfn_config {
   }
 }
 
+module genbank_mpx_sfn_config {
+  source   = "../sfn_config"
+  app_name = "genbank-mpx-sfn"
+  image    = local.gisaid_image
+  memory   = 16000
+  wdl_path = "workflows/genbank-mpx.wdl"
+  custom_stack_name     = local.custom_stack_name
+  deployment_stage      = local.deployment_stage
+  remote_dev_prefix     = local.remote_dev_prefix
+  stack_resource_prefix = local.stack_resource_prefix
+  swipe_comms_bucket    = local.swipe_comms_bucket
+  swipe_wdl_bucket      = local.swipe_wdl_bucket
+  sfn_arn               = local.swipe_sfn_arn
+  schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 1 ? * MON-FRI *)"] : []
+  event_role_arn        = local.event_role_arn
+  extra_args            =  {
+    genepi_config_secret_name = local.app_secret_name
+    remote_dev_prefix = local.remote_dev_prefix
+  }
+}
+
 module pangolin_sfn_config {
   source   = "../sfn_config"
   app_name = "pangolin-sfn"
