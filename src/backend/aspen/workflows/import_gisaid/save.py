@@ -38,13 +38,9 @@ def cli(
     write_table(metadata_fh, pathogen_slug, public_repository)
 
 
-def write_table(metadata_fh, pathogen_slug: str, public_repository_name: str):
-    data = csv.DictReader(metadata_fh, delimiter="\t")
-
-    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
-
-    if public_repository_name == "GISAID":
-        fields_to_import = {
+def get_fields_to_import(public_repository_name: str) -> Dict[str, Dict[str, str]]:
+    repository_to_fields_to_import = {
+        "GISAID": {
             "strain": "strain",
             "pango_lineage": "lineage",
             "gisaid_epi_isl": "isl",
@@ -53,9 +49,8 @@ def write_table(metadata_fh, pathogen_slug: str, public_repository_name: str):
             "division": "division",
             "location": "location",
             "date": "date",
-        }
-    if public_repository_name == "GenBank":
-        fields_to_import = {
+        },
+        "GenBank": {
             "genbank_accession_rev": "strain",  # TODO: Strains have duplicate values!
             "lineage": "lineage",
             "accession": "isl",
@@ -64,7 +59,16 @@ def write_table(metadata_fh, pathogen_slug: str, public_repository_name: str):
             "division": "division",
             "location": "location",
             "date": "date",
-        }
+        },
+    }
+    return repository_to_fields_to_import[public_repository_name]
+
+
+def write_table(metadata_fh, pathogen_slug: str, public_repository_name: str):
+    data = csv.DictReader(metadata_fh, delimiter="\t")
+
+    interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
+    fields_to_import = get_fields_to_import(public_repository_name)
 
     num_rows = 0
     with session_scope(interface) as session:
