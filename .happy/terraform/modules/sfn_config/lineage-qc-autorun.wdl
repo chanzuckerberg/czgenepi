@@ -6,6 +6,7 @@ workflow lineage_qc_autorun {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
+        String deployment_stage
     }
 
     call lineage_qc_autorun_workflow {
@@ -14,6 +15,7 @@ workflow lineage_qc_autorun {
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
+        deployment_stage = deployment_stage
     }
 }
 
@@ -23,6 +25,7 @@ task lineage_qc_autorun_workflow {
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
+        String deployment_stage
     }
 
     command <<<
@@ -37,6 +40,7 @@ task lineage_qc_autorun_workflow {
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
+    export DEPLOYMENT_STAGE="~{deployment_stage}"
 
     # Ensure we start in an empty directory for entire process.
     # (For current use case, eh, this is unnecessary, but also doesn't hurt

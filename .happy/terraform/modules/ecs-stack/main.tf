@@ -262,6 +262,7 @@ module lineage_qc_autorun_sfn_config {
   extra_args            =  {
     genepi_config_secret_name = local.app_secret_name
     remote_dev_prefix        = local.remote_dev_prefix
+    deployment_stage = local.deployment_stage
   }
 }
 
