@@ -40,39 +40,39 @@ export const LINEAGE_HEADER: Header = {
       text: "Lineage",
     },
     {
-      key: "scorpio_call",
+      key: "scorpioCall",
       text: "Scorpio Call",
     },
     {
-      key: "scorpio_support",
+      key: "scorpioSupport",
       text: "Scorpio Support",
     },
     {
-      key: "last_updated",
+      key: "lastUpdated",
       text: "Last Updated",
     },
     {
-      key: "lineage_software_version",
+      key: "lineageSoftwareVersion",
       text: "Version",
     },
     {
-      key: "reference_dataset_name",
+      key: "referenceDatasetName",
       text: "Reference Dataset Name",
     },
     {
-      key: "lineage_type",
+      key: "lineageType",
       text: "Lineage Caller",
     },
     {
-      key: "reference_dataset_tag",
+      key: "referenceDatasetTag",
       text: "Reference Dataset Tag",
     },
     {
-      key: "reference_sequence_accession",
+      key: "referenceSequenceAccession",
       text: "Reference Sequence Accession",
     },
     {
-      key: "lineage_probability",
+      key: "lineageProbability",
       text: "Lineage Probability",
     },
   ],
@@ -179,7 +179,7 @@ export const GISAID_HEADER = {
       text: "GISAID Status",
     },
     {
-      key: "gisaid_id",
+      key: "gisaidId",
       text: "GISAID ID",
     },
   ],
@@ -201,7 +201,7 @@ export const GENBANK_HEADER = {
       text: "GenBank Status",
     },
     {
-      key: "genbank_accession",
+      key: "genbankAccession",
       text: "GenBank Accession",
     },
   ],

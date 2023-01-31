@@ -101,7 +101,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     // If we start adding multiple lineages per sample we'll need to revisit this logic.
     const firstLineageValue = value[0];
     const hasLineage = Boolean(
-      firstLineageValue && firstLineageValue.lineage_software_version
+      firstLineageValue && firstLineageValue.lineageSoftwareVersion
     );
     const Component = hasLineage ? UnderlinedRowContent : RowContent;
 

@@ -336,12 +336,12 @@ const columns: ColumnDef<Sample, any>[] = [
       </SortableHeader>
     ),
     cell: memo(({ getValue, cell }) => {
-      const { gisaid_id, status } = getValue();
+      const { gisaidId, status } = getValue();
       return (
         <StyledCellBasic
           key={cell.id}
           primaryText={status}
-          secondaryText={gisaid_id}
+          secondaryText={gisaidId}
           shouldShowTooltipOnHover={false}
         />
       );
