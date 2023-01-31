@@ -219,7 +219,7 @@ const Data: FunctionComponent = () => {
       return { name: l as string };
     });
   const qcStatuses = uniq(
-    compact(map(sampleMap, (d) => d.qcMetrics[0]?.qc_status))
+    compact(map(sampleMap, (d) => d.qcMetrics[0]?.qcStatus))
   )
     .sort()
     .map((l) => {

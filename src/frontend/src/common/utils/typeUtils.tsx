@@ -14,31 +14,30 @@ function formatQCMetricsValue(
   // invalid with failed until we have designs to address the invalid case)
   if (JSON.stringify(inputValue) === "[]") {
     return [{ qcStatus: "Processing" }];
-  } else {
-    // this is guaranteed to be QCMetric since we did the earlier check
-    const qcMetric = inputValue as unknown as QCMetrics[];
-    qcMetric.map((e) => {
-      const qcStatusValue = e.qcStatus;
-      // TODO: remove this when we have designs ready to deal with invalid case, for now put a bandaid over the problem by marking samples as Failed
-      if (qcStatusValue === "invalid") {
-        e["qcStatus"] = "Failed";
-      } else {
-        // Capitalize first letter of qcStatus
-        e["qcStatus"] =
-          qcStatusValue.charAt(0).toUpperCase() + qcStatusValue.slice(1);
-      }
-    });
-    return qcMetric;
   }
+
+  // this is guaranteed to be QCMetric since we did the earlier check
+  const qcMetric = inputValue as unknown as QCMetrics[];
+  qcMetric.map((e) => {
+    const { qcStatus } = e;
+    // TODO: remove this when we have designs ready to deal with invalid case, for now put a bandaid over the problem by marking samples as Failed
+    if (qcStatus === "invalid") {
+      e["qcStatus"] = "Failed";
+    } else {
+      // Capitalize first letter of qcStatus
+      e["qcStatus"] = qcStatus.charAt(0).toUpperCase() + qcStatus.slice(1);
+    }
+  });
+  return qcMetric;
 }
 
 function getInputValue(
   inputObject: Record<string, JSONPrimitive>,
   key: string
 ): JSONPrimitive | { qcStatus: string }[] | QCMetrics[] {
-  // stub qcStatus to be 'processing if no qc_metrics data is available (this means sample was recently uploaded)'
+  // stub qcStatus to be 'processing if no qcMetrics data is available (this means sample was recently uploaded)'
   const inputValue = inputObject[key];
-  if (key === "qc_metrics") {
+  if (key === "qcMetrics") {
     return formatQCMetricsValue(inputValue);
   } else {
     return inputValue;

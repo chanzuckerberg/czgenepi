@@ -93,19 +93,19 @@ export const QC_METRICS_HEADER: Header = {
   sortKey: ["lineage", "lineage"],
   subHeaders: [
     {
-      key: "qc_caller",
+      key: "qcCaller",
       text: "QC Caller",
     },
     {
-      key: "qc_score",
+      key: "qcScore",
       text: "QC Score",
     },
     {
-      key: "qc_software_version",
+      key: "qcSoftwareVersion",
       text: "QC Software Version",
     },
     {
-      key: "qc_status",
+      key: "qcStatus",
       text: "QC Status",
     },
   ],
