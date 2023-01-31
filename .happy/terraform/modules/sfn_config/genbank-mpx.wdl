@@ -128,12 +128,16 @@ task IngestGenBankMPX {
     # save filtered metadata file to s3
     ${aws} s3 cp metadata.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
 
+    end_time=$(date +%s)
+
     # create the objects
-    python3 /usr/src/app/aspen/workflows/ingest_raw_sequences/save.py  \
-            --genbank-s3-bucket "${aspen_s3_db_bucket}"        \
-            --genbank-sequences-s3-key "${alignment_key}"  \
-            --genbank-metadata-s3-key "${metadata_key}"   \
-            --pathogen-slug "MPX"                                       \
+    python3 /usr/src/app/aspen/workflows/ingest_aligned_sequences/save.py  \
+            --genbank-s3-bucket "${aspen_s3_db_bucket}"                    \
+            --genbank-sequences-s3-key "${alignment_key}"                  \
+            --genbank-metadata-s3-key "${metadata_key}"                    \
+            --pathogen-slug "MPX"                                          \
+            --start-time "${start_time}"                                   \
+            --end-time "${end_time}"                                       \
             --public-repository "GenBank" > entity_id 
 
     >>>
