@@ -24,29 +24,52 @@ from aspen.workflows.shared_utils.database import (
 @click.command("save")
 @click.option("metadata_fh", "--metadata-file", type=click.File("r"), required=True)
 @click.option("--test", type=bool, is_flag=True)
+@click.option("--pathogen-slug", type=str, default="SC2")
+@click.option("--public-repository", type=str, default="GISAID")
 def cli(
     metadata_fh: io.TextIOBase,
+    pathogen_slug: str,
+    public_repository,
     test: bool,
 ):
     if test:
         print("Success!")
         return
-    write_table(metadata_fh, "SC2", "GISAID")
+    write_table(metadata_fh, pathogen_slug, public_repository)
+
+
+def get_fields_to_import(public_repository_name: str) -> Dict[str, str]:
+    repository_to_fields_to_import = {
+        "GISAID": {
+            "strain": "strain",
+            "pango_lineage": "lineage",
+            "gisaid_epi_isl": "isl",
+            "region": "region",
+            "country": "country",
+            "division": "division",
+            "location": "location",
+            "date": "date",
+        },
+        "GenBank": {
+            "accession": "strain",
+            "genbank_accession_rev": "isl",
+            "lineage": "lineage",
+            "region": "region",
+            "country": "country",
+            "division": "division",
+            "location": "location",
+            "date": "date",
+        },
+    }
+    return repository_to_fields_to_import[public_repository_name]
 
 
 def write_table(metadata_fh, pathogen_slug: str, public_repository_name: str):
     data = csv.DictReader(metadata_fh, delimiter="\t")
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
-    fields_to_import = {
-        "strain": "strain",
-        "pango_lineage": "lineage",
-        "gisaid_epi_isl": "isl",
-        "region": "region",
-        "country": "country",
-        "division": "division",
-        "location": "location",
-    }
+    fields_to_import = get_fields_to_import(public_repository_name)
+
     num_rows = 0
     with session_scope(interface) as session:
         pathogen = session.query(Pathogen).filter(Pathogen.slug == pathogen_slug).one()  # type: ignore

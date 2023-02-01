@@ -46,6 +46,15 @@ RUN mkdir /ncov && \
     git remote add origin https://github.com/chanzuckerberg/ncov.git && \
     git fetch origin czgenepi && \
     git reset --hard FETCH_HEAD
+
+# Add support for our custom mpox workflow
+RUN mkdir /mpox && \
+    cd /mpox && \
+    git init && \
+    git remote add origin https://github.com/chanzuckerberg/monkeypox.git && \
+    git fetch origin subsampling && \
+    git reset --hard FETCH_HEAD
+
 RUN mkdir -p /ncov/auspice
 RUN mkdir -p /ncov/logs
 
@@ -64,6 +73,8 @@ ENV PYTHONPATH=.
 COPY . .
 # Install the aspen package
 RUN poetry install
+RUN chmod a+w /ncov/auspice /ncov/logs
+RUN chmod a+w /mpox/ /mpox/config
 
 # TODO - Mismatch between poetry and augur deps forces us to manually install jsonschema v3 here
 RUN pip install jsonschema==3.*
