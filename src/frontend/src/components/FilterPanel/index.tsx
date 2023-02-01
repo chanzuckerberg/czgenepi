@@ -7,6 +7,7 @@ import {
 } from "src/common/analytics/eventTypes";
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
+import { getQCStatusFromSample } from "src/views/Upload/components/Samples/utils";
 import { CollectionDateFilter } from "./components/CollectionDateFilter";
 import { LineageFilter } from "./components/LineageFilter";
 import { QCStatusFilter } from "./components/QCStatusFilter";
@@ -56,7 +57,7 @@ const DATA_FILTER_INIT = {
     params: {
       multiSelected: [],
     },
-    transform: (d: Sample) => d.qcMetrics[0]?.qcStatus,
+    transform: getQCStatusFromSample,
     type: TypeFilterType.Multiple,
   },
   collectionDate: {
