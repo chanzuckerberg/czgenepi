@@ -1,6 +1,5 @@
 import csv
 import io
-import json
 from typing import Dict, IO, Optional
 
 import click
@@ -22,6 +21,7 @@ from aspen.database.models import (
     SampleMutation,
     SampleQCMetric,
 )
+from aspen.workflows.nextclade.utils import extract_dataset_info
 
 # TODO, create an enum table for below and standard nextclade QC overallStatus
 INVALID_RESULT_STATUS = "invalid"
@@ -43,13 +43,19 @@ def cli(
     pathogen_slug: str,
 ):
     """Go through results from nextclade run, save to DB for each sample."""
+    print("Beginning to save Nextclade results to DB.")
     # Track info about the dataset that was used to produce results being saved
     dataset_info = extract_dataset_info(nextclade_tag_fh)
+
+    # This can be a lot of samples, so batch up commits as we go.
+    COMMIT_CHUNK_SIZE = 1000  # This number has worked fine in manual running.
+    entry_count_so_far = 0  # Final value will be total count.
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     with session_scope(interface) as session:
         nextclade_csv: csv.DictReader = csv.DictReader(nextclade_fh, delimiter=";")
         for row in nextclade_csv:
+            entry_count_so_far += 1
             # For entire workflow, we use sample id primary keys for names.
             sample_id = int(row["seqName"])
             sample_q = sa.select(Sample).where(Sample.id == sample_id)
@@ -165,32 +171,13 @@ def cli(
                     sample_lineage.reference_dataset_tag = dataset_info["tag"]
                 session.add(sample_lineage)
 
-        # TODO: commit session after 1000 entries to limit transaction size
+            if entry_count_so_far % COMMIT_CHUNK_SIZE == 0:
+                session.commit()
+        # Don't forget to commit the last chunk of entries that remain!
+        session.commit()
 
-
-def extract_dataset_info(nextclade_tag_fh: IO[str]) -> Dict[str, str]:
-    """Extracts important info from `tag.json` file of a nextclade dataset.
-
-    A Nextclade dataset provides a `tag.json` file with various pieces of info
-    on that specific dataset bundle.
-    https://docs.nextstrain.org/projects/nextclade/en/stable/user/datasets.html
-    We want to persist certain key pieces of info because they let us know the
-    provenance of a lineage/QC/mutations call when using Nextclade.
-
-    Those pieces of info are
-        - name: The Nextclade name for the dataset bundle, eg "sars-cov-2"
-            (Note, a given pathogen can have multiple of these with different
-            meaning. For example, "sars-cov-2-no-recomb" also pertains to the
-            same pathogen, but focuses the dataset on different aspects.)
-        - accession: The underlying reference genome's id, eg "MN908947"
-        - tag: The version of overall dataset bundle, eg "2022-11-15T12:00:00Z"
-    """
-    nextclade_tag = json.load(nextclade_tag_fh)
-    return {
-        "name": nextclade_tag["name"],
-        "accession": nextclade_tag["reference"]["accession"],
-        "tag": nextclade_tag["tag"],
-    }
+    print("Finished saving Nextclade results to DB.")
+    print(f"Total count of samples run and saved: {entry_count_so_far}")
 
 
 def is_nextclade_result_valid(nextclade_csv_row: Dict[str, str]) -> bool:

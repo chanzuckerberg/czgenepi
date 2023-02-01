@@ -6,6 +6,7 @@ workflow lineage_qc_autorun {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
+        String deployment_stage
     }
 
     call lineage_qc_autorun_workflow {
@@ -14,6 +15,7 @@ workflow lineage_qc_autorun {
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
+        deployment_stage = deployment_stage
     }
 }
 
@@ -23,13 +25,14 @@ task lineage_qc_autorun_workflow {
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
+        String deployment_stage
     }
 
     command <<<
     set -Euxo pipefail
     # All the `1>&2` below is so miniwdl will log our messages since stdout
     # is effectively ignored in preference of only logging stderr
-    echo "Starting task for processing lineage QC" 1>&2
+    echo "Starting task for kicking off autorun lineage QC jobs" 1>&2
 
     # Setup env vars for configs that expect them to be there.
     export AWS_REGION="~{aws_region}"
@@ -37,15 +40,16 @@ task lineage_qc_autorun_workflow {
     if [ "~{remote_dev_prefix}" != "" ]; then
         export REMOTE_DEV_PREFIX="~{remote_dev_prefix}"
     fi
+    export DEPLOYMENT_STAGE="~{deployment_stage}"
 
     # Ensure we start in an empty directory for entire process.
+    # (For current use case, eh, this is unnecessary, but also doesn't hurt
+    # in case we do something complicated later and could trip over files.)
     WORKING_DIR=nextclade_autorun
     mkdir "${WORKING_DIR}"
     cd "${WORKING_DIR}"
 
-    # TODO Implement an autorun process, this is just temporary setup for the
-    # rest of the boilerplate until we get around to coding this.
-    echo "TODO implement autorun of nextclade" 1>&2
+    python3 /usr/src/app/aspen/workflows/nextclade/launch_refresh_jobs.py 1>&2
     >>>
 
     runtime {

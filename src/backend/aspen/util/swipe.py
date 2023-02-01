@@ -1,7 +1,7 @@
 import datetime
 import json
 import re
-from typing import List
+from typing import List, Optional
 
 from boto3 import Session
 
@@ -92,15 +92,33 @@ class NextstrainScheduledJob(NextstrainJob):
 
 
 class LineageQcJob(SwipeJob):
+    job_type = "ondemand"
+    run_type = "specified-ids-only"
+
     def get_sfn_config(self):
         return self.settings.AWS_LINEAGE_QC_SFN_PARAMETERS
 
-    def run(self, group: Group, pathogen_slug: str, sample_ids: List[int]):
+    def run(
+        self, group: Optional[Group], pathogen_slug: str, sample_ids: List[int] = []
+    ):
         extra_params = {
             "pathogen_slug": pathogen_slug,
-            "sample_ids": sample_ids,  # sample PK ids
+            # See workflow's `prep_samples.py` for allowed values of run_type
+            "run_type": self.run_type,
+            # sample_ids ignored if run_type is not "specified-ids-only" type
+            "sample_ids": sample_ids,
         }
         now = datetime.datetime.now()
         output_suffix = f"/{str(now)}"
-        execution_name = f"{group.prefix}-ondemand-lineage-qc-{str(now)}"
+        group_prefix = ""
+        if group is not None:
+            group_prefix = f"{group.prefix}-"
+        execution_name = (
+            f"{group_prefix}{self.job_type}-{pathogen_slug}-lineage-qc-{str(now)}"
+        )
         return self._start(execution_name, output_suffix, extra_params)
+
+
+class LineageQcScheduledJob(LineageQcJob):
+    job_type = "scheduled"
+    run_type = "refresh-stale"

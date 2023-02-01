@@ -7,7 +7,10 @@ workflow lineage_qc_ondemand {
         String genepi_config_secret_name
         String remote_dev_prefix = ""
         String pathogen_slug
-        Array[Int] sample_ids
+        # `run_type`: See workflow's `prep_samples.py` for allowed values
+        String run_type
+        # `sample_ids` is ignored for run types that are not specified-ids-only
+        Array[Int] sample_ids = []
     }
 
     call lineage_qc_ondemand_workflow {
@@ -17,6 +20,7 @@ workflow lineage_qc_ondemand {
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
         pathogen_slug = pathogen_slug,
+        run_type = run_type,
         sample_ids = sample_ids,
     }
 }
@@ -28,6 +32,7 @@ task lineage_qc_ondemand_workflow {
         String genepi_config_secret_name
         String remote_dev_prefix
         String pathogen_slug
+        String run_type
         Array[Int] sample_ids
     }
 
@@ -50,6 +55,7 @@ task lineage_qc_ondemand_workflow {
     cd "${WORKING_DIR}"
 
     export PATHOGEN_SLUG="~{pathogen_slug}"
+    export RUN_TYPE="~{run_type}"
     export SAMPLE_IDS_FILENAME="sample_ids.txt"
     # While `sample_ids` is Array[Int], WDL auto coerces to strings, as we want
     echo "~{sep('\n', sample_ids)}" > $SAMPLE_IDS_FILENAME
