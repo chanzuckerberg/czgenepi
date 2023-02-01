@@ -169,7 +169,7 @@ def cli(
             )
 
         # We should abandon this workflow run if there are no samples to run.
-        if sample_ids == []:
+        if not sample_ids:
             if run_type == RunType.REFRESH_STALE:
                 print("No samples were found that needed refreshing.")
                 save_job_info(job_info_fh, should_exit_early=True)
