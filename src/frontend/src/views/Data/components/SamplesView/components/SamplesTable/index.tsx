@@ -36,6 +36,7 @@ import { getLineageFromSampleLineages } from "src/common/utils/samples";
 import { QualityScoreTag } from "./components/QualityScoreTag";
 import { memo } from "src/common/utils/memo";
 import { VirtualBumper } from "./components/VirtualBumper";
+import { getQCStatusFromSample } from "src/views/Upload/components/Samples/utils";
 
 interface Props {
   data: IdMap<Sample> | undefined;
@@ -181,8 +182,8 @@ const columns: ColumnDef<Sample, any>[] = [
       );
     }),
     sortingFn: (a, b) => {
-      const statusA = a.original.qcMetrics[0].qcStatus;
-      const statusB = b.original.qcMetrics[0].qcStatus;
+      const statusA = getQCStatusFromSample(a.original);
+      const statusB = getQCStatusFromSample(b.original);
       return statusA > statusB ? -1 : 1;
     },
   },
