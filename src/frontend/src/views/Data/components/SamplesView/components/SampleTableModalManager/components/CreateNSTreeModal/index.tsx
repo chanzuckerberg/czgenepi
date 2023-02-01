@@ -12,10 +12,7 @@ import type { TreeType } from "src/common/constants/types";
 import { TreeTypes } from "src/common/constants/types";
 import { useGroupInfo } from "src/common/queries/groups";
 import { useLineages } from "src/common/queries/lineages";
-import {
-  foldInLocationName,
-  useNamedLocations,
-} from "src/common/queries/locations";
+import { useNamedLocations } from "src/common/queries/locations";
 import { RawTreeCreationWithId, useCreateTree } from "src/common/queries/trees";
 import { addNotification } from "src/common/redux/actions";
 import { useDispatch, useSelector } from "src/common/redux/hooks";
@@ -24,6 +21,7 @@ import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
+import { getLocationFromGroup } from "src/common/utils/groupUtils";
 import { pluralize } from "src/common/utils/strUtils";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
@@ -107,17 +105,13 @@ export const CreateNSTreeModal = ({
 
   // If we have the group's location, use this as the default for the filter
   const [selectedLocation, setSelectedLocation] =
-    useState<NamedGisaidLocation | null>(
-      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
-    );
+    useState<NamedGisaidLocation | null>(getLocationFromGroup(groupInfo));
 
   // If the group call isn't back when this is loaded, we need to update when the
   // call returns
   useEffect(() => {
-    setSelectedLocation(
-      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
-    );
-  }, [groupInfo?.location]);
+    setSelectedLocation(getLocationFromGroup(groupInfo));
+  }, [groupInfo]);
 
   // Filter based on date ranges
   const [startDate, setStartDate] = useState<FormattedDateType>();
@@ -146,9 +140,7 @@ export const CreateNSTreeModal = ({
     setStartDate(undefined);
     setEndDate(undefined);
     setSelectedLineages([]);
-    setSelectedLocation(
-      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
-    );
+    setSelectedLocation(getLocationFromGroup(groupInfo));
     setIsFilterEnabled(false);
   };
 
