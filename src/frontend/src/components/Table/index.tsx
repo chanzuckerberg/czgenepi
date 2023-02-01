@@ -8,13 +8,13 @@ import {
   TableOptions,
   useReactTable,
 } from "@tanstack/react-table";
-import { Table as SDSTable, TableHeader } from "czifui";
+import { Table as SDSTable, TableHeader, TableRow } from "czifui";
 import { map } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { useVirtual, VirtualItem } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
-import { StyledTableRow, StyledWrapper } from "./style";
-import { EmptyTable } from "src/views/Data/components/EmptyState";
+import { StyledWrapper } from "./style";
+import { EmptyTable } from "./components/EmptyState";
 import { VirtualBumper } from "./components/VirtualBumper";
 import { rowSelectionColumn } from "./columnDefinitions/RowSelectionColumn";
 
@@ -71,7 +71,10 @@ const Table = <T extends any>({
     data,
     defaultColumn: {
       minSize: 50,
-      size: 50,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - (mlila) this is a fix for a table spacing problem we had
+      // https://github.com/TanStack/table/discussions/3192
+      size: "auto",
     },
     columns: enableMultiRowSelection
       ? [rowSelectionColumn, ...columns]
@@ -132,13 +135,13 @@ const Table = <T extends any>({
             {virtualRows.map((vRow: VirtualItem) => {
               const row = rows[vRow.index];
               return (
-                <StyledTableRow key={row.id} shouldShowTooltipOnHover={false}>
+                <TableRow key={row.id} shouldShowTooltipOnHover={false}>
                   {row
                     .getVisibleCells()
                     .map((cell) =>
                       flexRender(cell.column.columnDef.cell, cell.getContext())
                     )}
-                </StyledTableRow>
+                </TableRow>
               );
             })}
           </VirtualBumper>

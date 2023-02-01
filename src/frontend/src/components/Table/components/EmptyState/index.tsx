@@ -10,7 +10,6 @@ import {
   Wrapper,
 } from "./style";
 
-// TODO-TR: move to the appropriate directory where it is used
 interface Props {
   numOfColumns: number;
 }

@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { getColors, TableRow } from "czifui";
+import { CommonThemeProps, getColors } from "czifui";
 
 // needed to keep search bar sticky
 export const StyledWrapper = styled.div`
@@ -9,13 +9,11 @@ export const StyledWrapper = styled.div`
   & > div {
     overflow: auto;
   }
-`;
 
-export const StyledTableRow = styled(TableRow)`
-  ${(props) => {
+  ${(props: CommonThemeProps) => {
     const colors = getColors(props);
     return `
-      &:hover {
+      tr:hover {
         background-color: ${colors?.primary[100]};
       }
     `;

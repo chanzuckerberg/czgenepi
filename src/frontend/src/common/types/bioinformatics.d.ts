@@ -1,5 +1,3 @@
-// TODO-TR: write mapping functions for the following 3 types to reduce snake case
-// TODO-TR: variable in the front end. They don't belong here
 interface GISAID {
   status: "submitted" | "not_eligible" | "accepted" | "rejected" | "no_info";
   gisaid_id?: string;

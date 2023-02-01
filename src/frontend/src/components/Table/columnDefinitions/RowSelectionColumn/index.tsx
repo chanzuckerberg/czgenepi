@@ -8,6 +8,7 @@ export const rowSelectionColumn: ColumnDef<any, any> = {
   id: "select",
   size: 40,
   minSize: 40,
+  maxSize: 40,
   header: ({ table, column, header }) => {
     const {
       getIsAllRowsSelected,
