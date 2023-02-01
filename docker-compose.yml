@@ -256,6 +256,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=dev_secret_access_key
       - FLASK_ENV=development
       - PYTHONUNBUFFERED=1
+      - GENEPI_CONFIG_SECRET_NAME=genepi-config
       - BOTO_ENDPOINT_URL=http://localstack.genepinet.localdev:4566
       - DB=docker
       - ENV=local

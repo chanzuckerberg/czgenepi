@@ -15,10 +15,10 @@ from aspen.database.connection import (
     session_scope,
     SqlAlchemyInterface,
 )
-from aspen.database.models import Location, PublicRepositoryMetadata
+from aspen.database.models import Location, Pathogen, PublicRepositoryMetadata
 
 
-def save():
+def save(pathogen_slug: str):
     config = Config()
     interface: SqlAlchemyInterface = init_db(get_db_uri(config))
 
@@ -31,8 +31,10 @@ def save():
                 PublicRepositoryMetadata.division,
                 PublicRepositoryMetadata.location,
             )
+            .join(Pathogen)
             .where(
                 and_(
+                    Pathogen.slug == pathogen_slug,
                     PublicRepositoryMetadata.location != "",
                     PublicRepositoryMetadata.location != None,
                 )
@@ -129,11 +131,12 @@ def save():
 
 @click.command("save")
 @click.option("--test", type=bool, is_flag=True)
-def cli(test: bool):
+@click.option("--pathogen", type=str, default="SC2")
+def cli(test: bool, pathogen: str):
     if test:
         print("Success!")
         return
-    save()
+    save(pathogen)
 
 
 if __name__ == "__main__":

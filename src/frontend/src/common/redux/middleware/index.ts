@@ -17,6 +17,7 @@ import {
 import { getCurrentUserInfo } from "src/common/queries/auth";
 import { expireAllCaches } from "src/common/queries/groups";
 import { USE_LINEAGES_INFO_QUERY_KEY } from "src/common/queries/lineages";
+import { USE_LOCATIONS_INFO_QUERY_KEY } from "src/common/queries/locations";
 import { USE_PHYLO_RUN_INFO } from "src/common/queries/phyloRuns";
 import { queryClient } from "src/common/queries/queryClient";
 import { USE_SAMPLE_INFO } from "src/common/queries/samples";
@@ -70,6 +71,9 @@ const expirePathogenCaches = async (): Promise<void> => {
     USE_PHYLO_RUN_INFO,
     USE_SAMPLE_INFO,
     USE_LINEAGES_INFO_QUERY_KEY,
+    // (ehoops) Refetching locations is somewhat expensive. If users often
+    // switch between pathogens, we should cache this per pathogen.
+    USE_LOCATIONS_INFO_QUERY_KEY,
   ];
 
   forEach(queriesToRefetch, async (q) => {

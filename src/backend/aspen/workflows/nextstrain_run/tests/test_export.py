@@ -440,6 +440,7 @@ def generate_run(phylo_run_id, reset_status=False):
     builds_file_fh = StringIO()
     export_run_config(
         phylo_run_id,
+        "uploaded",
         sequences_fh,
         selected_fh,
         metadata_fh,

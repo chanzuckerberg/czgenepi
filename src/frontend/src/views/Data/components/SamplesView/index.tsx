@@ -49,7 +49,7 @@ const SamplesView = (): JSX.Element => {
   // update list of qcStatuses to use in the filter panel on the left side of the screen
   const qcStatuses = useMemo(
     () =>
-      uniq(compact(map(samples, (d) => d.qcMetrics[0]?.qc_status)))
+      uniq(compact(map(samples, (d) => d.qcMetrics[0]?.qcStatus)))
         .sort()
         .map((name) => ({ name })),
     [samples]

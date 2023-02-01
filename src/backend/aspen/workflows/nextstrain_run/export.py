@@ -28,13 +28,12 @@ from aspen.database.models import (
     PathogenLineage,
     PhyloRun,
     Sample,
-    UploadedPathogenGenome,
 )
 from aspen.database.models.workflow import WorkflowStatusType
 from aspen.util.lineage import expand_lineage_wildcards
 from aspen.workflows.nextstrain_run.build_config import TemplateBuilder
 
-METADATA_CSV_FIELDS = [
+NCOV_CSV_FIELDS = [
     "strain",
     "virus",
     "gisaid_epi_isl",
@@ -62,6 +61,37 @@ METADATA_CSV_FIELDS = [
     "paper_url",
     "date_submitted",
 ]
+GENBANK_CSV_FIELDS = [
+    "accession",
+    "genbank_accession_rev",
+    "strain",
+    "date",
+    "region",
+    "country",
+    "division",
+    "location",
+    "host",
+    "date_submitted",
+    "sra_accession",
+    "abbr_authors",
+    "reverse",
+    "clade",
+    "outbreak",
+    "lineage",
+    "coverage",
+    "missing_data",
+    "divergence",
+    "nonACGTN",
+    "QC_missing_data",
+    "QC_mixed_sites",
+    "QC_rare_mutations",
+    "QC_frame_shifts",
+    "QC_stop_codons",
+    "frame_shifts",
+    "is_reverse_complement",
+    "authors",
+    "institution",
+]
 
 
 @click.command("save")
@@ -86,6 +116,12 @@ METADATA_CSV_FIELDS = [
 )
 @click.option("--test", type=bool, is_flag=True)
 @click.option("--builds-file-only", type=bool, is_flag=True)
+@click.option(
+    "--sequence-type",
+    type=click.Choice(["aligned", "uploaded"]),
+    default="uploaded",
+    required=True,
+)
 def cli(
     phylo_run_id: int,
     sequences_fh: io.TextIOWrapper,
@@ -96,6 +132,7 @@ def cli(
     reset_status: bool,
     test: bool,
     builds_file_only: bool,
+    sequence_type: str,
 ):
     if builds_file_only:
         dump_yaml_template(phylo_run_id, builds_file_fh)
@@ -105,6 +142,7 @@ def cli(
         return
     aligned_repo_data = export_run_config(
         phylo_run_id,
+        sequence_type,
         sequences_fh,
         selected_fh,
         metadata_fh,
@@ -133,9 +171,13 @@ def dump_yaml_template(
         context = {
             "num_sequences": num_sequences,
             "num_included_samples": num_included_samples,
+            "run_start_datetime": phylo_run.start_datetime,  # can be None
         }
+        resolved_template_args = resolve_template_args(
+            session, phylo_run.pathogen, phylo_run.template_args, group
+        )
         builder: TemplateBuilder = TemplateBuilder(
-            phylo_run.tree_type, group, phylo_run.template_args, **context
+            phylo_run.tree_type, phylo_run.group, resolved_template_args, **context
         )
         builder.write_file(builds_file_fh)
 
@@ -144,6 +186,7 @@ def dump_yaml_template(
 
 def export_run_config(
     phylo_run_id: int,
+    sequence_type: str,
     sequences_fh: io.TextIOBase,
     selected_fh: io.TextIOBase,
     metadata_fh: io.TextIOBase,
@@ -165,7 +208,11 @@ def export_run_config(
         group: Group = phylo_run.group
 
         # Fetch all of a group's samples.
-        county_samples: List[PathogenGenome] = get_county_samples(session, group)
+        county_samples: List[PathogenGenome] = []
+        if sequence_type == "aligned":
+            county_samples = get_aligned_county_samples(session, group)
+        else:
+            county_samples = get_county_samples(session, group)
 
         # get the aligned gisaid run info.
         aligned_gisaid: AlignedRepositoryData = [
@@ -173,7 +220,7 @@ def export_run_config(
         ][0]
 
         num_sequences = write_sequences_files(
-            session, county_samples, sequences_fh, metadata_fh
+            session, sequence_type, county_samples, sequences_fh, metadata_fh
         )
 
         selected_samples: List[PathogenGenome] = [
@@ -225,6 +272,21 @@ def get_county_samples(session, group: Group):
         )
     )
     pathogen_genomes = [sample.uploaded_pathogen_genome for sample in all_samples]
+    return pathogen_genomes
+
+
+def get_aligned_county_samples(session, group: Group):
+    # Get all samples for the group
+    all_samples: Iterable[Sample] = (
+        session.query(Sample)
+        .filter(Sample.submitting_group_id == group.id)
+        .options(
+            joinedload(Sample.aligned_pathogen_genome, innerjoin=True).undefer(
+                PathogenGenome.sequence
+            )
+        )
+    )
+    pathogen_genomes = [sample.aligned_pathogen_genome[0] for sample in all_samples]
     return pathogen_genomes
 
 
@@ -339,9 +401,7 @@ def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
     num_includes = 0
     sample_ids: List[int] = [
-        pathogen_genome.sample_id
-        for pathogen_genome in pathogen_genomes
-        if isinstance(pathogen_genome, UploadedPathogenGenome)
+        pathogen_genome.sample_id for pathogen_genome in pathogen_genomes
     ]
 
     # Write an includes.txt with the sample ID's.
@@ -362,23 +422,83 @@ def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
 def get_lineage(sample: Sample):
     if sample.lineages:
         return sample.lineages[0].lineage
-
     return None
 
 
-def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
+def populate_uploaded_row(sample, sequence):
+    gisaid_accession: Optional[Accession] = None
+    genbank_accession: Optional[Accession] = None
+    for accession in sample.accessions:
+        if accession.accession_type == AccessionType.GISAID_ISL:
+            gisaid_accession = accession
+        elif accession.accession_type == AccessionType.GENBANK:
+            genbank_accession = accession
+
+    upload_date = None
+    if sample.uploaded_pathogen_genome is not None:
+        upload_date = sample.uploaded_pathogen_genome.upload_date.strftime("%Y-%m-%d")
+
+    row: MutableMapping[str, Any] = {
+        "strain": sample.public_identifier,
+        "virus": "ncov",
+        "gisaid_epi_isl": getattr(gisaid_accession, "accession", None) or "",
+        "genbank_accession": getattr(genbank_accession, "accession", None) or "",
+        "date": sample.collection_date.strftime("%Y-%m-%d"),
+        "date_submitted": upload_date,
+        "region": sample.collection_location.region,
+        "country": sample.collection_location.country,
+        "division": sample.collection_location.division,
+        "location": sample.collection_location.location,
+        "region_exposure": sample.collection_location.region,
+        "country_exposure": sample.collection_location.country,
+        "division_exposure": sample.collection_location.division,
+        "segment": "genome",
+        "length": len(sequence),
+        "host": "Human",
+        "age": "?",
+        "sex": "?",
+        "originating_lab": sample.sample_collected_by,
+        "submitting_lab": sample.submitting_group.name,
+        "authors": ", ".join(sample.authors),
+        "pango_lineage": get_lineage(sample),
+    }
+    return row
+
+
+def populate_aligned_row(sample, sequence):
+    genbank_accession: Optional[Accession] = None
+    for accession in sample.accessions:
+        if accession.accession_type == AccessionType.GENBANK:
+            genbank_accession = accession
+    upload_date = None
+    if sample.uploaded_pathogen_genome is not None:
+        upload_date = sample.uploaded_pathogen_genome.upload_date.strftime("%Y-%m-%d")
+
+    row: MutableMapping[str, Any] = {
+        "strain": sample.public_identifier,
+        "accession": getattr(genbank_accession, "accession", None) or "",
+        "date": sample.collection_date.strftime("%Y-%m-%d"),
+        "region": sample.collection_location.region,
+        "country": sample.collection_location.country,
+        "division": sample.collection_location.division,
+        "location": sample.collection_location.location,
+        "host": "Human",
+        "date_submitted": upload_date,
+        "authors": ", ".join(sample.authors),
+        "lineage": get_lineage(sample),
+        "institution": sample.submitting_group.name,
+    }
+    return row
+
+
+def write_sequences_files(
+    session, sequence_type: str, pathogen_genomes, sequences_fh, metadata_fh
+):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
     num_sequences = 0
-    uploaded_pathogen_genomes = {
-        pathogen_genome
-        for pathogen_genome in pathogen_genomes
-        if isinstance(pathogen_genome, UploadedPathogenGenome)
-    }
+    sequences = {sequence for sequence in pathogen_genomes}
 
-    sample_ids = {
-        uploaded_pathogen_genome.sample_id
-        for uploaded_pathogen_genome in uploaded_pathogen_genomes
-    }
+    sample_ids = {sequence.sample_id for sequence in sequences}
 
     sample_id_to_sample: Mapping[int, Sample] = {
         sample.id: sample
@@ -390,14 +510,14 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
     aliased(Entity)
 
     aspen_samples: Set[str] = set()
-    metadata_csv_fh = csv.DictWriter(metadata_fh, METADATA_CSV_FIELDS, delimiter="\t")
+    csv_fields = NCOV_CSV_FIELDS
+    if sequence_type == "aligned":
+        csv_fields = GENBANK_CSV_FIELDS
+    metadata_csv_fh = csv.DictWriter(metadata_fh, csv_fields, delimiter="\t")
     metadata_csv_fh.writeheader()
     for pathogen_genome in pathogen_genomes:
         # find the corresponding sample
-        if isinstance(pathogen_genome, UploadedPathogenGenome):
-            sample_id = pathogen_genome.sample_id
-        else:
-            raise ValueError("pathogen genome of unknown type")
+        sample_id = pathogen_genome.sample_id
         sample = sample_id_to_sample[sample_id]
         aspen_samples.add(sample.public_identifier)
 
@@ -408,48 +528,17 @@ def write_sequences_files(session, pathogen_genomes, sequences_fh, metadata_fh):
                 if not (line.startswith(">") or line.startswith(";"))
             ]
         )
-        sequence = sequence.strip("Nn")
 
-        upload_date = None
-        if sample.uploaded_pathogen_genome is not None:
-            upload_date = sample.uploaded_pathogen_genome.upload_date.strftime(
-                "%Y-%m-%d"
-            )
+        # N's are desired in aligned sequences but not uploaded ones!
+        if sequence_type != "aligned":
+            sequence = sequence.strip("Nn")
 
-        gisaid_accession: Optional[Accession] = None
-        genbank_accession: Optional[Accession] = None
-        for accession in sample.accessions:
-            if accession.accession_type == AccessionType.GISAID_ISL:
-                gisaid_accession = accession
-            elif accession.accession_type == AccessionType.GENBANK:
-                genbank_accession = accession
+        if sequence_type == "aligned":
+            row = populate_aligned_row(sample, sequence)
+        else:
+            row = populate_uploaded_row(sample, sequence)
 
-        aspen_metadata_row: MutableMapping[str, Any] = {
-            "strain": sample.public_identifier,
-            "virus": "ncov",
-            "gisaid_epi_isl": getattr(gisaid_accession, "accession", None) or "",
-            "genbank_accession": getattr(genbank_accession, "accession", None) or "",
-            "date": sample.collection_date.strftime("%Y-%m-%d"),
-            "date_submitted": upload_date,
-            "region": sample.collection_location.region,
-            "country": sample.collection_location.country,
-            "division": sample.collection_location.division,
-            "location": sample.collection_location.location,
-            "region_exposure": sample.collection_location.region,
-            "country_exposure": sample.collection_location.country,
-            "division_exposure": sample.collection_location.division,
-            "segment": "genome",
-            "length": len(sequence),
-            "host": "Human",
-            "age": "?",
-            "sex": "?",
-            "originating_lab": sample.sample_collected_by,
-            "submitting_lab": sample.submitting_group.name,
-            "authors": ", ".join(sample.authors),
-            "pango_lineage": get_lineage(sample),
-        }
-
-        metadata_csv_fh.writerow(aspen_metadata_row)
+        metadata_csv_fh.writerow(row)
         sequences_fh.write(f">{sample.public_identifier}\n")
         sequences_fh.write(sequence)
         sequences_fh.write("\n")

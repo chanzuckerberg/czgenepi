@@ -1,0 +1,7 @@
+{
+"docker_image_id": "${DOCKER_REPO}genepi-gisaid:latest",
+"aws_region": "us-west-2",
+"genepi_config_secret_name": "genepi-config",
+"genbank_metadata_url": "https://github.com/chanzuckerberg/czge-test-data/raw/main/public_repo_data/mpx_metadata.tsv.gz",
+"genbank_alignment_url": "https://github.com/chanzuckerberg/czge-test-data/raw/main/public_repo_data/mpx_alignment.fasta.xz"
+}

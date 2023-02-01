@@ -1,6 +1,10 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import { API, getBackendApiJson } from "../api";
+import { store } from "../redux";
+import { selectCurrentPathogen } from "../redux/selectors";
+import { Pathogen } from "../redux/types";
+import { PathogenConfigType } from "../types/pathogenConfig";
 import { IdMap, reduceObjectArrayToLookupDict } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 
@@ -8,11 +12,26 @@ export interface LocationsResponse {
   locations: GisaidLocation[];
 }
 
-const fetchLocations = (): Promise<LocationsResponse> => {
-  return getBackendApiJson(API.LOCATIONS);
+const locationDepthPathogenConfig: PathogenConfigType<
+  keyof GisaidLocation | null
+> = {
+  [Pathogen.COVID]: null,
+  [Pathogen.MONKEY_POX]: "division",
 };
 
-const USE_LOCATIONS_INFO_QUERY_KEY = {
+const fetchLocations = (): Promise<LocationsResponse> => {
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+
+  const route =
+    locationDepthPathogenConfig[pathogen] === null
+      ? API.LOCATIONS
+      : `${API.LOCATIONS}?max_location_depth=${locationDepthPathogenConfig[pathogen]}`;
+
+  return getBackendApiJson(route);
+};
+
+export const USE_LOCATIONS_INFO_QUERY_KEY = {
   entities: [ENTITIES.LOCATION_INFO],
   id: "locationInfo",
 };

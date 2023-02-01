@@ -35,7 +35,7 @@ const STATUS_LABELS: StatusLabelMap = {
 const getLabelForQCMetric = (qcMetric: QCMetrics): StatusLabel => {
   if (!qcMetric) return STATUS_LABELS.processing;
 
-  const qcStatus = qcMetric.qc_status;
+  const { qcStatus } = qcMetric;
 
   switch (qcStatus?.toLowerCase()) {
     case "good":
