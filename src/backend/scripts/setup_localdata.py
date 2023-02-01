@@ -335,16 +335,17 @@ def create_sample(session, group, pathogen, uploaded_by_user, location, suffix):
 
 
 def create_run(session, group, pathogen, user, tree_type, status, name=None):
-    run = (
+    query = (
         session.query(PhyloRun)
         .filter(PhyloRun.tree_type == tree_type)
         .filter(PhyloRun.user == user)
         .filter(PhyloRun.group == group)
         .filter(PhyloRun.workflow_status == status)
         .filter(PhyloRun.pathogen == pathogen)
-        .order_by(PhyloRun.id)
-        .first()
     )
+    if name:
+        query = query.filter(PhyloRun.name == name)
+    run = query.first()
     if run:
         return run
     aligned_dump = (
@@ -425,8 +426,12 @@ def create_test_trees(session, group, pathogen, user):
         if typename == "TARGETED":
             name = f"{group.name} {status.value.title()} {typename.title()} {pathogen.slug} Run"
             run_user = user
-        run = create_run(session, group, pathogen, run_user, tree_type, status, name)
-        create_tree(session, run)
+        for i in range(100):
+            name = f"{group.name} {status.value.title()} {typename.title()} {pathogen.slug} Run {i}"
+            run = create_run(
+                session, group, pathogen, run_user, tree_type, status, name
+            )
+            create_tree(session, run)
 
 
 def create_alignment_entity(session, pathogen, repository):
