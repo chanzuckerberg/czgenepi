@@ -25,7 +25,7 @@ import {
   StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
 import { getLocationFromGroup } from "src/common/utils/groupUtils";
-import { createStringToLocationFinder } from "src/common/utils/locationUtils";
+import { createMaxDepthLocationFinder } from "src/common/utils/locationUtils";
 import { pluralize } from "src/common/utils/strUtils";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
@@ -112,12 +112,13 @@ export const CreateNSTreeModal = ({
   const [selectedLocation, setSelectedLocation] =
     useState<NamedGisaidLocation | null>(getLocationFromGroup(groupInfo));
 
-  const stringToLocationFinder = useMemo(() => {
-    return createStringToLocationFinder(namedLocations);
+  const locationMaxDepthFinder = useMemo(() => {
+    return createMaxDepthLocationFinder(namedLocations);
   }, [namedLocations]);
 
   const setLocationToGroupDefault = () => {
     const locationDepth = locationDepthPathogenConfig[pathogen];
+
     const defaultTreeLocation =
       locationDepth === null
         ? // If locationDepth is not specified, use the group's location
@@ -127,7 +128,7 @@ export const CreateNSTreeModal = ({
         ? // Search for the location id that matches the max depth of the group's location
           // For example, for mpox the max depth is "division", we want to find the id of
           // the location that has the same division as the group's location, but location is null
-          stringToLocationFinder(groupInfo?.location[locationDepth] as string)
+          locationMaxDepthFinder(groupInfo?.location, locationDepth)
         : // If location is not defined, we can't set the default selectedLocation yet
           null;
     if (defaultTreeLocation) {
@@ -138,7 +139,7 @@ export const CreateNSTreeModal = ({
   // call returns
   useEffect(setLocationToGroupDefault, [
     groupInfo,
-    stringToLocationFinder,
+    locationMaxDepthFinder,
     pathogen,
   ]);
 
