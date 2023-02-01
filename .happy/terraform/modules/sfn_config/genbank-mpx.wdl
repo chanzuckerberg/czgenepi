@@ -91,8 +91,8 @@ task IngestGenBankMPX {
     aspen_creation_rev=$COMMIT_SHA
 
     # S3 target locations
-    metadata_key="raw_nextstrain_mpx_dump/${build_id}/metadata.tsv.xz"
-    alignment_key="raw_nextstrain_mpx_dump/${build_id}/aligntment.fasta.xz"
+    metadata_key="aligned_genbank_mpx_dump/${build_id}/metadata.tsv.xz"
+    alignment_key="aligned_genbank_mpx_dump/${build_id}/aligntment.fasta.xz"
 
     # fetch the nextstrain mpx sequences and save them to s3.
     wget "~{genbank_alignment_url}" --continue --tries=2 -O alignment.fasta.xz
@@ -128,12 +128,16 @@ task IngestGenBankMPX {
     # save filtered metadata file to s3
     ${aws} s3 cp metadata.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
 
+    end_time=$(date +%s)
+
     # create the objects
-    python3 /usr/src/app/aspen/workflows/ingest_raw_sequences/save.py  \
-            --genbank-s3-bucket "${aspen_s3_db_bucket}"        \
-            --genbank-sequences-s3-key "${alignment_key}"  \
-            --genbank-metadata-s3-key "${metadata_key}"   \
-            --pathogen-slug "MPX"                                       \
+    python3 /usr/src/app/aspen/workflows/ingest_aligned_sequences/save.py  \
+            --genbank-s3-bucket "${aspen_s3_db_bucket}"                    \
+            --genbank-sequences-s3-key "${alignment_key}"                  \
+            --genbank-metadata-s3-key "${metadata_key}"                    \
+            --pathogen-slug "MPX"                                          \
+            --start-time "${start_time}"                                   \
+            --end-time "${end_time}"                                       \
             --public-repository "GenBank" > entity_id 
 
     >>>
