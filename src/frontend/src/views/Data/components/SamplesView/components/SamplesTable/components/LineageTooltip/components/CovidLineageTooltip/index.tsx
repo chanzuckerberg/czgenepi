@@ -4,30 +4,30 @@ import { Label, Text, Wrapper } from "./style";
 
 const KEY_TO_LABELS = {
   lineage: "Lineage",
-  qc_status: "QC Status",
-  scorpio_call: "Scorpio Call",
-  scorpio_support: "Scorpio Support",
-  lineage_software_version: "Version",
-  lineage_type: "Lineage Type",
-  lineage_probability: "Lineage Probability",
-  last_updated: "Last Updated",
-  reference_dataset_name: "Reference Dataset Name",
-  reference_sequence_accession: "Reference Sequence Accession",
-  reference_dataset_tag: "Reference Dataset Tag",
+  qcStatus: "QC Status",
+  scorpioCall: "Scorpio Call",
+  scorpioSupport: "Scorpio Support",
+  lineageSoftwareVersion: "Version",
+  lineageType: "Lineage Type",
+  lineageProbability: "Lineage Probability",
+  lastUpdated: "Last Updated",
+  referenceDatasetName: "Reference Dataset Name",
+  referenceSequenceAccession: "Reference Sequence Accession",
+  referenceDatasetTag: "Reference Dataset Tag",
 };
 
 const DISPLAY_ORDER: Array<keyof Lineage> = [
   "lineage",
-  "qc_status",
-  "lineage_software_version",
-  "lineage_type",
-  "lineage_probability",
-  "last_updated",
-  "scorpio_call",
-  "scorpio_support",
-  "reference_dataset_name",
-  "reference_sequence_accession",
-  "reference_dataset_tag",
+  "qcStatus",
+  "lineageSoftwareVersion",
+  "lineageType",
+  "lineageProbability",
+  "lastUpdated",
+  "scorpioCall",
+  "scorpioSupport",
+  "referenceDatasetName",
+  "referenceSequenceAccession",
+  "referenceDatasetTag",
 ];
 
 export const CovidLineageTooltip = ({
@@ -41,10 +41,10 @@ export const CovidLineageTooltip = ({
         // skip certain keys for now that are extra and not included in current design
         if (
           ![
-            "reference_dataset_name",
-            "reference_sequence_accession",
-            "reference_dataset_tag",
-            "lineage_type",
+            "referenceDatasetName",
+            "referenceSequenceAccession",
+            "referenceDatasetTag",
+            "lineageType",
           ].includes(key)
         ) {
           return (

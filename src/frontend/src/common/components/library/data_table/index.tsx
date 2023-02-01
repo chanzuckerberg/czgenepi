@@ -288,8 +288,8 @@ export const DataTable: FunctionComponent<Props> = ({
         String(item.publicId),
         Boolean(
           item.qcMetrics.length > 0 &&
-            (item.qcMetrics[0].qc_status === "Bad" ||
-              item.qcMetrics[0].qc_status === "Failed")
+            (item.qcMetrics[0].qcStatus === "Bad" ||
+              item.qcMetrics[0].qcStatus === "Failed")
         )
       );
     };

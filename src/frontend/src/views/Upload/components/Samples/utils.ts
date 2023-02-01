@@ -264,8 +264,8 @@ export function getBadOrFailedQCSampleIds(samples: Sample[]) {
       // for now there should only ever be one qcMetrics entry per sample
       .filter(
         (s) =>
-          s.qcMetrics[0].qc_status === "Bad" ||
-          s.qcMetrics[0].qc_status === "Failed"
+          s.qcMetrics[0].qcStatus === "Bad" ||
+          s.qcMetrics[0].qcStatus === "Failed"
       )
       .map((s) => s.publicId)
   );

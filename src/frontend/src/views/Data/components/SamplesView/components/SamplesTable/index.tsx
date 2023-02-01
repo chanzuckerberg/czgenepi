@@ -181,8 +181,8 @@ const columns: ColumnDef<Sample, any>[] = [
       );
     }),
     sortingFn: (a, b) => {
-      const statusA = a.original.qcMetrics[0].qc_status;
-      const statusB = b.original.qcMetrics[0].qc_status;
+      const statusA = a.original.qcMetrics[0].qcStatus;
+      const statusB = b.original.qcMetrics[0].qcStatus;
       return statusA > statusB ? -1 : 1;
     },
   },
@@ -336,12 +336,12 @@ const columns: ColumnDef<Sample, any>[] = [
       </SortableHeader>
     ),
     cell: memo(({ getValue, cell }) => {
-      const { gisaid_id, status } = getValue();
+      const { gisaidId, status } = getValue();
       return (
         <StyledCellBasic
           key={cell.id}
           primaryText={status}
-          secondaryText={gisaid_id}
+          secondaryText={gisaidId}
           shouldShowTooltipOnHover={false}
         />
       );

@@ -85,12 +85,12 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     );
   },
   gisaid: ({ value }) => {
-    const { gisaid_id, status } = value as Sample["gisaid"];
+    const { gisaidId, status } = value as Sample["gisaid"];
     return (
       <RowContent>
         <GISAIDCell data-test-id="row-gisaid-id">
           {status}
-          {gisaid_id && <Subtext>{gisaid_id}</Subtext>}
+          {gisaidId && <Subtext>{gisaidId}</Subtext>}
         </GISAIDCell>
       </RowContent>
     );
@@ -101,7 +101,7 @@ const SAMPLE_CUSTOM_RENDERERS: Record<string | number, CellRenderer> = {
     // If we start adding multiple lineages per sample we'll need to revisit this logic.
     const firstLineageValue = value[0];
     const hasLineage = Boolean(
-      firstLineageValue && firstLineageValue.lineage_software_version
+      firstLineageValue && firstLineageValue.lineageSoftwareVersion
     );
     const Component = hasLineage ? UnderlinedRowContent : RowContent;
 
