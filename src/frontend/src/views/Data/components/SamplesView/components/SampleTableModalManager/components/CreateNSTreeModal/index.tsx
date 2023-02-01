@@ -1,7 +1,6 @@
 import RadioGroup from "@mui/material/RadioGroup";
 import { Icon, Link } from "czifui";
 import { uniq } from "lodash";
-import Image from "next/image";
 import { SyntheticEvent, useEffect, useState } from "react";
 import {
   AnalyticsTreeCreationNextstrain,
@@ -11,13 +10,9 @@ import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
 import type { TreeType } from "src/common/constants/types";
 import { TreeTypes } from "src/common/constants/types";
-import GisaidLogo from "src/common/images/gisaid-logo-full.png";
 import { useGroupInfo } from "src/common/queries/groups";
 import { useLineages } from "src/common/queries/lineages";
-import {
-  foldInLocationName,
-  useNamedLocations,
-} from "src/common/queries/locations";
+import { useNamedLocations } from "src/common/queries/locations";
 import { RawTreeCreationWithId, useCreateTree } from "src/common/queries/trees";
 import { addNotification } from "src/common/redux/actions";
 import { useDispatch, useSelector } from "src/common/redux/hooks";
@@ -26,10 +21,13 @@ import {
   StyledCloseIconButton,
   StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
+import { getLocationFromGroup } from "src/common/utils/groupUtils";
 import { pluralize } from "src/common/utils/strUtils";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { Header } from "../DownloadModal/style";
+import { Acknowledgement } from "./components/Acknowledgement";
+import { AcknowledgementFooter } from "./components/AcknowledgementFooter";
 import { BadOrFailedQCSampleAlert } from "./components/BadQCSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
 import { MissingSampleAlert } from "./components/MissingSampleAlert";
@@ -40,14 +38,9 @@ import {
 } from "./components/RadioLabel";
 import { SampleIdInput } from "./components/SampleIdInput";
 import {
-  Acknowledgements,
-  Attribution,
   CreateTreeInfo,
   FieldTitle,
-  ImageSizer,
-  NextstrainLogo,
   Separator,
-  SpacedAcknowledgements,
   StyledDialog,
   StyledDialogContent,
   StyledDialogTitle,
@@ -112,18 +105,13 @@ export const CreateNSTreeModal = ({
 
   // If we have the group's location, use this as the default for the filter
   const [selectedLocation, setSelectedLocation] =
-    useState<NamedGisaidLocation | null>(
-      // TODO-TR: we need to make this DRY, it shows up multiple times in code base
-      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
-    );
+    useState<NamedGisaidLocation | null>(getLocationFromGroup(groupInfo));
 
   // If the group call isn't back when this is loaded, we need to update when the
   // call returns
   useEffect(() => {
-    setSelectedLocation(
-      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
-    );
-  }, [groupInfo?.location]);
+    setSelectedLocation(getLocationFromGroup(groupInfo));
+  }, [groupInfo]);
 
   // Filter based on date ranges
   const [startDate, setStartDate] = useState<FormattedDateType>();
@@ -152,9 +140,7 @@ export const CreateNSTreeModal = ({
     setStartDate(undefined);
     setEndDate(undefined);
     setSelectedLineages([]);
-    setSelectedLocation(
-      groupInfo?.location ? foldInLocationName(groupInfo?.location) : null
-    );
+    setSelectedLocation(getLocationFromGroup(groupInfo));
     setIsFilterEnabled(false);
   };
 
@@ -323,31 +309,7 @@ export const CreateNSTreeModal = ({
           </Title>
         </StyledDialogTitle>
         <StyledDialogContent data-test-id="modal-content">
-          <Attribution>
-            Built in partnership with <NextstrainLogo />, enabled by data
-            from&nbsp;
-            <NewTabLink href="https://gisaid.org/" target="_blank">
-              <ImageSizer>
-                <Image src={GisaidLogo} alt="GISAID" />
-              </ImageSizer>
-            </NewTabLink>
-            .
-          </Attribution>
-          <SpacedAcknowledgements>
-            We are grateful to the data contributors who shared the data used in
-            this Web Application via the GISAID Initiative&#42;: the Authors,
-            the Originating Laboratories responsible for obtaining the
-            specimens, and the Submitting Laboratories that generated the
-            genetic sequences and metadata.
-          </SpacedAcknowledgements>
-          <Acknowledgements>
-            Data used in this web application remain subject to GISAID’s Terms
-            and Conditions&nbsp;
-            <Link href="http://www.gisaid.org/DAA/" target="_blank">
-              http://www.gisaid.org/DAA/
-            </Link>
-            .
-          </Acknowledgements>
+          <Acknowledgement />
           <Separator marginSize="xl" />
           <TreeNameInput
             setTreeName={setTreeName}
@@ -468,11 +430,7 @@ export const CreateNSTreeModal = ({
           <CreateTreeInfo>
             Creating a new tree can take up to 12 hours.
           </CreateTreeInfo>
-          <Separator marginSize="xl" marginBottomSize="l" />
-          <Acknowledgements>
-            Shu, Y., McCauley, J. (2017) GISAID: From vision to reality.
-            EuroSurveillance, 22(13) DOI: 10.2807/1560-7917.ES.2017.22.13.30494.
-          </Acknowledgements>
+          <AcknowledgementFooter />
         </StyledFooter>
       </StyledDialog>
     </>

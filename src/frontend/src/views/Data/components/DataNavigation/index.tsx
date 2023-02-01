@@ -71,7 +71,6 @@ const DataNavigation = ({
   }, [currentPath, tabData]);
 
   const handleTabClick: TabEventHandler = (_, value) => {
-    // TODO-TR: smoother view transition
     router.push(value);
   };
 

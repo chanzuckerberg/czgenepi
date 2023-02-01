@@ -1,0 +1,138 @@
+subsampling_scheme: "OVERVIEW"
+
+exclude: "config/exclude_accessions_mpxv.txt"
+reference: "config/reference.fasta"
+genemap: "config/genemap.gff"
+genbank_reference: "config/reference.gb"
+colors: "config/colors_mpxv.tsv"
+lat_longs: "config/lat_longs.tsv"
+auspice_config: "config/auspice_config_mpxv.json"
+description: "config/description.md"
+clades: "config/clades.tsv"
+tree_mask: "config/tree_mask.tsv"
+
+strain_id_field: "accession"
+display_strain_field: "strain_original"
+
+build_name: "mpxv"
+auspice_name: "monkeypox_mpxv"
+
+## align
+max_indel: 10000
+seed_spacing: 1000
+
+## treefix
+fix_tree: true
+
+## refine
+timetree: false
+root: "min_dev"
+clock_rate: 3e-6
+clock_std_dev: 6e-6
+
+## recency
+recency: true
+
+mask:
+  from_beginning: 1350
+  from_end: 6422
+  maskfile: "config/mask_overview.bed"
+
+## Subsampling schemas
+subsampling:
+
+  OVERVIEW:
+    group:
+      subsample-max-sequences: 500
+      query: "(location == '{location}') & (division == '{division}')" 
+      min-length: 100000
+      
+    state:
+      subsample-max-sequences: 300
+      query: "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
+      priorities:
+        type: "proximity"
+        focus: "group"
+      min-length: 100000
+
+    country:
+      subsample-max-sequences: 300
+      query: "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
+      priorities:
+        type: "proximity"
+        focus: "group"
+      min-length: 100000
+      
+    international:
+      subsample-max-sequences: 300
+      query: "(country != '{country}')" # this should capture samples that have no division or location info
+      priorities:
+          type: "proximity"
+          focus: "group"
+      min-length: 100000
+      
+    international_serial_sampling:
+      group-by: ["region", "year"]  # lots of samples have no "month" so in order to include them, we'll only go by "year"
+      sequences-per-group: 2
+      query: "(country != '{country}')"
+      min-length: 100000
+
+
+  TARGETED:
+    focal:
+      exclude-all: true
+      
+    closest:
+      subsample-max-sequences: 100   # this changes with number of samples in include.txt and that's good
+      priorities:
+        type: "proximity"
+        focus: "focal"
+      min-length: 100000
+
+    group:
+      subsample-max-sequences: 25
+      query: "(location == '{location}') & (division == '{division}')"
+      priorities:
+        type: "proximity"
+        focus: "focal"
+      min-length: 100000
+       
+    state:
+      subsample-max-sequences: 25
+      query: "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
+      priorities:
+        type: "proximity"
+        focus: "focal"
+      min-length: 100000
+
+    country:
+      subsample-max-sequences: 25
+      query: "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
+      priorities:
+        type: "proximity"
+        focus: "focal"
+      min-length: 100000
+      
+    international:
+      subsample-max-sequences: 25
+      query: "(country != '{country}')" # this should capture samples that have no division or location info
+      priorities:
+          type: "proximity"
+          focus: "focal"
+      min-length: 100000
+      
+    international_serial_sampling:
+      group-by: ["region", "year"]  # lots of samples have no "month" so in order to include them, we'll only go by "year"
+      sequences-per-group: 2
+      query: "(country != '{country}')"
+      min-length: 100000
+      
+      
+
+  NON_CONTEXTUALIZED:
+    group:
+      group-by:
+        - "year"
+      subsample-max-sequences: 1000
+      query: "(location == '{location}') & (division == '{division}')"
+      min-length: 100000

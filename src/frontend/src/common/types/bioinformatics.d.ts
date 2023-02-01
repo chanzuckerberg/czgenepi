@@ -1,8 +1,11 @@
-// TODO-TR: write mapping functions for the following 3 types to reduce snake case
-// TODO-TR: variable in the front end. They don't belong here
 interface GISAID {
   status: "submitted" | "not_eligible" | "accepted" | "rejected" | "no_info";
-  gisaid_id?: string;
+  gisaidId?: string;
+}
+
+interface Genbank {
+  status: string;
+  genbankAccession: string;
 }
 
 interface Genbank {
@@ -12,26 +15,26 @@ interface Genbank {
 
 interface Lineage {
   lineage: string;
-  lineage_type: string;
-  lineage_software_version: string;
-  lineage_probability?: string;
-  last_updated?: string;
-  reference_dataset_name?: string;
-  reference_sequence_accession?: string;
-  reference_dataset_tag?: string;
-  scorpio_call?: string;
-  scorpio_support?: string;
-  qc_status?: string;
+  lineageType: string;
+  lineageSoftwareVersion: string;
+  lineageProbability?: string;
+  lastUpdated?: string;
+  referenceDatasetName?: string;
+  referenceSequenceAccession?: string;
+  referenceDatasetTag?: string;
+  scorpioCall?: string;
+  scorpioSupport?: string;
+  qcStatus?: string;
 }
 
 interface QCMetrics {
-  qc_score?: string;
-  qc_software_version: string;
-  qc_status: string;
-  qc_caller: string;
-  reference_dataset_name?: string;
-  reference_sequence_accession?: string;
-  reference_dataset_tag?: string;
+  qcScore?: string;
+  qcSoftwareVersion: string;
+  qcStatus: string;
+  qcCaller: string;
+  referenceDatasetName?: string;
+  referenceSequenceAccession?: string;
+  referenceDatasetTag?: string;
 }
 
 enum TREE_STATUS {
