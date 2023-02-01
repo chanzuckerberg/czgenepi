@@ -6,17 +6,18 @@ import { collectionLocationColumn } from "./columnDefinitions/collectionLocation
 import { gisaidColumn } from "./columnDefinitions/gisaid";
 import { lineageColumn } from "./columnDefinitions/lineage";
 import { privateIdColumn } from "./columnDefinitions/privateId";
-import { publicIdColumn } from "./columnDefinitions/publicId";
+import { sc2PublicIdColumn } from "./columnDefinitions/sc2PublicId";
 import { qualityControlColumn } from "./columnDefinitions/qualityControl";
 import { sequencingDateColumn } from "./columnDefinitions/sequencingDate";
 import { uploadDateColumn } from "./columnDefinitions/uploadDate";
+import { mpoxPublicIdColumn } from "./columnDefinitions/mpoxPublicId";
 
 export const SAMPLE_TABLE_COLUMNS: PathogenConfigType<
   ColumnDef<Sample, any>[]
 > = {
   [Pathogen.COVID]: [
     privateIdColumn,
-    publicIdColumn,
+    sc2PublicIdColumn,
     qualityControlColumn,
     uploadDateColumn,
     collectionDateColumn,
@@ -27,7 +28,7 @@ export const SAMPLE_TABLE_COLUMNS: PathogenConfigType<
   ],
   [Pathogen.MONKEY_POX]: [
     privateIdColumn,
-    publicIdColumn,
+    mpoxPublicIdColumn,
     collectionDateColumn,
     lineageColumn,
     uploadDateColumn,
