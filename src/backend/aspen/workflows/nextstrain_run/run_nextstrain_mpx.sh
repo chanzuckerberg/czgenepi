@@ -38,7 +38,7 @@ s3_prefix="s3://${aspen_s3_db_bucket}/${key_prefix}"
 # We use a file to pass from `export.py` to `save.py` before writing them to DB
 RESOLVED_TEMPLATE_ARGS_SAVEFILE=/tmp/resolved_template_args.json
 
-mpox_git_rev=$(cd /ncov && git rev-parse HEAD)
+mpox_git_rev=$(cd /mpox && git rev-parse HEAD)
 
 # dump the sequences, metadata, and builds.yaml for a run out to disk.
 # TODO -- we need to emit *aligned* mpox sequences!!!
