@@ -4,8 +4,8 @@ from aspen.database.models import Location
 
 
 def location_factory(
-    region: str,
-    country: str,
+    region: Optional[str],
+    country: Optional[str],
     division: Optional[str] = None,
     location: Optional[str] = None,
     latitude: Optional[float] = None,

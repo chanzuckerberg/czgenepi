@@ -38,6 +38,8 @@ s3_prefix="s3://${aspen_s3_db_bucket}/${key_prefix}"
 # We use a file to pass from `export.py` to `save.py` before writing them to DB
 RESOLVED_TEMPLATE_ARGS_SAVEFILE=/tmp/resolved_template_args.json
 
+mpox_git_rev=$(cd /ncov && git rev-parse HEAD)
+
 # dump the sequences, metadata, and builds.yaml for a run out to disk.
 # TODO -- we need to emit *aligned* mpox sequences!!!
 aligned_upstream_location=$(
@@ -90,7 +92,7 @@ end_time=$(date +%s)
 python3 /usr/src/app/aspen/workflows/nextstrain_run/save.py                 \
     --aspen-workflow-rev "${aspen_workflow_rev}"                            \
     --aspen-creation-rev "${aspen_creation_rev}"                            \
-    --ncov-rev "${ncov_git_rev}"                                            \
+    --ncov-rev "${mpox_git_rev}"                                            \
     --aspen-docker-image-version ""                                         \
     --end-time "${end_time}"                                                \
     --phylo-run-id "${WORKFLOW_ID}"                                         \

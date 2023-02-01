@@ -51,8 +51,8 @@ async def list_locations(
     # Add null filters to our query
     for col in required_null_columns:
         all_locations_query = all_locations_query.where(
-            getattr(Location, col) == None
-        )  # noqa
+            getattr(Location, col) == None  # noqa: E711
+        )
     result = await db.execute(all_locations_query)
     response = []
     for row in result.scalars():
