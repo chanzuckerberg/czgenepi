@@ -1,28 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
+import { useMemo } from "react";
+import { useSelector } from "src/common/redux/hooks";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { IdMap } from "src/common/utils/dataTransforms";
 import Table from "src/components/Table";
-import { privateIdColumn } from "./columnDefinitions/privateId";
-import { publicIdColumn } from "./columnDefinitions/publicId";
-import { qualityControlColumn } from "./columnDefinitions/qualityControl";
-import { uploadDateColumn } from "./columnDefinitions/uploadDate";
-import { collectionDateColumn } from "./columnDefinitions/collectionDate";
-import { lineageColumn } from "./columnDefinitions/lineage";
-import { collectionLocationColumn } from "./columnDefinitions/collectionLocation";
-import { sequencingDateColumn } from "./columnDefinitions/sequencingDate";
-import { gisaidColumn } from "./columnDefinitions/gisaid";
-
-const columns: ColumnDef<Sample, any>[] = [
-  privateIdColumn,
-  publicIdColumn,
-  qualityControlColumn,
-  uploadDateColumn,
-  collectionDateColumn,
-  lineageColumn,
-  collectionLocationColumn,
-  sequencingDateColumn,
-  gisaidColumn,
-];
-
+import { SAMPLE_TABLE_COLUMNS } from "./pathogenColumnConfig";
 interface Props {
   data: IdMap<Sample> | undefined;
   isLoading: boolean;
@@ -34,6 +16,12 @@ const SamplesTable = ({
   isLoading,
   setCheckedSamples,
 }: Props): JSX.Element => {
+  const pathogen = useSelector(selectCurrentPathogen);
+  const columns: ColumnDef<Sample, any>[] = useMemo(
+    () => SAMPLE_TABLE_COLUMNS[pathogen],
+    [pathogen]
+  );
+
   return (
     <Table<Sample>
       columns={columns}
