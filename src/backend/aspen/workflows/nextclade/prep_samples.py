@@ -122,9 +122,27 @@ def cli(
             session.execute(target_pathogen_query).scalars().one()
         )
 
+        # This column is NULL-able. We should abandon workflow if NULL.
+        # TODO (Vince) Some pathogens will not have a dataset once we get to
+        # generalized case and we'll need to figure out how to handle that,
+        # but right now the workflow is hardcoded to always expecting dataset.
+        nextclade_dataset_name = target_pathogen.nextclade_dataset_name
+        if not nextclade_dataset_name:
+            print("No nextclade_dataset_name for this pathogen in the DB.")
+            if run_type == RunType.REFRESH_STALE:
+                print(
+                    "Since this is a refresh job, assuming pathogen is still "
+                    "being integrated and we should stop workflow for now."
+                )
+                save_job_info(job_info_fh, should_exit_early=True)
+                sys.exit()
+            else:
+                print("Can not progress to running Nextclade with no dataset!")
+                raise RuntimeError("Pathogen has no `nextclade_dataset_name`")
+
         # This downloads the dataset info to disk for later use by Nextclade.
         nextclade_dataset_info = download_nextclade_dataset(
-            target_pathogen.nextclade_dataset_name,
+            nextclade_dataset_name,
             nextclade_dataset_dir,
             nextclade_tag_filename,
         )
@@ -154,7 +172,7 @@ def cli(
         if sample_ids == []:
             if run_type == RunType.REFRESH_STALE:
                 print("No samples were found that needed refreshing.")
-                save_job_info(job_info_fh, should_exit_because_no_samples=True)
+                save_job_info(job_info_fh, should_exit_early=True)
                 sys.exit()
             else:
                 print("No samples for Nextclade run! Aborting workflow!")
@@ -344,7 +362,7 @@ def get_all_sample_ids_for_pathogen(
 def save_job_info(
     job_info_fh: IO[str],
     pathogen_slug: Optional[str] = None,
-    should_exit_because_no_samples: bool = False,
+    should_exit_early: bool = False,
 ):
     """Write a JSON of important info about job for use later in workflow.
 
@@ -355,8 +373,9 @@ def save_job_info(
     job_info = {
         "pathogen_slug": pathogen_slug,
         # Possible for everything to be working as expected, but there's no
-        # need to keep running workflow because no samples need to be run.
-        "should_exit_because_no_samples": should_exit_because_no_samples,
+        # need to keep running workflow because of what we found while running.
+        # Let the bash script know it can exit early with a 0 exit code.
+        "should_exit_early": should_exit_early,
     }
     json.dump(job_info, job_info_fh)
 

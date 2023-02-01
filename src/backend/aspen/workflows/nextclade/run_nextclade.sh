@@ -39,9 +39,11 @@ SEQUENCES_FILE=sequences.fasta
   --job-info-file "${JOB_INFO_FILE}"
 
 # In some cases, we discover nothing needs to be done, can exit early.
-should_exit_because_no_samples=$(jq --raw-output ".should_exit_because_no_samples" "${JOB_INFO_FILE}")
-if [ "${should_exit_because_no_samples}" = true ] ; then
-    echo "No samples to run Nextclade against. Exiting workflow."
+should_exit_early=$(jq --raw-output ".should_exit_early" "${JOB_INFO_FILE}")
+if [ "${should_exit_early}" = true ] ; then
+    echo "Unnecessary to keep running workflow, exiting early."
+    echo "For reasons behind early exit, see messages from above script."
+    echo "Exiting workflow."
     exit 0
 fi
 
