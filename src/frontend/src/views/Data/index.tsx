@@ -161,16 +161,7 @@ const Data: FunctionComponent = () => {
   };
 
   // create JSX elements from categories
-  const menuItemsOrNull = dataCategories.map((category) => {
-    // NOTE!! Here we are temporarily hiding the tree tab for monkeypox until
-    // we complete the functionality next quarter. For features that will be
-    // hidden long-term, a config would be more appropriate than this if statement.
-    if (
-      pathogen === Pathogen.MONKEY_POX &&
-      category.to === ROUTES.PHYLO_TREES
-    ) {
-      return null;
-    }
+  dataJSX.menuItems = dataCategories.map((category) => {
     const item = category.text.replace(" ", "-").toLowerCase();
     return (
       <StyledMenuItem key={category.text}>
@@ -192,11 +183,6 @@ const Data: FunctionComponent = () => {
       </StyledMenuItem>
     );
   });
-
-  // TODO: (ehoops) - once trees are re-enabled for mpx, we can remove this.
-  dataJSX.menuItems = menuItemsOrNull.filter(
-    (item) => item !== null
-  ) as Array<JSX.Element>; // Casting here because typescript thinks this can still be null.
 
   const subTitle = currentPath.startsWith(ROUTES.DATA_SAMPLES)
     ? "Samples"
