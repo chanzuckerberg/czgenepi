@@ -1,8 +1,9 @@
 import functools
+from enum import Enum
 from typing import Dict, List, Optional
 
 import sqlalchemy as sa
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import and_, BinaryExpression
@@ -22,6 +23,14 @@ router = APIRouter()
 
 
 LOCATION_KEYS = ("region", "country", "division", "location")
+LOCATION_DEPTH = ["region", "country", "division", "location"]
+
+
+class LocationDepthEnum(str, Enum):
+    LOCATION = "location"
+    DIVISION = "division"
+    COUNTRY = "country"
+    REGION = "region"
 
 
 @router.get("/", response_model=LocationListResponse)
@@ -30,10 +39,20 @@ async def list_locations(
     db: AsyncSession = Depends(get_db),
     settings: APISettings = Depends(get_settings),
     user: User = Depends(get_auth_user),
+    max_location_depth: LocationDepthEnum = Query(default=LocationDepthEnum.LOCATION),
 ) -> LocationListResponse:
 
     # load the locations.
     all_locations_query = sa.select(Location)  # type: ignore
+    # Find out which columns need to be forced to null based on our max location depth
+    required_null_columns = LOCATION_DEPTH[
+        LOCATION_DEPTH.index(max_location_depth) + 1 :
+    ]
+    # Add null filters to our query
+    for col in required_null_columns:
+        all_locations_query = all_locations_query.where(
+            getattr(Location, col) == None  # noqa: E711
+        )
     result = await db.execute(all_locations_query)
     response = []
     for row in result.scalars():

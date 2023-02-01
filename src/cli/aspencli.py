@@ -165,7 +165,8 @@ class ApiClient:
             )
             raise click.UsageError(err_msg)
         if not self.pathogen_slug:
-            err_msg = ("The endpoint this command uses requires a pathogen slug.\n"
+            err_msg = (
+                "The endpoint this command uses requires a pathogen slug.\n"
                 "You need to use the `--pathogen-slug` option with the slug \n"
                 "(or set a CZGE_PATHOGEN env var with the slug) for the desired pathogen."
             )
@@ -605,10 +606,17 @@ def locations():
 
 
 @locations.command(name="list")
+@click.option(
+    "--max-location-depth",
+    type=click.Choice(["region", "country", "division", "location"]),
+)
 @click.pass_context
-def list_locations(ctx):
+def list_locations(ctx, max_location_depth):
     api_client = ctx.obj["api_client"]
-    resp = api_client.get("/v2/locations/")
+    params = {}
+    if max_location_depth:
+        params["max_location_depth"] = max_location_depth
+    resp = api_client.get("/v2/locations/", params=params)
     print(resp.text)
 
 
