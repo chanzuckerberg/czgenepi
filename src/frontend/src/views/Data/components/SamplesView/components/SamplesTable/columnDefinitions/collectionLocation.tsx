@@ -1,3 +1,4 @@
+import { ColumnDef } from "@tanstack/react-table";
 import { memo } from "src/common/utils/memo";
 import { generateWidthStyles } from "src/common/utils/tableUtils";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";

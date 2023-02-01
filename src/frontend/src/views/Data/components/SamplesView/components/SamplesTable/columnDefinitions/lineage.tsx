@@ -1,3 +1,4 @@
+import { ColumnDef } from "@tanstack/react-table";
 import { memo } from "src/common/utils/memo";
 import { getLineageFromSampleLineages } from "src/common/utils/samples";
 import { generateWidthStyles } from "src/common/utils/tableUtils";

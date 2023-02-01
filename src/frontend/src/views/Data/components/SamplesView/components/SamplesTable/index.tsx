@@ -5,6 +5,7 @@ import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { IdMap } from "src/common/utils/dataTransforms";
 import Table from "src/components/Table";
 import { SAMPLE_TABLE_COLUMNS } from "./pathogenColumnConfig";
+
 interface Props {
   data: IdMap<Sample> | undefined;
   isLoading: boolean;
