@@ -12,7 +12,7 @@ export interface LocationsResponse {
   locations: GisaidLocation[];
 }
 
-const locationDepthPathogenConfig: PathogenConfigType<
+export const locationDepthPathogenConfig: PathogenConfigType<
   keyof GisaidLocation | null
 > = {
   [Pathogen.COVID]: null,

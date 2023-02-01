@@ -1,7 +1,7 @@
 import RadioGroup from "@mui/material/RadioGroup";
 import { Icon, Link } from "czifui";
 import { uniq } from "lodash";
-import { SyntheticEvent, useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useMemo, useState } from "react";
 import {
   AnalyticsTreeCreationNextstrain,
   EVENT_TYPES,
@@ -12,7 +12,10 @@ import type { TreeType } from "src/common/constants/types";
 import { TreeTypes } from "src/common/constants/types";
 import { useGroupInfo } from "src/common/queries/groups";
 import { useLineages } from "src/common/queries/lineages";
-import { useNamedLocations } from "src/common/queries/locations";
+import {
+  locationDepthPathogenConfig,
+  useNamedLocations,
+} from "src/common/queries/locations";
 import { RawTreeCreationWithId, useCreateTree } from "src/common/queries/trees";
 import { addNotification } from "src/common/redux/actions";
 import { useDispatch, useSelector } from "src/common/redux/hooks";
@@ -22,6 +25,7 @@ import {
   StyledCloseIconWrapper,
 } from "src/common/styles/iconStyle";
 import { getLocationFromGroup } from "src/common/utils/groupUtils";
+import { createStringToLocationFinder } from "src/common/utils/locationUtils";
 import { pluralize } from "src/common/utils/strUtils";
 import { NotificationComponents } from "src/components/NotificationManager/components/Notification";
 import { TreeNameInput } from "src/components/TreeNameInput";
@@ -100,18 +104,43 @@ export const CreateNSTreeModal = ({
   // Filter based on location
   const { data: groupInfo } = useGroupInfo();
   const { data: namedLocationsData } = useNamedLocations();
-  const namedLocations: NamedGisaidLocation[] =
-    namedLocationsData?.namedLocations ?? [];
+  const namedLocations: NamedGisaidLocation[] = useMemo(() => {
+    return namedLocationsData?.namedLocations ?? [];
+  }, [namedLocationsData]);
 
   // If we have the group's location, use this as the default for the filter
   const [selectedLocation, setSelectedLocation] =
     useState<NamedGisaidLocation | null>(getLocationFromGroup(groupInfo));
 
+  const stringToLocationFinder = useMemo(() => {
+    return createStringToLocationFinder(namedLocations);
+  }, [namedLocations]);
+
+  const setLocationToGroupDefault = () => {
+    const locationDepth = locationDepthPathogenConfig[pathogen];
+    const defaultTreeLocation =
+      locationDepth === null
+        ? // If locationDepth is not specified, use the group's location
+          getLocationFromGroup(groupInfo)
+        : // if the locationDepth is specified and location is defined, then search
+        groupInfo?.location
+        ? // Search for the location id that matches the max depth of the group's location
+          // For example, for mpox the max depth is "division", we want to find the id of
+          // the location that has the same division as the group's location, but location is null
+          stringToLocationFinder(groupInfo?.location[locationDepth] as string)
+        : // If location is not defined, we can't set the default selectedLocation yet
+          null;
+    if (defaultTreeLocation) {
+      setSelectedLocation(defaultTreeLocation);
+    }
+  };
   // If the group call isn't back when this is loaded, we need to update when the
   // call returns
-  useEffect(() => {
-    setSelectedLocation(getLocationFromGroup(groupInfo));
-  }, [groupInfo]);
+  useEffect(setLocationToGroupDefault, [
+    groupInfo,
+    stringToLocationFinder,
+    pathogen,
+  ]);
 
   // Filter based on date ranges
   const [startDate, setStartDate] = useState<FormattedDateType>();
@@ -140,7 +169,7 @@ export const CreateNSTreeModal = ({
     setStartDate(undefined);
     setEndDate(undefined);
     setSelectedLineages([]);
-    setSelectedLocation(getLocationFromGroup(groupInfo));
+    setLocationToGroupDefault();
     setIsFilterEnabled(false);
   };
 
