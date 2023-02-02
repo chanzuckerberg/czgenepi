@@ -201,17 +201,28 @@ def is_nextclade_result_valid(nextclade_csv_row: Dict[str, str]) -> bool:
     When running Nextclade, sequences can fail for various reasons. If a
     sequence fails, it will either have associated `errors` or `warnings`.
     Those are present in the general results file, and also duplicated to
-    their own special error file (nextclade.errors.csv). If anything shows up
-    for either of those, consider the sequence invalid. We should record that
-    its QC came back as invalid, but do not record mutations or lineages.
+    their own special error file (nextclade.errors.csv).
+
+    If something shows up for `errors`, we should definitely consider the
+    sequence invalid. Sadly, `warnings` is more of a gray area. Talking to
+    Comp Bio, it seems that in some cases, we'll have `warnings` indicate
+    that the sequence was invalid, but in other cases, it's possible to have
+    warnings that are unimportant. To get around this, `qc.overallScore` can be
+    used as a proxy metric. Experimenting with the Nextclade tool, it seems to
+    be that an invalid sequence gets blanked out in its CSV almost across the
+    board. So since qc.overallScore should always be present in a valid
+    sequence, if there are warnings and it's missing, consider sample invalid.
 
     There is also a `failedGenes` field: it's currently an open Comp Bio
     question if we need to do anything based on that being populated, or if
     it's okay to just ignore it. Right now it seems like it's fine to ignore
     for our use-case, but that might change in the future."""
-    if nextclade_csv_row["errors"] == "" and nextclade_csv_row["warnings"] == "":
-        return True
-    return False
+    is_result_valid = True
+    if nextclade_csv_row["errors"] != "":
+        is_result_valid = False
+    elif nextclade_csv_row["warnings"] != "" and nextclade_csv_row["qc.overallScore"] == "":
+        is_result_valid = False
+    return is_result_valid
 
 
 def get_lineage_from_row(
