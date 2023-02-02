@@ -6,6 +6,10 @@ import { generateWidthStyles } from "src/common/utils/tableUtils";
 import TreeTableNameCell from "../components/TreeTableNameCell";
 import { StyledSortableHeader } from "../style";
 
+/**
+ * Typically, column defs are regular objects. However, fetching location data is very expensive, so
+ * this column def is a function that accepts the (hopefully memoized) map of locations
+ */
 export const treeName = (
   locations: IdMap<NamedGisaidLocation>
 ): ColumnDef<PhyloRun, any> => ({

@@ -1,9 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { memo } from "src/common/utils/memo";
 import { generateWidthStyles } from "src/common/utils/tableUtils";
-import { StyledCellBasic } from "src/views/Data/components/SamplesView/components/SamplesTable/style";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
 import { TreeTypeTooltip } from "../components/TreeTypeTooltip";
+import { StyledCellBasic } from "../style";
 
 export const treeType: ColumnDef<PhyloRun, any> = {
   id: "treeType",

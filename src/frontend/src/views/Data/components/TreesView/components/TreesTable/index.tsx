@@ -1,6 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { IdMap } from "src/common/utils/dataTransforms";
-import { StyledCellBasic } from "../../../SamplesView/components/SamplesTable/style";
 import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 import { memo } from "src/common/utils/memo";
 import Table from "src/components/Table";
@@ -11,6 +10,7 @@ import { treeName } from "./columnDefinitions/treeName";
 import { startedDate } from "./columnDefinitions/startedDate";
 import { treeType } from "./columnDefinitions/treeType";
 import { actionMenu } from "./columnDefinitions/actionMenu";
+import { StyledCellBasic } from "./style";
 
 interface Props {
   data: IdMap<PhyloRun> | undefined;
