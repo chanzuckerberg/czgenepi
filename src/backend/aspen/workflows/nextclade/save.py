@@ -192,11 +192,34 @@ def cli(
                 session.commit()
         # Don't forget to commit the last chunk of entries that remain!
         session.commit()
+        print("Finished saving Nextclade CSV results to DB.")
+        print(f"Total count of samples run and saved: {entry_count_so_far}")
 
-        # We now handle saving out
+        # Now that CSV saving is done, we handle saving aligned sequence data
+        ids_in_aligned_fasta = save_aligned_genomes(
+            session,
+            nextclade_aligned_fasta_fh,
+            dataset_info["accession"],
+            nextclade_run_datetime,
+            )
+        # The `aligned_fasta_expected` ids **should** exactly match all the ids
+        # found in the FASTA. If there's a difference something weird is going
+        # on and we should at least have some warning logs. Maybe even fail?
+        unexpected_ids = ids_in_aligned_fasta - aligned_fasta_expected
+        if unexpected_ids:
+            print("WARNING -- Aligned FASTA had ids that were not expected!")
+            print(
+                "List of ids that were not expected to be present:",
+                sorted(unexpected_ids),
+            )
+        missing_ids = aligned_fasta_expected - ids_in_aligned_fasta
+        if missing_ids:
+            print("WARNING -- Aligned FASTA was missing ids we expected!")
+            print(
+                "List of ids that were expected in FASTA but not found:",
+                sorted(missing_ids),
+            )
 
-    print("Finished saving Nextclade results to DB.")
-    print(f"Total count of samples run and saved: {entry_count_so_far}")
 
 
 def is_nextclade_result_valid(nextclade_csv_row: Dict[str, str]) -> bool:
@@ -274,16 +297,21 @@ def save_aligned_genomes(
     latest_reference_name: str,
     nextclade_run_datetime: datetime,
     # TODO add taking timestamp, use bash
-    ):
+    ) -> Set[int]:
     """DOCME
     TODO VOODOO -- have this output a set of the saved ids, then callsite can compare and warn
 
     - Talk about the `id` versus `description` aspect and how we get what we
     want out of it. Also can mention name is equivalent to id for fastas"""
+    # This can be a lot of data, so batch up commits as we go.
+    COMMIT_CHUNK_SIZE = 100  # Number was picked out of thin air. Seems sane?
+    apg_to_save_so_far = 0  # Final value will be count /actually/ saved to DB.
+
+    ids_in_aligned_fasta: Set[int] = set()
     parsed_fasta = SeqIO.parse(aligned_fasta_file, "fasta")
     for record in parsed_fasta:
         sample_id = int(record.id)
-        print(f"sample_id: {sample_id}")
+        ids_in_aligned_fasta.add(sample_id)
         existing_aligned_pathogen_genome_q = (
             sa.select(AlignedPathogenGenome)
             .filter(AlignedPathogenGenome.sample_id == sample_id)
@@ -292,7 +320,6 @@ def save_aligned_genomes(
 
         should_add_to_session = False
         if aligned_pathogen_genome is None:
-            print("No prior APG")  # REMOVE VOODOO
             aligned_pathogen_genome = AlignedPathogenGenome(
                 sample_id=sample_id,
                 sequence=str(record.seq),
@@ -302,20 +329,27 @@ def save_aligned_genomes(
             should_add_to_session = True
         # If pre-existing APG, no need to update unless changed reference seq.
         elif aligned_pathogen_genome.reference_name != latest_reference_name:
-            print("found a prior APG, but it's stale: updating!")  # REMOVE VOODOO
             aligned_pathogen_genome.sequence = str(record.seq)
             aligned_pathogen_genome.reference_name = latest_reference_name
             aligned_pathogen_genome.aligned_date = nextclade_run_datetime
             should_add_to_session = True
-        else:
-            print("found a prior APG, but we all good")  # REMOVE VOODOO
 
         if should_add_to_session:
             session.add(aligned_pathogen_genome)
-
-    print("LOCK IT IN!")  # REMOVE VOODOO
+            apg_to_save_so_far += 1
+        if apg_to_save_so_far % COMMIT_CHUNK_SIZE == 0:
+            session.commit()
+    # Don't forget to commit the last chunk of entries that remain!
     session.commit()
-    print("locked")  # REMOVE VOODOO
+
+    print("Finished saving Nextclade aligned genomes to DB.")
+    print(f"Total count of aligned pathogen genomes added (new) or updated"
+        f"(existing): {apg_to_save_so_far}. [We only update if previous"
+        f"reference_name/accession differed from latest in Nextclade dataset."
+        )
+
+    return ids_in_aligned_fasta
+
 
 if __name__ == "__main__":
     cli()
