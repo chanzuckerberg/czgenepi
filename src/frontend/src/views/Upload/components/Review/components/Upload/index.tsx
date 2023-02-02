@@ -36,7 +36,7 @@ interface Props {
   analyticsFlowUuid: string;
 }
 
-const uploadAnalyticsData = (respData: RawSamplesWithId) => {
+const getAttemptedUploadedIds = (respData: RawSamplesWithId) => {
   const attemptedUploadedSamples = respData.samples;
   return attemptedUploadedSamples.map((sample) => sample.id);
 };
@@ -54,7 +54,7 @@ export default function Upload({
   const { mutate, isLoading, isSuccess, isError, error } = useCreateSamples({
     componentOnSuccess: (respData: RawSamplesWithId) => {
       // Analytics event: successful upload of samples
-      const attemptedUploadedIds = uploadAnalyticsData(respData);
+      const attemptedUploadedIds = getAttemptedUploadedIds(respData);
       analyticsTrackEvent<AnalyticsSamplesUploadSuccess>(
         EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS,
         {
@@ -68,7 +68,7 @@ export default function Upload({
     },
     componentOnError: (respData: RawSamplesWithId) => {
       // Analytics event: unsuccessful upload of samples
-      const attemptedUploadedIds = uploadAnalyticsData(respData);
+      const attemptedUploadedIds = getAttemptedUploadedIds(respData);
       analyticsTrackEvent<AnalyticsSamplesUploadFailed>(
         EVENT_TYPES.SAMPLES_UPLOAD_FAILED,
         {

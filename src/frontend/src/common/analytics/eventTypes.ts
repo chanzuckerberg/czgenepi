@@ -56,7 +56,7 @@ export enum EVENT_TYPES {
   SAMPLES_UPLOAD_SUCCESS = "SAMPLES_UPLOAD_SUCCESS",
 
   // User is uploading data that has resulted in a failure
-  SAMPLES_UPLOAD_FAILED = "UPLOAD_METADATA_TYPE",
+  SAMPLES_UPLOAD_FAILED = "SAMPLES_UPLOAD_FAILED",
 
   // User is uploading data with a metadata template or is doing manual entry
   UPLOAD_METADATA_TYPE = "UPLOAD_METADATA_TYPE",
