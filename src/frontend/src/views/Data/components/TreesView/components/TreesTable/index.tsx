@@ -36,8 +36,8 @@ const columns: ColumnDef<PhyloRun, any>[] = [
         Tree Name
       </StyledSortableHeader>
     ),
-    cell: memo(({ row }) => (
-      <CellComponent>
+    cell: memo(({ row, cell }) => (
+      <CellComponent key={cell.id}>
         <TreeTableNameCell phyloRun={row.original} />
       </CellComponent>
     )),
@@ -60,8 +60,9 @@ const columns: ColumnDef<PhyloRun, any>[] = [
         Creation Date
       </SortableHeader>
     ),
-    cell: memo(({ getValue }) => (
+    cell: memo(({ getValue, cell }) => (
       <StyledCellBasic
+        key={cell.id}
         verticalAlign="center"
         shouldShowTooltipOnHover={false}
         primaryText={datetimeWithTzToLocalDate(getValue())}
@@ -90,11 +91,12 @@ const columns: ColumnDef<PhyloRun, any>[] = [
         Tree Type
       </SortableHeader>
     ),
-    cell: memo(({ getValue }) => {
+    cell: memo(({ getValue, cell }) => {
       const type = getValue();
       return (
         <TreeTypeTooltip value={type}>
           <StyledCellBasic
+            key={cell.id}
             verticalAlign="center"
             shouldShowTooltipOnHover={false}
             primaryText={getValue()}
@@ -107,13 +109,17 @@ const columns: ColumnDef<PhyloRun, any>[] = [
   {
     id: "action",
     size: 160,
-    header: ({ column }) => (
-      <CellHeader style={generateWidthStyles(column)} hideSortIcon>
+    header: ({ column, header }) => (
+      <CellHeader
+        key={header.id}
+        style={generateWidthStyles(column)}
+        hideSortIcon
+      >
         {" "}
       </CellHeader>
     ),
-    cell: memo(({ row }) => (
-      <CellComponent>
+    cell: memo(({ row, cell }) => (
+      <CellComponent key={cell.id}>
         <TreeActionMenu phyloRun={row.original} />
       </CellComponent>
     )),
@@ -121,16 +127,17 @@ const columns: ColumnDef<PhyloRun, any>[] = [
 ];
 
 const defaultColumn: Partial<ColumnDef<PhyloRun, any>> = {
-  cell: ({ getValue }) => (
+  cell: memo(({ getValue }) => (
     <StyledCellBasic
       verticalAlign="center"
       shouldShowTooltipOnHover={false}
       primaryText={(getValue() || NO_CONTENT_FALLBACK) as string}
     />
-  ),
+  )),
 };
 
 const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
+  console.log("TreesTable");
   return (
     <Table<PhyloRun>
       columns={columns}

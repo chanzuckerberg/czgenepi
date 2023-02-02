@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { Table as SDSTable, TableHeader, TableRow } from "czifui";
 import { isEqual, map } from "lodash";
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { useVirtual, VirtualItem } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { StyledWrapper } from "./style";
@@ -171,7 +171,10 @@ const Table = <T extends any>({
             {virtualRows.map((vRow: VirtualItem) => {
               const row = rows[vRow.index];
               return (
-                <TableRow key={row.id} shouldShowTooltipOnHover={false}>
+                <TableRow
+                  key={`row-${row.id}`}
+                  shouldShowTooltipOnHover={false}
+                >
                   {row
                     .getVisibleCells()
                     .map((cell) =>
@@ -187,4 +190,4 @@ const Table = <T extends any>({
   );
 };
 
-export default Table;
+export default memo(Table);
