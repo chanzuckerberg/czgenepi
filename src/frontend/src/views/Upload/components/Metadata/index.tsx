@@ -57,14 +57,11 @@ export default function Metadata({
   // this is used to track whether the user has manually edited the metadata for analytics
   const [hasManuallyEditedMetadata, setHasManuallyEditedMetadata] =
     useState<boolean>(false);
-  const [numberOfDetectedSamples, setNumberOfDetectedSamples] =
-    useState<number>(0);
 
-  useEffect(() => {
-    if (samples != null) {
-      setNumberOfDetectedSamples(Object.keys(samples).length);
-    }
-  }, [samples]);
+  let numberOfDetectedSamples = 0;
+  if (samples != null) {
+    numberOfDetectedSamples = (Object.keys(samples).length);
+  }
 
   useEffect(() => {
     const hasMetadataBeenEdited =
