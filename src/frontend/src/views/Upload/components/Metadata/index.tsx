@@ -54,6 +54,7 @@ export default function Metadata({
     useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+  // this is used to track whether the user has manually edited the metadata for analytics
   const [hasManuallyEditedMetadata, setHasManuallyEditedMetadata] =
     useState<boolean>(false);
   const [numberOfDetectedSamples, setNumberOfDetectedSamples] =

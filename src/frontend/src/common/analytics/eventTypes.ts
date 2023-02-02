@@ -246,7 +246,7 @@ export type AnalyticsUploadMetadataType = {
   // The type of metadata the user is uploading
   metadata_entry_type: "MANUAL" | "TSV" | "BOTH";
   // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
-  // For an Upload "flow" that ends in successful upload, this will match up.
+  // For an Upload "flow" that ends in successful or failed upload, this will match up.
   upload_flow_uuid: string;
   // number of samples in the upload
   sample_count: number;
@@ -259,7 +259,7 @@ export type AnalyticsSamplesUploadSuccess = {
   // JSON array of all the IDs for newly created samples for this upload
   sample_ids: JsonString;
   // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
-  // For an Upload "flow" that ends in successful upload, this will match up.
+  // For an Upload "flow" that ends in successful or failed upload, this will match up.
   upload_flow_uuid: string;
   // The current pathogen. For example, "SC2" or "MPX".
   pathogen: string;
@@ -272,7 +272,7 @@ export type AnalyticsSamplesUploadFailed = {
   // JSON array of all the IDs for newly created samples for this upload
   sample_ids: JsonString;
   // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
-  // For an Upload "flow" that ends in successful upload, this will match up.
+  // For an Upload "flow" that ends in successful or failed upload, this will match up.
   upload_flow_uuid: string;
   // The current pathogen. For example, "SC2" or "MPX".
   pathogen: string;
