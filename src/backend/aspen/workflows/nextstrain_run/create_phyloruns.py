@@ -4,7 +4,10 @@ import re
 from typing import Any, Dict, MutableSequence
 
 import click
+import dateparser
 import sqlalchemy as sa
+from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 
 from aspen.api.settings import CLISettings
 from aspen.config.config import Config
@@ -17,9 +20,12 @@ from aspen.database.connection import (
 from aspen.database.models import (
     AlignedRepositoryData,
     Group,
+    Location,
     Pathogen,
     PhyloRun,
     PublicRepository,
+    PublicRepositoryMetadata,
+    Sample,
     TreeType,
     User,
     Workflow,
@@ -30,7 +36,7 @@ from aspen.util.swipe import NextstrainScheduledJob
 
 SCHEDULED_TREE_TYPE = "OVERVIEW"
 
-TEMPLATE_ARGS = {"filter_start_date": "12 weeks ago", "filter_end_date": "now"}
+DEFAULT_TEMPLATE_ARGS = {"filter_start_date": "12 weeks ago", "filter_end_date": "now"}
 
 
 def create_phylo_run(
@@ -129,6 +135,124 @@ def launch_one(
             job.run(workflow, "scheduled")
 
 
+def retry_template_args_for_focal_group(
+    db,
+    group: Group,
+    pathogen: Pathogen,
+    repo: PublicRepository,
+    filter_start_date: datetime.date,
+    filter_end_date: datetime.date,
+):
+    args = {}
+    location = group.default_tree_location
+    location_hierarchy = ["region", "country", "division", "location"]
+    # Keep track of what our initial group hierarchy level is.
+    current_location_level = []
+    for level in location_hierarchy:
+        if getattr(location, level):
+            current_location_level.append(level)
+    start_date_attempts = ["6 months ago", "12 months ago"]
+
+    while True:
+        args = get_template_args_for_focal_group(
+            db, group, pathogen, repo, location, filter_start_date, filter_end_date
+        )
+        if args:
+            print(
+                f"Group '{group.name}' matched focal sequences for '{location.region}/{location.country}/{location.division}/{location.location}', newer than {filter_start_date}! Proceeding with build."
+            )
+            return args
+
+        # widen our geographical search area
+        if (
+            "division" in current_location_level
+        ):  # We don't build scheduled trees for locations bigger than a country.
+            print(
+                f"Group '{group.name}' had no focal sequences that matched '{location.region}/{location.country}/{location.division}/{location.location}', trying again with a wider search area."
+            )
+            current_location_level = current_location_level[:-1]
+            new_location_query = sa.select(Location)
+            for col in location_hierarchy:
+                col_match = None
+                if col in current_location_level:
+                    col_match = getattr(location, col)
+                new_location_query = new_location_query.where(
+                    getattr(Location, col) == col_match
+                )
+            location = db.execute(new_location_query).scalars().one()
+            # We overwrote the location var with a wider area. Try again!
+            continue
+
+        # Try going back further in time.
+        if start_date_attempts:
+            print(
+                f"Group '{group.name}' had no focal sequences that matched '{location.region}/{location.country}/{location.division}/{location.location}', newer than {filter_start_date}, trying again with a wider date range."
+            )
+            filter_start_date = dateparser.parse(start_date_attempts.pop(0)).date()
+            # We overwrote the start date to look further back in time, let's try again!
+            continue
+
+        # If we've made it this far, we have no more options, skip the build..
+        return None
+
+
+def get_template_args_for_focal_group(
+    db,
+    group: Group,
+    pathogen: Pathogen,
+    repo: PublicRepository,
+    location: Location,
+    filter_start_date: datetime.date,
+    filter_end_date: datetime.date,
+):
+    template_args = {
+        "location_id": location.id,
+        "filter_start_date": filter_start_date.strftime("%Y-%m-%d"),
+        "filter_end_date": filter_end_date.strftime("%Y-%m-%d"),
+    }
+
+    # If this group has uploaded samples within our start/end dates, we're all set.
+    group_samples = db.execute(
+        sa.select([func.count()])
+        .select_from(Sample)
+        .where(
+            Sample.pathogen == pathogen,
+            Sample.submitting_group == group,
+            Sample.collection_date >= filter_start_date,
+            Sample.collection_date <= filter_end_date,
+        )
+    ).scalar()
+    if group_samples:
+        return template_args
+
+    # Even if the group hasn't uploaded samples, we can proceed if anyone's uploaded
+    # data to gisaid for their default tree location.
+    upstream_samples_query = (
+        sa.select([func.count()])
+        .select_from(PublicRepositoryMetadata)
+        .where(
+            PublicRepositoryMetadata.region == location.region,
+            PublicRepositoryMetadata.country == location.country,
+            PublicRepositoryMetadata.pathogen == pathogen,
+            PublicRepositoryMetadata.public_repository == repo,
+            PublicRepositoryMetadata.date >= filter_start_date,
+            PublicRepositoryMetadata.date <= filter_end_date,
+        )
+    )
+    if location.location:
+        upstream_samples_query = upstream_samples_query.where(
+            PublicRepositoryMetadata.location == location.location,
+        )
+    if location.division:
+        upstream_samples_query = upstream_samples_query.where(
+            PublicRepositoryMetadata.division == location.division,
+        )
+    upstream_samples = db.execute(upstream_samples_query).scalar()
+    if upstream_samples:
+        return template_args
+    return None
+
+
 @cli.command("launch-all")
 @click.option("--pathogen", type=str, default="SC2")
 def launch_all(pathogen):
@@ -156,7 +280,9 @@ def launch_all(pathogen):
             .one()
         )
 
-        all_groups_query = sa.select(Group)
+        all_groups_query = sa.select(Group).options(
+            joinedload(Group.default_tree_location)
+        )
         all_groups: MutableSequence[Group] = (
             db.execute(all_groups_query).scalars().all()
         )
@@ -166,13 +292,26 @@ def launch_all(pathogen):
                 schedule_expression is None
                 or datetime.date.today().weekday() in schedule_expression
             ):
+                template_args = retry_template_args_for_focal_group(
+                    db,
+                    group,
+                    pathogen_obj,
+                    repository,
+                    dateparser.parse(DEFAULT_TEMPLATE_ARGS["filter_start_date"]).date(),
+                    dateparser.parse(DEFAULT_TEMPLATE_ARGS["filter_end_date"]).date(),
+                )
+                if not template_args:
+                    print(
+                        f"Could not find any focal samples for group {group.name}, skipping!"
+                    )
+                    continue
                 workflow = create_phylo_run(
-                    db, group, TEMPLATE_ARGS, tree_type, pathogen_obj, repository
+                    db, group, template_args, tree_type, pathogen_obj, repository
                 )
 
-                job = NextstrainScheduledJob(settings)
+                NextstrainScheduledJob(settings)
                 db.commit()
-                job.run(workflow, "scheduled")
+                # job.run(workflow, "scheduled")
 
 
 if __name__ == "__main__":
