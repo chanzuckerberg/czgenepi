@@ -60,9 +60,11 @@ export default function Metadata({
   const [numberOfDetectedSamples, setNumberOfDetectedSamples] =
     useState<number>(0);
 
-  if (samples != null) {
-    setNumberOfDetectedSamples(Object.keys(samples).length);
-  }
+  useEffect(() => {
+    if (samples != null) {
+      setNumberOfDetectedSamples(Object.keys(samples).length);
+    }
+}, [samples]);
 
   useEffect(() => {
     const hasMetadataBeenEdited =
