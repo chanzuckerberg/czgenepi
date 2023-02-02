@@ -281,15 +281,7 @@ export const USE_SAMPLE_INFO = {
   id: "sampleInfo",
 };
 
-export function useSampleInfo(): UseQueryResult<SampleResponse, unknown> {
-  const state = store.getState();
-  const pathogen = selectCurrentPathogen(state);
-  return useQuery([USE_SAMPLE_INFO, pathogen], () => fetchSamples(), {
-    retry: false,
-  });
-}
-
-export function useNewSampleInfo(): UseQueryResult<IdMap<Sample>, unknown> {
+export function useSampleInfo(): UseQueryResult<IdMap<Sample>, unknown> {
   return useQuery([USE_SAMPLE_INFO], () => fetchSamples(), {
     retry: false,
     select: mapSampleData,
