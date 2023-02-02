@@ -23,8 +23,14 @@ interface Props<T> {
   tableData: IdMap<T> | undefined;
   initialSortKey?: string;
   isLoading?: boolean;
-  checkedRows: T[];
+  uniqueIdentifier: keyof T;
+  // the following three props should either
+  // 1) always appear together
+  // 2) none appear at all
+  // it's hard to programmatically enforce this, so leaving it as a convention for now
+  checkedRows?: T[];
   onSetCheckedRows?(rowData: T[]): void;
+  enableMultiRowSelection?: boolean;
 }
 
 /**
@@ -42,6 +48,7 @@ const Table = <T extends any>({
   isLoading,
   checkedRows = [],
   onSetCheckedRows,
+  uniqueIdentifier,
   ...props
 }: Props<T> & Partial<TableOptions<any>>): JSX.Element => {
   const { enableMultiRowSelection } = props;
@@ -82,7 +89,7 @@ const Table = <T extends any>({
       ? [rowSelectionColumn, ...columns]
       : columns,
     getCoreRowModel: getCoreRowModel(),
-    getRowId: (r) => r.id, // use the cz ge object id instead of a default react table id
+    getRowId: (r) => r[uniqueIdentifier], // use the cz ge object id instead of a default react table id
     getSortedRowModel: getSortedRowModel(),
     state: {
       rowSelection,
@@ -108,13 +115,19 @@ const Table = <T extends any>({
     onSetCheckedRows(newCheckedRows);
   }, [rowSelection]);
 
-  // pass updates regarding checkedRows from parent view to the table
+  // pass updates regarding checkedRows from parent view to the table by creating a react-table-readable
+  // rowSelectionState (in the form of { rowId: true } for selected rows)
   useEffect(() => {
     const newRowSelection = checkedRows.reduce(
-      (obj, row) => ({
-        ...obj,
-        [row.id]: true,
-      }),
+      (obj: Record<string | number, boolean>, row: T) => {
+        // not getting row selection as expected? Make sure that your uniqueIdentifier
+        // represents a field on your item that returns a unique string or number
+        const key = row[uniqueIdentifier] as string | number;
+        return {
+          ...obj,
+          [key]: true,
+        };
+      },
       {}
     );
 

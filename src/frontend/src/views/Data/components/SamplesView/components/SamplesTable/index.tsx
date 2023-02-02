@@ -31,6 +31,7 @@ const SamplesTable = ({
       isLoading={isLoading}
       initialSortKey="uploadDate"
       tableData={data}
+      uniqueIdentifier="id"
       checkedRows={checkedSamples}
       onSetCheckedRows={setCheckedSamples}
       enableMultiRowSelection
