@@ -59,6 +59,7 @@ nextclade run \
   --output-all "${NEXTCLADE_OUTPUT_DIR}" \
   "${SEQUENCES_FILE}"
 echo "Nextclade run complete"
+nextclade_complete_at=$(date "+%Y-%m-%dT%H:%M:%S")
 
 pathogen_slug=$(jq --raw-output ".pathogen_slug" "${JOB_INFO_FILE}")
 # save results back to db
@@ -67,4 +68,5 @@ pathogen_slug=$(jq --raw-output ".pathogen_slug" "${JOB_INFO_FILE}")
     --nextclade-aligned-fasta "${NEXTCLADE_OUTPUT_DIR}/nextclade.aligned.fasta" \
     --nextclade-dataset-tag "${NEXTCLADE_DATASET_DIR}/${NEXTCLADE_TAG_FILENAME}" \
     --nextclade-version "$(nextclade --version)" \
+    --nextclade-run-datetime "${nextclade_complete_at}" \
     --pathogen-slug "${pathogen_slug}"

@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime
 import io
 from typing import Dict, IO, Set, Optional
 
@@ -41,12 +42,15 @@ FAILED_LINEAGE_STATUS = "FAILED"
     "nextclade_tag_fh", "--nextclade-dataset-tag", type=click.File("r"), required=True
 )
 @click.option("nextclade_version", "--nextclade-version", type=str, required=True)
+@click.option("nextclade_run_datetime", "--nextclade-run-datetime",
+    type=click.DateTime(formats=["%Y-%m-%dT%H:%M:%S"]), required=True)
 @click.option("pathogen_slug", "--pathogen-slug", type=str, required=True)
 def cli(
     nextclade_fh: io.TextIOBase,
     nextclade_aligned_fasta_fh: io.TextIOBase,
     nextclade_tag_fh: IO[str],
     nextclade_version: str,
+    nextclade_run_datetime: datetime,
     pathogen_slug: str,
 ):
     """Go through results from nextclade run, save to DB for each sample."""
@@ -268,6 +272,7 @@ def save_aligned_genomes(
     session: Session,
     aligned_fasta_file: io.TextIOBase,
     latest_reference_name: str,
+    nextclade_run_datetime: datetime,
     # TODO add taking timestamp, use bash
     ):
     """DOCME
@@ -287,28 +292,30 @@ def save_aligned_genomes(
 
         should_add_to_session = False
         if aligned_pathogen_genome is None:
-            print("No prior APG")
+            print("No prior APG")  # REMOVE VOODOO
             aligned_pathogen_genome = AlignedPathogenGenome(
                 sample_id=sample_id,
                 sequence=str(record.seq),
-                reference_name="VOODOO",
+                reference_name=latest_reference_name,
+                aligned_date=nextclade_run_datetime,
             )
             should_add_to_session = True
         # If pre-existing APG, no need to update unless changed reference seq.
         elif aligned_pathogen_genome.reference_name != latest_reference_name:
-            print("found a prior APG, but it's stale: updating!")
+            print("found a prior APG, but it's stale: updating!")  # REMOVE VOODOO
             aligned_pathogen_genome.sequence = str(record.seq)
             aligned_pathogen_genome.reference_name = latest_reference_name
+            aligned_pathogen_genome.aligned_date = nextclade_run_datetime
             should_add_to_session = True
         else:
-            print("found a prior APG, but we all good")
+            print("found a prior APG, but we all good")  # REMOVE VOODOO
 
         if should_add_to_session:
             session.add(aligned_pathogen_genome)
 
-    print("LOCK IT IN!")
+    print("LOCK IT IN!")  # REMOVE VOODOO
     session.commit()
-    print("locked")
+    print("locked")  # REMOVE VOODOO
 
 if __name__ == "__main__":
     cli()
