@@ -263,7 +263,7 @@ export const isSampleQCStatusBad = (sample?: Sample): boolean => {
   return status === "Bad" || status === "Failed";
 };
 
-export function getBadOrFailedQCSampleIds(samples: Sample[]): Sample[] {
+export function getBadOrFailedQCSampleIds(samples: Sample[]): string[] {
   return (
     samples
       // for now there should only ever be one qcMetrics entry per sample
