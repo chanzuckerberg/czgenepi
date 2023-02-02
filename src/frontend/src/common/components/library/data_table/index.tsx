@@ -21,7 +21,10 @@ import {
   TableRow,
   TreeRowContent,
 } from "./style";
-import { getBadOrFailedQCSampleIds } from "src/views/Upload/components/Samples/utils";
+import {
+  getBadOrFailedQCSampleIds,
+  isSampleQCStatusBad,
+} from "src/views/Upload/components/Samples/utils";
 
 interface Props {
   data?: TableItem[];
@@ -284,14 +287,7 @@ export const DataTable: FunctionComponent<Props> = ({
       item?.publicId as string
     );
     const handleClick = function handleClick() {
-      handleRowCheckboxClick(
-        String(item.publicId),
-        Boolean(
-          item.qcMetrics.length > 0 &&
-            (item.qcMetrics[0].qcStatus === "Bad" ||
-              item.qcMetrics[0].qcStatus === "Failed")
-        )
-      );
+      handleRowCheckboxClick(String(item.publicId), isSampleQCStatusBad(item));
     };
     return (
       <RowCheckbox

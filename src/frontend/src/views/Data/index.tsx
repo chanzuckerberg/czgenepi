@@ -21,6 +21,7 @@ import { USER_FEATURE_FLAGS } from "src/components/Split/types";
 import { DataSubview } from "../../common/components";
 import { VIEWNAME } from "../../common/constants/types";
 import { ROUTES } from "../../common/routes";
+import { getQCStatusFromSample } from "../Upload/components/Samples/utils";
 import { SampleRenderer, TreeRenderer } from "./cellRenderers";
 import { FilterPanelToggle } from "./components/DataNavigation/FilterPanelToggle";
 import { SamplesView } from "./components/SamplesView";
@@ -218,9 +219,7 @@ const Data: FunctionComponent = () => {
     .map((l) => {
       return { name: l as string };
     });
-  const qcStatuses = uniq(
-    compact(map(sampleMap, (d) => d.qcMetrics[0]?.qcStatus))
-  )
+  const qcStatuses = uniq(compact(map(sampleMap, getQCStatusFromSample)))
     .sort()
     .map((l) => {
       return { name: l as string };
