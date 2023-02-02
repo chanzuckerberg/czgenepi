@@ -64,7 +64,7 @@ export default function Metadata({
     if (samples != null) {
       setNumberOfDetectedSamples(Object.keys(samples).length);
     }
-}, [samples]);
+  }, [samples]);
 
   useEffect(() => {
     const hasMetadataBeenEdited =
@@ -76,7 +76,6 @@ export default function Metadata({
     if (hasImportedMetadataFile) metadataType = "TSV";
     if (hasImportedMetadataFile && hasManuallyEditedMetadata)
       metadataType = "BOTH";
-
     analyticsTrackEvent<AnalyticsUploadMetadataType>(
       EVENT_TYPES.UPLOAD_METADATA_TYPE,
       {
