@@ -90,6 +90,7 @@ const SamplesView = (): JSX.Element => {
           <SamplesTable
             isLoading={isLoading}
             data={displayedRows}
+            checkedSamples={checkedSamples}
             setCheckedSamples={setCheckedSamples}
           />
         </MaxWidth>

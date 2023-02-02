@@ -44,16 +44,20 @@ const SampleTableModalManager = ({
   // determine whether selected samples can be edited
   useEffect(() => {
     const numberOfCheckedSamples = checkedSampleIds.length;
-    if (numberOfCheckedSamples > 0 && numberOfCheckedSamples <= 100) {
-      setCanEditSamples(true);
-    } else {
-      setCanEditSamples(false);
-    }
+    const canEditSamples =
+      numberOfCheckedSamples > 0 && numberOfCheckedSamples <= 100;
+
+    setCanEditSamples(canEditSamples);
   }, [checkedSampleIds]);
 
   useEffect(() => {
     if (shouldStartUsherFlow) setShouldStartUsherFlow(false);
   }, [shouldStartUsherFlow]);
+
+  const handleDownloadModalClose = () => {
+    setIsDownloadModalOpen(false);
+    clearCheckedSamples();
+  };
 
   const handleDeleteSampleModalClose = () => {
     setIsDeleteSampleModalOpen(false);
@@ -70,10 +74,7 @@ const SampleTableModalManager = ({
       <DownloadModal
         checkedSamples={checkedSamples}
         open={isDownloadModalOpen}
-        onClose={() => {
-          setIsDownloadModalOpen(false);
-          clearCheckedSamples();
-        }}
+        onClose={handleDownloadModalClose}
       />
       <CreateNSTreeModal
         checkedSampleIds={checkedSampleIds}

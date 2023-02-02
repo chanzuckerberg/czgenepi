@@ -9,7 +9,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Table as SDSTable, TableHeader, TableRow } from "czifui";
-import { map } from "lodash";
+import { isEqual, map } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { useVirtual, VirtualItem } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
@@ -23,6 +23,7 @@ interface Props<T> {
   tableData: IdMap<T> | undefined;
   initialSortKey?: string;
   isLoading?: boolean;
+  checkedRows: T[];
   onSetCheckedRows?(rowData: T[]): void;
 }
 
@@ -39,6 +40,7 @@ const Table = <T extends any>({
   tableData,
   initialSortKey,
   isLoading,
+  checkedRows = [],
   onSetCheckedRows,
   ...props
 }: Props<T> & Partial<TableOptions<any>>): JSX.Element => {
@@ -80,6 +82,7 @@ const Table = <T extends any>({
       ? [rowSelectionColumn, ...columns]
       : columns,
     getCoreRowModel: getCoreRowModel(),
+    getRowId: (r) => r.id, // use the cz ge object id instead of a default react table id
     getSortedRowModel: getSortedRowModel(),
     state: {
       rowSelection,
@@ -89,6 +92,38 @@ const Table = <T extends any>({
     onSortingChange: setSorting,
     ...props,
   });
+
+  // CHECKED ROW MGMT //
+  // this is slightly an anti-pattern, but unfortunately because of the way react table
+  // stores state for checked boxes, this way is the most efficient and abstracted
+  useEffect(() => {
+    if (!onSetCheckedRows) return;
+
+    // for each selected row in the table, map the react-table internal row to the data
+    // originally passed into the row
+    const newCheckedRows = table
+      .getSelectedRowModel()
+      .rows.map((r) => r.original);
+
+    onSetCheckedRows(newCheckedRows);
+  }, [rowSelection]);
+
+  // pass updates regarding checkedRows from parent view to the table
+  useEffect(() => {
+    const newRowSelection = checkedRows.reduce(
+      (obj, row) => ({
+        ...obj,
+        [row.id]: true,
+      }),
+      {}
+    );
+
+    // don't initiate an infinite loop
+    if (isEqual(newRowSelection, rowSelection)) return;
+
+    setRowSelection(newRowSelection);
+  }, [checkedRows]);
+  // END CHECKED ROW MGMT //
 
   // adds virtualization to the table
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -103,18 +138,6 @@ const Table = <T extends any>({
   });
   const { virtualItems: virtualRows, totalSize } = rowVirtualizer;
   // end virtualization code
-
-  useEffect(() => {
-    if (!onSetCheckedRows) return;
-
-    // for each selected row in the table, map the react-table internal row to the data
-    // originally passed into the row
-    const newCheckedRows = table
-      .getSelectedRowModel()
-      .rows.map((r) => r.original);
-
-    onSetCheckedRows(newCheckedRows);
-  }, [rowSelection]);
 
   if (isLoading) {
     return <EmptyTable numOfColumns={columns.length} />;

@@ -9,12 +9,14 @@ import { SAMPLE_TABLE_COLUMNS } from "./pathogenColumnConfig";
 interface Props {
   data: IdMap<Sample> | undefined;
   isLoading: boolean;
+  checkedSamples: Sample[];
   setCheckedSamples(samples: Sample[]): void;
 }
 
 const SamplesTable = ({
   data,
   isLoading,
+  checkedSamples,
   setCheckedSamples,
 }: Props): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
@@ -29,6 +31,7 @@ const SamplesTable = ({
       isLoading={isLoading}
       initialSortKey="uploadDate"
       tableData={data}
+      checkedRows={checkedSamples}
       onSetCheckedRows={setCheckedSamples}
       enableMultiRowSelection
     />
