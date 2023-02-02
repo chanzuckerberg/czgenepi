@@ -34,6 +34,7 @@ import {
   VerticalLine,
   Wrapper,
 } from "./style";
+
 interface Props {
   handleMetadata: (result: ParseResultUpload) => void;
   samples: CommonProps["samples"];

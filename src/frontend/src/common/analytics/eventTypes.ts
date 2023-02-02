@@ -55,6 +55,12 @@ export enum EVENT_TYPES {
   // User has successfully uploaded new samples
   SAMPLES_UPLOAD_SUCCESS = "SAMPLES_UPLOAD_SUCCESS",
 
+  // User is uploading data that has resulted in a failure
+  SAMPLES_UPLOAD_FAILED = "UPLOAD_METADATA_TYPE",
+
+  // User is uploading data with a metadata template or is doing manual entry
+  UPLOAD_METADATA_TYPE = "UPLOAD_METADATA_TYPE",
+
   // User downloading data about samples to a file(s)
   // Does not currently address success/failure, but download failures are very
   // rare, so generally safe to not be concerned about that aspect for now.
@@ -233,8 +239,34 @@ export type AnalyticsSamplesUploadPageChange = {
   upload_flow_uuid: string;
 };
 
+/** EVENT_TYPES.UPLOAD_METADATA_TYPE */
+export type AnalyticsUploadMetadataType = {
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: string;
+  // The type of metadata the user is uploading
+  metadata_entry_type: "MANUAL" | "TSV" | "BOTH";
+  // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
+  // For an Upload "flow" that ends in successful upload, this will match up.
+  upload_flow_uuid: string;
+  // number of samples in the upload
+  sample_count: number;
+};
+
 /** EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS*/
 export type AnalyticsSamplesUploadSuccess = {
+  // How many samples the user just uploaded
+  sample_count: number;
+  // JSON array of all the IDs for newly created samples for this upload
+  sample_ids: JsonString;
+  // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
+  // For an Upload "flow" that ends in successful upload, this will match up.
+  upload_flow_uuid: string;
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: string;
+};
+
+/** EVENT_TYPES.SAMPLES_UPLOAD_FAILED */
+export type AnalyticsSamplesUploadFailed = {
   // How many samples the user just uploaded
   sample_count: number;
   // JSON array of all the IDs for newly created samples for this upload

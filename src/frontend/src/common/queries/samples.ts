@@ -261,11 +261,14 @@ export async function createSamples({
 
 export function useCreateSamples({
   componentOnSuccess,
+  componentOnError,
 }: {
   componentOnSuccess: (respData: RawSamplesWithId) => void;
+  componentOnError: (respData: RawSamplesWithId) => void;
 }): UseMutationResult<unknown, unknown, SampleCreateRequestType, unknown> {
   return useMutation(createSamples, {
     onSuccess: componentOnSuccess,
+    onError: componentOnError,
   });
 }
 

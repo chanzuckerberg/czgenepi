@@ -1,6 +1,6 @@
 import { Button, Link } from "czifui";
 import NextLink from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { setApplyAllValueToPrevMetadata } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal/utils";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
@@ -33,23 +33,57 @@ import {
   ParseResult,
   SampleIdToWarningMessages,
 } from "./components/ImportFile/parseFile";
+import { analyticsTrackEvent } from "src/common/analytics/methods";
+import {
+  AnalyticsUploadMetadataType,
+  EVENT_TYPES,
+} from "src/common/analytics/eventTypes";
+import { useSelector } from "react-redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 
 export default function Metadata({
   samples,
   namedLocations,
   metadata,
   setMetadata,
+  analyticsFlowUuid,
 }: Props): JSX.Element {
+  const pathogen = useSelector(selectCurrentPathogen);
   const [isValid, setIsValid] = useState(false);
   const [hasImportedMetadataFile, setHasImportedMetadataFile] =
     useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
+  const [hasManuallyEditedMetadata, setHasManuallyEditedMetadata] =
+    useState<boolean>(false);
+  const [numberOfDetectedSamples, setNumberOfDetectedSamples] =
+    useState<number>(0);
 
-  let numberOfDetectedSamples = 0;
   if (samples != null) {
-    numberOfDetectedSamples = Object.keys(samples).length;
+    setNumberOfDetectedSamples(Object.keys(samples).length);
   }
+
+  useEffect(() => {
+    const hasMetadataBeenEdited =
+      hasImportedMetadataFile || hasManuallyEditedMetadata;
+    if (!hasMetadataBeenEdited) return;
+
+    type MetadataType = "BOTH" | "MANUAL" | "TSV";
+    let metadataType: MetadataType = "MANUAL";
+    if (hasImportedMetadataFile) metadataType = "TSV";
+    if (hasImportedMetadataFile && hasManuallyEditedMetadata)
+      metadataType = "BOTH";
+
+    analyticsTrackEvent<AnalyticsUploadMetadataType>(
+      EVENT_TYPES.UPLOAD_METADATA_TYPE,
+      {
+        pathogen: pathogen,
+        metadata_entry_type: metadataType,
+        upload_flow_uuid: analyticsFlowUuid,
+        sample_count: numberOfDetectedSamples,
+      }
+    );
+  }, [hasManuallyEditedMetadata, hasImportedMetadataFile]);
 
   const shouldUseStaticMetadataTable = numberOfDetectedSamples >= 100;
 
@@ -62,6 +96,7 @@ export default function Metadata({
     setMetadata((prevMetadata) => {
       return { ...prevMetadata, [id]: sampleMetadata };
     });
+    setHasManuallyEditedMetadata(true);
   };
 
   const handleRowMetadata = useCallback(handleRowMetadata_, [setMetadata]);
@@ -71,6 +106,7 @@ export default function Metadata({
     setMetadata((prevMetadata) => {
       return setApplyAllValueToPrevMetadata(prevMetadata, fieldKey, value);
     });
+    setHasManuallyEditedMetadata(true);
   };
 
   const applyToAllColumn = useCallback(applyToAllColumn_, [setMetadata]);
