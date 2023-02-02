@@ -286,7 +286,7 @@ def apply_filters(config, subsampling, template_args):
         if include_arguments_in_filters:
             subsampling["group"][
                 "min_date"
-            ] = f"--{min_date.replace('_', '-')} {min_date}"  # ex: --max-date 2020-01-01
+            ] = f"--{"min_date".replace('_', '-')} {min_date}"  # ex: --max-date 2020-01-01
         else:
             subsampling["group"]["min_date".replace("_", "-")] = str(
                 min_date
@@ -299,15 +299,15 @@ def apply_filters(config, subsampling, template_args):
         if include_arguments_in_filters:
             subsampling["group"][
                 "max_date"
-            ] = f"--{max_date.replace('_', '-')} {max_date}"  # ex: --max-date 2020-01-01
+            ] = f"--{"max_date".replace('_', '-')} {max_date}"  # ex: --max-date 2020-01-01
             subsampling["international_serial_sampling"][
                 "max_date"
-            ] = f"--{max_date.replace('_', '-')} {max_date}"  # ex: --max-date 2020-01-01
+            ] = f"--{"max_date".replace('_', '-')} {max_date}"  # ex: --max-date 2020-01-01
         else:
-            subsampling["group"][max_date.replace("_", "-")] = str(
+            subsampling["group"]["max_date".replace("_", "-")] = str(
                 max_date
             )  # ex: max-date: 2020-01-01
-            subsampling["group"][max_date.replace("_", "-")] = str(
+            subsampling["group"]["max_date".replace("_", "-")] = str(
                 max_date
             )  # ex: max-date: 2020-01-01
 
