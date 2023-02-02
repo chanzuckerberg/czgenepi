@@ -130,7 +130,7 @@ export const CreateNSTreeModal = ({
         // For example, for mpox the max depth is "division", we want to find the id of
         // the location that has the same division as the group's location, but location is null
         defaultTreeLocation = locationMaxDepthFinder(
-          groupInfo?.location,
+          groupInfo.location,
           locationDepth
         );
       }
