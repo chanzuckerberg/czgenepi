@@ -14,7 +14,7 @@ import { useGroupInfo } from "src/common/queries/groups";
 import { useLineages } from "src/common/queries/lineages";
 import {
   locationDepthPathogenConfig,
-  useNamedLocations,
+  useNamedPathogenDepthLocations,
 } from "src/common/queries/locations";
 import { RawTreeCreationWithId, useCreateTree } from "src/common/queries/trees";
 import { addNotification } from "src/common/redux/actions";
@@ -103,7 +103,7 @@ export const CreateNSTreeModal = ({
 
   // Filter based on location
   const { data: groupInfo } = useGroupInfo();
-  const { data: namedLocationsData } = useNamedLocations();
+  const { data: namedLocationsData } = useNamedPathogenDepthLocations();
   const namedLocations: NamedGisaidLocation[] = useMemo(() => {
     return namedLocationsData?.namedLocations ?? [];
   }, [namedLocationsData]);
@@ -119,18 +119,23 @@ export const CreateNSTreeModal = ({
   const setLocationToGroupDefault = () => {
     const locationDepth = locationDepthPathogenConfig[pathogen];
 
-    const defaultTreeLocation =
-      locationDepth === null
-        ? // If locationDepth is not specified, use the group's location
-          getLocationFromGroup(groupInfo)
-        : // if the locationDepth is specified and location is defined, then search
-        groupInfo?.location
-        ? // Search for the location id that matches the max depth of the group's location
-          // For example, for mpox the max depth is "division", we want to find the id of
-          // the location that has the same division as the group's location, but location is null
-          locationMaxDepthFinder(groupInfo?.location, locationDepth)
-        : // If location is not defined, we can't set the default selectedLocation yet
-          null;
+    let defaultTreeLocation: NamedGisaidLocation | null | undefined = null;
+    if (locationDepth === null) {
+      // If locationDepth is not specified, use the group's location
+      defaultTreeLocation = getLocationFromGroup(groupInfo);
+    } else {
+      // if the locationDepth is specified and location is defined, then search
+      if (groupInfo?.location) {
+        // Search for the location id that matches the max depth of the group's location
+        // For example, for mpox the max depth is "division", we want to find the id of
+        // the location that has the same division as the group's location, but location is null
+        defaultTreeLocation = locationMaxDepthFinder(
+          groupInfo?.location,
+          locationDepth
+        );
+      }
+    }
+    // If location is not defined, we can't set the default selectedLocation yet
     if (defaultTreeLocation) {
       setSelectedLocation(defaultTreeLocation);
     }
