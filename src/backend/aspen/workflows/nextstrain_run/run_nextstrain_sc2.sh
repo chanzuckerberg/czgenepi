@@ -57,6 +57,12 @@ aligned_gisaid_location=$(
 )
 
 
+# Tree builds break if include.txt is empty. If we don't have any selected samples,
+# then copy in nextstrain's defaults.
+if [ ! -s /ncov/data/include.txt ]; then
+    cp /ncov/defaults/include.txt /ncov/data/include.txt
+fi
+
 # Persist the build config we generated.
 $aws s3 cp /ncov/my_profiles/aspen/builds.yaml "${s3_prefix}/builds.yaml"
 $aws s3 cp /ncov/data/include.txt "${s3_prefix}/include.txt"
@@ -75,12 +81,6 @@ aligned_gisaid_metadata_s3_key=$(echo "${aligned_gisaid_location}" | jq -r .meta
 # fetch the gisaid dataset
 $aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_sequences_s3_key}" /ncov/results/
 $aws s3 cp --no-progress "s3://${aligned_gisaid_s3_bucket}/${aligned_gisaid_metadata_s3_key}" /ncov/results/
-
-# Tree builds break if include.txt is empty. If we don't have any selected samples,
-# then copy in nextstrain's defaults.
-if [ ! -s /ncov/data/include.txt ]; then
-    cp /ncov/defaults/include.txt /ncov/data/include.txt
-fi
 
 # run snakemake, if run fails export the logs from snakemake and ncov to s3
 (cd /ncov && snakemake --printshellcmds auspice/ncov_aspen.json --profile my_profiles/aspen/ --resources=mem_mb=312320) || { $aws s3 cp /ncov/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /ncov/logs/ "${s3_prefix}/logs/ncov/" --recursive ; }

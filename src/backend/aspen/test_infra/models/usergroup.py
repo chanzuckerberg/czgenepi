@@ -43,7 +43,7 @@ def group_factory(
 
 
 def user_factory(
-    group: Group,
+    group: Optional[Group] = None,
     name="test",
     auth0_user_id="test_auth0_id",
     email="test_user@dph.org",

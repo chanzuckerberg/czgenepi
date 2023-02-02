@@ -277,15 +277,19 @@ module lineage_qc_autorun_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = local.swipe_sfn_arn
-  # TODO set up a schedule once we decide on one.
-  # schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 23 ? * MON-FRI *)"] : []
+  # Weekly Saturdays @ 0900 UTC (1am PST [winter] / 2am PDT [summer])
+  schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 9 ? * SAT *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     genepi_config_secret_name = local.app_secret_name
     remote_dev_prefix        = local.remote_dev_prefix
+    deployment_stage = local.deployment_stage
   }
 }
 
+# This template is used as the actual runner for all our on-demand and
+# scheduled lineage-qc runs (scheduled runs are kicked off by lineage-qc-autorun),
+# so be aware that changing this also affects how all scheduled runs function.
 module lineage_qc_ondemand_sfn_config {
   source   = "../sfn_config"
   app_name = "lineage-qc-ondemand-sfn"
