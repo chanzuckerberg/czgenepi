@@ -1,6 +1,6 @@
 import { distance } from "fastest-levenshtein";
 import { foldInLocationName } from "../queries/locations";
-import { reduceObjectArrayToLookupDict } from "./dataTransforms";
+import { IdMap, reduceObjectArrayToLookupDict } from "./dataTransforms";
 
 // Produce unique string to name a GISAID location from its various attributes
 export function stringifyGisaidLocation(location?: GisaidLocation): string {
@@ -154,17 +154,11 @@ export const getIdFromCollectionLocation = (
   }
 };
 
-export interface NamedLocationsByIdResponse {
-  namedLocationsById: IdMap<NamedGisaidLocation>;
-}
-
 export const getNamedLocationsById = (
   locations: NamedGisaidLocation[]
-): NamedLocationsByIdResponse => {
+): IdMap<NamedGisaidLocation> => {
   if (!locations) return {};
 
   const namedLocations = locations.map(foldInLocationName);
-  return {
-    namedLocationsById: reduceObjectArrayToLookupDict(namedLocations, "id"),
-  };
+  return reduceObjectArrayToLookupDict(namedLocations, "id");
 };

@@ -8,7 +8,7 @@ import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { TREE_STATUS } from "src/common/constants/types";
 import { useGroupInfo } from "src/common/queries/groups";
 import { foldInLocationName } from "src/common/queries/locations";
-import { NamedLocationsByIdResponse } from "src/common/utils/locationUtils";
+import { IdMap } from "src/common/utils/dataTransforms";
 import { NO_CONTENT_FALLBACK } from "src/views/Upload/components/common/constants";
 import NextstrainConfirmationModal from "../NextstrainConfirmationModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
@@ -26,7 +26,7 @@ import {
 
 interface Props {
   phyloRun: PhyloRun;
-  locations: NamedLocationsByIdResponse;
+  locations: IdMap<NamedGisaidLocation>;
 }
 
 const getDateRangeString = (phyloRun: PhyloRun): string => {
@@ -66,7 +66,7 @@ const TreeTableNameCell = ({ phyloRun, locations }: Props): JSX.Element => {
     // the group location here because it is incorrect. Instead, we show
     // nothing until the data is ready.
     if (!locations) return "";
-    return locations.locations[templateLocationId].name;
+    return locations[templateLocationId].name;
   };
 
   const handleClickOpen = () => {

@@ -1,12 +1,13 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { CellComponent } from "czifui";
+import { IdMap } from "src/common/utils/dataTransforms";
 import { memo } from "src/common/utils/memo";
 import { generateWidthStyles } from "src/common/utils/tableUtils";
 import TreeTableNameCell from "../components/TreeTableNameCell";
 import { StyledSortableHeader } from "../style";
 
 export const treeName = (
-  locations: NamedGisaidLocation[]
+  locations: IdMap<NamedGisaidLocation>
 ): ColumnDef<PhyloRun, any> => ({
   id: "name",
   accessorKey: "name",

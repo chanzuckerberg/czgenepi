@@ -5,7 +5,6 @@ import { store } from "../redux";
 import { selectCurrentPathogen } from "../redux/selectors";
 import { Pathogen } from "../redux/types";
 import { PathogenConfigType } from "../types/pathogenConfig";
-import { IdMap, reduceObjectArrayToLookupDict } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 
 export interface LocationsResponse {

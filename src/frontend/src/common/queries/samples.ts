@@ -18,8 +18,6 @@ import {
   SampleResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
-import { store } from "../redux";
-import { selectCurrentPathogen } from "../redux/selectors";
 import { IdMap, reduceObjectArrayToLookupDict } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
