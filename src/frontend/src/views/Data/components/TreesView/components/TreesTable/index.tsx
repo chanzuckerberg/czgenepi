@@ -138,6 +138,7 @@ const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
       isLoading={isLoading}
       initialSortKey="startedDate"
       defaultColumn={defaultColumn}
+      uniqueIdentifier="workflowId"
     />
   );
 };
