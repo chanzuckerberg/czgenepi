@@ -28,7 +28,18 @@ const defaultColumn: Partial<ColumnDef<PhyloRun, any>> = {
 };
 
 const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
-  console.log("TreesTable");
+  const { data: locationData = {} } = useLocations();
+  const { locations } = locationData;
+
+  const namedLocationsById = useMemo(
+    () => getNamedLocationsById(locations),
+    [locations]
+  );
+
+  const columns: ColumnDef<PhyloRun, any>[] = useMemo(() => {
+    return [treeName(namedLocationsById), startedDate, treeType, actionMenu];
+  }, [namedLocationsById]);
+
   return (
     <Table<PhyloRun>
       columns={columns}
