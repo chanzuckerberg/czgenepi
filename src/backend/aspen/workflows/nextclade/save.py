@@ -1,9 +1,11 @@
 import csv
 import io
-from typing import Dict, IO, Optional
+from typing import Dict, IO, Set, Optional
 
+from Bio import SeqIO
 import click
 import sqlalchemy as sa
+from sqlalchemy.orm.session import Session
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -13,6 +15,7 @@ from aspen.database.connection import (
     SqlAlchemyInterface,
 )
 from aspen.database.models import (
+    AlignedPathogenGenome,
     LineageType,
     MutationsCaller,
     QCMetricCaller,
@@ -32,12 +35,16 @@ FAILED_LINEAGE_STATUS = "FAILED"
 @click.command("save")
 @click.option("nextclade_fh", "--nextclade-csv", type=click.File("r"), required=True)
 @click.option(
+    "nextclade_aligned_fasta_fh", "--nextclade-aligned-fasta", type=click.File("r"), required=True
+)
+@click.option(
     "nextclade_tag_fh", "--nextclade-dataset-tag", type=click.File("r"), required=True
 )
 @click.option("nextclade_version", "--nextclade-version", type=str, required=True)
 @click.option("pathogen_slug", "--pathogen-slug", type=str, required=True)
 def cli(
     nextclade_fh: io.TextIOBase,
+    nextclade_aligned_fasta_fh: io.TextIOBase,
     nextclade_tag_fh: IO[str],
     nextclade_version: str,
     pathogen_slug: str,
@@ -46,6 +53,8 @@ def cli(
     print("Beginning to save Nextclade results to DB.")
     # Track info about the dataset that was used to produce results being saved
     dataset_info = extract_dataset_info(nextclade_tag_fh)
+    # Set of sample_ids for all samples we expect will be in aligned fasta.
+    aligned_fasta_expected: Set[int] = set()
 
     # This can be a lot of samples, so batch up commits as we go.
     COMMIT_CHUNK_SIZE = 1000  # This number has worked fine in manual running.
@@ -65,7 +74,11 @@ def cli(
             # We always record QC info for any sample run, even if invalid.
             qc_score: Optional[str] = row["qc.overallScore"]
             qc_status = row["qc.overallStatus"]
-            if not is_result_valid:
+            if is_result_valid:
+                # If valid result, we expect it will have an aligned sequence
+                aligned_fasta_expected.add(sample_id)
+            else:
+                # If result was invalid, mark QC info accordingly
                 qc_score = None
                 qc_status = INVALID_RESULT_STATUS
 
@@ -176,6 +189,8 @@ def cli(
         # Don't forget to commit the last chunk of entries that remain!
         session.commit()
 
+        # We now handle saving out
+
     print("Finished saving Nextclade results to DB.")
     print(f"Total count of samples run and saved: {entry_count_so_far}")
 
@@ -237,6 +252,52 @@ def get_lineage_from_row(
 
     return lineage
 
+
+def save_aligned_genomes(
+    session: Session,
+    aligned_fasta_file: io.TextIOBase,
+    latest_reference_name: str,
+    # TODO add taking timestamp, use bash
+    ):
+    """DOCME
+    TODO VOODOO -- have this output a set of the saved ids, then callsite can compare and warn
+
+    - Talk about the `id` versus `description` aspect and how we get what we
+    want out of it. Also can mention name is equivalent to id for fastas"""
+    parsed_fasta = SeqIO.parse(aligned_fasta_file, "fasta")
+    for record in parsed_fasta:
+        sample_id = int(record.id)
+        print(f"sample_id: {sample_id}")
+        existing_aligned_pathogen_genome_q = (
+            sa.select(AlignedPathogenGenome)
+            .filter(AlignedPathogenGenome.sample_id == sample_id)
+        )
+        aligned_pathogen_genome = session.execute(existing_aligned_pathogen_genome_q).scalars().one_or_none()
+
+        should_add_to_session = False
+        if aligned_pathogen_genome is None:
+            print("No prior APG")
+            aligned_pathogen_genome = AlignedPathogenGenome(
+                sample_id=sample_id,
+                sequence=str(record.seq),
+                reference_name="VOODOO",
+            )
+            should_add_to_session = True
+        # If pre-existing APG, no need to update unless changed reference seq.
+        elif aligned_pathogen_genome.reference_name != latest_reference_name:
+            print("found a prior APG, but it's stale: updating!")
+            aligned_pathogen_genome.sequence = str(record.seq)
+            aligned_pathogen_genome.reference_name = latest_reference_name
+            should_add_to_session = True
+        else:
+            print("found a prior APG, but we all good")
+
+        if should_add_to_session:
+            session.add(aligned_pathogen_genome)
+
+    print("LOCK IT IN!")
+    session.commit()
+    print("locked")
 
 if __name__ == "__main__":
     cli()
