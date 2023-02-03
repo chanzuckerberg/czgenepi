@@ -1,11 +1,11 @@
 import csv
-from datetime import datetime
 import io
-from typing import Dict, IO, Set, Optional
+from datetime import datetime
+from typing import Dict, IO, Optional, Set
 
-from Bio import SeqIO
 import click
 import sqlalchemy as sa
+from Bio import SeqIO
 from sqlalchemy.orm.session import Session
 
 from aspen.config.config import Config
@@ -36,14 +36,21 @@ FAILED_LINEAGE_STATUS = "FAILED"
 @click.command("save")
 @click.option("nextclade_fh", "--nextclade-csv", type=click.File("r"), required=True)
 @click.option(
-    "nextclade_aligned_fasta_fh", "--nextclade-aligned-fasta", type=click.File("r"), required=True
+    "nextclade_aligned_fasta_fh",
+    "--nextclade-aligned-fasta",
+    type=click.File("r"),
+    required=True,
 )
 @click.option(
     "nextclade_tag_fh", "--nextclade-dataset-tag", type=click.File("r"), required=True
 )
 @click.option("nextclade_version", "--nextclade-version", type=str, required=True)
-@click.option("nextclade_run_datetime", "--nextclade-run-datetime",
-    type=click.DateTime(formats=["%Y-%m-%dT%H:%M:%S"]), required=True)
+@click.option(
+    "nextclade_run_datetime",
+    "--nextclade-run-datetime",
+    type=click.DateTime(formats=["%Y-%m-%dT%H:%M:%S"]),
+    required=True,
+)
 @click.option("pathogen_slug", "--pathogen-slug", type=str, required=True)
 def cli(
     nextclade_fh: io.TextIOBase,
@@ -201,7 +208,7 @@ def cli(
             nextclade_aligned_fasta_fh,
             dataset_info["accession"],
             nextclade_run_datetime,
-            )
+        )
         # The `aligned_fasta_expected` ids **should** exactly match all the ids
         # found in the FASTA. If there's a difference something weird is going
         # on and we should at least have some warning logs. Maybe even fail?
@@ -219,7 +226,6 @@ def cli(
                 "List of ids that were expected in FASTA but not found:",
                 sorted(missing_ids),
             )
-
 
 
 def is_nextclade_result_valid(nextclade_csv_row: Dict[str, str]) -> bool:
@@ -247,7 +253,10 @@ def is_nextclade_result_valid(nextclade_csv_row: Dict[str, str]) -> bool:
     is_result_valid = True
     if nextclade_csv_row["errors"] != "":
         is_result_valid = False
-    elif nextclade_csv_row["warnings"] != "" and nextclade_csv_row["qc.overallScore"] == "":
+    elif (
+        nextclade_csv_row["warnings"] != ""
+        and nextclade_csv_row["qc.overallScore"] == ""
+    ):
         is_result_valid = False
     return is_result_valid
 
@@ -296,7 +305,7 @@ def save_aligned_genomes(
     aligned_fasta_file: io.TextIOBase,
     latest_reference_name: str,
     nextclade_run_datetime: datetime,
-    ) -> Set[int]:
+) -> Set[int]:
     """Saves the aligned sequences from Nextclade output to DB.
 
     This does /not/ save every sequence from the `nextclade.aligned.fasta`,
@@ -332,11 +341,12 @@ def save_aligned_genomes(
         # of copying this code. It is NOT just the string on `>` line in fasta.
         sample_id = int(record.id)
         ids_in_aligned_fasta.add(sample_id)
-        existing_aligned_pathogen_genome_q = (
-            sa.select(AlignedPathogenGenome)
-            .filter(AlignedPathogenGenome.sample_id == sample_id)
+        existing_aligned_pathogen_genome_q = sa.select(AlignedPathogenGenome).filter(
+            AlignedPathogenGenome.sample_id == sample_id
         )
-        aligned_pathogen_genome = session.execute(existing_aligned_pathogen_genome_q).scalars().one_or_none()
+        aligned_pathogen_genome = (
+            session.execute(existing_aligned_pathogen_genome_q).scalars().one_or_none()
+        )
 
         should_add_to_session = False
         if aligned_pathogen_genome is None:
@@ -362,9 +372,10 @@ def save_aligned_genomes(
     # Don't forget to commit the last chunk of entries that remain!
     session.commit()
     print("Finished saving Nextclade aligned genomes to DB.")
-    print(f"Total count of aligned pathogen genomes added (new) or updated "
+    print(
+        f"Total count of aligned pathogen genomes added (new) or updated "
         f"(existing): {apg_to_save_so_far}."
-        )
+    )
 
     return ids_in_aligned_fasta
 
