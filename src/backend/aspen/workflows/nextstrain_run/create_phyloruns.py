@@ -168,7 +168,7 @@ def retry_template_args_for_focal_group(
 
         # Try going back further in time.
         if start_date_attempts:
-            filter_start_date = dateparser.parse(start_date_attempts.pop(0)).date()
+            filter_start_date = dateparser.parse(start_date_attempts.pop(0)).date()  # type: ignore
             # We overwrote the start date to look further back in time, let's try again!
             continue
 
