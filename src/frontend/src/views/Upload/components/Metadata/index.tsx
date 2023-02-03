@@ -1,6 +1,6 @@
 import { Button, Link } from "czifui";
 import NextLink from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { setApplyAllValueToPrevMetadata } from "src/views/Data/components/SamplesView/components/SampleTableModalManager/components/EditSamplesConfirmationModal/utils";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
@@ -33,56 +33,24 @@ import {
   ParseResult,
   SampleIdToWarningMessages,
 } from "./components/ImportFile/parseFile";
-import { analyticsTrackEvent } from "src/common/analytics/methods";
-import {
-  AnalyticsUploadMetadataType,
-  EVENT_TYPES,
-  UploadFormMetadataType,
-} from "src/common/analytics/eventTypes";
-import { useSelector } from "react-redux";
-import { selectCurrentPathogen } from "src/common/redux/selectors";
 
 export default function Metadata({
   samples,
   namedLocations,
   metadata,
   setMetadata,
-  analyticsFlowUuid,
+  setHasManuallyEditedMetadata,
+  setHasImportedMetadataFile,
+  hasImportedMetadataFile,
 }: Props): JSX.Element {
-  const pathogen = useSelector(selectCurrentPathogen);
   const [isValid, setIsValid] = useState(false);
-  const [hasImportedMetadataFile, setHasImportedMetadataFile] =
-    useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
-  // this is used to track whether the user has manually edited the metadata for analytics
-  const [hasManuallyEditedMetadata, setHasManuallyEditedMetadata] =
-    useState<boolean>(false);
 
   let numberOfDetectedSamples = 0;
   if (samples != null) {
     numberOfDetectedSamples = Object.keys(samples).length;
   }
-
-  useEffect(() => {
-    const hasMetadataBeenEdited =
-      hasImportedMetadataFile || hasManuallyEditedMetadata;
-    if (!hasMetadataBeenEdited) return;
-
-    let metadataType: UploadFormMetadataType = "MANUAL";
-    if (hasImportedMetadataFile) metadataType = "TSV";
-    if (hasImportedMetadataFile && hasManuallyEditedMetadata)
-      metadataType = "BOTH";
-    analyticsTrackEvent<AnalyticsUploadMetadataType>(
-      EVENT_TYPES.UPLOAD_METADATA_TYPE,
-      {
-        pathogen: pathogen,
-        metadata_entry_type: metadataType,
-        upload_flow_uuid: analyticsFlowUuid,
-        sample_count: numberOfDetectedSamples,
-      }
-    );
-  }, [hasManuallyEditedMetadata, hasImportedMetadataFile]);
 
   const shouldUseStaticMetadataTable = numberOfDetectedSamples >= 100;
 

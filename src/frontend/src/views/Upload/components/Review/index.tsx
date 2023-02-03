@@ -1,6 +1,6 @@
 import { Button } from "czifui";
 import NextLink from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { HeadAppTitle } from "src/common/components";
 import { NewTabLink } from "src/common/components/library/NewTabLink";
@@ -31,18 +31,52 @@ import {
   StyledButton,
   StyledCheckbox,
 } from "./style";
+import {
+  AnalyticsUploadMetadataType,
+  EVENT_TYPES,
+  UploadFormMetadataType,
+} from "src/common/analytics/eventTypes";
+import { analyticsTrackEvent } from "src/common/analytics/methods";
 
 export default function Review({
   samples,
   metadata,
   cancelPrompt,
   analyticsFlowUuid,
+  hasManuallyEditedMetadata,
+  hasImportedMetadataFile,
 }: Props): JSX.Element {
   const pathogen = useSelector(selectCurrentPathogen);
   const { data: userInfo } = useUserInfo();
   const [isGroupConfirmationChecked, setIsGroupConfirmationChecked] =
     useState<boolean>(false);
   const [isConsentChecked, setIsConsentChecked] = useState(false);
+
+  let numberOfDetectedSamples = 0;
+  if (samples != null) {
+    numberOfDetectedSamples = Object.keys(samples).length;
+  }
+
+  // firing off analytics event in review since metadata editing should be finalized at this point.
+  useEffect(() => {
+    const hasMetadataBeenEdited =
+      hasImportedMetadataFile || hasManuallyEditedMetadata;
+    if (!hasMetadataBeenEdited) return;
+
+    let metadataType: UploadFormMetadataType = "MANUAL";
+    if (hasImportedMetadataFile) metadataType = "TSV";
+    if (hasImportedMetadataFile && hasManuallyEditedMetadata)
+      metadataType = "BOTH";
+    analyticsTrackEvent<AnalyticsUploadMetadataType>(
+      EVENT_TYPES.UPLOAD_METADATA_TYPE,
+      {
+        pathogen: pathogen,
+        metadata_entry_type: metadataType,
+        upload_flow_uuid: analyticsFlowUuid,
+        sample_count: numberOfDetectedSamples,
+      }
+    );
+  }, [hasManuallyEditedMetadata, hasImportedMetadataFile]);
 
   const group = getCurrentGroupFromUserInfo(userInfo);
 
