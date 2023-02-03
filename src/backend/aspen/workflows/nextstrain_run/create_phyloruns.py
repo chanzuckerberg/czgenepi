@@ -154,22 +154,28 @@ def retry_template_args_for_focal_group(
     start_date_attempts = ["6 months ago", "12 months ago"]
 
     while True:
+        print(
+            f"Checking for focal samples for group '{group.name}' in '{location.region}/{location.country}/{location.division}/{location.location}', newer than {filter_start_date} ... ",
+            end="",
+        )
         args = get_template_args_for_focal_group(
             db, group, pathogen, repo, location, filter_start_date, filter_end_date
         )
         if args:
-            print(
-                f"Group '{group.name}' matched focal sequences for '{location.region}/{location.country}/{location.division}/{location.location}', newer than {filter_start_date}! Proceeding with build."
-            )
+            print("match found")
             return args
+        print("no matches, trying again")
+
+        # Try going back further in time.
+        if start_date_attempts:
+            filter_start_date = dateparser.parse(start_date_attempts.pop(0)).date()
+            # We overwrote the start date to look further back in time, let's try again!
+            continue
 
         # widen our geographical search area
         if (
             "division" in current_location_level
         ):  # We don't build scheduled trees for locations bigger than a country.
-            print(
-                f"Group '{group.name}' had no focal sequences that matched '{location.region}/{location.country}/{location.division}/{location.location}', trying again with a wider search area."
-            )
             current_location_level = current_location_level[:-1]
             new_location_query = sa.select(Location)
             for col in location_hierarchy:
@@ -181,15 +187,6 @@ def retry_template_args_for_focal_group(
                 )
             location = db.execute(new_location_query).scalars().one()
             # We overwrote the location var with a wider area. Try again!
-            continue
-
-        # Try going back further in time.
-        if start_date_attempts:
-            print(
-                f"Group '{group.name}' had no focal sequences that matched '{location.region}/{location.country}/{location.division}/{location.location}', newer than {filter_start_date}, trying again with a wider date range."
-            )
-            filter_start_date = dateparser.parse(start_date_attempts.pop(0)).date()
-            # We overwrote the start date to look further back in time, let's try again!
             continue
 
         # If we've made it this far, we have no more options, skip the build..
@@ -309,9 +306,9 @@ def launch_all(pathogen):
                     db, group, template_args, tree_type, pathogen_obj, repository
                 )
 
-                NextstrainScheduledJob(settings)
+                job = NextstrainScheduledJob(settings)
                 db.commit()
-                # job.run(workflow, "scheduled")
+                job.run(workflow, "scheduled")
 
 
 if __name__ == "__main__":
