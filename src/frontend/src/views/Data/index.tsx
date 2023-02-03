@@ -9,7 +9,6 @@ import { useProtectedRoute } from "src/common/queries/auth";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
-import { Pathogen } from "src/common/redux/types";
 import { DataCategory, Transform } from "src/common/types/data";
 import {
   IdMap,
