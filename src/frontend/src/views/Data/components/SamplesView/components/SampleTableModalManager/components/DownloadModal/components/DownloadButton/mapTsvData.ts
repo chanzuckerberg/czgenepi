@@ -38,7 +38,7 @@ export const mapTsvData = (checkedSamples: Sample[]): string[][] => {
     value: any;
   }): string[] => {
     return subHeaders.map((subHeader) => {
-      const subHeaderValue = value[subHeader.key];
+      const subHeaderValue = value?.[subHeader.key];
       return subHeaderValue ? String(subHeaderValue) : defaultEmptyValue;
     });
   };
