@@ -288,10 +288,7 @@ def apply_filters(config, subsampling, template_args):
                 "min_date"
             ] = f"--min-date {min_date}"  # ex: --max-date 2020-01-01
         else:
-            subsampling["group"]["min-date")] = str(
-                min_date
-            )  # ex: max-date: 2020-01-01
-
+            subsampling["group"]["min-date"] = str(min_date)  # ex: max-date: 2020-01-01
     max_date = template_args.get("filter_end_date")
     if max_date:
         # Support date expressions like "5 days ago" in our cron schedule.
@@ -300,16 +297,16 @@ def apply_filters(config, subsampling, template_args):
             subsampling["group"][
                 "max_date"
             ] = f"--max-date {max_date}"  # ex: --max-date 2020-01-01
-            subsampling["international_serial_sampling"][
-                "max_date"
-            ] = f"--max-date {max_date}"  # ex: --max-date 2020-01-01
+            if "international_serial_sampling" in subsampling:
+                subsampling["international_serial_sampling"][
+                    "max_date"
+                ] = f"--max-date {max_date}"  # ex: --max-date 2020-01-01
         else:
-            subsampling["group"]["max-date"] = str(
-                max_date
-            )  # ex: max-date: 2020-01-01
-            subsampling["group"]["max-date"] = str(
-                max_date
-            )  # ex: max-date: 2020-01-01
+            subsampling["group"]["max-date"] = str(max_date)  # ex: max-date: 2020-01-01
+            if "international_serial_sampling" in subsampling:
+                subsampling["group"]["international_serial_sampling"] = str(
+                    max_date
+                )  # ex: max-date: 2020-01-01
 
     pango_lineages = template_args.get("filter_pango_lineages")
     if pango_lineages:

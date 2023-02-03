@@ -200,6 +200,47 @@ def test_overview_config_ondemand(mocker, session, postgres_database, split_clie
     )
     assert subsampling_scheme["group"]["min_date"] == "--min-date 2021-04-30"
     assert subsampling_scheme["group"]["max_date"] == f"--max-date {max_date}"
+    assert (
+        subsampling_scheme["international_serial_sampling"]["max_date"]
+        == f"--max-date {max_date}"
+    )
+    assert subsampling_scheme["group"]["max_sequences"] == 2000
+    assert (
+        subsampling_scheme["group"]["query"]
+        == "--query \"(location == '{location}') & (division == '{division}') & (pango_lineage in {pango_lineage})\""
+    )
+    assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
+    assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
+    assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
+
+
+# Make sure that we can filter non-contextualized trees
+def test_non_contextualized_config_filters(
+    mocker, session, postgres_database, split_client
+):
+    mock_remote_db_uri(mocker, postgres_database.as_uri())
+
+    tree_type = TreeType.NON_CONTEXTUALIZED
+    query = {
+        "filter_start_date": "2021-04-30",
+        "filter_end_date": "10 days ago",
+        "filter_pango_lineages": ["AY", "B.1.116"],
+    }
+    phylo_run = create_test_data(
+        session, split_client, tree_type, 10, 5, 5, template_args=query
+    )
+    sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
+
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
+
+    max_date = dateparser.parse("10 days ago").strftime("%Y-%m-%d")
+    assert nextstrain_config["files"]["include"] == "data/include.txt"
+    # Order does not matter for lineages, just verify matched sets.
+    assert set(nextstrain_config["builds"]["aspen"]["pango_lineage"]) == set(
+        query["filter_pango_lineages"]
+    )
+    assert subsampling_scheme["group"]["min_date"] == "--min-date 2021-04-30"
+    assert subsampling_scheme["group"]["max_date"] == f"--max-date {max_date}"
     assert subsampling_scheme["group"]["max_sequences"] == 2000
     assert (
         subsampling_scheme["group"]["query"]

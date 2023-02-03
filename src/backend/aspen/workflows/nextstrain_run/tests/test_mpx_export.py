@@ -163,6 +163,9 @@ def test_overview_config_ondemand(mocker, session, postgres_database, split_clie
     # Order does not matter for lineages, just verify matched sets.
     assert subsampling_scheme["group"]["min-date"] == "2021-04-30"
     assert subsampling_scheme["group"]["max-date"] == f"{max_date}"
+    assert (
+        subsampling_scheme["international_serial_sampling"]["max-date"] == f"{max_date}"
+    )
     assert subsampling_scheme["group"]["subsample-max-sequences"] == 500
     filter_pango_lineages = "['" + "', '".join(query["filter_pango_lineages"]) + "']"
     assert (
