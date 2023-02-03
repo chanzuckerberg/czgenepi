@@ -3,6 +3,7 @@ import { CellComponent } from "czifui";
 import { memo } from "src/common/utils/memo";
 import { generateWidthStyles } from "src/common/utils/tableUtils";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
+import { getQCStatusFromSample } from "src/views/Upload/components/Samples/utils";
 import { QualityScoreTag } from "../components/QualityScoreTag";
 
 export const qualityControlColumn: ColumnDef<Sample, any> = {
@@ -34,8 +35,8 @@ export const qualityControlColumn: ColumnDef<Sample, any> = {
     );
   }),
   sortingFn: (a, b) => {
-    const statusA = a.original.qcMetrics[0].qcStatus;
-    const statusB = b.original.qcMetrics[0].qcStatus;
+    const statusA = getQCStatusFromSample(a.original) ?? "";
+    const statusB = getQCStatusFromSample(b.original) ?? "";
     return statusA > statusB ? -1 : 1;
   },
 };
