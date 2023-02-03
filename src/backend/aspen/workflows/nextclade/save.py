@@ -296,13 +296,31 @@ def save_aligned_genomes(
     aligned_fasta_file: io.TextIOBase,
     latest_reference_name: str,
     nextclade_run_datetime: datetime,
-    # TODO add taking timestamp, use bash
     ) -> Set[int]:
-    """DOCME
-    TODO VOODOO -- have this output a set of the saved ids, then callsite can compare and warn
+    """Saves the aligned sequences from Nextclade output to DB.
 
-    - Talk about the `id` versus `description` aspect and how we get what we
-    want out of it. Also can mention name is equivalent to id for fastas"""
+    This does /not/ save every sequence from the `nextclade.aligned.fasta`,
+    it only saves sequences for A) samples that do not have an aligned pathogen
+    genome yet, or B) they have an aligned pathogen genome already, but it's
+    against an old reference_sequence_accession (AKA, reference_name), so the
+    result in the FASTA is new. The reasoning here is that these sequences
+    are pretty big, and if a sample already has an APG for the same accession,
+    the aligned genome will be identical, so there's no benefit to spamming
+    the DB with unnecessary saves.
+
+    It returns a set of all the sample_ids we found in FASTA so the callsite
+    can compare that against which sequences it expected to have been aligned
+    successfully from the Nextclade CSV and verify they match up.
+
+    We're using `biopython` package (imported as `Bio`) to do the actual FASTA
+    reading. Interestingly, the `.id` attribute on a SeqRecord is **only** the
+    string from `>` line in FASTA up until the first space, then it truncates.
+    If you want the whole string, you need `.description`. (`.name`, for FASTA,
+    is an equivalent to `.id`) But because this entire workflow only uses PK
+    sample_ids, `.id` works perfectly, and handles the " |(reverse complement)"
+    appends we occasionally get from running Nextclade with the retry reverse
+    complement flag for those pathogens that need it.
+    """
     # This can be a lot of data, so batch up commits as we go.
     COMMIT_CHUNK_SIZE = 100  # Number was picked out of thin air. Seems sane?
     apg_to_save_so_far = 0  # Final value will be count /actually/ saved to DB.
@@ -310,6 +328,8 @@ def save_aligned_genomes(
     ids_in_aligned_fasta: Set[int] = set()
     parsed_fasta = SeqIO.parse(aligned_fasta_file, "fasta")
     for record in parsed_fasta:
+        # Note, `record.id` is a little odd. See notes above if you're thinking
+        # of copying this code. It is NOT just the string on `>` line in fasta.
         sample_id = int(record.id)
         ids_in_aligned_fasta.add(sample_id)
         existing_aligned_pathogen_genome_q = (
