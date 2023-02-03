@@ -304,7 +304,7 @@ def apply_filters(config, subsampling, template_args):
         else:
             subsampling["group"]["max-date"] = str(max_date)  # ex: max-date: 2020-01-01
             if "international_serial_sampling" in subsampling:
-                subsampling["group"]["international_serial_sampling"] = str(
+                subsampling["international_serial_sampling"]["max-date"] = str(
                     max_date
                 )  # ex: max-date: 2020-01-01
 
