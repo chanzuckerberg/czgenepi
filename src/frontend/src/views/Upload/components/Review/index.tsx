@@ -58,7 +58,7 @@ export default function Review({
   }
 
   // firing off analytics event in review since metadata editing should be finalized at this point.
-  useEffect(() => {
+  function fireMetadataTypeAnalyticsEvent() {
     const hasMetadataBeenEdited =
       hasImportedMetadataFile || hasManuallyEditedMetadata;
     if (!hasMetadataBeenEdited) return;
@@ -76,7 +76,11 @@ export default function Review({
         sample_count: numberOfDetectedSamples,
       }
     );
-  }, [hasManuallyEditedMetadata, hasImportedMetadataFile]);
+  }
+
+  useEffect(() => {
+    fireMetadataTypeAnalyticsEvent();
+  }, [hasImportedMetadataFile, hasManuallyEditedMetadata]);
 
   const group = getCurrentGroupFromUserInfo(userInfo);
 

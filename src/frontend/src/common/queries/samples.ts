@@ -264,7 +264,7 @@ export function useCreateSamples({
   componentOnError,
 }: {
   componentOnSuccess: (respData: RawSamplesWithId) => void;
-  componentOnError: (respData: RawSamplesWithId) => void;
+  componentOnError: () => void;
 }): UseMutationResult<unknown, unknown, SampleCreateRequestType, unknown> {
   return useMutation(createSamples, {
     onSuccess: componentOnSuccess,

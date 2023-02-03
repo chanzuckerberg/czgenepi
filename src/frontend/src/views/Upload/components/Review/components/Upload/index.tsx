@@ -36,11 +36,6 @@ interface Props {
   analyticsFlowUuid: string;
 }
 
-const getAttemptedUploadedIds = (respData: RawSamplesWithId) => {
-  const attemptedUploadedSamples = respData.samples;
-  return attemptedUploadedSamples.map((sample) => sample.id);
-};
-
 export default function Upload({
   isDisabled,
   samples,
@@ -54,26 +49,25 @@ export default function Upload({
   const { mutate, isLoading, isSuccess, isError, error } = useCreateSamples({
     componentOnSuccess: (respData: RawSamplesWithId) => {
       // Analytics event: successful upload of samples
-      const attemptedUploadedIds = getAttemptedUploadedIds(respData);
+      const uploadedSamples = respData.samples;
+      const uploadedSamplesIds = uploadedSamples.map((sample) => sample.id);
       analyticsTrackEvent<AnalyticsSamplesUploadSuccess>(
         EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS,
         {
-          sample_count: attemptedUploadedIds.length,
-          sample_ids: JSON.stringify(attemptedUploadedIds),
+          sample_count: uploadedSamplesIds.length,
+          sample_ids: JSON.stringify(uploadedSamplesIds),
           upload_flow_uuid: analyticsFlowUuid,
           pathogen: pathogen,
         }
       );
       cancelPrompt();
     },
-    componentOnError: (respData: RawSamplesWithId) => {
+    componentOnError: () => {
       // Analytics event: unsuccessful upload of samples
-      const attemptedUploadedIds = getAttemptedUploadedIds(respData);
       analyticsTrackEvent<AnalyticsSamplesUploadFailed>(
         EVENT_TYPES.SAMPLES_UPLOAD_FAILED,
         {
-          sample_count: attemptedUploadedIds.length,
-          sample_ids: JSON.stringify(attemptedUploadedIds),
+          failed_message: (error as Error)?.message,
           upload_flow_uuid: analyticsFlowUuid,
           pathogen: pathogen,
         }

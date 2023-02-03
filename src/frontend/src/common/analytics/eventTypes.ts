@@ -272,10 +272,8 @@ export type AnalyticsSamplesUploadSuccess = {
 
 /** EVENT_TYPES.SAMPLES_UPLOAD_FAILED */
 export type AnalyticsSamplesUploadFailed = {
-  // How many samples the user just uploaded
-  sample_count: number;
-  // JSON array of all the IDs for newly created samples for this upload
-  sample_ids: JsonString;
+  // What was the error message for the failed upload
+  failed_message: string;
   // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
   // For an Upload "flow" that ends in successful or failed upload, this will match up.
   upload_flow_uuid: string;
