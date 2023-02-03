@@ -304,7 +304,7 @@ def apply_filters(config, subsampling, template_args):
                 "max_date"
             ] = f"--max-date {max_date}"  # ex: --max-date 2020-01-01
         else:
-            subsampling["group"]["max_date".replace("_", "-")] = str(
+            subsampling["group"]["max-date"] = str(
                 max_date
             )  # ex: max-date: 2020-01-01
             subsampling["group"]["max_date".replace("_", "-")] = str(
