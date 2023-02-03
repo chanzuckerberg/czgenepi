@@ -20,7 +20,11 @@ import {
 import { API_URL } from "../constants/ENV";
 import { store } from "../redux";
 import { selectCurrentPathogen } from "../redux/selectors";
-import { IdMap, reduceObjectArrayToLookupDict, replaceKeyName } from "../utils/dataTransforms";
+import {
+  IdMap,
+  reduceObjectArrayToLookupDict,
+  replaceKeyName,
+} from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
