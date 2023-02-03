@@ -91,7 +91,7 @@ export const getCapitalCaseTreeType = (
  * Useful for parsing backend responses.
  */
 export const camelize = (obj: any): any => {
-  return transform(obj, (acc, value, key, target) => {
+  return transform(obj, (acc, value, key: string, target) => {
     const camelKey = isArray(target) ? key : camelCase(key);
     acc[camelKey] = isObject(value) ? camelize(value) : value;
   });
