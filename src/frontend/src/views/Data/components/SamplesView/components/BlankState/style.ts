@@ -16,8 +16,8 @@ export const Container = styled.div`
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
-    margin-top: ${spaces?.xl}px;
-  `;
+      margin-top: ${spaces?.xl}px;
+    `;
   }}
 `;
 
