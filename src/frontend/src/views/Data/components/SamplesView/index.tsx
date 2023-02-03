@@ -1,5 +1,5 @@
 import { compact, map, uniq } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
 import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
 import { IdMap } from "src/common/utils/dataTransforms";
@@ -28,15 +28,8 @@ const SamplesView = (): JSX.Element => {
 
   // load sample data from server
   const { data: samples, isLoading } = useSampleInfo();
-  const [showBlankState, setShowBlankState] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!isLoading && samples && Object.keys(samples).length === 0) {
-      setShowBlankState(true);
-    } else {
-      setShowBlankState(false);
-    }
-  }, [isLoading, samples]);
+  const showBlankState =
+    !isLoading && samples && Object.keys(samples).length === 0;
 
   // only display rows that match the current search and the current filters.
   // what's returned here will be the rows that are actually shown in the table.
