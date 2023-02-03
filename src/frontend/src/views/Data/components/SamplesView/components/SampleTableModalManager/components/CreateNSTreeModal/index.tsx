@@ -1,6 +1,7 @@
 import RadioGroup from "@mui/material/RadioGroup";
 import { Icon, Link } from "czifui";
 import { uniq } from "lodash";
+import { path } from "lodash/fp";
 import { SyntheticEvent, useEffect, useMemo, useState } from "react";
 import {
   AnalyticsTreeCreationNextstrain,
@@ -15,6 +16,8 @@ import { useLineages } from "src/common/queries/lineages";
 import {
   locationDepthPathogenConfig,
   useNamedPathogenDepthLocations,
+  USE_LOCATIONS_INFO_QUERY_KEY,
+  USE_PATHOGEN_DEPTH_LOCATIONS_INFO_QUERY_KEY,
 } from "src/common/queries/locations";
 import { RawTreeCreationWithId, useCreateTree } from "src/common/queries/trees";
 import { addNotification } from "src/common/redux/actions";
@@ -103,7 +106,14 @@ export const CreateNSTreeModal = ({
 
   // Filter based on location
   const { data: groupInfo } = useGroupInfo();
-  const { data: namedLocationsData } = useNamedPathogenDepthLocations();
+  // Choosing the query key based on the pathogen ensures that pathogens
+  // that use all of the locations for their trees don' have to re-fetch
+  // everything
+  const { data: namedLocationsData } = useNamedPathogenDepthLocations(
+    locationDepthPathogenConfig[pathogen] === null
+      ? USE_LOCATIONS_INFO_QUERY_KEY
+      : USE_PATHOGEN_DEPTH_LOCATIONS_INFO_QUERY_KEY
+  );
   const namedLocations: NamedGisaidLocation[] = useMemo(() => {
     return namedLocationsData?.namedLocations ?? [];
   }, [namedLocationsData]);

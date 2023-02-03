@@ -23,7 +23,12 @@ const fetchAllLocations = (): Promise<LocationsResponse> => {
   return getBackendApiJson(API.LOCATIONS);
 };
 
-export const USE_LOCATIONS_INFO_QUERY_KEY = {
+type QueryKeyType = {
+  entities: ENTITIES[];
+  id: string;
+};
+
+export const USE_LOCATIONS_INFO_QUERY_KEY: QueryKeyType = {
   entities: [ENTITIES.LOCATION_INFO],
   id: "locationInfo",
 };
@@ -54,24 +59,14 @@ const fetchPathogenDepthLocations = (): Promise<LocationsResponse> => {
   return getBackendApiJson(route);
 };
 
-export const USE_PATHOGEN_DEPTH_LOCATIONS_INFO_QUERY_KEY = {
+export const USE_PATHOGEN_DEPTH_LOCATIONS_INFO_QUERY_KEY: QueryKeyType = {
   entities: [ENTITIES.LOCATION_INFO],
-  id: "pathogenDepthocationInfo",
+  id: "pathogenDepthLocationInfo",
 };
 
-export function useNamedPathogenDepthLocations(): UseQueryResult<
-  NamedLocationsResponse,
-  unknown
-> {
-  const state = store.getState();
-  const pathogen = selectCurrentPathogen(state);
-  // Choosing the query key based on the pathogen ensures that pathogens
-  // that use all of the locations for their trees don' have to re-fetch
-  // everything
-  const queryKey =
-    locationDepthPathogenConfig[pathogen] === null
-      ? USE_LOCATIONS_INFO_QUERY_KEY
-      : USE_PATHOGEN_DEPTH_LOCATIONS_INFO_QUERY_KEY;
+export function useNamedPathogenDepthLocations(
+  queryKey: QueryKeyType
+): UseQueryResult<NamedLocationsResponse, unknown> {
   return useQuery([queryKey], fetchPathogenDepthLocations, {
     retry: false,
     // Using `select` allows it to share cache with other USE_LOCATIONS_INFO_QUERY_KEY,
