@@ -286,7 +286,7 @@ def apply_filters(config, subsampling, template_args):
         if include_arguments_in_filters:
             subsampling["group"][
                 "min_date"
-            ] = f"--{"min_date".replace('_', '-')} {min_date}"  # ex: --max-date 2020-01-01
+            ] = f"--min-date {min_date}"  # ex: --max-date 2020-01-01
         else:
             subsampling["group"]["min_date".replace("_", "-")] = str(
                 min_date
