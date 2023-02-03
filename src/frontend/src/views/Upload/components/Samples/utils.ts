@@ -258,15 +258,20 @@ export function hasSamples(samples: Samples | null): boolean {
   return Object.keys(samples).length > 0;
 }
 
-export function getBadOrFailedQCSampleIds(samples: Sample[]) {
+export const isSampleQCStatusBad = (sample?: Sample): boolean => {
+  const status = getQCStatusFromSample(sample);
+  return status === "Bad" || status === "Failed";
+};
+
+export function getBadOrFailedQCSampleIds(samples: Sample[]): string[] {
   return (
     samples
       // for now there should only ever be one qcMetrics entry per sample
-      .filter(
-        (s) =>
-          s.qcMetrics[0].qcStatus === "Bad" ||
-          s.qcMetrics[0].qcStatus === "Failed"
-      )
+      .filter(isSampleQCStatusBad)
       .map((s) => s.publicId)
   );
 }
+
+export const getQCStatusFromSample = (sample?: Sample): string | undefined => {
+  return sample?.qcMetrics?.[0]?.qcStatus;
+};
