@@ -13,6 +13,7 @@ import {
   generateGroupSpecificUrl,
 } from "../api";
 import { API_URL } from "../constants/ENV";
+import { camelize } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 import { USE_PHYLO_RUN_INFO } from "./phyloRuns";
 import { USE_SAMPLE_INFO } from "./samples";
@@ -51,28 +52,6 @@ export const mapGroupData = (obj: RawGroupRequest): GroupDetails => {
     location: obj.default_tree_location,
     name: obj.name,
     prefix: obj.prefix,
-  };
-};
-
-const mapGroupInvitations = (obj: RawInvitationResponse): Invitation => {
-  return {
-    createdAt: obj.created_at,
-    expiresAt: obj.expires_at,
-    id: obj.id,
-    invitee: obj.invitee,
-    inviter: obj.inviter,
-  };
-};
-
-export const mapGroupMemberData = (obj: RawGroupMemberRequest): GroupMember => {
-  return {
-    acknowledgedPolicyVersion: obj.acknowledged_policy_version,
-    agreedToTos: obj.agreed_to_tos,
-    createdAt: obj.created_at,
-    email: obj.email,
-    id: obj.id,
-    name: obj.name,
-    role: obj.role,
   };
 };
 
@@ -124,7 +103,7 @@ export function useGroupMembersInfo(): UseQueryResult<GroupMember[], unknown> {
     retry: false,
     select: (data) => {
       const { members } = data;
-      return members.map((m) => mapGroupMemberData(m));
+      return members.map(camelize);
     },
   });
 }
@@ -156,7 +135,7 @@ export function useGroupInvitations(): UseQueryResult<Invitation[], unknown> {
     retry: false,
     select: (data) => {
       const { invitations } = data;
-      return invitations.map((i) => mapGroupInvitations(i));
+      return invitations.map(camelize);
     },
   });
 }
