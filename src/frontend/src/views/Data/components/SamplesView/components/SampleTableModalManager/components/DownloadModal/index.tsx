@@ -13,6 +13,7 @@ import {
 } from "src/common/styles/iconStyle";
 import { pluralize } from "src/common/utils/strUtils";
 import Dialog from "src/components/Dialog";
+import { getQCStatusFromSample } from "src/views/Upload/components/Samples/utils";
 import { DownloadButton } from "./components/DownloadButton";
 import { DownloadMenuSelection } from "./components/DownloadMenuSelection";
 import {
@@ -51,7 +52,7 @@ const DownloadModal = ({
   useEffect(() => {
     const noQCIds = checkedSamples
       // for now samples should only have one qcMetrics entry
-      .filter((s) => s.qcMetrics[0]?.qcStatus === "Processing")
+      .filter((s) => getQCStatusFromSample(s) === "Processing")
       .map((s) => s.publicId);
     setNoQCDataSampleIds(noQCIds);
   }, [checkedSamples]);

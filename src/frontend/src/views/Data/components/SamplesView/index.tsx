@@ -5,6 +5,7 @@ import { useSampleInfo } from "src/common/queries/samples";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { FilterPanel } from "src/components/FilterPanel";
 import { SearchBar } from "src/components/Table/components/SearchBar";
+import { getQCStatusFromSample } from "src/views/Upload/components/Samples/utils";
 import { DataNavigation } from "../DataNavigation";
 import { SamplesTable } from "./components/SamplesTable";
 import { SampleTableModalManager } from "./components/SampleTableModalManager";
@@ -49,7 +50,7 @@ const SamplesView = (): JSX.Element => {
   // update list of qcStatuses to use in the filter panel on the left side of the screen
   const qcStatuses = useMemo(
     () =>
-      uniq(compact(map(samples, (d) => d.qcMetrics[0]?.qcStatus)))
+      uniq(compact(map(samples, getQCStatusFromSample)))
         .sort()
         .map((name) => ({ name })),
     [samples]
