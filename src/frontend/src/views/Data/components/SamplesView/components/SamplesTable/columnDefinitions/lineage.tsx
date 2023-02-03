@@ -1,6 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { memo } from "src/common/utils/memo";
-import { getLineageFromSampleLineages } from "src/common/utils/samples";
+import {
+  getLineageFromSample,
+  getLineageFromSampleLineages,
+} from "src/common/utils/samples";
 import { generateWidthStyles } from "src/common/utils/tableUtils";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
 import { LineageTooltip } from "../components/LineageTooltip";
@@ -46,4 +49,9 @@ export const lineageColumn: ColumnDef<Sample, any> = {
     );
   }),
   enableSorting: true,
+  sortingFn: (a, b) => {
+    const aLineage = getLineageFromSample(a.original) ?? "";
+    const bLineage = getLineageFromSample(b.original) ?? "";
+    return aLineage > bLineage ? -1 : 1;
+  },
 };

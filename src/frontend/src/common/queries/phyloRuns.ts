@@ -26,7 +26,7 @@ import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
 const mapPhyloRuns = (data: PhyloRunResponse) => {
-  const phyloRuns = data.phyloRuns;
+  const { phyloRuns } = data;
 
   const transformedRuns = phyloRuns.map((p: PhyloRun) => {
     replaceKeyName(p, "workflowStatus", "status");
