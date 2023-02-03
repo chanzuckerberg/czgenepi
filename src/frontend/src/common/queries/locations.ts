@@ -63,22 +63,27 @@ export function useNamedPathogenDepthLocations(): UseQueryResult<
   NamedLocationsResponse,
   unknown
 > {
-  return useQuery(
-    [USE_PATHOGEN_DEPTH_LOCATIONS_INFO_QUERY_KEY],
-    fetchPathogenDepthLocations,
-    {
-      retry: false,
-      // Using `select` allows it to share cache with other USE_LOCATIONS_INFO_QUERY_KEY,
-      // but give a different view on the same data after processed by `select` func.
-      select: foldInNamesToLocations,
-      // Because locations are very stable and mildly heavy (~2Meg), we mark
-      // stale and re-fetch after an hour rather than default insta-stale.
-      // Note, this does not prevent garbage cleanup due to `cacheTime` if user
-      // does not have data "actively" used. In that case, re-fetch would happen
-      // next time a component using this data mounts and uses this func.
-      staleTime: ONE_HOUR,
-    }
-  );
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+  // Choosing the query key based on the pathogen ensures that pathogens
+  // that use all of the locations for their trees don' have to re-fetch
+  // everything
+  const queryKey =
+    locationDepthPathogenConfig[pathogen] === null
+      ? USE_LOCATIONS_INFO_QUERY_KEY
+      : USE_PATHOGEN_DEPTH_LOCATIONS_INFO_QUERY_KEY;
+  return useQuery([queryKey], fetchPathogenDepthLocations, {
+    retry: false,
+    // Using `select` allows it to share cache with other USE_LOCATIONS_INFO_QUERY_KEY,
+    // but give a different view on the same data after processed by `select` func.
+    select: foldInNamesToLocations,
+    // Because locations are very stable and mildly heavy (~2Meg), we mark
+    // stale and re-fetch after an hour rather than default insta-stale.
+    // Note, this does not prevent garbage cleanup due to `cacheTime` if user
+    // does not have data "actively" used. In that case, re-fetch would happen
+    // next time a component using this data mounts and uses this func.
+    staleTime: ONE_HOUR,
+  });
 }
 
 interface NamedLocationsResponse {
