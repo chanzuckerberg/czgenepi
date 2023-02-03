@@ -70,7 +70,7 @@ type PhyloTreeManipulationType = PhyloRun & { tree_type?: TreeType };
 export const getCapitalCaseTreeType = (
   phyloRun: PhyloTreeManipulationType
 ): string | undefined => {
-  const { tree_type: treeType } = phyloRun;
+  const { treeType } = phyloRun;
 
   if (typeof treeType !== "string" || treeType.toLowerCase() == "unknown") {
     return undefined;

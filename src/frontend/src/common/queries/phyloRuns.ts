@@ -30,6 +30,7 @@ const mapPhyloRuns = (data: PhyloRunResponse) => {
 
   const transformedRuns = phyloRuns.map((p: PhyloRun) => {
     replaceKeyName(p, "workflowStatus", "status");
+    replaceKeyName(p, "startDatetime", "startedDate");
 
     return {
       ...p,
