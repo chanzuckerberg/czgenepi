@@ -1,7 +1,6 @@
 import RadioGroup from "@mui/material/RadioGroup";
 import { Icon, Link } from "czifui";
 import { uniq } from "lodash";
-import { path } from "lodash/fp";
 import { SyntheticEvent, useEffect, useMemo, useState } from "react";
 import {
   AnalyticsTreeCreationNextstrain,
