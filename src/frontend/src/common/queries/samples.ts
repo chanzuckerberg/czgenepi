@@ -18,7 +18,9 @@ import {
   SampleResponse,
 } from "../api";
 import { API_URL } from "../constants/ENV";
-import { IdMap, reduceObjectArrayToLookupDict } from "../utils/dataTransforms";
+import { store } from "../redux";
+import { selectCurrentPathogen } from "../redux/selectors";
+import { IdMap, reduceObjectArrayToLookupDict, replaceKeyName } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
@@ -271,7 +273,14 @@ export function useCreateSamples({
  * sample cache
  */
 const mapSampleData = (data: SampleResponse) => {
-  return reduceObjectArrayToLookupDict<Sample>(data.samples, "publicId");
+  const { samples } = data;
+
+  samples.forEach((s) => {
+    replaceKeyName(s, "privateIdentifier", "privateId");
+    replaceKeyName(s, "publicIdentifier", "publicId");
+  });
+
+  return reduceObjectArrayToLookupDict<Sample>(samples, "publicId");
 };
 
 export const USE_SAMPLE_INFO = {
@@ -280,7 +289,10 @@ export const USE_SAMPLE_INFO = {
 };
 
 export function useSampleInfo(): UseQueryResult<IdMap<Sample>, unknown> {
-  return useQuery([USE_SAMPLE_INFO], () => fetchSamples(), {
+  const state = store.getState();
+  const pathogen = selectCurrentPathogen(state);
+
+  return useQuery([USE_SAMPLE_INFO, pathogen], fetchSamples, {
     retry: false,
     select: mapSampleData,
   });
