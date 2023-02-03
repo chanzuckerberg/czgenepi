@@ -57,8 +57,8 @@ export const StyledLinkText = styled.p`
   ${(props: CommonThemeProps) => {
     const spaces = getSpaces(props);
     return `
-    margin-right: ${spaces?.xs}px;
-  `;
+      margin-right: ${spaces?.xs}px;
+    `;
   }}
 `;
 
