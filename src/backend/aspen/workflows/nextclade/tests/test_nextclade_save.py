@@ -68,7 +68,9 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     nextclade_csv: PosixPath = Path(Path(__file__).parent, "data", "nextclade.csv")
-    nextclade_fasta: PosixPath = Path(Path(__file__).parent, "data", "nextclade.aligned.fasta")
+    nextclade_fasta: PosixPath = Path(
+        Path(__file__).parent, "data", "nextclade.aligned.fasta"
+    )
     tag_json: PosixPath = Path(Path(__file__).parent, "data", "tag.json")
 
     runner: CliRunner = CliRunner()
@@ -112,7 +114,6 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
         .options(undefer(AlignedPathogenGenome.sequence))
         .one()
     )
-
 
     # matched against values from test nextclade.csv in test data directory
     assert qc_metrics.qc_score == "18.062500"
@@ -172,7 +173,9 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
     session.add(aligned_pathogen_genome)
     session.commit()
     nextclade_csv: PosixPath = Path(Path(__file__).parent, "data", "nextclade.csv")
-    nextclade_fasta: PosixPath = Path(Path(__file__).parent, "data", "nextclade.aligned.fasta")
+    nextclade_fasta: PosixPath = Path(
+        Path(__file__).parent, "data", "nextclade.aligned.fasta"
+    )
     tag_json: PosixPath = Path(Path(__file__).parent, "data", "tag.json")
 
     runner: CliRunner = CliRunner()
