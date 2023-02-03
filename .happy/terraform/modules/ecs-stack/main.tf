@@ -193,7 +193,7 @@ module gisaid_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = local.swipe_sfn_arn
-  schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 1 ? * MON-FRI *)"] : []
+  schedule_expressions  = contains(["geprod", "gestaging"], local.deployment_stage) ? ["cron(0 1 ? * TUE,THU,SUN *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     genepi_config_secret_name = local.app_secret_name
@@ -325,7 +325,7 @@ module nextstrain_autorun_sfn_config {
   swipe_comms_bucket    = local.swipe_comms_bucket
   swipe_wdl_bucket      = local.swipe_wdl_bucket
   sfn_arn               = local.swipe_sfn_arn
-  schedule_expressions  = local.deployment_stage == "geprod" ? ["cron(0 3 ? * MON-FRI *)"] : []
+  schedule_expressions  = local.deployment_stage == "geprod" ? ["cron(0 3 ? * THU *)"] : []
   event_role_arn        = local.event_role_arn
   extra_args            =  {
     genepi_config_secret_name = local.app_secret_name
