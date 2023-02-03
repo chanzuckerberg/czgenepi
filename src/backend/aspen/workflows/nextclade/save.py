@@ -341,11 +341,9 @@ def save_aligned_genomes(
             session.commit()
     # Don't forget to commit the last chunk of entries that remain!
     session.commit()
-
     print("Finished saving Nextclade aligned genomes to DB.")
-    print(f"Total count of aligned pathogen genomes added (new) or updated"
-        f"(existing): {apg_to_save_so_far}. [We only update if previous"
-        f"reference_name/accession differed from latest in Nextclade dataset."
+    print(f"Total count of aligned pathogen genomes added (new) or updated "
+        f"(existing): {apg_to_save_so_far}."
         )
 
     return ids_in_aligned_fasta

@@ -70,3 +70,5 @@ pathogen_slug=$(jq --raw-output ".pathogen_slug" "${JOB_INFO_FILE}")
     --nextclade-version "$(nextclade --version)" \
     --nextclade-run-datetime "${nextclade_complete_at}" \
     --pathogen-slug "${pathogen_slug}"
+
+echo "Workflow complete"
