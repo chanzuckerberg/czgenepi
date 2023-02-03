@@ -171,7 +171,10 @@ const Table = <T extends any>({
             {virtualRows.map((vRow: VirtualItem) => {
               const row = rows[vRow.index];
               return (
-                <TableRow key={row.id} shouldShowTooltipOnHover={false}>
+                <TableRow
+                  key={`row-${row.id}`}
+                  shouldShowTooltipOnHover={false}
+                >
                   {row
                     .getVisibleCells()
                     .map((cell) =>

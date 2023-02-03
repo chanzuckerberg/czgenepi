@@ -7,10 +7,8 @@ import {
 import { analyticsTrackEvent } from "src/common/analytics/methods";
 import { TREE_STATUS } from "src/common/constants/types";
 import { useGroupInfo } from "src/common/queries/groups";
-import {
-  foldInLocationName,
-  useNamedLocationsById,
-} from "src/common/queries/locations";
+import { foldInLocationName } from "src/common/queries/locations";
+import { IdMap } from "src/common/utils/dataTransforms";
 import { NO_CONTENT_FALLBACK } from "src/views/Upload/components/common/constants";
 import NextstrainConfirmationModal from "../NextstrainConfirmationModal";
 import { PhyloTreeStatusTag } from "./components/PhyloTreeStatusTag";
@@ -28,6 +26,7 @@ import {
 
 interface Props {
   phyloRun: PhyloRun;
+  locations: IdMap<NamedGisaidLocation>;
 }
 
 const getDateRangeString = (phyloRun: PhyloRun): string => {
@@ -43,13 +42,12 @@ const getDateRangeString = (phyloRun: PhyloRun): string => {
   return `${startDate} to ${endDate}`;
 };
 
-const TreeTableNameCell = ({ phyloRun }: Props): JSX.Element => {
+const TreeTableNameCell = ({ phyloRun, locations }: Props): JSX.Element => {
   const [open, setOpen] = useState(false);
   const { name, phyloTree, status, templateArgs, user } = phyloRun;
   const treeId = phyloTree?.id;
   const userName = user?.name;
   const isDisabled = status !== TREE_STATUS.Completed || !treeId;
-  const { data: namedLocationsById } = useNamedLocationsById();
 
   const { data: groupInfo } = useGroupInfo();
 
@@ -67,8 +65,8 @@ const TreeTableNameCell = ({ phyloRun }: Props): JSX.Element => {
     // namedLocationsData takes a while to load. We do not want to show
     // the group location here because it is incorrect. Instead, we show
     // nothing until the data is ready.
-    if (!namedLocationsById) return "";
-    return namedLocationsById.namedLocationsById[templateLocationId].name;
+    if (!locations) return "";
+    return locations[templateLocationId].name;
   };
 
   const handleClickOpen = () => {

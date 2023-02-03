@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { CellBasic, getFontWeights } from "czifui";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
 
 export const StyledSortableHeader = styled(SortableHeader)`
@@ -13,4 +14,16 @@ export const StyledWrapper = styled.div`
   & > div {
     overflow: auto;
   }
+`;
+
+export const StyledCellBasic = styled(CellBasic)`
+  ${(props) => {
+    const fontWeights = getFontWeights(props);
+    return `
+      span {
+        font-weight: ${fontWeights?.semibold};
+        word-break: break-word;
+      }
+    `;
+  }}
 `;

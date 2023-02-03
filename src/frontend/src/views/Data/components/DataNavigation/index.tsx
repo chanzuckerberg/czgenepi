@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
-import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
+import { useSampleInfo } from "src/common/queries/samples";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
 import { ROUTES } from "src/common/routes";

@@ -1,7 +1,7 @@
 import { compact, map, uniq } from "lodash";
 import { useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
-import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
+import { useSampleInfo } from "src/common/queries/samples";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { FilterPanel } from "src/components/FilterPanel";
 import { SearchBar } from "src/components/Table/components/SearchBar";
