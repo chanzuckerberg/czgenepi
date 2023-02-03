@@ -106,9 +106,33 @@ export const CreateNSTreeModal = ({
 
   // Filter based on location
   const { data: groupInfo } = useGroupInfo();
-  // Choosing the query key based on the pathogen ensures that pathogens
-  // that use all of the locations for their trees don' have to re-fetch
-  // everything
+
+  /*  useNamedLocations vs useNamedPathogenDepthLocations
+
+  useNamedLocations fetches all location data, down to the location level
+  i.e. Los Angeles County
+
+  useNamedPathogenDepthLocations fetches location data, down to the level
+  specified in locationDepthPathogenConfig.
+  For mpox, the depth is set as "division", so locations would only be
+  as specific as the division-level.  i.e. California
+
+  We have two different queries because some pathogens (mpox) only create trees 
+  using division data rather than location-level data. Other parts of the app - 
+  notably sample upload - still use the location-level data for mpox.
+  
+  When the app loads, we will fetch location-level data using the query key 
+  USE_LOCATIONS_INFO_QUERY_KEY.  When the pathogen uses division-level
+  locations for trees, we have a second fetch with a new query key,
+  USE_PATHOGEN_DEPTH_LOCATIONS_INFO_QUERY_KEY.
+  
+  Choosing the query key based on the pathogen ensures that pathogens
+  that use all of the locations for their trees, i.e. SC2, don't have to re-fetch
+  everything when opening the NS Tree Modal. 
+  Setting this inside of useNamedPathogetDepthLocations does not properly update 
+  the query key when switching between pathogens, which is why it is here.
+  */
+
   const { data: namedLocationsData } = useNamedPathogenDepthLocations(
     locationDepthPathogenConfig[pathogen] === null
       ? USE_LOCATIONS_INFO_QUERY_KEY
