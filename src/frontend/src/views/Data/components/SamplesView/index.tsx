@@ -7,6 +7,7 @@ import { FilterPanel } from "src/components/FilterPanel";
 import { SearchBar } from "src/components/Table/components/SearchBar";
 import { getQCStatusFromSample } from "src/views/Upload/components/Samples/utils";
 import { DataNavigation } from "../DataNavigation";
+import { BlankState } from "./components/BlankState";
 import SamplesTable from "./components/SamplesTable";
 import { SampleTableModalManager } from "./components/SampleTableModalManager";
 import { Flex, MaxWidth, StyledActionBar } from "./style";
@@ -28,6 +29,8 @@ const SamplesView = (): JSX.Element => {
 
   // load sample data from server
   const { data: samples, isLoading } = useSampleInfo();
+  const showBlankState =
+    !isLoading && samples && Object.keys(samples).length === 0;
 
   // only display rows that match the current search and the current filters.
   // what's returned here will be the rows that are actually shown in the table.
@@ -84,21 +87,27 @@ const SamplesView = (): JSX.Element => {
           data-test-id="menu-item-sample-count"
         />
         <MaxWidth>
-          <StyledActionBar>
-            <SearchBar
-              tableData={samples}
-              onSearchComplete={setSearchResults}
-            />
-            <SampleTableModalManager
-              checkedSamples={checkedSamples}
-              clearCheckedSamples={() => setCheckedSamples([])}
-            />
-          </StyledActionBar>
-          <SamplesTable
-            isLoading={isLoading}
-            data={displayedRows}
-            setCheckedSamples={setCheckedSamples}
-          />
+          {showBlankState ? (
+            <BlankState />
+          ) : (
+            <>
+              <StyledActionBar>
+                <SearchBar
+                  tableData={samples}
+                  onSearchComplete={setSearchResults}
+                />
+                <SampleTableModalManager
+                  checkedSamples={checkedSamples}
+                  clearCheckedSamples={() => setCheckedSamples([])}
+                />
+              </StyledActionBar>
+              <SamplesTable
+                isLoading={isLoading}
+                data={displayedRows}
+                setCheckedSamples={setCheckedSamples}
+              />
+            </>
+          )}
         </MaxWidth>
       </Flex>
     </>
