@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { Table as SDSTable, TableHeader, TableRow } from "czifui";
 import { isEqual, map } from "lodash";
-import { memo, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useVirtual, VirtualItem } from "react-virtual";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { StyledWrapper } from "./style";
@@ -190,4 +190,4 @@ const Table = <T extends any>({
   );
 };
 
-export default memo(Table);
+export default Table;

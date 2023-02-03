@@ -155,7 +155,7 @@ export const getIdFromCollectionLocation = (
 };
 
 export const getNamedLocationsById = (
-  locations: NamedGisaidLocation[]
+  locations: GisaidLocation[]
 ): IdMap<NamedGisaidLocation> => {
   if (!locations) return {};
 

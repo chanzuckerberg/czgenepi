@@ -28,7 +28,7 @@ const defaultColumn: Partial<ColumnDef<PhyloRun, any>> = {
 };
 
 const TreesTable = ({ data, isLoading }: Props): JSX.Element => {
-  const { data: locationData = {} } = useLocations();
+  const { data: locationData = { locations: [] } } = useLocations();
   const { locations } = locationData;
 
   const namedLocationsById = useMemo(
