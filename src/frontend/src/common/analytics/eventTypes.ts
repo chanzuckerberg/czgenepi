@@ -1,3 +1,5 @@
+import { Pathogen } from "../redux/types";
+
 /**
  * Canonical list of all the various event types we track with analytics.
  *
@@ -98,6 +100,9 @@ export type EventData = Record<string, EventValue | undefined>;
 // For ease of readability below, we alias string for those cases.
 type JsonString = string;
 
+// capture how the user is uploading or entering metadata
+export type UploadFormMetadataType = "BOTH" | "MANUAL" | "TSV";
+
 /**
  * Structure of additionalEventData for each EVENT_TYPES type that sends it.
  *
@@ -141,7 +146,7 @@ export type AnalyticsTreeViewNextstrain = {
   // Tree that user is being sent to view
   tree_id: number;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
 };
 
 /** EVENT_TYPES.TREE_CREATION_NEXTSTRAIN */
@@ -161,7 +166,7 @@ export type AnalyticsTreeCreationNextstrain = {
   // generally shouldn't happen.
   group_location_id: number | null;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
   // Lineages selected for tree creation. json stringified list of strings.
   // "[]" indicates "All lineages"
   selected_lineages: JsonString;
@@ -195,7 +200,7 @@ export type AnalyticsTreeDownloadTreeFile = {
   // in this event for tree_id, it very likely indicates a bug with app.
   tree_id: number | null;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
   // PK of the workflow that kicked off the creation of this tree.
   // Should never be null, but TS for underlying item does not guarantee it, so
   // the null possibility is mostly to keep TS happy. If null, app has a bug.
@@ -216,7 +221,7 @@ export type AnalyticsTreeDownloadSelectedSamplesTemplate = {
   // Can download template before tree done or tree failed. Null indicates such
   tree_id: number | null;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
   // PK of the workflow that kicked off the creation of this tree.
   // Should never be null, but TS for underlying item does not guarantee it, so
   // the null possibility is mostly to keep TS happy. If null, app has a bug.
@@ -231,7 +236,7 @@ export type AnalyticsSamplesUploadPageChange = {
   // The Samples Upload route user has just gone to.
   new_route: string;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
   // Random ID generated at start of a given Samples Upload process.
   // This allows us to correlate all the steps in a single Upload process into
   // a unified "flow". If a new Upload is started in same browser session, this
@@ -242,9 +247,9 @@ export type AnalyticsSamplesUploadPageChange = {
 /** EVENT_TYPES.UPLOAD_METADATA_TYPE */
 export type AnalyticsUploadMetadataType = {
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
   // The type of metadata the user is uploading
-  metadata_entry_type: "MANUAL" | "TSV" | "BOTH";
+  metadata_entry_type: UploadFormMetadataType;
   // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
   // For an Upload "flow" that ends in successful or failed upload, this will match up.
   upload_flow_uuid: string;
@@ -262,7 +267,7 @@ export type AnalyticsSamplesUploadSuccess = {
   // For an Upload "flow" that ends in successful or failed upload, this will match up.
   upload_flow_uuid: string;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
 };
 
 /** EVENT_TYPES.SAMPLES_UPLOAD_FAILED */
@@ -275,7 +280,7 @@ export type AnalyticsSamplesUploadFailed = {
   // For an Upload "flow" that ends in successful or failed upload, this will match up.
   upload_flow_uuid: string;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
 };
 
 /** EVENT_TYPES.SAMPLES_DOWNLOAD_FILE*/
@@ -297,7 +302,7 @@ export type AnalyticsSamplesDownloadFile = {
   // User downloaded info on metadata for these samples
   includes_sample_metadata: boolean;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
 };
 
 /** EVENT_TYPES.ACTIVE_GROUP_CHANGE*/
@@ -332,5 +337,5 @@ export type AnalyticsSamplesFilter = {
   // JSON array of all the qc statuses that user is filtering on
   qc_statuses: JsonString;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
 };

@@ -37,6 +37,7 @@ import { analyticsTrackEvent } from "src/common/analytics/methods";
 import {
   AnalyticsUploadMetadataType,
   EVENT_TYPES,
+  UploadFormMetadataType,
 } from "src/common/analytics/eventTypes";
 import { useSelector } from "react-redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
@@ -60,7 +61,7 @@ export default function Metadata({
 
   let numberOfDetectedSamples = 0;
   if (samples != null) {
-    numberOfDetectedSamples = (Object.keys(samples).length);
+    numberOfDetectedSamples = Object.keys(samples).length;
   }
 
   useEffect(() => {
@@ -68,8 +69,7 @@ export default function Metadata({
       hasImportedMetadataFile || hasManuallyEditedMetadata;
     if (!hasMetadataBeenEdited) return;
 
-    type MetadataType = "BOTH" | "MANUAL" | "TSV";
-    let metadataType: MetadataType = "MANUAL";
+    let metadataType: UploadFormMetadataType = "MANUAL";
     if (hasImportedMetadataFile) metadataType = "TSV";
     if (hasImportedMetadataFile && hasManuallyEditedMetadata)
       metadataType = "BOTH";
