@@ -6,7 +6,6 @@ from typing import Any, Dict, MutableSequence
 import click
 import dateparser
 import sqlalchemy as sa
-from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
 from aspen.api.settings import CLISettings
@@ -210,31 +209,27 @@ def get_template_args_for_focal_group(
 
     # If this group has uploaded samples within our start/end dates, we're all set.
     group_samples = db.execute(
-        sa.select([func.count()])
-        .select_from(Sample)
+        sa.select(Sample)
         .where(
             Sample.pathogen == pathogen,
             Sample.submitting_group == group,
             Sample.collection_date >= filter_start_date,
             Sample.collection_date <= filter_end_date,
         )
+        .limit(1)
     ).scalar()
     if group_samples:
         return template_args
 
     # Even if the group hasn't uploaded samples, we can proceed if anyone's uploaded
     # data to gisaid for their default tree location.
-    upstream_samples_query = (
-        sa.select([func.count()])
-        .select_from(PublicRepositoryMetadata)
-        .where(
-            PublicRepositoryMetadata.region == location.region,
-            PublicRepositoryMetadata.country == location.country,
-            PublicRepositoryMetadata.pathogen == pathogen,
-            PublicRepositoryMetadata.public_repository == repo,
-            PublicRepositoryMetadata.date >= filter_start_date,
-            PublicRepositoryMetadata.date <= filter_end_date,
-        )
+    upstream_samples_query = sa.select(PublicRepositoryMetadata).where(
+        PublicRepositoryMetadata.region == location.region,
+        PublicRepositoryMetadata.country == location.country,
+        PublicRepositoryMetadata.pathogen == pathogen,
+        PublicRepositoryMetadata.public_repository == repo,
+        PublicRepositoryMetadata.date >= filter_start_date,
+        PublicRepositoryMetadata.date <= filter_end_date,
     )
     if location.location:
         upstream_samples_query = upstream_samples_query.where(
@@ -244,7 +239,7 @@ def get_template_args_for_focal_group(
         upstream_samples_query = upstream_samples_query.where(
             PublicRepositoryMetadata.division == location.division,
         )
-    upstream_samples = db.execute(upstream_samples_query).scalar()
+    upstream_samples = db.execute(upstream_samples_query.limit(1)).scalar()
     if upstream_samples:
         return template_args
     return None
