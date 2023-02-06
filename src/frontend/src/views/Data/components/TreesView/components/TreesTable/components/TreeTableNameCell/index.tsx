@@ -66,7 +66,7 @@ const TreeTableNameCell = ({ phyloRun, locations }: Props): JSX.Element => {
     // the group location here because it is incorrect. Instead, we show
     // nothing until the data is ready.
     if (!locations) return "";
-    return locations[templateLocationId].name;
+    return locations[templateLocationId]?.name;
   };
 
   const handleClickOpen = () => {
