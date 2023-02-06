@@ -1,11 +1,8 @@
 import { Tab } from "czifui";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { useSampleInfo } from "src/common/queries/samples";
-import { selectCurrentPathogen } from "src/common/redux/selectors";
-import { Pathogen } from "src/common/redux/types";
 import { ROUTES } from "src/common/routes";
 import { FilterPanelToggle } from "./FilterPanelToggle";
 import { Navigation, StyledTabs } from "./style";
@@ -32,7 +29,6 @@ const DataNavigation = ({
   shouldShowSampleFilterToggle,
   toggleFilterPanel,
 }: Props): JSX.Element => {
-  const pathogen = useSelector(selectCurrentPathogen);
   const [currentTab, setCurrentTab] = useState<ROUTES>(ROUTES.DATA_SAMPLES);
   const [tabData, setTabData] = useState<TabData[]>([]);
 
@@ -84,15 +80,6 @@ const DataNavigation = ({
       )}
       <StyledTabs value={currentTab} sdsSize="large" onChange={handleTabClick}>
         {tabData.map((tab) => {
-          // NOTE!! Here we are temporarily hiding the tree tab for monkeypox until
-          // we complete the functionality next quarter. For features that will be
-          // hidden long-term, a config would be more appropriate than this if statement.
-          if (
-            pathogen === Pathogen.MONKEY_POX &&
-            tab.to === ROUTES.PHYLO_TREES
-          ) {
-            return;
-          }
           return (
             <Tab
               key={tab.to}
