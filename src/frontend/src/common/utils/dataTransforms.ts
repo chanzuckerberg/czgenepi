@@ -1,3 +1,4 @@
+import { camelCase, isArray, isObject, transform } from "lodash";
 import { generateOrgSpecificUrl, ORG_API } from "src/common/api";
 import ENV from "src/common/constants/ENV";
 import { TreeType } from "../constants/types";
@@ -69,7 +70,7 @@ type PhyloTreeManipulationType = PhyloRun & { tree_type?: TreeType };
 export const getCapitalCaseTreeType = (
   phyloRun: PhyloTreeManipulationType
 ): string | undefined => {
-  const { tree_type: treeType } = phyloRun;
+  const { treeType } = phyloRun;
 
   if (typeof treeType !== "string" || treeType.toLowerCase() == "unknown") {
     return undefined;
@@ -82,4 +83,38 @@ export const getCapitalCaseTreeType = (
   }
 
   return nameParts.join("-");
+};
+
+/**
+ * Accepts any object with arbitrary levels of nesting (the nested bits can be objs or arrays),
+ * and returns essentially the same object with all the keys camelCased instead of snake_cased.
+ * Useful for parsing backend responses.
+ */
+export const camelize = (obj: any): any => {
+  return transform(obj, (acc, value, key: string, target) => {
+    const camelKey = isArray(target) ? key : camelCase(key);
+    acc[camelKey] = isObject(value) ? camelize(value) : value;
+  });
+};
+
+/**
+ * Will change the key associated with a value for the given object and keys.
+ * Example:
+ *   >>> replaceKeyName({ a: "apple" }, "a", "b");
+ *   <<< { b: "apple"}
+ */
+export const replaceKeyName = (
+  obj: any,
+  oldKey: string,
+  newKey: string
+): any => {
+  if (oldKey === newKey) return;
+
+  Object.defineProperty(
+    obj,
+    newKey,
+    Object.getOwnPropertyDescriptor(obj, oldKey) ?? {}
+  );
+
+  delete obj[oldKey];
 };

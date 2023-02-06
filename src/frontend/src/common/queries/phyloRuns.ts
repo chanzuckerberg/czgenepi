@@ -20,18 +20,24 @@ import {
   getDownloadLinks,
   IdMap,
   reduceObjectArrayToLookupDict,
+  replaceKeyName,
 } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
 const mapPhyloRuns = (data: PhyloRunResponse) => {
-  const phyloRuns = data.phylo_runs;
+  const { phyloRuns } = data;
 
-  const transformedRuns = phyloRuns.map((p: PhyloRun) => ({
-    ...p,
-    ...getDownloadLinks(p),
-    treeType: getCapitalCaseTreeType(p),
-  }));
+  const transformedRuns = phyloRuns.map((p: PhyloRun) => {
+    replaceKeyName(p, "workflowStatus", "status");
+    replaceKeyName(p, "startDatetime", "startedDate");
+
+    return {
+      ...p,
+      ...getDownloadLinks(p),
+      treeType: getCapitalCaseTreeType(p),
+    };
+  });
 
   return reduceObjectArrayToLookupDict<PhyloRun>(transformedRuns, "id");
 };

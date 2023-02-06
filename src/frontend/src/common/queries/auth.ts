@@ -15,6 +15,7 @@ import { API, DEFAULT_PUT_OPTIONS, getBackendApiJson } from "../api";
 import { selectCurrentGroup } from "../redux/selectors";
 import { ensureValidGroup } from "../redux/utils/groupUtils";
 import { ROUTES } from "../routes";
+import { camelize } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 import { GROUP_QUERY_ID_PREFIX } from "./groups";
 
@@ -35,19 +36,6 @@ export interface RawUserRequest {
   analytics_id: string;
   gisaid_submitter_id: string;
 }
-
-export const mapUserData = (obj: RawUserRequest): User => {
-  return {
-    acknowledgedPolicyVersion: obj.acknowledged_policy_version,
-    agreedToTos: obj.agreed_to_tos,
-    analyticsId: obj.analytics_id,
-    gisaidSubmitterId: obj.gisaid_submitter_id,
-    groups: obj.groups,
-    id: obj.id,
-    name: obj.name,
-    splitId: obj.split_id,
-  };
-};
 
 export const fetchUserInfo = (): Promise<RawUserRequest> => {
   return getBackendApiJson(API.USERDATA);
@@ -81,7 +69,7 @@ export function useUpdateUserInfo(): UseMutationResult<
 // Performs the needed `select` for `useUserInfo`, but also inserts a call
 // to analytics as a way to easily catch any changes to user info over time.
 function mapUserDataAndHandleAnalytics(obj: RawUserRequest): User {
-  const user = mapUserData(obj);
+  const user = camelize(obj);
   // Downstream will handle figuring out group info (and if it's ready yet).
   analyticsSendUserInfo(user);
   return user;
@@ -113,7 +101,7 @@ export function useUserInfo(): UseQueryResult<User, unknown> {
  */
 export const getCurrentUserInfo = (): User | undefined => {
   const rawUser = queryClient.getQueryData<RawUserRequest>([USE_USER_INFO]);
-  return rawUser && mapUserData(rawUser);
+  return rawUser && camelize(rawUser);
 };
 
 /**

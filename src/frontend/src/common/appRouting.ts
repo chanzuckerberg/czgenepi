@@ -1,6 +1,6 @@
 import { forEach } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { fetchUserInfo, mapUserData } from "./queries/auth";
+import { fetchUserInfo } from "./queries/auth";
 import { store } from "./redux";
 import { setGroup, setPathogen } from "./redux/actions";
 import { selectCurrentGroup, selectCurrentPathogen } from "./redux/selectors";
@@ -11,6 +11,7 @@ import {
   isValidPathogen,
 } from "./redux/utils/pathogenUtils";
 import { workspacePaths } from "./routes";
+import { camelize } from "./utils/dataTransforms";
 import { canUserViewGroup } from "./utils/userInfo";
 
 // TODO (mlila): if we end up with more than two workspace values (groupId, pathogen)
@@ -101,7 +102,7 @@ const setWorkspaceGroupId = async (
   potentialUrlGroupId = ""
 ): Promise<string> => {
   const rawUserInfo = await fetchUserInfo();
-  const userInfo = mapUserData(rawUserInfo);
+  const userInfo = camelize(rawUserInfo);
   const { dispatch, getState } = store;
   const state = getState();
 
