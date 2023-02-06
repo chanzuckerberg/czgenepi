@@ -183,7 +183,7 @@ class Auth0Client:
             org["id"], {"members": [user_id]}
         )
 
-    def add_org(self, group_id: int, org_name: str) -> Auth0Org:
+    def add_org(self, group_id: str, org_name: str) -> Auth0Org:
         # TODO, learn more about connections! For now we only have this one, let's use it wherever we need to.
         connection = self.get_connection("Username-Password-Authentication")
         body = {

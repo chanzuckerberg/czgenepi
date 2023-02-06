@@ -1,8 +1,10 @@
 from pathlib import Path, PosixPath
 
 from click.testing import CliRunner, Result
+from sqlalchemy.orm import undefer
 
 from aspen.database.models import (
+    AlignedPathogenGenome,
     Group,
     LineageType,
     MutationsCaller,
@@ -66,6 +68,9 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
     nextclade_csv: PosixPath = Path(Path(__file__).parent, "data", "nextclade.csv")
+    nextclade_fasta: PosixPath = Path(
+        Path(__file__).parent, "data", "nextclade.aligned.fasta"
+    )
     tag_json: PosixPath = Path(Path(__file__).parent, "data", "tag.json")
 
     runner: CliRunner = CliRunner()
@@ -74,10 +79,14 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
         [
             "--nextclade-csv",
             nextclade_csv,
+            "--nextclade-aligned-fasta",
+            nextclade_fasta,
             "--nextclade-dataset-tag",
             tag_json,
             "--nextclade-version",
             "v1.1",
+            "--nextclade-run-datetime",
+            "2023-02-03T03:47:00",
             "--pathogen-slug",
             "MPX",
         ],
@@ -99,6 +108,12 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
         session.query(SampleQCMetric).filter(SampleQCMetric.sample == sample).one()
     )
     lineage = session.query(SampleLineage).filter(SampleLineage.sample == sample).one()
+    aligned_pathogen_genome = (
+        session.query(AlignedPathogenGenome)
+        .filter(AlignedPathogenGenome.sample == sample)
+        .options(undefer(AlignedPathogenGenome.sequence))
+        .one()
+    )
 
     # matched against values from test nextclade.csv in test data directory
     assert qc_metrics.qc_score == "18.062500"
@@ -109,6 +124,9 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
     assert qc_metrics.reference_dataset_name == "sars-cov-2"
     assert qc_metrics.reference_sequence_accession == "MN908947"
     assert qc_metrics.reference_dataset_tag == "2022-11-15T12:00:00Z"
+    # matched against tag.json and nextclade.aligned.fasta in test data dir
+    assert aligned_pathogen_genome.reference_name == "MN908947"
+    assert aligned_pathogen_genome.sequence == "A" * 1001
 
 
 def test_nextclade_save_overwrite(mocker, session, postgres_database):
@@ -143,12 +161,21 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
         lineage_software_version="v1",
         lineage="B",
     )
+    aligned_pathogen_genome = AlignedPathogenGenome(
+        sample=sample,
+        sequence=("G" * 1001),
+        reference_name="stale",
+    )
 
     session.add(qc_metrics)
     session.add(mutation)
     session.add(lineage)
+    session.add(aligned_pathogen_genome)
     session.commit()
     nextclade_csv: PosixPath = Path(Path(__file__).parent, "data", "nextclade.csv")
+    nextclade_fasta: PosixPath = Path(
+        Path(__file__).parent, "data", "nextclade.aligned.fasta"
+    )
     tag_json: PosixPath = Path(Path(__file__).parent, "data", "tag.json")
 
     runner: CliRunner = CliRunner()
@@ -157,10 +184,14 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
         [
             "--nextclade-csv",
             nextclade_csv,
+            "--nextclade-aligned-fasta",
+            nextclade_fasta,
             "--nextclade-dataset-tag",
             tag_json,
             "--nextclade-version",
             "v1.1",
+            "--nextclade-run-datetime",
+            "2023-02-03T03:47:00",
             "--pathogen-slug",
             "MPX",
         ],
@@ -178,6 +209,12 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
         session.query(SampleQCMetric).filter(SampleQCMetric.sample == sample).one()
     )
     lineage = session.query(SampleLineage).filter(SampleLineage.sample == sample).one()
+    aligned_pathogen_genome = (
+        session.query(AlignedPathogenGenome)
+        .filter(AlignedPathogenGenome.sample == sample)
+        .options(undefer(AlignedPathogenGenome.sequence))
+        .one()
+    )
 
     # matched against values from test nextclade.csv in test data directory
     assert qc_metrics.qc_score == "18.062500"
@@ -188,3 +225,6 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
     assert qc_metrics.reference_dataset_name == "sars-cov-2"
     assert qc_metrics.reference_sequence_accession == "MN908947"
     assert qc_metrics.reference_dataset_tag == "2022-11-15T12:00:00Z"
+    # matched against tag.json and nextclade.aligned.fasta in test data dir
+    assert aligned_pathogen_genome.reference_name == "MN908947"
+    assert aligned_pathogen_genome.sequence == "A" * 1001

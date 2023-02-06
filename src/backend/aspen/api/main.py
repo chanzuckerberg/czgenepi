@@ -111,7 +111,7 @@ def get_app() -> FastAPI:
     )
     _app.add_middleware(SessionMiddleware, secret_key=settings.FLASK_SECRET)
 
-    sentry_sdk.init(
+    sentry_sdk.init(  # type: ignore
         dsn=settings.SENTRY_BACKEND_DSN,
         environment=os.environ.get("DEPLOYMENT_STAGE"),
         traces_sample_rate=1.0,
