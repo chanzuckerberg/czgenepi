@@ -67,8 +67,8 @@ unxz /mpox/data/*.xz
 # If we've written out any samples, add them to the upstream metadata/fasta files
 if [ -e /mpox/data/sequences_czge.fasta ]; then
     # Skip the TSV header when appending
-    tail +2 /mpox/data/metadata_czge.tsv > /mpox/data/metadata.tsv
-    cat /mpox/data/sequences_czge.fasta > /mpox/data/sequences.fasta
+    tail +2 /mpox/data/metadata_czge.tsv >> /mpox/data/metadata.tsv
+    cat /mpox/data/sequences_czge.fasta >> /mpox/data/sequences.fasta
 fi;
 
 # Persist the build config we generated.
