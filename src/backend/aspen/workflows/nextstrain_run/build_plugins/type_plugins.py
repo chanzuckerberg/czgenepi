@@ -279,21 +279,34 @@ def apply_filters(config, subsampling, template_args):
         include_arguments_in_filters = True
         lineage_field = "pango_lineage"
 
-    filter_map = {"filter_start_date": "min_date", "filter_end_date": "max_date"}
-    for filter_name, yaml_key in filter_map.items():
-        value = template_args.get(filter_name)
-        if not value:
-            continue  # This filter isn't set, skip it.
+    min_date = template_args.get("filter_start_date")
+    if min_date:
         # Support date expressions like "5 days ago" in our cron schedule.
-        value = dateparser.parse(value).strftime("%Y-%m-%d")
+        min_date = dateparser.parse(min_date).strftime("%Y-%m-%d")
         if include_arguments_in_filters:
             subsampling["group"][
-                yaml_key
-            ] = f"--{yaml_key.replace('_', '-')} {value}"  # ex: --max-date 2020-01-01
+                "min_date"
+            ] = f"--min-date {min_date}"  # ex: --max-date 2020-01-01
         else:
-            subsampling["group"][yaml_key.replace("_", "-")] = str(
-                value
-            )  # ex: max-date: 2020-01-01
+            subsampling["group"]["min-date"] = str(min_date)  # ex: max-date: 2020-01-01
+    max_date = template_args.get("filter_end_date")
+    if max_date:
+        # Support date expressions like "5 days ago" in our cron schedule.
+        max_date = dateparser.parse(max_date).strftime("%Y-%m-%d")
+        if include_arguments_in_filters:
+            subsampling["group"][
+                "max_date"
+            ] = f"--max-date {max_date}"  # ex: --max-date 2020-01-01
+            if "international_serial_sampling" in subsampling:
+                subsampling["international_serial_sampling"][
+                    "max_date"
+                ] = f"--max-date {max_date}"  # ex: --max-date 2020-01-01
+        else:
+            subsampling["group"]["max-date"] = str(max_date)  # ex: max-date: 2020-01-01
+            if "international_serial_sampling" in subsampling:
+                subsampling["international_serial_sampling"]["max-date"] = str(
+                    max_date
+                )  # ex: max-date: 2020-01-01
 
     pango_lineages = template_args.get("filter_pango_lineages")
     if pango_lineages:

@@ -162,3 +162,70 @@ export const getNamedLocationsById = (
   const namedLocations = locations.map(foldInLocationName);
   return reduceObjectArrayToLookupDict(namedLocations, "id");
 };
+
+function findMaxDepthLocation(
+  searchLocation: GisaidLocation | NamedGisaidLocation,
+  maxDepth: keyof GisaidLocation,
+  locations: NamedGisaidLocation[],
+  locationFinderCache: LocationFinderCache | null = null
+): NamedGisaidLocation | undefined {
+  // Safety check -- Should not occur, but if app hasn't finished loading the
+  // Locations data and this gets called, would blow up because we assume there
+  // are some Locations below. Instead, fallback to `undefined` location.
+  if (locations.length === 0) {
+    return undefined;
+  }
+
+  // Only do cache interactions if one was provided
+  if (
+    locationFinderCache !== null &&
+    locationFinderCache[`${searchLocation.id}${maxDepth}`]
+  ) {
+    return locationFinderCache[`${searchLocation.id}${maxDepth}`];
+  }
+
+  const locationHierarchy: (keyof GisaidLocation)[] = [
+    "region",
+    "country",
+    "division",
+    "location",
+  ];
+  const finalIndex = locationHierarchy.findIndex(
+    (element) => element === maxDepth
+  );
+
+  const foundLocations = locationHierarchy.reduce((acc, tier, index) => {
+    // Until we get to the index of the maxDepth, search for the searchLocation value
+    // After that, search for null
+    const filterValue = index <= finalIndex ? searchLocation[tier] : null;
+    return acc.filter((value) => value[tier] === filterValue);
+  }, locations);
+
+  const foundLocation =
+    foundLocations.length > 0 ? foundLocations[0] : undefined;
+
+  // If using cache, add latest result in to make future searches faster
+  if (locationFinderCache !== null && foundLocation) {
+    locationFinderCache[`${searchLocation.id}${maxDepth}`] = foundLocation;
+  }
+  return foundLocation;
+}
+
+export type LocationMaxDepthFinder = (
+  searchLocation: GisaidLocation,
+  maxDepth: keyof GisaidLocation
+) => NamedGisaidLocation | undefined;
+
+export function createMaxDepthLocationFinder(
+  locations: NamedGisaidLocation[]
+): LocationMaxDepthFinder {
+  const locationFinderCache: LocationFinderCache = {};
+  return (searchLocation: GisaidLocation, maxDepth: keyof GisaidLocation) => {
+    return findMaxDepthLocation(
+      searchLocation,
+      maxDepth,
+      locations,
+      locationFinderCache
+    );
+  };
+}

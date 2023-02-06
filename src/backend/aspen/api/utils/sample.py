@@ -291,7 +291,14 @@ def collect_submission_information(
 
     for sample in samples:
         sample_info = {}
-        sample_location = getattr(sample, "collection_location", Location())
+        # (Vince): Pretty confident the `getattr` aspect is unnecessary now.
+        # I was fixing an error MyPy found but don't have time to investigate,
+        # so I'm leaving approach, which means `getattr` stays for now.
+        sample_location: Optional[Location] = getattr(
+            sample, "collection_location", None
+        )
+        if sample_location is None:
+            sample_location = Location()
         sample_info = {
             "gisaid_submitter_id": user.gisaid_submitter_id,
             "public_identifier": sample.public_identifier,

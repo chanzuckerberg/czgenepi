@@ -27,6 +27,9 @@ RUN wget https://github.com/chanzuckerberg/oso/archive/czge-oso25.zip -O oso.zip
 RUN poetry config virtualenvs.create false && \
     poetry install
 ENV PYTHONPATH=.
+# FIXME Should figure out how to fold biopython install into poetry, but poetry
+# breaks right now trying to add it to deps.
+RUN pip install biopython
 
 COPY . .
 # Install the aspen package

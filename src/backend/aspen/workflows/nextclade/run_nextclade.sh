@@ -49,16 +49,26 @@ fi
 
 echo "Starting nextclade run"
 NEXTCLADE_OUTPUT_DIR=output
+# Re: `retry-reverse-complement` -- Some pathogens (eg, MPX) frequently need
+# the flag to be correctly placed. For other pathogens, it's pointless. But even for
+# those pathogens, it should never negatively impact the results, worst
+# case is just a bit of unnecessary compute. Easiest to just always have on.
 nextclade run \
   --input-dataset "${NEXTCLADE_DATASET_DIR}" \
+  --retry-reverse-complement \
   --output-all "${NEXTCLADE_OUTPUT_DIR}" \
   "${SEQUENCES_FILE}"
 echo "Nextclade run complete"
+nextclade_complete_at=$(date "+%Y-%m-%dT%H:%M:%S")
 
 pathogen_slug=$(jq --raw-output ".pathogen_slug" "${JOB_INFO_FILE}")
 # save results back to db
 /usr/local/bin/python3.10 /usr/src/app/aspen/workflows/nextclade/save.py \
     --nextclade-csv "${NEXTCLADE_OUTPUT_DIR}/nextclade.csv" \
+    --nextclade-aligned-fasta "${NEXTCLADE_OUTPUT_DIR}/nextclade.aligned.fasta" \
     --nextclade-dataset-tag "${NEXTCLADE_DATASET_DIR}/${NEXTCLADE_TAG_FILENAME}" \
     --nextclade-version "$(nextclade --version)" \
+    --nextclade-run-datetime "${nextclade_complete_at}" \
     --pathogen-slug "${pathogen_slug}"
+
+echo "Workflow complete"

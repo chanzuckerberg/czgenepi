@@ -64,4 +64,7 @@ ENV PYTHONPATH=.
 COPY . .
 # By default, Poetry installs deps, dev deps, and the project package (aspen)
 RUN cd aspen && poetry install
+# FIXME Should figure out how to fold biopython install into poetry, but poetry
+# breaks right now trying to add it to deps.
+RUN pip install biopython
 CMD ["/usr/local/bin/supervisord", "-c", "/usr/src/app/etc/supervisord.conf"]

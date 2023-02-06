@@ -142,6 +142,7 @@ async def test_samples_list(
                 "%Y-%m-%d"
             )
 
+        id_range: range = params["id_range"]  # type: ignore
         expected = {
             "samples": [
                 {
@@ -220,7 +221,7 @@ async def test_samples_list(
                         }
                     ],
                 }
-                for i in params["id_range"]  # type: ignore
+                for i in id_range
             ]
         }
         assert response == expected
@@ -322,6 +323,7 @@ async def test_samples_list_no_qc_status(
                 "%Y-%m-%d"
             )
 
+        id_range: range = params["id_range"]  # type: ignore
         expected = {
             "samples": [
                 {
@@ -384,7 +386,7 @@ async def test_samples_list_no_qc_status(
                         }
                     ],
                 }
-                for i in params["id_range"]  # type: ignore
+                for i in id_range
             ]
         }
         assert response == expected
