@@ -62,6 +62,10 @@ export const setGroupMiddleware: Middleware =
     return next(action);
   };
 
+/**
+ * custom hook to automatically expire tree info when needed
+ * such as when trees are deleted
+ */
 const expirePathogenCaches = async (): Promise<void> => {
   const queriesToRefetch = [
     USE_PHYLO_RUN_INFO,

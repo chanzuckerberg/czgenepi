@@ -1,8 +1,3 @@
-interface BioinformaticsType {
-  [index: string]: JSONPrimitive;
-  type: "BioinformaticsType";
-}
-
 interface GISAID {
   status: "submitted" | "not_eligible" | "accepted" | "rejected" | "no_info";
   gisaidId?: string;
@@ -11,6 +6,11 @@ interface GISAID {
 interface Genbank {
   status: string;
   genbankAccession: string;
+}
+
+interface Genbank {
+  status: string;
+  genbank_accession: string;
 }
 
 interface Lineage {
@@ -43,7 +43,7 @@ enum TREE_STATUS {
   Started = "STARTED",
 }
 
-interface Sample extends BioinformaticsType {
+interface Sample {
   id: number;
   type: "Sample";
   privateId: string;
@@ -61,6 +61,7 @@ interface Sample extends BioinformaticsType {
     name: string;
   };
   gisaid: GISAID;
+  genbank: Genbank;
   lineages: [Lineage];
   qcMetrics: [QCMetrics];
   private?: boolean;
@@ -83,18 +84,18 @@ interface TemplateArgs {
  * A run is generated any time we make an attempt to make a tree, but not all runs have trees
  * associated with them (for example, while a run is in progress, or when a run has failed).
  */
-interface PhyloRun extends BioinformaticsType {
+interface PhyloRun {
   type: "Tree";
   id?: number;
   name: string;
-  pathogenGenomeCount: number;
-  creationDate: string;
   startedDate: string;
   workflowId: string;
   status: TREE_STATUS;
   templateArgs: TemplateArgs;
+  accessionsLink?: string;
   downloadLinkIdStylePrivateIdentifiers?: string;
   downloadLinkIdStylePublicIdentifiers?: string;
+  treeType?: TreeType;
   user: {
     name: string;
     id: number;
@@ -105,17 +106,3 @@ interface PhyloRun extends BioinformaticsType {
   };
   phyloTree?: Tree;
 }
-
-// TODO-TR (mlila): remove these types after removing transforms from Data/index.tsx
-type BioinformaticsData = Sample | PhyloRun;
-type BioinformaticsDataArray = Array<Sample> | Array<PhyloRun>;
-
-interface SampleMap {
-  [key: string]: Sample;
-}
-
-interface PhyloRunMap {
-  [key: string]: PhyloRun;
-}
-
-type BioinformaticsMap = SampleMap | PhyloRunMap;

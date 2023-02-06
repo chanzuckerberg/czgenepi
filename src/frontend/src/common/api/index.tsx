@@ -1,7 +1,7 @@
 import ENV from "src/common/constants/ENV";
-import { jsonToType } from "src/common/utils";
 import { store } from "../redux";
 import { selectCurrentGroup, selectCurrentPathogen } from "../redux/selectors";
+import { camelize } from "../utils/dataTransforms";
 
 export enum API {
   USERDATA = "/v2/users/me",
@@ -70,7 +70,7 @@ export const DEFAULT_DELETE_OPTIONS: RequestInit = {
 /**
  * Generic functions to interface with the backend API
  *
- * First chunk of things -- `API_KEY_TO_TYPE`, `convert`, and `apiResponse` --
+ * First chunk of things -- `apiResponse` --
  * are intended for "heavier" GETs to the backend that require some level
  * of data conversion for the response we get. For example, the samples
  * endpoint returns a bunch of stuff in snake_case, but we want camelCase,
@@ -87,39 +87,6 @@ export const DEFAULT_DELETE_OPTIONS: RequestInit = {
  * response, either would make sense, use your best judgment.
  **/
 
-const API_KEY_TO_TYPE: Record<string, string> = {
-  group: "Group",
-  phylo_trees: "Tree",
-  samples: "Sample",
-  user: "User",
-};
-
-function convert<U extends APIResponse, T extends U[keyof U]>(
-  entry: Record<string, JSONPrimitive>,
-  keyMap: Map<string, string | number> | null,
-  key: keyof U,
-  keySubMap?: Map<string, Map<string, string>>
-): T {
-  const converted = jsonToType<T>(entry, keyMap);
-  // key should always be a string anyways. no funky business please.
-  converted.type = API_KEY_TO_TYPE[String(key)];
-  // ^^^ FIXME (Vince) Does this get used anywhere? What was original purpose?
-
-  // If we end up with deeper nested objects, this could be recursive instead.
-  if (keySubMap) {
-    const convertedKeys = Object.keys(converted);
-    convertedKeys.forEach((convertedKey) => {
-      if (keySubMap.has(convertedKey)) {
-        converted[convertedKey] = jsonToType<T>(
-          converted[convertedKey],
-          keySubMap.get(convertedKey) || null
-        );
-      }
-    });
-  }
-  return converted;
-}
-
 /**
  * Make a GET request to backend API, parse results based on provided mapping.
  *
@@ -134,34 +101,15 @@ function convert<U extends APIResponse, T extends U[keyof U]>(
  */
 
 export async function apiResponse<T extends APIResponse>(
-  keys: (keyof T)[],
-  mappings: (Map<string, string | number> | null)[],
-  endpoint: string,
-  subMappings?: Map<string, Map<string, string>>[]
+  endpoint: string
 ): Promise<T> {
   const response = await fetch(ENV.API_URL + endpoint, DEFAULT_FETCH_OPTIONS);
-  const result = await response.json();
+  const apiData = await response.json();
   if (!response.ok) {
-    throw result;
+    throw apiData;
   }
 
-  const convertedData = keys.map((key, index) => {
-    type keyType = T[typeof key];
-    const typeData = result[key];
-    const keyMap = mappings[index];
-    const keySubMap = subMappings && subMappings[index];
-    let resultData: keyType | keyType[];
-    if (typeData instanceof Array) {
-      resultData = typeData.map((entry: Record<string, JSONPrimitive>) =>
-        convert<T, keyType>(entry, keyMap, key, keySubMap)
-      );
-    } else {
-      resultData = convert<T, keyType>(typeData, keyMap, key, keySubMap);
-    }
-    return [key, resultData];
-  });
-
-  return Object.fromEntries(convertedData);
+  return camelize(apiData);
 }
 
 /**
@@ -218,91 +166,12 @@ export interface SampleResponse extends APIResponse {
   samples: Sample[];
 }
 
-const GENBANK_SUBMAP = new Map<string, keyof Genbank>([
-  ["genbank_accession", "genbankAccession"],
-]);
-
-const GISAID_SUBMAP = new Map<string, keyof GISAID>([
-  ["gisaid_id", "gisaidId"],
-]);
-
-const LINEAGE_SUBMAP = new Map<string, keyof Lineage>([
-  ["lineage_type", "lineageType"],
-  ["lineage_software_version", "lineageSoftwareVersion"],
-  ["lineage_probability", "lineageProbability"],
-  ["last_updated", "lastUpdated"],
-  ["reference_dataset_name", "referenceDatasetName"],
-  ["reference_sequence_accession", "referenceSequenceAccession"],
-  ["reference_dataset_tag", "referenceDatasetTag"],
-  ["scorpio_call", "scorpioCall"],
-  ["scorpio_support", "scorpioSupport"],
-  ["qc_status", "qcStatus"],
-]);
-
-const QC_SUBMAP = new Map<string, keyof QCMetrics>([
-  ["qc_score", "qcScore"],
-  ["qc_software_version", "qcSoftwareVersion"],
-  ["qc_status", "qcStatus"],
-  ["qc_caller", "qcCaller"],
-  ["reference_dataset_name", "referenceDatasetName"],
-  ["reference_sequence_accession", "referenceSequenceAccession"],
-  ["reference_dataset_tag", "referenceDatasetTag"],
-]);
-
-const SAMPLE_SUBMAP = new Map<string, Map<string, string>>([
-  ["genbank", GENBANK_SUBMAP],
-  ["gisaid", GISAID_SUBMAP],
-  ["lineage", LINEAGE_SUBMAP],
-  ["qcMetrics", QC_SUBMAP],
-]);
-
-const SAMPLE_MAP = new Map<string, keyof Sample>([
-  ["collection_date", "collectionDate"],
-  ["collection_location", "collectionLocation"],
-  ["private_identifier", "privateId"],
-  ["public_identifier", "publicId"],
-  ["upload_date", "uploadDate"],
-  ["uploaded_by", "uploadedBy"],
-  ["sequencing_date", "sequencingDate"],
-  ["submitting_group", "submittingGroup"],
-  ["qc_metrics", "qcMetrics"],
-]);
-
 export const fetchSamples = (): Promise<SampleResponse> =>
-  apiResponse<SampleResponse>(
-    ["samples"],
-    [SAMPLE_MAP],
-    generateOrgSpecificUrl(ORG_API.SAMPLES),
-    [SAMPLE_SUBMAP]
-  );
+  apiResponse<SampleResponse>(generateOrgSpecificUrl(ORG_API.SAMPLES));
 
 export interface PhyloRunResponse extends APIResponse {
   phylo_trees: PhyloRun[];
 }
-const PHYLO_RUN_MAP = new Map<string, keyof PhyloRun>([
-  ["end_datetime", "endDate"],
-  ["phylo_tree", "phyloTree"],
-  ["start_datetime", "startedDate"],
-  ["template_args", "templateArgs"],
-  ["tree_type", "treeType"],
-  ["workflow_id", "workflowId"],
-  ["workflow_status", "status"],
-]);
-
-const TEMPLATE_ARGS_MAP = new Map<string, keyof TemplateArgs>([
-  ["filter_pango_lineages", "filterPangoLineages"],
-  ["filter_start_date", "filterStartDate"],
-  ["filter_end_date", "filterEndDate"],
-  ["location_id", "locationId"],
-]);
-
-const PHYLO_RUN_SUBMAP = new Map<string, Map<string, string>>();
-PHYLO_RUN_SUBMAP.set("templateArgs", TEMPLATE_ARGS_MAP);
 
 export const fetchPhyloRuns = (): Promise<PhyloRunResponse> =>
-  apiResponse<PhyloRunResponse>(
-    ["phylo_runs"],
-    [PHYLO_RUN_MAP],
-    generateOrgSpecificUrl(ORG_API.PHYLO_RUNS),
-    [PHYLO_RUN_SUBMAP]
-  );
+  apiResponse<PhyloRunResponse>(generateOrgSpecificUrl(ORG_API.PHYLO_RUNS));

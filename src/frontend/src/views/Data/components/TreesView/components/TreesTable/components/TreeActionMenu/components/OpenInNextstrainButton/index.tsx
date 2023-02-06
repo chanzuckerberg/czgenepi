@@ -1,15 +1,15 @@
 import { ButtonIcon, Icon, Tooltip } from "czifui";
 import { useState } from "react";
 import { TREE_STATUS } from "src/common/constants/types";
-import NextstrainConfirmationModal from "./components/NextstrainConfirmationModal";
+import NextstrainConfirmationModal from "../../../NextstrainConfirmationModal";
 
 interface Props {
-  item: PhyloRun;
+  phyloRun: PhyloRun;
 }
 
-const OpenInNextstrainButton = ({ item }: Props): JSX.Element => {
+const OpenInNextstrainButton = ({ phyloRun }: Props): JSX.Element => {
   const [open, setOpen] = useState(false);
-  const { status, phyloTree } = item;
+  const { status, phyloTree } = phyloRun;
   const treeId = phyloTree?.id;
   const isDisabled = status !== TREE_STATUS.Completed || !treeId;
 

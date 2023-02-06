@@ -1,24 +1,18 @@
 import { compact, map, uniq } from "lodash";
 import { useMemo, useState } from "react";
 import { HeadAppTitle } from "src/common/components";
-import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
+import { useSampleInfo } from "src/common/queries/samples";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { FilterPanel } from "src/components/FilterPanel";
 import { SearchBar } from "src/components/Table/components/SearchBar";
 import { getQCStatusFromSample } from "src/views/Upload/components/Samples/utils";
 import { DataNavigation } from "../DataNavigation";
 import { BlankState } from "./components/BlankState";
-import SamplesTable from "./components/SamplesTable";
+import { SamplesTable } from "./components/SamplesTable";
 import { SampleTableModalManager } from "./components/SampleTableModalManager";
 import { Flex, MaxWidth, StyledActionBar } from "./style";
 
 const SamplesView = (): JSX.Element => {
-  // initialize state
-  // TODO-TR (mlilia): types
-
-  // TODO-TR (mlila): consider restructuring table, modalmanager, and view to better manage
-  // TODO             checked sample state
-
   // TODO-TR: when samples are cleared after closing a modal, the UI doesn't update
   const [checkedSamples, setCheckedSamples] = useState<Sample[]>([]);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState<boolean>(true);
@@ -104,6 +98,7 @@ const SamplesView = (): JSX.Element => {
               <SamplesTable
                 isLoading={isLoading}
                 data={displayedRows}
+                checkedSamples={checkedSamples}
                 setCheckedSamples={setCheckedSamples}
               />
             </>

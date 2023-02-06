@@ -1,4 +1,4 @@
-import { UNDEFINED_TEXT } from "../components/library/data_table";
+import { NO_CONTENT_FALLBACK } from "src/components/Table/constants";
 
 // Takes ISO8601 datetime with TZ and returns corresponding date
 // (only) on user's machine.
@@ -6,7 +6,7 @@ import { UNDEFINED_TEXT } from "../components/library/data_table";
 // datetimeWithTzToLocalDate("2021-12-02T01:07:48+00:00") => "2021-12-01"
 export const datetimeWithTzToLocalDate = (d: string): string => {
   // We use this as a stand in for missing values in the tables
-  if (!d || d.startsWith(UNDEFINED_TEXT)) return d;
+  if (!d || d.startsWith(NO_CONTENT_FALLBACK)) return d;
 
   const date = new Date(d);
   const offset = date.getTimezoneOffset();

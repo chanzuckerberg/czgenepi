@@ -1,13 +1,5 @@
 import { NewTabLink } from "src/common/components/library/NewTabLink";
-
-export type TooltipTextType = {
-  boldText: string;
-  regularText: string;
-  link?: {
-    href: string;
-    linkText: string;
-  };
-};
+import { TooltipTextType } from "src/views/Data/tableHeaders/types";
 
 interface TooltipTextProps {
   tooltipStrings?: TooltipTextType;

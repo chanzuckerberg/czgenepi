@@ -20,18 +20,24 @@ import {
   getDownloadLinks,
   IdMap,
   reduceObjectArrayToLookupDict,
+  replaceKeyName,
 } from "../utils/dataTransforms";
 import { ENTITIES } from "./entities";
 import { MutationCallbacks } from "./types";
 
 const mapPhyloRuns = (data: PhyloRunResponse) => {
-  const phyloRuns = data.phylo_runs;
+  const { phyloRuns } = data;
 
-  const transformedRuns = phyloRuns.map((p: PhyloRun) => ({
-    ...p,
-    ...getDownloadLinks(p),
-    treeType: getCapitalCaseTreeType(p),
-  }));
+  const transformedRuns = phyloRuns.map((p: PhyloRun) => {
+    replaceKeyName(p, "workflowStatus", "status");
+    replaceKeyName(p, "startDatetime", "startedDate");
+
+    return {
+      ...p,
+      ...getDownloadLinks(p),
+      treeType: getCapitalCaseTreeType(p),
+    };
+  });
 
   return reduceObjectArrayToLookupDict<PhyloRun>(transformedRuns, "id");
 };
@@ -41,20 +47,10 @@ export const USE_PHYLO_RUN_INFO = {
   id: "phyloRunInfo",
 };
 
-/**
- * custom hook to automatically expire tree info when needed
- * such as when trees are deleted
- */
-export function usePhyloRunInfo(): UseQueryResult<PhyloRunResponse, unknown> {
+export function usePhyloRunInfo(): UseQueryResult<IdMap<PhyloRun>, unknown> {
   const state = store.getState();
   const pathogen = selectCurrentPathogen(state);
   return useQuery([USE_PHYLO_RUN_INFO, pathogen], fetchPhyloRuns, {
-    retry: false,
-  });
-}
-
-export function useNewPhyloRunInfo(): UseQueryResult<IdMap<PhyloRun>, unknown> {
-  return useQuery([USE_PHYLO_RUN_INFO], fetchPhyloRuns, {
     retry: false,
     select: mapPhyloRuns,
   });

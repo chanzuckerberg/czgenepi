@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { HeadAppTitle } from "src/common/components";
-import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
+import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
 import { IdMap } from "src/common/utils/dataTransforms";
 import { SearchBar } from "src/components/Table/components/SearchBar";
 import { DataNavigation } from "../DataNavigation";
 import { MaxWidth } from "../SamplesView/style";
 import { BlankStateTrees } from "./components/BlankStateTrees";
 import { TreeCreateHelpLink } from "./components/TreeCreateHelpLink";
-import TreesTable from "./components/TreesTable";
+import { TreesTable } from "./components/TreesTable";
 import { Flex } from "./style";
 
 const TreesView = (): JSX.Element => {

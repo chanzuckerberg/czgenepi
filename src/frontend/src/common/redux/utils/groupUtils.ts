@@ -1,10 +1,11 @@
+import { camelize } from "src/common/utils/dataTransforms";
 import {
   getLocalStorage,
   isWindowDefined,
 } from "src/common/utils/localStorage";
 import { canUserViewGroup } from "src/common/utils/userInfo";
 import { store } from "..";
-import { fetchUserInfo, mapUserData } from "../../queries/auth";
+import { fetchUserInfo } from "../../queries/auth";
 import { setGroup } from "../actions";
 import { selectCurrentGroup } from "../selectors";
 import { ReduxPersistenceTokens } from "../types";
@@ -15,7 +16,7 @@ export const ensureValidGroup = async (): Promise<void> => {
   const { dispatch, getState } = store;
   const state = getState();
   const rawUserInfo = await fetchUserInfo();
-  const userInfo = mapUserData(rawUserInfo);
+  const userInfo = camelize(rawUserInfo);
   const { groups } = userInfo;
 
   // wait until app initialized & user info loaded

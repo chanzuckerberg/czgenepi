@@ -1,9 +1,9 @@
 import { pick } from "lodash";
 import { EMPTY_OBJECT } from "src/common/constants/empty";
+import { foldInLocationName } from "src/common/queries/locations";
 import { store } from "src/common/redux";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
-import { stringifyGisaidLocation } from "src/common/utils/locationUtils";
 import {
   EMPTY_METADATA,
   SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS,
@@ -16,18 +16,19 @@ import {
 } from "src/components/WebformTable/common/types";
 
 export function structureInitialMetadata(
-  item: Sample,
+  sample: Sample,
   pathogen: Pathogen
 ): SampleEditMetadataWebform {
-  const i: SampleEditMetadataWebform = pick(
-    item,
+  const s = {
+    ...sample,
+    collectionLocation: foldInLocationName(sample.collectionLocation),
+    keepPrivate: sample.private,
+  };
+
+  return pick(
+    s,
     Object.keys(SAMPLE_EDIT_WEBFORM_METADATA_KEYS_TO_HEADERS[pathogen])
   );
-  if (i.collectionLocation && typeof i.collectionLocation !== "string") {
-    i.collectionLocation.name = stringifyGisaidLocation(i.collectionLocation);
-  }
-  i.keepPrivate = item.private;
-  return i;
 }
 export function findMetadataChanges(
   combinedMetadata: SampleEditMetadataWebform,
@@ -91,8 +92,11 @@ export function getInitialMetadata(
   const pathogen = selectCurrentPathogen(state);
 
   const initialMetadata: SampleIdToEditMetadataWebform = {};
-  samplesCanEdit.forEach((item) => {
-    initialMetadata[item.privateId] = structureInitialMetadata(item, pathogen);
+  samplesCanEdit.forEach((sample) => {
+    initialMetadata[sample.privateId] = structureInitialMetadata(
+      sample,
+      pathogen
+    );
   });
   return initialMetadata;
 }

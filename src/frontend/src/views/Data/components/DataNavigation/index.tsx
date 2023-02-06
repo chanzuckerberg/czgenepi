@@ -2,14 +2,15 @@ import { Tab } from "czifui";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNewPhyloRunInfo as usePhyloRunInfo } from "src/common/queries/phyloRuns";
-import { useNewSampleInfo as useSampleInfo } from "src/common/queries/samples";
+import { usePhyloRunInfo } from "src/common/queries/phyloRuns";
+import { useSampleInfo } from "src/common/queries/samples";
 import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { Pathogen } from "src/common/redux/types";
 import { ROUTES } from "src/common/routes";
-import { DataCategory } from "src/common/types/data";
 import { FilterPanelToggle } from "./FilterPanelToggle";
 import { Navigation, StyledTabs } from "./style";
+import { TabData } from "../../types";
+import { VIEWNAME } from "src/common/constants/types";
 
 // either all the props for sample filter panel are passed
 // or no props are passed
@@ -33,7 +34,7 @@ const DataNavigation = ({
 }: Props): JSX.Element => {
   const pathogen = useSelector(selectCurrentPathogen);
   const [currentTab, setCurrentTab] = useState<ROUTES>(ROUTES.DATA_SAMPLES);
-  const [tabData, setTabData] = useState<Partial<DataCategory>[]>([]);
+  const [tabData, setTabData] = useState<TabData[]>([]);
 
   const router = useRouter();
   const { asPath: currentPath } = router;
@@ -46,12 +47,12 @@ const DataNavigation = ({
     const newTabData = [
       {
         count: samples && Object.keys(samples).length,
-        text: "Samples",
+        text: VIEWNAME.SAMPLES,
         to: ROUTES.DATA_SAMPLES,
       },
       {
         count: phyloRuns && Object.keys(phyloRuns).length,
-        text: "Phylogenetics Trees",
+        text: VIEWNAME.TREES,
         to: ROUTES.PHYLO_TREES,
       },
     ];
@@ -70,7 +71,6 @@ const DataNavigation = ({
   }, [currentPath, tabData]);
 
   const handleTabClick: TabEventHandler = (_, value) => {
-    // TODO-TR: smoother view transition
     router.push(value);
   };
 
