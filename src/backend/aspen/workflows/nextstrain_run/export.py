@@ -475,8 +475,8 @@ def populate_aligned_row(sample, sequence):
         upload_date = sample.uploaded_pathogen_genome.upload_date.strftime("%Y-%m-%d")
 
     row: MutableMapping[str, Any] = {
-        "strain": sample.public_identifier,
-        "accession": getattr(genbank_accession, "accession", None) or "",
+        "accession": sample.public_identifier,
+        "strain": getattr(genbank_accession, "accession", None) or "",
         "date": sample.collection_date.strftime("%Y-%m-%d"),
         "region": sample.collection_location.region,
         "country": sample.collection_location.country,
