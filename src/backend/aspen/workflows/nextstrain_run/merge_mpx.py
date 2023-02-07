@@ -6,7 +6,8 @@ from Bio import SeqIO
 
 
 @click.command("merge")
-@click.option("--unique-column", type=str, required=True)
+@click.option("--required-match-column", type=str, required=True)
+@click.option("--upstream-match-column", type=str, required=True)
 @click.option(
     "required_metadata_fh", "--required-metadata", type=click.File("r"), required=True
 )
@@ -32,7 +33,8 @@ from Bio import SeqIO
     required=True,
 )
 def cli(
-    unique_column: str,
+    required_match_column: str,
+    upstream_match_column: str,
     required_metadata_fh: io.TextIOBase,
     required_sequences_fh: io.TextIOBase,
     upstream_metadata_fh: io.TextIOBase,
@@ -42,16 +44,6 @@ def cli(
 ):
     required_ids = set([])
     required_sequences = SeqIO.parse(required_sequences_fh, "fasta")
-    for record in required_sequences:
-        SeqIO.write(record, destination_sequences_fh, "fasta-2line")
-        required_ids.add(record.id)
-
-    upstream_sequences = SeqIO.parse(upstream_sequences_fh, "fasta")
-    unique_records_iterator = (
-        item for item in upstream_sequences if item.id not in required_ids
-    )
-    SeqIO.write(unique_records_iterator, destination_sequences_fh, "fasta-2line")
-
     required_metadata: csv.DictReader = csv.DictReader(
         required_metadata_fh, delimiter="\t"
     )
@@ -63,11 +55,22 @@ def cli(
     )
     destination_metadata.writeheader()
     for row in required_metadata:
+        required_ids.add(row[required_match_column])
         destination_metadata.writerow(row)
     for row in upstream_metadata:
-        if row[unique_column] in required_ids:
+        if row[upstream_match_column] in required_ids:
             continue
         destination_metadata.writerow(row)
+
+    for record in required_sequences:
+        SeqIO.write(record, destination_sequences_fh, "fasta-2line")
+        required_ids.add(record.id)
+
+    upstream_sequences = SeqIO.parse(upstream_sequences_fh, "fasta")
+    unique_records_iterator = (
+        item for item in upstream_sequences if item.id not in required_ids
+    )
+    SeqIO.write(unique_records_iterator, destination_sequences_fh, "fasta-2line")
 
 
 if __name__ == "__main__":

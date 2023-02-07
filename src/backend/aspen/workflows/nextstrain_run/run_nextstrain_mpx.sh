@@ -69,7 +69,7 @@ if [ -e /mpox/data/sequences_czge.fasta ]; then
     # Skip the TSV header when appending
     tail +2 /mpox/data/metadata_czge.tsv >> /mpox/data/metadata.tsv
     cat /mpox/data/sequences_czge.fasta >> /mpox/data/sequences.fasta
-    python3 merge_mpx.py --required-metadata metadata_czge.tsv --required-sequences sequences.fasta --upstream-metadata /mpox/data/metadata.tsv --upstream-sequences /mpox/data/sequences.fasta --destination-metadata merged.tsv --destination-sequences merged.fasta --unique-column accession
+    python3 merge_mpx.py --required-metadata metadata_czge.tsv --required-sequences sequences.fasta --upstream-metadata /mpox/data/metadata.tsv --upstream-sequences /mpox/data/sequences.fasta --destination-metadata merged.tsv --destination-sequences merged.fasta --required-match-column strain --upstream-match-column accession
     mv merged.tsv /mpox/data/metadata.tsv
     mv merged.fasta /mpox/data/sequences.fasta
 fi;
