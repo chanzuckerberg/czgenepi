@@ -476,7 +476,7 @@ def populate_aligned_row(sample, sequence):
 
     row: MutableMapping[str, Any] = {
         "accession": sample.public_identifier,
-        "strain": getattr(genbank_accession, "accession", None) or "",
+        "strain": sample.public_identifier,
         "date": sample.collection_date.strftime("%Y-%m-%d"),
         "region": sample.collection_location.region,
         "country": sample.collection_location.country,
