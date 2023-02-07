@@ -35,6 +35,11 @@ export default function Upload(): JSX.Element | null {
   const pathogen = useSelector(selectCurrentPathogen);
   const [samples, setSamples] = useState<ISamples | null>(null);
   const [metadata, setMetadata] = useState<SampleIdToMetadata | null>(null);
+  const [hasManuallyEditedMetadata, setHasManuallyEditedMetadata] =
+    useState<boolean>(false);
+  // this is used to track whether the user has manually edited the metadata for analytics
+  const [hasImportedMetadataFile, setHasImportedMetadataFile] =
+    useState<boolean>(false);
   /**
    * For analytics, we group all events in a single Upload "flow" to correlate.
    *
@@ -139,6 +144,10 @@ export default function Upload(): JSX.Element | null {
           setMetadata={setMetadata}
           cancelPrompt={cancelPrompt}
           analyticsFlowUuid={analyticsFlowUuid}
+          hasManuallyEditedMetadata={hasManuallyEditedMetadata}
+          setHasManuallyEditedMetadata={setHasManuallyEditedMetadata}
+          hasImportedMetadataFile={hasImportedMetadataFile}
+          setHasImportedMetadataFile={setHasImportedMetadataFile}
         />
       )}
     </StyledPageContent>

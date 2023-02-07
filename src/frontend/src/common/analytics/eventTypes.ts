@@ -1,3 +1,5 @@
+import { Pathogen } from "../redux/types";
+
 /**
  * Canonical list of all the various event types we track with analytics.
  *
@@ -55,6 +57,12 @@ export enum EVENT_TYPES {
   // User has successfully uploaded new samples
   SAMPLES_UPLOAD_SUCCESS = "SAMPLES_UPLOAD_SUCCESS",
 
+  // User is uploading data that has resulted in a failure
+  SAMPLES_UPLOAD_FAILED = "SAMPLES_UPLOAD_FAILED",
+
+  // User is uploading data with a metadata template or is doing manual entry
+  UPLOAD_METADATA_TYPE = "UPLOAD_METADATA_TYPE",
+
   // User downloading data about samples to a file(s)
   // Does not currently address success/failure, but download failures are very
   // rare, so generally safe to not be concerned about that aspect for now.
@@ -91,6 +99,9 @@ export type EventData = Record<string, EventValue | undefined>;
 // While we only send values of EventValue, sometimes we send a JSON string.
 // For ease of readability below, we alias string for those cases.
 type JsonString = string;
+
+// capture how the user is uploading or entering metadata
+export type UploadFormMetadataType = "BOTH" | "MANUAL" | "TSV";
 
 /**
  * Structure of additionalEventData for each EVENT_TYPES type that sends it.
@@ -135,7 +146,7 @@ export type AnalyticsTreeViewNextstrain = {
   // Tree that user is being sent to view
   tree_id: number;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
 };
 
 /** EVENT_TYPES.TREE_CREATION_NEXTSTRAIN */
@@ -155,7 +166,7 @@ export type AnalyticsTreeCreationNextstrain = {
   // generally shouldn't happen.
   group_location_id: number | null;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
   // Lineages selected for tree creation. json stringified list of strings.
   // "[]" indicates "All lineages"
   selected_lineages: JsonString;
@@ -189,7 +200,7 @@ export type AnalyticsTreeDownloadTreeFile = {
   // in this event for tree_id, it very likely indicates a bug with app.
   tree_id: number | null;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
   // PK of the workflow that kicked off the creation of this tree.
   // Should never be null, but TS for underlying item does not guarantee it, so
   // the null possibility is mostly to keep TS happy. If null, app has a bug.
@@ -210,7 +221,7 @@ export type AnalyticsTreeDownloadSelectedSamplesTemplate = {
   // Can download template before tree done or tree failed. Null indicates such
   tree_id: number | null;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
   // PK of the workflow that kicked off the creation of this tree.
   // Should never be null, but TS for underlying item does not guarantee it, so
   // the null possibility is mostly to keep TS happy. If null, app has a bug.
@@ -225,12 +236,25 @@ export type AnalyticsSamplesUploadPageChange = {
   // The Samples Upload route user has just gone to.
   new_route: string;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
   // Random ID generated at start of a given Samples Upload process.
   // This allows us to correlate all the steps in a single Upload process into
   // a unified "flow". If a new Upload is started in same browser session, this
   // will be re-generated, so distinct Upload "flows" will have distinct IDs.
   upload_flow_uuid: string;
+};
+
+/** EVENT_TYPES.UPLOAD_METADATA_TYPE */
+export type AnalyticsUploadMetadataType = {
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: Pathogen;
+  // The type of metadata the user is uploading
+  metadata_entry_type: UploadFormMetadataType;
+  // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
+  // For an Upload "flow" that ends in successful or failed upload, this will match up.
+  upload_flow_uuid: string;
+  // number of samples in the upload
+  sample_count: number;
 };
 
 /** EVENT_TYPES.SAMPLES_UPLOAD_SUCCESS*/
@@ -240,10 +264,21 @@ export type AnalyticsSamplesUploadSuccess = {
   // JSON array of all the IDs for newly created samples for this upload
   sample_ids: JsonString;
   // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
-  // For an Upload "flow" that ends in successful upload, this will match up.
+  // For an Upload "flow" that ends in successful or failed upload, this will match up.
   upload_flow_uuid: string;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
+};
+
+/** EVENT_TYPES.SAMPLES_UPLOAD_FAILED */
+export type AnalyticsSamplesUploadFailed = {
+  // What was the error message for the failed upload
+  failed_message: string;
+  // See above docs on `AnalyticsSamplesUploadPageChange.upload_flow_uuid`.
+  // For an Upload "flow" that ends in successful or failed upload, this will match up.
+  upload_flow_uuid: string;
+  // The current pathogen. For example, "SC2" or "MPX".
+  pathogen: Pathogen;
 };
 
 /** EVENT_TYPES.SAMPLES_DOWNLOAD_FILE*/
@@ -265,7 +300,7 @@ export type AnalyticsSamplesDownloadFile = {
   // User downloaded info on metadata for these samples
   includes_sample_metadata: boolean;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
 };
 
 /** EVENT_TYPES.ACTIVE_GROUP_CHANGE*/
@@ -300,5 +335,5 @@ export type AnalyticsSamplesFilter = {
   // JSON array of all the qc statuses that user is filtering on
   qc_statuses: JsonString;
   // The current pathogen. For example, "SC2" or "MPX".
-  pathogen: string;
+  pathogen: Pathogen;
 };

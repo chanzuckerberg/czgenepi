@@ -38,4 +38,8 @@ export interface Props {
   setMetadata: React.Dispatch<React.SetStateAction<SampleIdToMetadata | null>>;
   cancelPrompt: () => void;
   analyticsFlowUuid: string;
+  hasManuallyEditedMetadata: boolean;
+  setHasManuallyEditedMetadata: React.Dispatch<React.SetStateAction<boolean>>;
+  hasImportedMetadataFile: boolean;
+  setHasImportedMetadataFile: React.Dispatch<React.SetStateAction<boolean>>;
 }

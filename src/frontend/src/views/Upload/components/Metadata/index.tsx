@@ -39,10 +39,11 @@ export default function Metadata({
   namedLocations,
   metadata,
   setMetadata,
+  setHasManuallyEditedMetadata,
+  setHasImportedMetadataFile,
+  hasImportedMetadataFile,
 }: Props): JSX.Element {
   const [isValid, setIsValid] = useState(false);
-  const [hasImportedMetadataFile, setHasImportedMetadataFile] =
-    useState<boolean>(false);
   const [autocorrectWarnings, setAutocorrectWarnings] =
     useState<SampleIdToWarningMessages>(EMPTY_OBJECT);
 
@@ -62,6 +63,7 @@ export default function Metadata({
     setMetadata((prevMetadata) => {
       return { ...prevMetadata, [id]: sampleMetadata };
     });
+    setHasManuallyEditedMetadata(true);
   };
 
   const handleRowMetadata = useCallback(handleRowMetadata_, [setMetadata]);
@@ -71,6 +73,7 @@ export default function Metadata({
     setMetadata((prevMetadata) => {
       return setApplyAllValueToPrevMetadata(prevMetadata, fieldKey, value);
     });
+    setHasManuallyEditedMetadata(true);
   };
 
   const applyToAllColumn = useCallback(applyToAllColumn_, [setMetadata]);
