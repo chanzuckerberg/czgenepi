@@ -5,9 +5,22 @@ import click
 from Bio import SeqIO
 
 
+def upstream_row_matches(row, required_ids, upstream_match_columns):
+    for col in upstream_match_columns:
+        if row[col] in required_ids:
+            return True
+    return False
+
+
 @click.command("merge")
 @click.option("--required-match-column", type=str, required=True)
-@click.option("--upstream-match-column", type=str, required=True)
+@click.option(
+    "upstream_match_columns",
+    "--upstream-match-column",
+    type=str,
+    required=True,
+    multiple=True,
+)
 @click.option(
     "required_metadata_fh", "--required-metadata", type=click.File("r"), required=True
 )
@@ -34,7 +47,7 @@ from Bio import SeqIO
 )
 def cli(
     required_match_column: str,
-    upstream_match_column: str,
+    upstream_match_columns: list[str],
     required_metadata_fh: io.TextIOBase,
     required_sequences_fh: io.TextIOBase,
     upstream_metadata_fh: io.TextIOBase,
@@ -51,14 +64,14 @@ def cli(
         upstream_metadata_fh, delimiter="\t"
     )
     destination_metadata: csv.DictWriter = csv.DictWriter(
-        destination_metadata_fh, fieldnames=upstream_metadata.fieldnames
+        destination_metadata_fh, fieldnames=upstream_metadata.fieldnames, delimiter="\t"
     )
     destination_metadata.writeheader()
     for row in required_metadata:
         required_ids.add(row[required_match_column])
         destination_metadata.writerow(row)
     for row in upstream_metadata:
-        if row[upstream_match_column] in required_ids:
+        if upstream_row_matches(row, required_ids, upstream_match_columns):
             continue
         destination_metadata.writerow(row)
 
