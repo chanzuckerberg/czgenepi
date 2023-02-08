@@ -466,10 +466,6 @@ def populate_uploaded_row(sample, sequence):
 
 
 def populate_aligned_row(sample, sequence):
-    genbank_accession: Optional[Accession] = None
-    for accession in sample.accessions:
-        if accession.accession_type == AccessionType.GENBANK:
-            genbank_accession = accession
     upload_date = None
     if sample.uploaded_pathogen_genome is not None:
         upload_date = sample.uploaded_pathogen_genome.upload_date.strftime("%Y-%m-%d")
