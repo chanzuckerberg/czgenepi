@@ -63,9 +63,7 @@ def cli(
     upstream_metadata: csv.DictReader = csv.DictReader(
         upstream_metadata_fh, delimiter="\t"
     )
-    destination_metadata: csv.DictWriter = csv.DictWriter(
-        destination_metadata_fh, fieldnames=upstream_metadata.fieldnames, delimiter="\t"
-    )
+    destination_metadata: csv.DictWriter = csv.DictWriter(destination_metadata_fh, fieldnames=upstream_metadata.fieldnames, delimiter="\t")  # type: ignore
     destination_metadata.writeheader()
     for row in required_metadata:
         required_ids.add(row[required_match_column])
