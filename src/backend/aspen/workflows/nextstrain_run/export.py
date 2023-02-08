@@ -466,17 +466,15 @@ def populate_uploaded_row(sample, sequence):
 
 
 def populate_aligned_row(sample, sequence):
-    genbank_accession: Optional[Accession] = None
-    for accession in sample.accessions:
-        if accession.accession_type == AccessionType.GENBANK:
-            genbank_accession = accession
     upload_date = None
     if sample.uploaded_pathogen_genome is not None:
         upload_date = sample.uploaded_pathogen_genome.upload_date.strftime("%Y-%m-%d")
 
     row: MutableMapping[str, Any] = {
-        "accession": sample.public_identifier,
-        "strain": getattr(genbank_accession, "accession", None) or "",
+        # NOTE: mpox tree builds can't handle "/" in accessions names!
+        # However, it uses the "strain" metadata field to populate labels in the final tree.
+        "accession": sample.public_identifier.replace("/", "_"),
+        "strain": sample.public_identifier,
         "date": sample.collection_date.strftime("%Y-%m-%d"),
         "region": sample.collection_location.region,
         "country": sample.collection_location.country,
@@ -533,13 +531,16 @@ def write_sequences_files(
         if sequence_type != "aligned":
             sequence = sequence.strip("Nn")
 
+        fasta_label = f">{sample.public_identifier}\n"
         if sequence_type == "aligned":
             row = populate_aligned_row(sample, sequence)
+            # Use the accession from the resulting row as our fasta sample label
+            fasta_label = f">{row['accession']}\n"
         else:
             row = populate_uploaded_row(sample, sequence)
 
         metadata_csv_fh.writerow(row)
-        sequences_fh.write(f">{sample.public_identifier}\n")
+        sequences_fh.write(fasta_label)
         sequences_fh.write(sequence)
         sequences_fh.write("\n")
         num_sequences += 1

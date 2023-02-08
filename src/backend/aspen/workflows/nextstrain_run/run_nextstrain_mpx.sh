@@ -59,16 +59,21 @@ aligned_upstream_sequences_s3_key=$(echo "${aligned_upstream_location}" | jq -r 
 aligned_upstream_metadata_s3_key=$(echo "${aligned_upstream_location}" | jq -r .metadata_key)
 
 # fetch the upstream dataset
-$aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_sequences_s3_key}" /mpox/data/sequences.fasta.xz
-$aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_metadata_s3_key}" /mpox/data/metadata.tsv.xz
-
-unxz /mpox/data/*.xz
+if [ ! -e /mpox/data/upstream_sequences.fasta ]; then
+    $aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_sequences_s3_key}" /mpox/data/upstream_sequences.fasta.xz
+    unxz /mpox/data/*.xz
+fi
+if [ ! -e /mpox/data/upstream_metadata.tsv ]; then
+    $aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_metadata_s3_key}" /mpox/data/upstream_metadata.tsv.xz
+    unxz /mpox/data/*.xz
+fi
 
 # If we've written out any samples, add them to the upstream metadata/fasta files
 if [ -e /mpox/data/sequences_czge.fasta ]; then
-    # Skip the TSV header when appending
-    tail +2 /mpox/data/metadata_czge.tsv >> /mpox/data/metadata.tsv
-    cat /mpox/data/sequences_czge.fasta >> /mpox/data/sequences.fasta
+    python3 merge_mpx.py --required-metadata /mpox/data/metadata_czge.tsv --required-sequences /mpox/data/sequences_czge.fasta --upstream-metadata /mpox/data/upstream_metadata.tsv --upstream-sequences /mpox/data/upstream_sequences.fasta --destination-metadata /mpox/data/metadata.tsv --destination-sequences /mpox/data/sequences.fasta --required-match-column strain --upstream-match-column accession
+else
+    cp /mpox/data/upstream_metadata.tsv /mpox/data/metadata.tsv
+    cp /mpox/data/upstream_sequences.fasta /mpox/data/sequences.fasta
 fi;
 
 # Persist the build config we generated.

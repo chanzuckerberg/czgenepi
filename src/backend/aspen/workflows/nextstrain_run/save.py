@@ -5,6 +5,7 @@ from typing import IO, MutableSequence, Set
 
 import click
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.exc import NoResultFound
 
 from aspen.config.config import Config
 from aspen.database.connection import (
@@ -103,17 +104,28 @@ def cli(
             ):
                 included_samples.append(uploaded_pathogen_genome.sample)
 
-        # create an output
-        phylo_tree = PhyloTree(
-            s3_bucket=bucket,
-            s3_key=key,
-            constituent_samples=included_samples,
-            name=phylo_run.name,
-            group=phylo_run.group,
-            tree_type=phylo_run.tree_type,
-            pathogen=phylo_run.pathogen,
-            resolved_template_args=resolved_template_args,
-        )
+        phylo_tree_kwargs = {
+            "s3_bucket": bucket,
+            "s3_key": key,
+            "constituent_samples": included_samples,
+            "name": phylo_run.name,
+            "group": phylo_run.group,
+            "tree_type": phylo_run.tree_type,
+            "pathogen": phylo_run.pathogen,
+            "resolved_template_args": resolved_template_args,
+        }
+        try:
+            # Overwrite our existing tree output
+            phylo_tree: PhyloTree = (
+                session.query(PhyloTree)
+                .filter(PhyloTree.producing_workflow_id == phylo_run_id)
+                .one()
+            )
+            for k, v in phylo_tree_kwargs.items():
+                setattr(phylo_tree, k, v)
+        except NoResultFound:
+            # Create a new tree
+            phylo_tree = PhyloTree(**phylo_tree_kwargs)
 
         # update the run object with the metadata about the run.
         phylo_run.end_datetime = end_time_datetime
