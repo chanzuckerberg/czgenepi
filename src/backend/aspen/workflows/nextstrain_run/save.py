@@ -104,6 +104,16 @@ def cli(
             ):
                 included_samples.append(uploaded_pathogen_genome.sample)
 
+        phylo_tree_kwargs = {
+            "s3_bucket": bucket,
+            "s3_key": key,
+            "constituent_samples": included_samples,
+            "name": phylo_run.name,
+            "group": phylo_run.group,
+            "tree_type": phylo_run.tree_type,
+            "pathogen": phylo_run.pathogen,
+            "resolved_template_args": resolved_template_args,
+        }
         try:
             # Overwrite our existing tree output
             phylo_tree: PhyloTree = (
@@ -111,18 +121,11 @@ def cli(
                 .filter(PhyloTree.producing_workflow_id == phylo_run_id)
                 .one()
             )
+            for k, v in phylo_tree_kwargs.items():
+                setattr(phylo_tree, k, v)
         except NoResultFound:
             # Create a new tree
-            phylo_tree = PhyloTree()
-
-        phylo_tree.s3_bucket = bucket
-        phylo_tree.s3_key = key
-        phylo_tree.constituent_samples = included_samples
-        phylo_tree.name = phylo_run.name
-        phylo_tree.group = phylo_run.group
-        phylo_tree.tree_type = phylo_run.tree_type
-        phylo_tree.pathogen = phylo_run.pathogen
-        phylo_tree.resolved_template_args = resolved_template_args
+            phylo_tree = PhyloTree(**phylo_tree_kwargs)
 
         # update the run object with the metadata about the run.
         phylo_run.end_datetime = end_time_datetime
