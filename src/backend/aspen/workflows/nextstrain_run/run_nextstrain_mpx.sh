@@ -70,7 +70,7 @@ fi
 
 # If we've written out any samples, add them to the upstream metadata/fasta files
 if [ -e /mpox/data/sequences_czge.fasta ]; then
-    python3 merge_mpx.py --required-metadata /mpox/data/metadata_czge.tsv --required-sequences /mpox/data/sequences_czge.fasta --upstream-metadata /mpox/data/upstream_metadata.tsv --upstream-sequences /mpox/data/upstream_sequences.fasta --destination-metadata /mpox/data/metadata.tsv --destination-sequences /mpox/data/sequences.fasta --required-match-column strain --upstream-match-column accession
+    python3 /usr/src/app/aspen/workflows/nextstrain_run/merge_mpx.py --required-metadata /mpox/data/metadata_czge.tsv --required-sequences /mpox/data/sequences_czge.fasta --upstream-metadata /mpox/data/upstream_metadata.tsv --upstream-sequences /mpox/data/upstream_sequences.fasta --destination-metadata /mpox/data/metadata.tsv --destination-sequences /mpox/data/sequences.fasta --required-match-column strain --upstream-match-column accession
 else
     cp /mpox/data/upstream_metadata.tsv /mpox/data/metadata.tsv
     cp /mpox/data/upstream_sequences.fasta /mpox/data/sequences.fasta
