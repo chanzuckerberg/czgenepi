@@ -189,6 +189,7 @@ def test_overview_config_ondemand(mocker, session, postgres_database, split_clie
     # Make sure we're replacing "/" characters in public identifiers properly in all 3 tree data files.
     input_name_with_slash = phylo_run.inputs[0].sample.public_identifier
     fixed_slash_input_name = input_name_with_slash.replace("/", "_")
+    assert "/" in input_name_with_slash
     assert fixed_slash_input_name in selected
     assert fixed_slash_input_name in sequences
     assert f"{fixed_slash_input_name}\t\t{input_name_with_slash}" in metadata
