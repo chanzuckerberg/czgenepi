@@ -214,8 +214,8 @@ def export_run_config(
         else:
             county_samples = get_county_samples(session, group)
 
-        # get the aligned gisaid run info.
-        aligned_gisaid: AlignedRepositoryData = [
+        # get the aligned upstream run info.
+        aligned_repo_data: AlignedRepositoryData = [
             inp for inp in phylo_run.inputs if isinstance(inp, AlignedRepositoryData)
         ][0]
 
@@ -227,7 +227,7 @@ def export_run_config(
             inp for inp in phylo_run.inputs if isinstance(inp, PathogenGenome)
         ]
         num_included_samples = write_includes_file(
-            session, phylo_run.gisaid_ids, selected_samples, selected_fh
+            session, phylo_run.gisaid_ids, selected_samples, selected_fh, sequence_type
         )
 
         # Give the nexstrain config builder some info to make decisions
@@ -254,9 +254,9 @@ def export_run_config(
         builder.write_file(builds_file_fh)
 
         return {
-            "bucket": aligned_gisaid.s3_bucket,
-            "metadata_key": aligned_gisaid.metadata_s3_key,
-            "sequences_key": aligned_gisaid.sequences_s3_key,
+            "bucket": aligned_repo_data.s3_bucket,
+            "metadata_key": aligned_repo_data.metadata_s3_key,
+            "sequences_key": aligned_repo_data.sequences_s3_key,
         }
 
 
@@ -397,7 +397,9 @@ def save_resolved_template_args(
     json.dump(json_ready_dict, resolved_template_args_fh)
 
 
-def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
+def write_includes_file(
+    session, upstream_ids, pathogen_genomes, selected_fh, sequence_type: str
+):
     # Create a list of the inputted pathogen genomes that are uploaded pathogen genomes
     num_includes = 0
     sample_ids: List[int] = [
@@ -410,11 +412,16 @@ def write_includes_file(session, gisaid_ids, pathogen_genomes, selected_fh):
         public_identifier = sample.public_identifier
         # remove leading hcov-19/ preceding characters, ignore case
         public_identifier = re.sub(r"^hcov-19\/", "", public_identifier, flags=re.I)
+
+        # Mpox builds can't handle / in accession names.
+        if sequence_type == "aligned":
+            public_identifier = public_identifier.replace("/", "_")
+
         selected_fh.write(f"{public_identifier}\n")
         num_includes += 1
-    for gisaid_id in gisaid_ids:
-        gisaid_id = re.sub(r"^hcov-19\/", "", gisaid_id, flags=re.I)
-        selected_fh.write(f"{gisaid_id}\n")
+    for upstream_id in upstream_ids:
+        upstream_id = re.sub(r"^hcov-19\/", "", upstream_id, flags=re.I)
+        selected_fh.write(f"{upstream_id}\n")
         num_includes += 1
     return num_includes
 
