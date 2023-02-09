@@ -82,6 +82,15 @@ def create_test_data(
         group, pathogen, uploaded_by_user, location, num_county_samples
     )
 
+    # We need to add a "/" to one of the sample names, since mpox tree builds can't handle "/"
+    # characters in the accession column, and we need to test that we're replacing that it
+    # properly in include.txt, metadata, and fasta files
+    pathogen_genomes[
+        0
+    ].sample.public_identifier = (
+        f"testing/{pathogen_genomes[0].sample.public_identifier}"
+    )
+
     selected_samples = pathogen_genomes[:num_selected_samples]
     gisaid_dump = aligned_repo_data_factory(
         pathogen=pathogen,
@@ -176,6 +185,14 @@ def test_overview_config_ondemand(mocker, session, postgres_database, split_clie
     assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
+
+    # Make sure we're replacing "/" characters in public identifiers properly in all 3 tree data files.
+    input_name_with_slash = phylo_run.inputs[0].sample.public_identifier
+    fixed_slash_input_name = input_name_with_slash.replace("/", "_")
+    assert "/" in input_name_with_slash
+    assert fixed_slash_input_name in selected
+    assert fixed_slash_input_name in sequences
+    assert f"{fixed_slash_input_name}\t\t{input_name_with_slash}" in metadata
 
 
 # Make sure that configs specific to a Chicago Overview tree are working.
