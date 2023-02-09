@@ -131,7 +131,11 @@ def cli(
         if build_type != TreeType.OVERVIEW:
             gisaid_ids = generate_test_gisaid_ids(gisaid)
             num_included_samples = write_includes_file(
-                session, gisaid_ids, pathogen_genomes[:selected], selected_fh
+                session,
+                gisaid_ids,
+                pathogen_genomes[:selected],
+                selected_fh,
+                sequence_type,
             )
         pathogen_model = (
             session.execute(sa.select(Pathogen).where(Pathogen.slug == pathogen))  # type: ignore
