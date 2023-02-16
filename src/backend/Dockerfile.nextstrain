@@ -53,7 +53,7 @@ RUN mkdir /mpox && \
     git init && \
     git remote add origin https://github.com/chanzuckerberg/monkeypox.git && \
     git fetch origin subsampling && \
-    git reset --hard FETCH_HEAD
+    git reset --hard fd74f4b5f219035c9cbb7909b6f84f8a06fda76d
 
 RUN mkdir -p /ncov/auspice
 RUN mkdir -p /ncov/logs
