@@ -150,7 +150,7 @@ def retry_template_args_for_focal_group(
     for level in location_hierarchy:
         if getattr(location, level):
             current_location_level.append(level)
-    start_date_attempts = ["6 months ago", "12 months ago"]
+    start_date_attempts = ["6 months ago", "24 months ago"]
 
     while True:
         print(
