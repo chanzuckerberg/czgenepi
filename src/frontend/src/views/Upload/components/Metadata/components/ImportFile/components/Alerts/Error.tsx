@@ -19,7 +19,6 @@ const ERROR_CODE_TO_MESSAGE: Record<
 > = {
   [ERROR_CODE.INVALID_NAME]: InvalidNameMessage,
   [ERROR_CODE.MISSING_FIELD]: MissingFieldMessage,
-  [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
   [ERROR_CODE.DEFAULT]: DefaultMessage,
 };
 
@@ -41,7 +40,6 @@ export default function Error({
     [ERROR_CODE.MISSING_FIELD]: (
       <B>Import Failed, file missing required field.</B>
     ),
-    [ERROR_CODE.OVER_MAX_SAMPLES]: "placeholder",
     [ERROR_CODE.DEFAULT]: (
       <B>Something went wrong, please try again or contact us!</B>
     ),
