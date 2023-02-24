@@ -20,8 +20,6 @@ const ERROR_CODE_MESSAGES: Record<BASE_ERROR_CODE, string> = {
   [ERROR_CODE.INVALID_NAME]:
     "Sample Name (from FASTA) did not meet our requirements, please update and retry. Sample names must be no longer than 120 characters and can only contain letters from the English alphabet (A-Z, upper and lower case), numbers (0-9), periods (.), hyphens (-), underscores (_), spaces ( ), and forward slashes (/).",
   [ERROR_CODE.MISSING_FIELD]: "placeholder",
-  [ERROR_CODE.OVER_MAX_SAMPLES]:
-    "This file contains more than 500 samples, which exceeds the maximum for each upload process. Please limit the samples to 500 or less",
 };
 
 interface Props {
