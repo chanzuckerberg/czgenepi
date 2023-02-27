@@ -1,6 +1,7 @@
 import random
 from pathlib import Path, PosixPath
 from typing import Collection
+from unittest.mock import patch
 
 from click.testing import CliRunner, Result
 from sqlalchemy.orm import undefer
@@ -74,8 +75,10 @@ def mock_remote_db_uri(mocker, test_postgres_db_uri):
     )
 
 
-def test_pangolin_find_samples(mocker, session, postgres_database):
+@patch("aspen.workflows.pangolin.find_samples.check_latest_pangolin_version")
+def test_pangolin_find_samples(pango_version_mock, mocker, session, postgres_database):
 
+    pango_version_mock.return_value = "1.1.234"
     samples, _, pathogen = create_test_data(session)
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
@@ -103,7 +106,9 @@ def _run_sample_export(ids_filename):
     return output_filename
 
 
-def test_pangolin_export(mocker, session, postgres_database):
+@patch("aspen.workflows.pangolin.find_samples.check_latest_pangolin_version")
+def test_pangolin_export(pango_version_mock, mocker, session, postgres_database):
+    pango_version_mock.return_value = "1.1.234"
 
     samples, pathogen_genomes, pathogen = create_test_data(session)
     mock_remote_db_uri(mocker, postgres_database.as_uri())
