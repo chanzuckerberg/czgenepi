@@ -1,5 +1,6 @@
 import io
-import urllib.request
+import re
+import subprocess
 from typing import Collection
 
 import click
@@ -16,19 +17,23 @@ from aspen.database.models import Pathogen, Sample
 
 
 def check_latest_pangolin_version() -> str:
-    contents = urllib.request.urlopen(
-        "https://github.com/cov-lineages/pangoLEARN/releases/latest"
+    installed_version = (
+        subprocess.check_output(["pangolin", "-pv"]).decode("utf-8").strip()
     )
-    # get latest version from redirected url:
-    redirected_url: str = contents.url
-    latest_version: str = redirected_url.split("/")[-1]
-    return latest_version
+    # Only capture the bock of digits and . characters at the end of the version string
+    installed_version = re.sub(r".*?([0-9\.]+)$", r"\1", installed_version)
+    return installed_version
 
 
 def should_sample_be_updated(sample: Sample, most_recent_pango_version: str) -> bool:
     if not sample.lineages:
         return True
-    return sample.lineages[0].lineage_software_version != most_recent_pango_version
+    # Grab the set of digits and . characters at the end of the version string
+    # to compare with the pango version.
+    sample_lineage_version = re.sub(
+        r".*?([0-9\.]+)$", r"\1", sample.lineages[0].lineage_software_version
+    )
+    return sample_lineage_version != most_recent_pango_version
 
 
 def find_samples(pathogen: str) -> Collection[str]:
