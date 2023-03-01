@@ -30,5 +30,6 @@ export enum PATHOGEN_FEATURE_FLAGS {
   lineage_filter_enabled = "PATHOGEN_lineage_filter_enabled",
   nextstrain_enabled = "PATHOGEN_nextstrain_enabled",
   public_repository = "PATHOGEN_public_repository",
+  show_gisaid_ingestion_banner = "PATHOGEN_show_gisaid_ingestion_banner",
   usher_linkout = "PATHOGEN_usher_linkout",
 }
