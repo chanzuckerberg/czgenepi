@@ -1,32 +1,33 @@
-import { ROUTES } from "src/common/routes";
-import { Banner } from "czifui";
-import { NewTabLink } from "src/common/components/library/NewTabLink";
+import { useSelector } from "react-redux";
+import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
+import { SplitPathogenWrapper } from "src/components/Split/SplitPathogenWrapper";
+import { PATHOGEN_FEATURE_FLAGS } from "src/components/Split/types";
+import { StyledBanner } from "./style";
 
-const PRIVACY_BANNER_EXPIRATION = "2023-02-01T00:00:00";
+// Note: this was previously for privacy policy announcements
+// It was pretty convenient to reuse - maybe we want to keep
+// it around for one-off banners.
 
+// Show Banner on Covid pages to let the user know that we
+// are currently unable to ingest GISAID data
 export const Announcements = (): JSX.Element => {
-  // Remove on or after Feb 1, 2023
-  const shouldRenderPrivacyBanner = () => {
-    const today = new Date();
-    const expirationDate = new Date(PRIVACY_BANNER_EXPIRATION);
-    return today.getTime() < expirationDate.getTime();
-  };
+  const pathogen = useSelector(selectCurrentPathogen);
 
-  const renderPrivacyBanner = () => (
+  return (
     <>
-      <Banner sdsType="primary">
-        <B>
-          We are updating our Privacy Policy to comply with CCPA, effective
-          January 3, 2023.
-        </B>{" "}
-        &nbsp;
-        <NewTabLink href={ROUTES.PRIVACY} sdsStyle="dashed">
-          View the updates.
-        </NewTabLink>
-      </Banner>
+      <SplitPathogenWrapper
+        pathogen={pathogen}
+        feature={PATHOGEN_FEATURE_FLAGS.show_gisaid_ingestion_banner}
+      >
+        <StyledBanner sdsType="primary">
+          <B>
+            As of 2/26/23, we have been experiencing difficulty fetching fresh
+            contextual data from GISAID for SARS-CoV-2 trees. We&apos;re working
+            on a solution and will update you when we have more information
+          </B>
+        </StyledBanner>
+      </SplitPathogenWrapper>
     </>
   );
-
-  return <>{shouldRenderPrivacyBanner() && renderPrivacyBanner()}</>;
 };
