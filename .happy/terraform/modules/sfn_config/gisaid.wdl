@@ -6,43 +6,45 @@ workflow LoadGISAID {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
-        String gisaid_ndjson_url = "https://www.epicov.org/epi3/3p/exp3/export/export.json.bz2"
+        String upstream_ndjson_url = "s3://nextstrain-data/files/ncov/open/genbank.ndjson.zst"
+        String upstream_aligned_url = "s3://nextstrain-data/files/ncov/open/aligned.fasta.xz"
     }
 
-    call IngestGISAID {
+    call IngestRepoData {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
-        gisaid_ndjson_url = gisaid_ndjson_url
+        upstream_ndjson_url = upstream_ndjson_url
     }
 
-    call TransformGISAID {
+    call TransformRepoData {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
-        raw_gisaid_object_id = IngestGISAID.entity_id,
+        raw_repo_entity_id = IngestRepoData.entity_id,
     }
 
-    call AlignGISAID {
+    call SaveAlignedData {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
-        processed_gisaid_object_id = TransformGISAID.entity_id,
+        transformed_metadata_entity_id = TransformRepoData.entity_id,
+	upstream_aligned_url = upstream_aligned_url,
     }
 
-    call ImportGISAID {
+    call ImportMetadata {
         input:
         docker_image_id = docker_image_id,
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
-        gisaid_metadata = AlignGISAID.gisaid_metadata,
+        repo_metadata = SaveAlignedData.repo_metadata,
     }
 
     call ImportLocations {
@@ -51,7 +53,7 @@ workflow LoadGISAID {
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
-        gisaid_import_complete = ImportGISAID.gisaid_import_complete,
+        repo_import_complete = ImportMetadata.repo_import_complete,
     }
 
     call ImportLatlongs {
@@ -69,25 +71,25 @@ workflow LoadGISAID {
         aws_region = aws_region,
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
-        gisaid_import_complete = ImportGISAID.gisaid_import_complete,
+        repo_import_complete = ImportMetadata.repo_import_complete,
     }
 
     output {
-        Array[File] snakemake_logs = AlignGISAID.snakemake_logs
-        File align_log = AlignGISAID.align_log
-        String ingest_entity_id = IngestGISAID.entity_id
-        String transform_entity_id = TransformGISAID.entity_id
-        String align_entity_id = AlignGISAID.entity_id
+        Array[File] snakemake_logs = SaveAlignedData.snakemake_logs
+        File align_log = SaveAlignedData.align_log
+        String ingest_entity_id = IngestRepoData.entity_id
+        String transform_entity_id = TransformRepoData.entity_id
+        String align_entity_id = SaveAlignedData.entity_id
     }
 }
 
-task IngestGISAID {
+task IngestRepoData {
     input {
         String docker_image_id
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
-        String gisaid_ndjson_url
+        String upstream_ndjson_url
     }
 
     command <<<
@@ -109,16 +111,12 @@ task IngestGISAID {
     aspen_workflow_rev=$COMMIT_SHA
     aspen_creation_rev=$COMMIT_SHA
 
-    # fetch genepi config
-    sequences_key="raw_gisaid_dump/${build_id}/gisaid.ndjson.zst"
+    # Set our destination key
+    sequences_key="raw_genbank_dump/${build_id}/genbank.ndjson.zst"
 
-    # fetch the gisaid dataset and transform it.
-    wget "~{gisaid_ndjson_url}" --user "${gisaid_username}" --password "${gisaid_password}" --continue --tries=2 -O gisaid_dump.fasta.bz2
-    bunzip2 gisaid_dump.fasta.bz2 
-    zstdmt gisaid_dump.fasta -o sequences.fasta.zst
-    rm gisaid_dump.fasta
-
-    ${aws} s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    # fetch the genbank dataset and transform it.
+    $(aws} s3 cp "~{upstream_ndjson_url}" genbank.ndjson.zst
+    ${aws} s3 cp genbank.ndjson.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
 
     end_time=$(date +%s)
 
@@ -138,13 +136,13 @@ task IngestGISAID {
     }
 }
 
-task TransformGISAID {
+task TransformRepoData {
     input {
         String docker_image_id
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
-        String raw_gisaid_object_id
+        String raw_repo_entity_id
     }
 
     command <<<
@@ -167,9 +165,9 @@ task TransformGISAID {
     aspen_creation_rev=$COMMIT_SHA
 
     # get the bucket/key from the object id
-    raw_gisaid_location=$(python3 /usr/src/app/aspen/workflows/transform_gisaid/lookup_raw_download_object.py --raw-download-object-id "~{raw_gisaid_object_id}")
-    raw_gisaid_s3_bucket=$(echo "${raw_gisaid_location}" | jq -r .bucket)
-    raw_gisaid_s3_key=$(echo "${raw_gisaid_location}" | jq -r .key)
+    raw_data_location=$(python3 /usr/src/app/aspen/workflows/transform_gisaid/lookup_raw_download_object.py --raw-download-object-id "~{raw_repo_entity_id}")
+    raw_data_s3_bucket=$(echo "${raw_data_location}" | jq -r .bucket)
+    raw_data_s3_key=$(echo "${raw_data_location}" | jq -r .key)
 
     git clone --depth 1 https://github.com/nextstrain/ncov-ingest /ncov-ingest
     ncov_ingest_git_rev=$(git -C /ncov-ingest rev-parse HEAD)
@@ -181,10 +179,10 @@ task TransformGISAID {
     mv /ncov-ingest/source-data/czgenepi_locations.tsv \
        /ncov-ingest/source-data/gisaid_geoLocationRules.tsv
 
-    # decompress the gisaid dataset and transform it.
-    ${aws} s3 cp --no-progress "s3://${raw_gisaid_s3_bucket}/${raw_gisaid_s3_key}" - | zstdmt -d > gisaid.ndjson
-    /ncov-ingest/bin/transform-gisaid     \
-        gisaid.ndjson                     \
+    # decompress the raw dataset and transform it.
+    ${aws} s3 cp --no-progress "s3://${raw_data_s3_bucket}/${raw_data_s3_key}" - | zstdmt -d > genbank.ndjson
+    /ncov-ingest/bin/transform-genbank    \
+        genbank.ndjson                    \
         --output-metadata metadata.tsv    \
         --output-fasta sequences.fasta    \
         --output-unix-newline
@@ -192,10 +190,11 @@ task TransformGISAID {
     zstdmt sequences.fasta
 
     # upload the files to S3
-    sequences_key="processed_gisaid_dump/${build_id}/sequences.fasta.zst"
-    metadata_key="processed_gisaid_dump/${build_id}/metadata.tsv"
-    ${aws} s3 cp sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
-    ${aws} s3 cp metadata.tsv "s3://${aspen_s3_db_bucket}/${metadata_key}"
+    sequences_key="processed_genbank_dump/${build_id}/sequences.fasta.zst"
+    metadata_key="processed_genbank_dump/${build_id}/metadata.tsv.xz"
+    ${aws} s3 cp --no-progress sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    xz metadata.tsv
+    ${aws} s3 cp --no-progress metadata.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
     end_time=$(date +%s)
 
     # create the objects
@@ -205,7 +204,7 @@ task TransformGISAID {
             --ncov-ingest-rev "${ncov_ingest_git_rev}"              \
             --start-time "${start_time}"                            \
             --end-time "${end_time}"                                \
-            --raw-gisaid-object-id "~{raw_gisaid_object_id}"        \
+            --raw-gisaid-object-id "~{raw_repo_entity_id}"          \
             --gisaid-s3-bucket "${aspen_s3_db_bucket}"              \
             --gisaid-sequences-s3-key "${sequences_key}"            \
             --gisaid-metadata-s3-key "${metadata_key}" > entity_id
@@ -220,13 +219,14 @@ task TransformGISAID {
     }
 }
 
-task AlignGISAID {
+task SaveAlignedData {
     input {
         String docker_image_id
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
-        String processed_gisaid_object_id
+        String transformed_metadata_entity_id
+	String upstream_aligned_url
     }
 
     command <<<
@@ -245,10 +245,9 @@ task AlignGISAID {
     source /usr/src/app/aspen/workflows/wdl_setup.sh
 
     # get the bucket/key from the object id
-    processed_gisaid_location=$(python3 /usr/src/app/aspen/workflows/align_gisaid/lookup_processed_repo_data_object.py --processed-object-id "~{processed_gisaid_object_id}")
-    processed_gisaid_s3_bucket=$(echo "${processed_gisaid_location}" | jq -r .bucket)
-    processed_gisaid_sequences_s3_key=$(echo "${processed_gisaid_location}" | jq -r .sequences_key)
-    processed_gisaid_metadata_s3_key=$(echo "${processed_gisaid_location}" | jq -r .metadata_key)
+    processed_genbank_location=$(python3 /usr/src/app/aspen/workflows/align_gisaid/lookup_processed_repo_data_object.py --processed-object-id "~{transformed_metadata_entity_id}")
+    processed_genbank_s3_bucket=$(echo "${processed_genbank_location}" | jq -r .bucket)
+    transformed_metadata_s3_key=$(echo "${processed_genbank_location}" | jq -r .metadata_key)
 
     start_time=$(date +%s)
     build_id=$(date +%Y%m%d-%H%M)
@@ -257,23 +256,15 @@ task AlignGISAID {
     # git clone --depth 1 https://github.com/nextstrain/ncov /ncov
     ncov_git_rev=$(git -C /ncov rev-parse HEAD)
 
-    # fetch the gisaid dataset
-    ${aws} s3 cp --no-progress "s3://${processed_gisaid_s3_bucket}/${processed_gisaid_sequences_s3_key}" - | zstdmt -d > /ncov/data/sequences.fasta
-    ${aws} s3 cp --no-progress "s3://${processed_gisaid_s3_bucket}/${processed_gisaid_metadata_s3_key}" /ncov/data/metadata.tsv
-    mkdir /ncov/my_profiles/align_gisaid/
-    cp /usr/src/app/aspen/workflows/align_gisaid/{builds.yaml,config.yaml} /ncov/my_profiles/align_gisaid/
-    # run snakemake, if run fails export the logs from snakemake and ncov to s3 
-    (cd /ncov && snakemake --printshellcmds results/aligned_gisaid.fasta.xz results/sanitized_metadata_gisaid.tsv.xz --profile my_profiles/align_gisaid) || { ${aws} s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/snakemake/" --recursive ; ${aws} s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_gisaid_dump/${build_id}/logs/ncov/" --recursive ; }
-
-    mv /ncov/.snakemake/log/*.snakemake.log /ncov/logs/align_gisaid.txt .
-    unxz -k /ncov/results/sanitized_metadata_gisaid.tsv.xz  # make an unzipped version for ImportGISAID. The zipped version goes to S3
-    mv /ncov/results/sanitized_metadata_gisaid.tsv metadata.tsv  # this is for wdl to pipe into ImportGISAID.
+    # fetch the upstream repo dataset
+    ${aws} s3 cp --no-progress "s3://${processed_genbank_s3_bucket}/${transformed_metadata_s3_key}" metadata.tsv.xz
+    ${aws} s3 cp --no-progress "~{upstream_aligned_url}" aligned.fasta.xz
 
     # upload the files to S3
-    sequences_key="aligned_gisaid_dump/${build_id}/aligned_gisaid.fasta.xz"
-    metadata_key="aligned_gisaid_dump/${build_id}/sanitized_metadata_gisaid.tsv.xz"
-    ${aws} s3 cp /ncov/results/aligned_gisaid.fasta.xz "s3://${aspen_s3_db_bucket}/${sequences_key}"
-    ${aws} s3 cp /ncov/results/sanitized_metadata_gisaid.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
+    sequences_key="aligned_genbank_dump/${build_id}/aligned_genbank.fasta.xz"
+    metadata_key="aligned_genbank_dump/${build_id}/sanitized_metadata_genbank.tsv.xz"
+    ${aws} s3 cp aligned.fasta.xz "s3://${aspen_s3_db_bucket}/${sequences_key}"
+    ${aws} s3 cp metadata.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
 
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
@@ -289,7 +280,7 @@ task AlignGISAID {
             --aspen-docker-image-version "externally_managed"                       \
             --start-time "${start_time}"                                            \
             --end-time "${end_time}"                                                \
-            --processed-gisaid-object-id "~{processed_gisaid_object_id}"            \
+            --processed-gisaid-object-id "~{transformed_metadata_entity_id}"        \
             --gisaid-s3-bucket "${aspen_s3_db_bucket}"                              \
             --gisaid-sequences-s3-key "${sequences_key}"                            \
             --gisaid-metadata-s3-key "${metadata_key}" > entity_id
@@ -297,8 +288,8 @@ task AlignGISAID {
 
     output {
         Array[File] snakemake_logs = glob("*.snakemake.log")
-        File gisaid_metadata = "metadata.tsv"
-        File align_log = "align_gisaid.txt"
+        File repo_metadata = "metadata.tsv.xz"
+        File align_log = "align_genbank.txt"
         String entity_id = read_string("entity_id")
     }
 
@@ -307,13 +298,13 @@ task AlignGISAID {
     }
 }
 
-task ImportGISAID {
+task ImportMetadata {
     input {
         String docker_image_id
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
-        File gisaid_metadata
+        File repo_metadata
     }
 
     command <<<
@@ -327,12 +318,12 @@ task ImportGISAID {
 
     export PYTHONUNBUFFERED=true
     python3 /usr/src/app/aspen/workflows/import_gisaid/save.py       \
-            --metadata-file ~{gisaid_metadata} 1>&2
-    echo done > gisaid_import_complete
+            --metadata-file ~{repo_metadata} 1>&2
+    echo done > repo_import_complete
     >>>
 
     output {
-        String gisaid_import_complete = read_string("gisaid_import_complete")
+        String repo_import_complete = read_string("repo_import_complete")
     }
 
     runtime {
@@ -346,7 +337,7 @@ task ImportLocations {
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
-        String gisaid_import_complete
+        String repo_import_complete
     }
 
     command <<<
@@ -410,7 +401,7 @@ task ImportISLs {
         String aws_region
         String genepi_config_secret_name
         String remote_dev_prefix
-        String gisaid_import_complete
+        String repo_import_complete
     }
 
     command <<<
