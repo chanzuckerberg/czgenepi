@@ -29,15 +29,14 @@ const InputInstructions = (): JSX.Element => {
                 InputInstructionsPathogenStrings[pathogen]
                   .publicRepositoryIdType
               }
-            </SemiBold>{" "}
-            (e.g.{" "}
+            </SemiBold>
+            , <SemiBold>CZ GEN EPI Public IDs</SemiBold>, or{" "}
+            <SemiBold>CZ GEN EPI Private IDs</SemiBold> (e.g.{" "}
             {
               InputInstructionsPathogenStrings[pathogen]
                 .publicRepositoryIdExamples
             }
-            ), <SemiBold>CZ GEN EPI Public IDs</SemiBold>, or{" "}
-            <SemiBold>CZ GEN EPI Private IDs</SemiBold> below to include samples
-            in your tree.
+            ) below to include samples in your tree.
           </div>,
           <div key={2}>
             IDs must be separated by tabs, commas, or enter one ID per row.
