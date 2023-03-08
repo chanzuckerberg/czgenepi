@@ -101,6 +101,8 @@ const TreeTableNameCell = ({ phyloRun, locations }: Props): JSX.Element => {
       label: "Lineages",
       value: templateArgs?.filterPangoLineages?.join(", ") || "All",
     },
+    // TODO (mlila): add data source here once BE returns it
+    // { label: "Contextual Data Source", value: "GenBank" },
   ];
 
   const detailsData = [
