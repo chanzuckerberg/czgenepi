@@ -3,7 +3,6 @@ import { Pathogen } from "src/common/redux/types";
 import { PathogenConfigType } from "src/common/types/pathogenConfig";
 import { collectionDateColumn } from "./columnDefinitions/collectionDate";
 import { collectionLocationColumn } from "./columnDefinitions/collectionLocation";
-import { gisaidColumn } from "./columnDefinitions/gisaid";
 import { lineageColumn } from "./columnDefinitions/lineage";
 import { privateIdColumn } from "./columnDefinitions/privateId";
 import { sc2PublicIdColumn } from "./columnDefinitions/sc2PublicId";
@@ -24,7 +23,6 @@ export const SAMPLE_TABLE_COLUMNS: PathogenConfigType<
     lineageColumn,
     collectionLocationColumn,
     sequencingDateColumn,
-    gisaidColumn,
   ],
   [Pathogen.MONKEY_POX]: [
     privateIdColumn,
