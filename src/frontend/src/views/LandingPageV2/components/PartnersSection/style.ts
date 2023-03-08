@@ -14,11 +14,6 @@ const centeredFlex = () => {
 // Each logo link has its own styled component because the images
 // are slightly different sizes. This makes them all appear the
 // same size.
-export const GisaidLogoLink = styled(NewTabLink)`
-  ${centeredFlex}
-  max-width: 140px;
-`;
-
 export const NextstrainLogoLink = styled(NewTabLink)`
   ${centeredFlex}
   max-width: 196px;
