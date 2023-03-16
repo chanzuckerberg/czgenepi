@@ -189,6 +189,7 @@ task TransformRepoData {
         genbank.ndjson                    \
         --output-metadata metadata.tsv    \
         --output-fasta sequences.fasta    \
+        --biosample=""                    \
         --output-unix-newline
 
     zstdmt sequences.fasta
@@ -261,15 +262,16 @@ task SaveAlignedData {
     ncov_git_rev=$(git -C /ncov rev-parse HEAD)
 
     # fetch the upstream repo dataset
-    ${aws} s3 cp --no-progress "s3://${processed_genbank_s3_bucket}/${transformed_metadata_s3_key}" metadata.tsv.xz
+    ${aws} s3 cp --no-progress "s3://${processed_genbank_s3_bucket}/${transformed_metadata_s3_key}" /ncov/data/metadata.tsv.xz
     # ${aws} s3 cp --no-progress "~{upstream_aligned_url}" aligned.fasta.xz
     wget -O aligned.fasta.xz "~{upstream_aligned_url}"
 
     # Transform gisaid metadata only! Don't re-run alignment!
+    unxz -k /ncov/data/metadata.tsv.xz
     mkdir /ncov/my_profiles/align_genbank/
     cp /usr/src/app/aspen/workflows/align_gisaid/{builds.yaml,config.yaml} /ncov/my_profiles/align_genbank/
     # run snakemake, if run fails export the logs from snakemake and ncov to s3
-    (cd /ncov && snakemake --printshellcmds results/sanitized_metadata_genbank.tsv.xz --profile my_profiles/align_genbank) --until || { ${aws} s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_genbank_dump/${build_id}/logs/snakemake/" --recursive ; ${aws} s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_genbank_dump/${build_id}/logs/ncov/" --recursive ; }
+    (cd /ncov && snakemake --printshellcmds results/sanitized_metadata_genbank.tsv.xz --profile my_profiles/align_genbank) || { ${aws} s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_genbank_dump/${build_id}/logs/snakemake/" --recursive ; ${aws} s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_genbank_dump/${build_id}/logs/ncov/" --recursive ; }
 
     # fetch the upstream repo dataset
     ${aws} s3 cp --no-progress "s3://${processed_genbank_s3_bucket}/${transformed_metadata_s3_key}" metadata.tsv.xz
