@@ -6,6 +6,7 @@ workflow LoadGISAID {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
+	# TODO we should be able to fetch from S3 but something's not working right
         # String upstream_ndjson_url = "s3://nextstrain-data/files/ncov/open/genbank.ndjson.zst"
         # String upstream_aligned_url = "s3://nextstrain-data/files/ncov/open/aligned.fasta.xz"
         String upstream_ndjson_url = "https://data.nextstrain.org/files/ncov/open/genbank.ndjson.zst"
@@ -119,7 +120,7 @@ task IngestRepoData {
     # fetch the genbank dataset and transform it.
     # ${aws} s3 cp "~{upstream_ndjson_url}" genbank.ndjson.zst
     # ${aws} s3 cp genbank.ndjson.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
-    wget -O genbank.ndjson.zst "~{upstream_ndjson_url}"
+    wget -nv -O genbank.ndjson.zst "~{upstream_ndjson_url}"
     ${aws} s3 cp genbank.ndjson.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
 
     end_time=$(date +%s)
@@ -264,7 +265,7 @@ task SaveAlignedData {
     # fetch the upstream repo dataset
     ${aws} s3 cp --no-progress "s3://${processed_genbank_s3_bucket}/${transformed_metadata_s3_key}" /ncov/data/metadata.tsv.xz
     # ${aws} s3 cp --no-progress "~{upstream_aligned_url}" aligned.fasta.xz
-    wget -O aligned.fasta.xz "~{upstream_aligned_url}"
+    wget -nv -O aligned.fasta.xz "~{upstream_aligned_url}"
 
     # Transform gisaid metadata only! Don't re-run alignment!
     unxz -k /ncov/data/metadata.tsv.xz
