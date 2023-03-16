@@ -8,8 +8,8 @@ workflow LoadGISAID {
         String remote_dev_prefix = ""
         # String upstream_ndjson_url = "s3://nextstrain-data/files/ncov/open/genbank.ndjson.zst"
         # String upstream_aligned_url = "s3://nextstrain-data/files/ncov/open/aligned.fasta.xz"
-        String upstream_ndjson_url = "https://data.nexstrain.org/files/ncov/open/genbank.ndjson.zst"
-        String upstream_aligned_url = "https://data.nexstrain.org/files/ncov/open/aligned.fasta.xz"
+        String upstream_ndjson_url = "https://data.nextstrain.org/files/ncov/open/genbank.ndjson.zst"
+        String upstream_aligned_url = "https://data.nextstrain.org/files/ncov/open/aligned.fasta.xz"
     }
 
     call IngestRepoData {
