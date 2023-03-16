@@ -115,7 +115,7 @@ task IngestRepoData {
     sequences_key="raw_genbank_dump/${build_id}/genbank.ndjson.zst"
 
     # fetch the genbank dataset and transform it.
-    $(aws} s3 cp "~{upstream_ndjson_url}" genbank.ndjson.zst
+    ${aws} s3 cp "~{upstream_ndjson_url}" genbank.ndjson.zst
     ${aws} s3 cp genbank.ndjson.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
 
     end_time=$(date +%s)
@@ -188,12 +188,12 @@ task TransformRepoData {
         --output-unix-newline
 
     zstdmt sequences.fasta
+    xz metadata.tsv
 
     # upload the files to S3
     sequences_key="processed_genbank_dump/${build_id}/sequences.fasta.zst"
     metadata_key="processed_genbank_dump/${build_id}/metadata.tsv.xz"
     ${aws} s3 cp --no-progress sequences.fasta.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
-    xz metadata.tsv
     ${aws} s3 cp --no-progress metadata.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
     end_time=$(date +%s)
 
@@ -255,6 +255,16 @@ task SaveAlignedData {
     # We're pinning to a specific git hash in the Dockerfile so we're not cloning this here.
     # git clone --depth 1 https://github.com/nextstrain/ncov /ncov
     ncov_git_rev=$(git -C /ncov rev-parse HEAD)
+
+    # fetch the upstream repo dataset
+    ${aws} s3 cp --no-progress "s3://${processed_genbank_s3_bucket}/${transformed_metadata_s3_key}" metadata.tsv.xz
+    ${aws} s3 cp --no-progress "~{upstream_aligned_url}" aligned.fasta.xz
+
+    # Transform gisaid metadata only! Don't re-run alignment!
+    mkdir /ncov/my_profiles/align_genbank/
+    cp /usr/src/app/aspen/workflows/align_gisaid/{builds.yaml,config.yaml} /ncov/my_profiles/align_genbank/
+    # run snakemake, if run fails export the logs from snakemake and ncov to s3
+    (cd /ncov && snakemake --printshellcmds results/sanitized_metadata_genbank.tsv.xz --profile my_profiles/align_genbank) --until || { ${aws} s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_genbank_dump/${build_id}/logs/snakemake/" --recursive ; ${aws} s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_genbank_dump/${build_id}/logs/ncov/" --recursive ; }
 
     # fetch the upstream repo dataset
     ${aws} s3 cp --no-progress "s3://${processed_genbank_s3_bucket}/${transformed_metadata_s3_key}" metadata.tsv.xz
