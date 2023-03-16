@@ -271,18 +271,15 @@ task SaveAlignedData {
     unxz -k /ncov/data/metadata.tsv.xz
     mkdir /ncov/my_profiles/align_genbank/
     cp /usr/src/app/aspen/workflows/align_gisaid/{builds.yaml,config.yaml} /ncov/my_profiles/align_genbank/
+
     # run snakemake, if run fails export the logs from snakemake and ncov to s3
     (cd /ncov && snakemake --printshellcmds results/sanitized_metadata_genbank.tsv.xz --profile my_profiles/align_genbank) || { ${aws} s3 cp /ncov/.snakemake/log/ "s3://${aspen_s3_db_bucket}/aligned_genbank_dump/${build_id}/logs/snakemake/" --recursive ; ${aws} s3 cp /ncov/logs/ "s3://${aspen_s3_db_bucket}/aligned_genbank_dump/${build_id}/logs/ncov/" --recursive ; }
-
-    # fetch the upstream repo dataset
-    ${aws} s3 cp --no-progress "s3://${processed_genbank_s3_bucket}/${transformed_metadata_s3_key}" metadata.tsv.xz
-    ${aws} s3 cp --no-progress "~{upstream_aligned_url}" aligned.fasta.xz
 
     # upload the files to S3
     sequences_key="aligned_genbank_dump/${build_id}/aligned_genbank.fasta.xz"
     metadata_key="aligned_genbank_dump/${build_id}/sanitized_metadata_genbank.tsv.xz"
     ${aws} s3 cp aligned.fasta.xz "s3://${aspen_s3_db_bucket}/${sequences_key}"
-    ${aws} s3 cp metadata.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
+    ${aws} s3 cp results/sanitized_metadata_genbank.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
 
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
