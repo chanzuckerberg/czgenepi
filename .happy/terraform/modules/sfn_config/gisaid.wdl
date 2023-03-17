@@ -279,7 +279,7 @@ task SaveAlignedData {
     sequences_key="aligned_genbank_dump/${build_id}/aligned_genbank.fasta.xz"
     metadata_key="aligned_genbank_dump/${build_id}/sanitized_metadata_genbank.tsv.xz"
     ${aws} s3 cp aligned.fasta.xz "s3://${aspen_s3_db_bucket}/${sequences_key}"
-    ${aws} s3 cp results/sanitized_metadata_genbank.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
+    ${aws} s3 cp /ncov/results/sanitized_metadata_genbank.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
 
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
