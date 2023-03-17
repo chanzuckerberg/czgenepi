@@ -6,7 +6,7 @@ workflow LoadGISAID {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
-	# TODO we should be able to fetch from S3 but something's not working right
+        # TODO we should be able to fetch from S3 but something's not working right
         # String upstream_ndjson_url = "s3://nextstrain-data/files/ncov/open/genbank.ndjson.zst"
         # String upstream_aligned_url = "s3://nextstrain-data/files/ncov/open/aligned.fasta.xz"
         String upstream_ndjson_url = "https://data.nextstrain.org/files/ncov/open/genbank.ndjson.zst"
@@ -38,7 +38,7 @@ workflow LoadGISAID {
         genepi_config_secret_name = genepi_config_secret_name,
         remote_dev_prefix = remote_dev_prefix,
         transformed_metadata_entity_id = TransformRepoData.entity_id,
-	upstream_aligned_url = upstream_aligned_url,
+        upstream_aligned_url = upstream_aligned_url,
     }
 
     call ImportMetadata {
@@ -232,7 +232,7 @@ task SaveAlignedData {
         String genepi_config_secret_name
         String remote_dev_prefix
         String transformed_metadata_entity_id
-	String upstream_aligned_url
+        String upstream_aligned_url
     }
 
     command <<<
@@ -281,13 +281,17 @@ task SaveAlignedData {
     ${aws} s3 cp aligned.fasta.xz "s3://${aspen_s3_db_bucket}/${sequences_key}"
     ${aws} s3 cp /ncov/results/sanitized_metadata_genbank.tsv.xz "s3://${aspen_s3_db_bucket}/${metadata_key}"
 
+    # Make our metadata easy for the import step to use
+    cp /ncov/results/sanitized_metadata_genbank.tsv.xz metadata.tsv.xz
+    unxz metadata.tsv.xz
+
     # These are set by the Dockerfile and the Happy CLI
     aspen_workflow_rev=$COMMIT_SHA
     aspen_creation_rev=$COMMIT_SHA
 
     end_time=$(date +%s)
 
-    # create the objects
+    # create db objects
     python3 /usr/src/app/aspen/workflows/align_gisaid/save.py                       \
             --aspen-workflow-rev "${aspen_workflow_rev}"                            \
             --aspen-creation-rev "${aspen_creation_rev}"                            \
