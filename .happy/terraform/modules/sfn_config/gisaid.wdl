@@ -307,7 +307,7 @@ task SaveAlignedData {
 
     output {
         Array[File] snakemake_logs = glob("*.snakemake.log")
-        File repo_metadata = "metadata.tsv.xz"
+        File repo_metadata = "metadata.tsv"
         File align_log = "align_genbank.txt"
         String entity_id = read_string("entity_id")
     }
