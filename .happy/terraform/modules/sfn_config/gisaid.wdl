@@ -79,7 +79,6 @@ workflow LoadGISAID {
 
     output {
         Array[File] snakemake_logs = SaveAlignedData.snakemake_logs
-        File align_log = SaveAlignedData.align_log
         String ingest_entity_id = IngestRepoData.entity_id
         String transform_entity_id = TransformRepoData.entity_id
         String align_entity_id = SaveAlignedData.entity_id
@@ -308,7 +307,6 @@ task SaveAlignedData {
     output {
         Array[File] snakemake_logs = glob("*.snakemake.log")
         File repo_metadata = "metadata.tsv"
-        File align_log = "align_genbank.txt"
         String entity_id = read_string("entity_id")
     }
 
