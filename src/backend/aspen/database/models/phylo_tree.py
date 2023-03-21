@@ -20,6 +20,7 @@ from aspen.database.models.pathogens import Pathogen
 from aspen.database.models.sample import Sample
 from aspen.database.models.usergroup import Group
 from aspen.database.models.workflow import Workflow, WorkflowType
+from aspen.database.models.public_repositories import PublicRepository
 
 _PHYLO_TREE_TABLENAME = "phylo_trees"
 
@@ -64,8 +65,12 @@ class PhyloTree(Entity):
 
     pathogen_id = Column(
         Integer, ForeignKey(Pathogen.id), nullable=False
-    )  # TODO: change to nullable=False once we update workflows
+    )
     pathogen: Pathogen = relationship(Pathogen, back_populates="phylo_trees")  # type: ignore
+    contextual_repository_id = Column(
+        Integer, ForeignKey(PublicRepository.id), nullable=False
+    )
+    contextual_repository: PublicRepository = relationship(PublicRepository, back_populates="contextual_trees")  # type: ignore
 
     constituent_samples = relationship(  # type: ignore
         Sample,
