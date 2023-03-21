@@ -33,7 +33,6 @@ import { NotificationComponents } from "src/components/NotificationManager/compo
 import { TreeNameInput } from "src/components/TreeNameInput";
 import { Header } from "../DownloadModal/style";
 import { Acknowledgement } from "./components/Acknowledgement";
-import { AcknowledgementFooter } from "./components/AcknowledgementFooter";
 import { BadOrFailedQCSampleAlert } from "./components/BadQCSampleAlert";
 import { CreateTreeButton } from "./components/CreateTreeButton";
 import { MissingSampleAlert } from "./components/MissingSampleAlert";
@@ -116,19 +115,19 @@ export const CreateNSTreeModal = ({
   For mpox, the depth is set as "division", so locations would only be
   as specific as the division-level.  i.e. California
 
-  We have two different queries because some pathogens (mpox) only create trees 
-  using division data rather than location-level data. Other parts of the app - 
+  We have two different queries because some pathogens (mpox) only create trees
+  using division data rather than location-level data. Other parts of the app -
   notably sample upload - still use the location-level data for mpox.
-  
-  When the app loads, we will fetch location-level data using the query key 
+
+  When the app loads, we will fetch location-level data using the query key
   USE_LOCATIONS_INFO_QUERY_KEY.  When the pathogen uses division-level
   locations for trees, we have a second fetch with a new query key,
   USE_PATHOGEN_DEPTH_LOCATIONS_INFO_QUERY_KEY.
-  
+
   Choosing the query key based on the pathogen ensures that pathogens
   that use all of the locations for their trees, i.e. SC2, don't have to re-fetch
-  everything when opening the NS Tree Modal. 
-  Setting this inside of useNamedPathogetDepthLocations does not properly update 
+  everything when opening the NS Tree Modal.
+  Setting this inside of useNamedPathogetDepthLocations does not properly update
   the query key when switching between pathogens, which is why it is here.
   */
 
@@ -498,7 +497,6 @@ export const CreateNSTreeModal = ({
           <CreateTreeInfo>
             Creating a new tree can take up to 12 hours.
           </CreateTreeInfo>
-          <AcknowledgementFooter />
         </StyledFooter>
       </StyledDialog>
     </>

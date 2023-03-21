@@ -33,6 +33,10 @@ const pathogenTrafficFlagConfig: PathogenTrafficFlagConfig = {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
     [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.OFF,
   },
+  [PATHOGEN_FEATURE_FLAGS.show_gisaid_ingestion_banner]: {
+    [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
+    [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.OFF,
+  },
   [PATHOGEN_FEATURE_FLAGS.usher_linkout]: {
     [Pathogen.COVID]: SPLIT_SIMPLE_FLAG.ON,
     [Pathogen.MONKEY_POX]: SPLIT_SIMPLE_FLAG.ON,
