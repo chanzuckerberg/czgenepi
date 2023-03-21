@@ -119,7 +119,7 @@ task IngestRepoData {
     # fetch the genbank dataset and transform it.
     # ${aws} s3 cp "~{upstream_ndjson_url}" genbank.ndjson.zst
     # ${aws} s3 cp genbank.ndjson.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
-    wget -nv -O genbank.ndjson.zst "~{upstream_ndjson_url}"
+    wget -nv --continue --tries=2 -O genbank.ndjson.zst "~{upstream_ndjson_url}"
     ${aws} s3 cp genbank.ndjson.zst "s3://${aspen_s3_db_bucket}/${sequences_key}"
 
     end_time=$(date +%s)
@@ -263,8 +263,7 @@ task SaveAlignedData {
 
     # fetch the upstream repo dataset
     ${aws} s3 cp --no-progress "s3://${processed_genbank_s3_bucket}/${transformed_metadata_s3_key}" /ncov/data/metadata.tsv.xz
-    # ${aws} s3 cp --no-progress "~{upstream_aligned_url}" aligned.fasta.xz
-    wget -nv -O aligned.fasta.xz "~{upstream_aligned_url}"
+    wget --continue --tries=2 -nv -O aligned.fasta.xz "~{upstream_aligned_url}"
 
     # Transform gisaid metadata only! Don't re-run alignment!
     unxz -k /ncov/data/metadata.tsv.xz
