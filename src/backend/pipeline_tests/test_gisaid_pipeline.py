@@ -13,10 +13,11 @@ from aspen.database.models import (
 
 
 def test_public_repo_db_objects_were_created(session):
+    strain_name = "SARS-CoV-2/human/USA/TX-DSHS-9180/2021"
     sample = (
         session.execute(
             sa.select(PublicRepositoryMetadata)
-            .where(PublicRepositoryMetadata.strain == "Wuhan/TEST_SAMPLE/2019")
+            .where(PublicRepositoryMetadata.strain == strain_name)
             .join(Pathogen)
             .join(PublicRepository)
             .where(PublicRepository.name == "GISAID")
@@ -25,13 +26,13 @@ def test_public_repo_db_objects_were_created(session):
         .scalars()
         .one()
     )
-    assert sample.strain == "Wuhan/TEST_SAMPLE/2019"
-    assert sample.lineage == "B"
-    assert sample.region == "Asia"
-    assert sample.country == "China"
-    assert sample.division == "Hubei"
-    assert sample.location == "Test Location"
-    assert sample.isl == "TEST_EPI_ISL_123"
+    assert sample.strain == "SARS-CoV-2/human/USA/TX-DSHS-9180/2021"
+    assert sample.lineage == "AY.14"
+    assert sample.region == "North America"
+    assert sample.country == "USA"
+    assert sample.division == "Texas"
+    assert sample.location is None
+    assert sample.isl == "OK358761.1"
 
 
 def test_new_workflow_artifacts_exist(session):
