@@ -60,7 +60,7 @@ def test_locations_import(session):
             .where(Location.region == "North America")  # type: ignore
             .where(Location.country == "USA")  # type: ignore
             .where(Location.division == "Texas")  # type: ignore
-            .where(Location.location == None)  # type: ignore
+            .where(Location.location == None)  # noqa: E711
             .limit(1)  # type: ignore
         )
         .scalars()
