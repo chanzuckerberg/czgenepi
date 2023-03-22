@@ -164,6 +164,7 @@ async def kick_off_phylo_run(
         name=phylo_run_request.name,
         gisaid_ids=list(gisaid_ids),
         tree_type=TreeType(phylo_run_request.tree_type),
+        contextual_repository=public_repository,
         user=user,
         outputs=[],  # Make our response schema happy.
     )
@@ -188,6 +189,7 @@ async def get_serializable_runs(
         joinedload(PhyloRun.outputs.of_type(PhyloTree)),  # type: ignore
         joinedload(PhyloRun.user),  # For Pydantic serialization
         joinedload(PhyloRun.group),  # For Pydantic serialization
+        joinedload(PhyloRun.contextual_repository),  # For Pydantic serialization
     )
     query = query.filter(PhyloRun.pathogen == pathogen)  # noqa: E711
     if run_id:

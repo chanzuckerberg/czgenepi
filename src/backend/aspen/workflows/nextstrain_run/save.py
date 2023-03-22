@@ -113,6 +113,7 @@ def cli(
             "tree_type": phylo_run.tree_type,
             "pathogen": phylo_run.pathogen,
             "resolved_template_args": resolved_template_args,
+            "contextual_repository": phylo_run.contextual_repository,
         }
         try:
             # Overwrite our existing tree output

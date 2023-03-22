@@ -17,10 +17,10 @@ from aspen.database.models.base import base
 from aspen.database.models.entity import Entity, EntityType
 from aspen.database.models.enum import Enum
 from aspen.database.models.pathogens import Pathogen
+from aspen.database.models.public_repositories import PublicRepository
 from aspen.database.models.sample import Sample
 from aspen.database.models.usergroup import Group
 from aspen.database.models.workflow import Workflow, WorkflowType
-from aspen.database.models.public_repositories import PublicRepository
 
 _PHYLO_TREE_TABLENAME = "phylo_trees"
 
@@ -63,9 +63,7 @@ class PhyloTree(Entity):
     s3_key = Column(String, nullable=False)
     name = Column(String, nullable=True)
 
-    pathogen_id = Column(
-        Integer, ForeignKey(Pathogen.id), nullable=False
-    )
+    pathogen_id = Column(Integer, ForeignKey(Pathogen.id), nullable=False)
     pathogen: Pathogen = relationship(Pathogen, back_populates="phylo_trees")  # type: ignore
     contextual_repository_id = Column(
         Integer, ForeignKey(PublicRepository.id), nullable=False
@@ -113,6 +111,10 @@ class PhyloRun(Workflow):
         Integer, ForeignKey(Pathogen.id), nullable=False
     )  # TODO: change to nullable=False once we update workflows
     pathogen: Pathogen = relationship(Pathogen, back_populates="phylo_runs")  # type: ignore
+    contextual_repository_id = Column(
+        Integer, ForeignKey(PublicRepository.id), nullable=False
+    )
+    contextual_repository: PublicRepository = relationship(PublicRepository, back_populates="contextual_phyloruns")  # type: ignore
 
     template_file_path = Column(String, nullable=True)
     """[Tony Tung, Spring2021] This is the path, relative to aspen root, for
