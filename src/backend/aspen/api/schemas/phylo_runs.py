@@ -112,7 +112,7 @@ class PhyloRunResponse(BaseResponse):
     template_file_path: Optional[StrictStr]
     tree_type: Optional[str]
     pathogen: Optional[PathogenResponse]
-    contextual_repository: str = Field(alias='contextual_data_source')
+    contextual_repository: str = Field(alias="contextual_data_source")
     user: Optional[UserResponse]
 
     # This lets us remap phlo_run.outputs to phylo_run.phylo_tree using the validator above
