@@ -3,7 +3,6 @@ import { CommonThemeProps, getColors, getSpaces } from "czifui";
 import { SmallerThanBreakpoint } from "src/common/styles/mixins/global";
 
 export const CZBiohubLogo = styled.a`
-  max-width: 120px;
   padding-left: 20px;
 `;
 
