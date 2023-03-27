@@ -4,7 +4,13 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.database.models import Group, PhyloTree, Sample, WorkflowStatusType, PublicRepository
+from aspen.database.models import (
+    Group,
+    PhyloTree,
+    PublicRepository,
+    Sample,
+    WorkflowStatusType,
+)
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
@@ -68,7 +74,9 @@ async def test_delete_phylo_run_matrix(
     tree1: PhyloTree = make_tree(
         repository, group, [sample], "tree1", status=WorkflowStatusType.COMPLETED
     )
-    tree2: PhyloTree = make_tree(repository, group, [], "tree2", status=WorkflowStatusType.STARTED)
+    tree2: PhyloTree = make_tree(
+        repository, group, [], "tree2", status=WorkflowStatusType.STARTED
+    )
     async_session.add_all([tree1, tree2, user2])
 
     await async_session.commit()
