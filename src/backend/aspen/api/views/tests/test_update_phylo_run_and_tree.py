@@ -35,7 +35,9 @@ async def make_shared_test_data(
     user = await userrole_factory(async_session, group, system_admin=system_admin)
 
     pathogen = random_pathogen_factory()
-    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+    _, default_repo_config = setup_gisaid_and_genbank_repo_configs(
+        async_session, pathogen
+    )
     samples = [
         sample_factory(
             group,
@@ -48,7 +50,11 @@ async def make_shared_test_data(
         for i in range(1, 3)
     ]
 
-    phylo_run = phylorun_factory(group, pathogen=pathogen)
+    phylo_run = phylorun_factory(
+        group,
+        contextual_repository=default_repo_config.public_repository,
+        pathogen=pathogen,
+    )
     phylo_tree = None
     if not no_trees:
         phylo_tree = phylotree_factory(phylo_run, samples)

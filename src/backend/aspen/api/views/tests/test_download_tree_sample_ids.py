@@ -115,6 +115,7 @@ async def create_phylotree_with_inputs(
         inputs=input_entities,
         gisaid_ids=db_gisaid_samples,
         pathogen=pathogen,
+        contextual_repository=pathogen_repo_config.public_repository
     )
     phylo_tree = phylotree_factory(
         phylo_run,
@@ -140,7 +141,7 @@ async def create_phylotree(
         "North America", "USA", "California", "Santa Barbara County"
     )
     pathogen = random_pathogen_factory()
-    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+    _, default_repo_config = setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
 
     sample = sample_factory(
         owner_group,
@@ -158,7 +159,7 @@ async def create_phylotree(
         run_inputs = [upg]
 
     phylo_tree = phylotree_factory(
-        phylorun_factory(owner_group, pathogen=pathogen, inputs=run_inputs),
+        phylorun_factory(owner_group, pathogen=pathogen, inputs=run_inputs, contextual_repository=default_repo_config.public_repository),
         samples,
     )
     upload_s3_file(mock_s3_resource, phylo_tree, samples)
