@@ -1,9 +1,11 @@
 name: Scheduled Deploy
 
 on:
-  schedule:
-    # Weekly Tuesday & Thursdays @ 16:00 UTC (8am PST [winter] / 9am PDT [summer])
-     - cron: '0 16 * * 2'
+  # Vince, Mar 31 2023: Since updates are less frequent at the moment, turning
+  # off scheduled deploys for now in favor of manual Prod pushes only.
+  # schedule:
+  #   # Weekly Tuesday & Thursdays @ 16:00 UTC (8am PST [winter] / 9am PDT [summer])
+  #    - cron: '0 16 * * 2,4'
   workflow_dispatch:
     inputs:
       image_tag:
