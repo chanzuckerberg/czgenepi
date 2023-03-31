@@ -198,7 +198,9 @@ class Sample(idbase, DictMixin):  # type: ignore
     # need to include those to maintain expected usage. "delete-orphan" is less
     # common, but handles cases when child is removed from a parent collection.
     aligned_pathogen_genome = relationship(  # type: ignore
-        "AlignedPathogenGenome", back_populates="sample", cascade="delete, delete-orphan, merge, save-update"
+        "AlignedPathogenGenome",
+        back_populates="sample",
+        cascade="delete, delete-orphan, merge, save-update",
     )
     lineages = relationship("SampleLineage", back_populates="sample")  # type: ignore
     aligned_peptides = relationship("AlignedPeptides", back_populates="sample")  # type: ignore
