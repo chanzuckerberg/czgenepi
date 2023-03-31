@@ -11,6 +11,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from aspen.api.authn import get_auth_user
 from aspen.api.authz import AuthZSession, get_authz_session, require_group_privilege
 from aspen.api.deps import (
+    get_contextual_repository,
     get_db,
     get_pathogen,
     get_pathogen_repo_config,
@@ -63,6 +64,7 @@ async def kick_off_phylo_run(
     group: Group = Depends(require_group_privilege("create_phylorun")),
     pathogen: Pathogen = Depends(get_pathogen),
     public_repository: PublicRepository = Depends(get_public_repository),
+    contextual_repository: PublicRepository = Depends(get_contextual_repository),
     pathogen_repo_config: PathogenRepoConfig = Depends(get_pathogen_repo_config),
 ) -> PhyloRunResponse:
 
@@ -164,6 +166,7 @@ async def kick_off_phylo_run(
         name=phylo_run_request.name,
         gisaid_ids=list(gisaid_ids),
         tree_type=TreeType(phylo_run_request.tree_type),
+        contextual_repository=contextual_repository,
         user=user,
         outputs=[],  # Make our response schema happy.
     )
@@ -188,6 +191,7 @@ async def get_serializable_runs(
         joinedload(PhyloRun.outputs.of_type(PhyloTree)),  # type: ignore
         joinedload(PhyloRun.user),  # For Pydantic serialization
         joinedload(PhyloRun.group),  # For Pydantic serialization
+        joinedload(PhyloRun.contextual_repository),  # For Pydantic serialization
     )
     query = query.filter(PhyloRun.pathogen == pathogen)  # noqa: E711
     if run_id:

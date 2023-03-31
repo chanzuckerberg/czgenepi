@@ -112,6 +112,7 @@ def create_test_data(
         template_args=template_args,
         workflow_status=WorkflowStatusType.STARTED,
         pathogen=pathogen,
+        contextual_repository=repository,
     )
     session.add(phylo_run)
     session.commit()
