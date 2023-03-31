@@ -121,13 +121,10 @@ class AlignedPathogenGenome(PathogenGenome):
     )
 
     sample_id = Column(Integer, ForeignKey(Sample.id), unique=True, nullable=False)
-    # The default value of cascade is "save-update, merge", so if we want to enable "delete", we
-    # need to include the other options as well to maintain backwards compatibility.
     sample = relationship(  # type: ignore
         Sample,
         back_populates="aligned_pathogen_genome",
         uselist=False,
-        cascade="delete, merge, save-update",
     )
     aligned_date = Column(DateTime, nullable=False, server_default=func.now())
     reference_name = Column(String, nullable=False)

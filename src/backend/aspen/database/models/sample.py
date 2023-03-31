@@ -180,22 +180,30 @@ class Sample(idbase, DictMixin):  # type: ignore
     accessions = relationship(
         Accession,
         backref=backref("sample", uselist=False),
-        cascade="all, delete",
+        cascade="delete, delete-orphan, merge, save-update",
         uselist=True,
     )  # type: ignore
 
+    # Relationship is implicitly created  by use of legacy `backref` param
+    # in the UploadedPathogenGenome relationship pointing to Sample.
+    # This is here just to make type hinting nicer.
     uploaded_pathogen_genome: Optional[UploadedPathogenGenome]
+    # NOTE (Vince) -- Some relationships need explicit cascade rules to support
+    # delete operations. Those using an explicit `cascade` pass deletes on to
+    # children, while those that have no `cascade` param "orphan" the child
+    # instead: child row stays, but its foreign key value gets set to NULL.
+    # Unclear if that's always best for these relationships, but it's how we
+    # set it up. As of Mar 2023, seems best to just leave it be.
+    # Default for cascade is "save-update, merge", so to enable "delete", we
+    # need to include those to maintain expected usage. "delete-orphan" is less
+    # common, but handles cases when child is removed from a parent collection.
     aligned_pathogen_genome = relationship(  # type: ignore
-        "AlignedPathogenGenome", back_populates="sample"
+        "AlignedPathogenGenome", back_populates="sample", cascade="delete, delete-orphan, merge, save-update"
     )
     lineages = relationship("SampleLineage", back_populates="sample")  # type: ignore
     aligned_peptides = relationship("AlignedPeptides", back_populates="sample")  # type: ignore
-
-    # NOTE - it's unclear why we need explicit cascade rules on some of these
-    # relationships and not others, but these are necessary to support simple
-    # deletions.
-    mutations = relationship("SampleMutation", back_populates="sample", cascade="all, delete")  # type: ignore
-    qc_metrics = relationship("SampleQCMetric", back_populates="sample", cascade="all, delete")  # type: ignore
+    mutations = relationship("SampleMutation", back_populates="sample", cascade="delete, delete-orphan, merge, save-update")  # type: ignore
+    qc_metrics = relationship("SampleQCMetric", back_populates="sample", cascade="delete, delete-orphan, merge, save-update")  # type: ignore
 
     def generate_public_identifier(self, prefix, already_exists=False):
         # If we don't have an explicit public identifier, generate one from
