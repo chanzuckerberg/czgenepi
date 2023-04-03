@@ -10,6 +10,7 @@ from aspen.database.models import (
     Pathogen,
     PhyloRun,
     PhyloTree,
+    PublicRepository,
     Sample,
     UploadedPathogenGenome,
     User,
@@ -57,12 +58,18 @@ def make_uploaded_pathogen_genomes(
 
 
 def make_trees(
-    group: Group, pathogen: Pathogen, samples: Collection[Sample], n_trees: int
+    group: Group,
+    pathogen: Pathogen,
+    contextual_repo: PublicRepository,
+    samples: Collection[Sample],
+    n_trees: int,
 ) -> Sequence[PhyloTree]:
     # make up to n trees, each with a random sample of uploaded pathogen genomes.
     return [
         phylotree_factory(
-            phylorun_factory(group, pathogen=pathogen),
+            phylorun_factory(
+                group, pathogen=pathogen, contextual_repository=contextual_repo
+            ),
             random.sample(samples, k=random.randint(0, len(samples))),  # type: ignore
             key=f"key_{ix}",
         )  # type: ignore
@@ -70,7 +77,9 @@ def make_trees(
     ]
 
 
-def make_runs_with_no_trees(group: Group, pathogen: Pathogen) -> Collection[PhyloRun]:
+def make_runs_with_no_trees(
+    group: Group, pathogen: Pathogen, contextual_repo: PublicRepository
+) -> Collection[PhyloRun]:
     # Make an in-progress run and a failed run.
     other_statuses = [WorkflowStatusType.STARTED, WorkflowStatusType.FAILED]
     template_args = {
@@ -83,6 +92,7 @@ def make_runs_with_no_trees(group: Group, pathogen: Pathogen) -> Collection[Phyl
             workflow_status=status,
             template_args=template_args,
             pathogen=pathogen,
+            contextual_repository=contextual_repo,
         )
         for status in other_statuses
     ]
@@ -103,7 +113,7 @@ def make_all_test_data(
     Collection[PhyloRun],
 ]:
     pathogen: Pathogen = random_pathogen_factory()
-    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+    _, repo_config = setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
 
     samples: Collection[Sample] = make_sample_data(
         group, user, location, n_samples, pathogen
@@ -112,8 +122,12 @@ def make_all_test_data(
         UploadedPathogenGenome
     ] = make_uploaded_pathogen_genomes(samples)
 
-    trees: Sequence[PhyloTree] = make_trees(group, pathogen, samples, n_trees)
-    treeless_runs: Collection[PhyloRun] = make_runs_with_no_trees(group, pathogen)
+    trees: Sequence[PhyloTree] = make_trees(
+        group, pathogen, repo_config.public_repository, samples, n_trees
+    )
+    treeless_runs: Collection[PhyloRun] = make_runs_with_no_trees(
+        group, pathogen, repo_config.public_repository
+    )
     async_session.add(pathogen)
     return pathogen, samples, uploaded_pathogen_genomes, trees, treeless_runs
 

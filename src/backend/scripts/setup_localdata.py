@@ -334,7 +334,9 @@ def create_sample(session, group, pathogen, uploaded_by_user, location, suffix):
     return sample
 
 
-def create_run(session, group, pathogen, user, tree_type, status, name=None):
+def create_run(
+    session, group, pathogen, repository, user, tree_type, status, name=None
+):
     run = (
         session.query(PhyloRun)
         .filter(PhyloRun.tree_type == tree_type)
@@ -342,6 +344,7 @@ def create_run(session, group, pathogen, user, tree_type, status, name=None):
         .filter(PhyloRun.group == group)
         .filter(PhyloRun.workflow_status == status)
         .filter(PhyloRun.pathogen == pathogen)
+        .filter(PhyloRun.contextual_repository == repository)
         .order_by(PhyloRun.id)
         .first()
     )
@@ -364,6 +367,7 @@ def create_run(session, group, pathogen, user, tree_type, status, name=None):
         group=group,
         pathogen=pathogen,
         tree_type=tree_type,
+        contextual_repository=repository,
         user=user,
     )
     workflow.inputs = [aligned_dump]
@@ -389,6 +393,7 @@ def create_tree(session, phylo_run):
         name=phylo_run.name,
         tree_type=phylo_run.tree_type,
         pathogen=phylo_run.pathogen,
+        contextual_repository=phylo_run.contextual_repository,
     )
     # update the run object with the metadata about the run.
     phylo_run.end_datetime = datetime.now()
@@ -403,7 +408,7 @@ def create_tree(session, phylo_run):
     return phylo_tree
 
 
-def create_test_trees(session, group, pathogen, user):
+def create_test_trees(session, group, pathogen, repository, user):
     tree_types = ["OVERVIEW", "NON_CONTEXTUALIZED", "TARGETED"]
     incomplete_statuses = [WorkflowStatusType.STARTED, WorkflowStatusType.FAILED]
     # Create 3 in-progress workflows
@@ -415,7 +420,9 @@ def create_test_trees(session, group, pathogen, user):
             if typename == "TARGETED":
                 name = f"{group.name} {status.value.title()} {typename.title()} {pathogen.slug} Run"
                 run_user = user
-            create_run(session, group, pathogen, run_user, tree_type, status, name)
+            create_run(
+                session, group, pathogen, repository, run_user, tree_type, status, name
+            )
     # Create 3 workflows with successful trees
     for typename in tree_types:
         status = WorkflowStatusType.COMPLETED
@@ -425,7 +432,9 @@ def create_test_trees(session, group, pathogen, user):
         if typename == "TARGETED":
             name = f"{group.name} {status.value.title()} {typename.title()} {pathogen.slug} Run"
             run_user = user
-        run = create_run(session, group, pathogen, run_user, tree_type, status, name)
+        run = create_run(
+            session, group, pathogen, repository, run_user, tree_type, status, name
+        )
         create_tree(session, run)
 
 
@@ -572,7 +581,7 @@ def create_test_data(engine):
     user = create_test_user(session, "user1@czgenepi.org", group, "User1", "Test User")
     for pathogen in pathogens:
         create_samples(session, group, pathogen, user, location, 15)
-        create_test_trees(session, group, pathogen, user)
+        create_test_trees(session, group, pathogen, repositories[0], user)
 
     # Create db rows for another group
     location2 = create_location(session, "Africa", "Mali", "Timbuktu", None)
@@ -584,7 +593,7 @@ def create_test_data(engine):
     )
     for pathogen in pathogens:
         create_samples(session, group2, pathogen, user2, location2, 15)
-        create_test_trees(session, group2, pathogen, user2)
+        create_test_trees(session, group2, pathogen, repositories[0], user2)
 
     upload_tree_files(session)
 

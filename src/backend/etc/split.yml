@@ -49,6 +49,9 @@
 - PATHOGEN_public_repository:
     # default value
     treatment: "GenBank"
+- PATHOGEN_contextual_repository:
+    # default value
+    treatment: "GenBank"
 - PATHOGEN_usher_linkout:
     treatment: "on"
     keys: "SC2"

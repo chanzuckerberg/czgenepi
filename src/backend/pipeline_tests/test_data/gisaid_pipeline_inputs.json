@@ -1,6 +1,7 @@
 {
 "docker_image_id": "${DOCKER_REPO}genepi-gisaid:latest",
-"gisaid_ndjson_url": "https://github.com/chanzuckerberg/czge-test-data/raw/main/public_repo_data/gisaid_test_data.fasta.bz2",
 "aws_region": "us-west-2",
-"genepi_config_secret_name": "genepi-config"
+"genepi_config_secret_name": "genepi-config",
+"upstream_ndjson_url": "https://github.com/chanzuckerberg/czge-test-data/raw/main/public_repo_data/genbank.ndjson.zst",
+"upstream_aligned_url": "https://github.com/chanzuckerberg/czge-test-data/raw/main/public_repo_data/metadata.tsv.xz"
 }

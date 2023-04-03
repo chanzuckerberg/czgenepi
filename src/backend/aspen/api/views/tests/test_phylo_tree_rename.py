@@ -61,7 +61,9 @@ async def test_phylo_tree_rename(
     wrong_can_see_group = group_factory("wrong_can_see")
     no_can_see_group = group_factory("no_can_see")
     pathogen = random_pathogen_factory()
-    setup_gisaid_and_genbank_repo_configs(async_session, pathogen)
+    _, default_repo_config = setup_gisaid_and_genbank_repo_configs(
+        async_session, pathogen
+    )
     pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
         pathogen, "GISAID", async_session
     )
@@ -130,7 +132,11 @@ async def test_phylo_tree_rename(
     ]
 
     phylo_tree = phylotree_factory(
-        phylorun_factory(viewer_group, pathogen=pathogen),
+        phylorun_factory(
+            viewer_group,
+            pathogen=pathogen,
+            contextual_repository=default_repo_config.public_repository,
+        ),
         local_samples + can_see_samples + wrong_can_see_samples + no_can_see_samples,
     )
 

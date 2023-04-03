@@ -25,3 +25,5 @@ class PublicRepository(idbase):  # type: ignore
     repository_download_workflows = relationship("RepositoryDownloadWorkflow", back_populates="public_repository", uselist=True)  # type: ignore
     repository_alignment_workflows = relationship("RepositoryAlignmentWorkflow", back_populates="public_repository", uselist=True)  # type: ignore
     public_repository_metadata = relationship("PublicRepositoryMetadata", back_populates="public_repository", uselist=True)  # type: ignore
+    contextual_trees = relationship("PhyloTree", back_populates="contextual_repository", uselist=True)  # type: ignore
+    contextual_phyloruns = relationship("PhyloRun", back_populates="contextual_repository", uselist=True)  # type: ignore

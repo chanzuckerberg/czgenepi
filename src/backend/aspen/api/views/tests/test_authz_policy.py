@@ -13,6 +13,7 @@ from aspen.database.models.base import idbase
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import pathogen_factory
 from aspen.test_infra.models.phylo_tree import phylorun_factory, phylotree_factory
+from aspen.test_infra.models.repository import random_repo_factory
 from aspen.test_infra.models.sample import sample_factory
 from aspen.test_infra.models.usergroup import (
     group_factory,
@@ -100,6 +101,7 @@ async def appdata(
     objects_to_commit = []
     trees: List[PhyloTree] = []
     pathogen = pathogen_factory()
+    repo = random_repo_factory()
     for i in range(len(groups)):
         group = groups[i]
         user = users[i]
@@ -118,7 +120,9 @@ async def appdata(
                 private_identifier=f"private_identifier_{group.name}_{i}",
                 public_identifier=f"public_identifier_{group.name}_{i}",
             )
-            phylo_run = phylorun_factory(group, pathogen=pathogen)
+            phylo_run = phylorun_factory(
+                group, pathogen=pathogen, contextual_repository=repo
+            )
             tree = phylotree_factory(phylo_run, [sample])
 
             group.test_samples.append(sample)
@@ -275,7 +279,7 @@ async def test_phylotrees_read(
     azs: List[AuthZSession],
 ):
     results = [
-        groups[0].test_runs,
+        groups[0].test_trees,
         groups[1].test_trees + groups[2].test_trees + groups[3].test_trees,
         groups[2].test_trees + groups[3].test_trees,
         groups[3].test_trees + groups[2].test_trees,

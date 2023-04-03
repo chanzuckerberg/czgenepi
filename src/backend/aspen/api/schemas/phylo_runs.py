@@ -62,6 +62,12 @@ class PhyloRunResponse(BaseResponse):
 
     # Return the first phylo tree output. We only expect one, and for this to
     # work right, this *depends on our query filtering out other output types!*
+    @validator("contextual_repository", pre=True)
+    def resolve_contextual_repository(cls, v):
+        return v.name
+
+    # Return the first phylo tree output. We only expect one, and for this to
+    # work right, this *depends on our query filtering out other output types!*
     @validator("outputs", pre=True)
     def resolve_tree(cls, v):
         for output in v:
@@ -106,6 +112,7 @@ class PhyloRunResponse(BaseResponse):
     template_file_path: Optional[StrictStr]
     tree_type: Optional[str]
     pathogen: Optional[PathogenResponse]
+    contextual_repository: str = Field(alias="contextual_data_source")
     user: Optional[UserResponse]
 
     # This lets us remap phlo_run.outputs to phylo_run.phylo_tree using the validator above

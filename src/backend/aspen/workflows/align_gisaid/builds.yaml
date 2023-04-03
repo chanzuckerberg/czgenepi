@@ -1,5 +1,5 @@
 inputs:
-  - name: "gisaid"
+  - name: "genbank"
     metadata: "data/metadata.tsv"
     sequences: "data/sequences.fasta"
 
