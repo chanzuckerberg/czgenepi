@@ -81,7 +81,7 @@ def test_mean_data(mocker, session, split_client, postgres_database):
 
     input_metadata = [
         # Region level
-        ["Asia", "Bangladesh", None, None],
+        ["Asia", None, None, None],
         # Country level
         ["Asia", "Bangladesh", "", None],
         ["Asia", "Bangladesh", "", ""],
