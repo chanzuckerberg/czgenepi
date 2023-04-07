@@ -5,7 +5,6 @@
 
 import click
 import sqlalchemy as sa
-from sqlalchemy import exists
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import and_
