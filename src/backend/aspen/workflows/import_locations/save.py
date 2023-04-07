@@ -30,6 +30,13 @@ def get_metadata_query(pathogen_slug, division=True, location=True):
         (PublicRepositoryMetadata.country != ""),
     ]
     location_alias = aliased(Location)
+    # Since postgresql treats all null values as not-comparable, we can't use our
+    # unique index to ensure that we don't wind up with duplicate rows in the
+    # locations database. We're working around that by *checking to see* if we
+    # already have a matching row before selecting data for insert. This is a
+    # step in the right direction, but it is not safe for concurrent inserts!
+    # The better solution is to upgrade to psql15 and use their new null-friendly indexes:
+    # https://pganalyze.com/blog/5mins-postgres-unique-constraint-null-parallel-distinct
     not_exists_clauses = [
         (PublicRepositoryMetadata.region == location_alias.region),
         (PublicRepositoryMetadata.country == location_alias.country),

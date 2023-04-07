@@ -90,7 +90,7 @@ def test_mean_data(mocker, session, split_client, postgres_database):
         ["Asia", "Bangladesh", None, None],
         # Country level
         ["Asia", "Bangladesh", "", None],
-        ["Asia", "Bangladesh", "", None],
+        ["Asia", "Bangladesh", "", ""],
         ["Asia", "Bangladesh", None, None],
         # Division level
         ["Asia", "Japan", "Hokkaido", None],
