@@ -3,7 +3,7 @@ import { selectCurrentPathogen } from "src/common/redux/selectors";
 import { B } from "src/common/styles/basicStyle";
 import { SplitPathogenWrapper } from "src/components/Split/SplitPathogenWrapper";
 import { PATHOGEN_FEATURE_FLAGS } from "src/components/Split/types";
-import { StyledBanner } from "./style";
+import { StyledBanner, StyledNewTabLink } from "./style";
 
 // Note: this was previously for privacy policy announcements
 // It was pretty convenient to reuse - maybe we want to keep
@@ -22,10 +22,16 @@ export const Announcements = (): JSX.Element => {
       >
         <StyledBanner sdsType="primary">
           <B>
-            As of 2/26/23, we have been experiencing difficulty fetching fresh
-            contextual data from GISAID for SARS-CoV-2 trees. We&apos;re working
-            on a solution and will update you when we have more information
+            As of 4/11/23, we have switched from using GISAID for phylo tree
+            focal and contextual samples to using GenBank.&nbsp;
           </B>
+          <StyledNewTabLink
+            href={
+              "https://help.czgenepi.org/hc/en-us/articles/14696829683860-GISAID-to-GenBank-Transition"
+            }
+          >
+            Learn more
+          </StyledNewTabLink>
         </StyledBanner>
       </SplitPathogenWrapper>
     </>
