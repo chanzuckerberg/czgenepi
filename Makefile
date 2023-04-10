@@ -81,7 +81,7 @@ oauth/pkcs12/certificate.pfx:
 	# If the OIDC server is already running, restart it to use the new certs
 	if [ -n "$$(docker ps -q -f name=oidc)" ]; then \
 		echo "Restarting OIDC server"; \
-		$(docker_compose) restart oidc; \
+		$(docker_compose) --profile $(LOCALDEV_PROFILE)  restart oidc; \
 	fi
 
 .env.ecr:
@@ -121,7 +121,7 @@ local-init: oauth/pkcs12/certificate.pfx .env.ecr local-ecr-login local-hostconf
 	# Hack - CI keeps recreating localstack for some reason :'(
 	$(docker_compose) --profile $(LOCALDEV_PROFILE) up -d
 	./scripts/setup_dev_data.sh
-	$(docker_compose) restart backend
+	$(docker_compose) --profile $(LOCALDEV_PROFILE) restart backend
 	$(docker_compose) exec -T backend alembic upgrade head
 	$(docker_compose) exec -T backend python scripts/setup_localdata.py
 	$(docker_compose) exec -e ASPEN_S3_DB_BUCKET=genepi-db-data -w /usr/src/app/aspen/workflows/import_pango_lineages -T backend ./entrypoint.sh

@@ -64,6 +64,12 @@ def get_fields_to_import(public_repository_name: str) -> Dict[str, str]:
     return repository_to_fields_to_import[public_repository_name]
 
 
+def format_values(value: str) -> Optional[str]:
+    if new_value := value.strip():
+        return new_value
+    return None
+
+
 def write_table(metadata_fh, pathogen_slug: str, public_repository_name: str):
     data = csv.DictReader(metadata_fh, delimiter="\t")
 
@@ -88,7 +94,7 @@ def write_table(metadata_fh, pathogen_slug: str, public_repository_name: str):
             metadata_fields: Dict[
                 str, Union[Optional[str], Optional[int], Optional[datetime.datetime]]
             ] = {
-                table_field: row[file_field]
+                table_field: format_values(row[file_field])
                 for file_field, table_field in fields_to_import.items()
             }
             if num_rows % 20000 == 0:
