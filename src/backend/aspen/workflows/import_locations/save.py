@@ -6,6 +6,7 @@
 import click
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import and_
 
 from aspen.config.config import Config
@@ -18,111 +19,98 @@ from aspen.database.connection import (
 from aspen.database.models import Location, Pathogen, PublicRepositoryMetadata
 
 
+def get_metadata_query(pathogen_slug, division=True, location=True):
+    fields = [PublicRepositoryMetadata.region, PublicRepositoryMetadata.country]
+    where_clauses = [
+        (Pathogen.slug == pathogen_slug),
+        (PublicRepositoryMetadata.region != None),
+        (PublicRepositoryMetadata.region != ""),
+        (PublicRepositoryMetadata.country != None),
+        (PublicRepositoryMetadata.country != ""),
+    ]
+    location_alias = aliased(Location)
+    # Since postgresql treats all null values as not-comparable, we can't use our
+    # unique index to ensure that we don't wind up with duplicate rows in the
+    # locations database. We're working around that by *checking to see* if we
+    # already have a matching row before selecting data for insert. This is a
+    # step in the right direction, but it is not safe for concurrent inserts!
+    # The better solution is to upgrade to psql15 and use their new null-friendly indexes:
+    # https://pganalyze.com/blog/5mins-postgres-unique-constraint-null-parallel-distinct
+    not_exists_clauses = [
+        (PublicRepositoryMetadata.region == location_alias.region),
+        (PublicRepositoryMetadata.country == location_alias.country),
+    ]
+    if division:
+        fields.append(PublicRepositoryMetadata.division)
+        not_exists_clauses.append(
+            PublicRepositoryMetadata.division == location_alias.division
+        )
+        where_clauses.extend(
+            [
+                (PublicRepositoryMetadata.division != ""),
+                (PublicRepositoryMetadata.division != None),
+            ]
+        )
+    else:
+        not_exists_clauses.append(location_alias.division == None)
+        fields.append(None)
+    if location:
+        fields.append(PublicRepositoryMetadata.location)
+        not_exists_clauses.append(
+            PublicRepositoryMetadata.division == location_alias.division
+        )
+        where_clauses.extend(
+            [
+                (PublicRepositoryMetadata.location != ""),
+                (PublicRepositoryMetadata.location != None),
+            ]
+        )
+    else:
+        not_exists_clauses.append(location_alias.location == None)
+        fields.append(None)
+
+    exists_query = (
+        sa.select(location_alias.id).where(and_(*not_exists_clauses)).exists()
+    )
+    metadata_locations_select = (
+        sa.select(*fields)
+        .join(Pathogen)
+        .filter(~exists_query)
+        .where(and_(*where_clauses))
+        .distinct()
+    )
+    return metadata_locations_select
+
+
+def run_insert_select(session, select_query):
+    metadata_locations_insert = (
+        postgresql.insert(Location.__table__)
+        .from_select(["region", "country", "division", "location"], select_query)
+        .on_conflict_do_nothing(
+            index_elements=("region", "country", "division", "location")
+        )
+    )
+    session.execute(metadata_locations_insert)
+
+
 def save(pathogen_slug: str):
     config = Config()
     interface: SqlAlchemyInterface = init_db(get_db_uri(config))
 
     with session_scope(interface) as session:
         # Insert all locations from public_repository_metadata
-        metadata_locations_select = (
-            sa.select(
-                PublicRepositoryMetadata.region,
-                PublicRepositoryMetadata.country,
-                PublicRepositoryMetadata.division,
-                PublicRepositoryMetadata.location,
-            )
-            .join(Pathogen)
-            .where(
-                and_(
-                    Pathogen.slug == pathogen_slug,
-                    PublicRepositoryMetadata.location != "",
-                    PublicRepositoryMetadata.location != None,
-                )
-            )
-            .distinct()
-        )
-        metadata_locations_insert = (
-            postgresql.insert(Location.__table__)
-            .from_select(
-                ["region", "country", "division", "location"], metadata_locations_select
-            )
-            .on_conflict_do_nothing(
-                index_elements=("region", "country", "division", "location")
-            )
-        )
-        session.execute(metadata_locations_insert)
+        all_locations = get_metadata_query(pathogen_slug)
+        run_insert_select(session, all_locations)
 
         # Insert an entry with a null location for every distinct Region/Country/Division combination
-        existing_null_location_select = (
-            sa.select(Location.region, Location.country, Location.division)
-            .where(Location.location == None)
-            .distinct()
-        )
-        existing_null_locations = set(
-            session.execute(existing_null_location_select).all()
-        )
-
-        metadata_null_locations_select = sa.select(
-            PublicRepositoryMetadata.region,
-            PublicRepositoryMetadata.country,
-            PublicRepositoryMetadata.division,
-        ).distinct()
-        metadata_null_locations = set(
-            session.execute(metadata_null_locations_select).all()
-        )
-
-        new_null_locations = metadata_null_locations - existing_null_locations
-        new_null_location_values = list(
-            map(
-                lambda region_country_division_tuple: {
-                    "region": region_country_division_tuple[0],
-                    "country": region_country_division_tuple[1],
-                    "division": region_country_division_tuple[2],
-                    "location": None,
-                },
-                new_null_locations,
-            )
-        )
-        if len(new_null_location_values) > 0:
-            new_null_locations_insert = Location.__table__.insert().values(
-                new_null_location_values
-            )
-            session.execute(new_null_locations_insert)
+        all_divisions = get_metadata_query(pathogen_slug, location=False)
+        run_insert_select(session, all_divisions)
 
         # Insert country-level locations
-        existing_country_level_loc_select = (
-            sa.select(Location.region, Location.country)
-            .where(and_(Location.division == None, Location.location == None))
-            .distinct()
+        all_countries = get_metadata_query(
+            pathogen_slug, division=False, location=False
         )
-        existing_country_level_locs = set(
-            session.execute(existing_country_level_loc_select).all()
-        )
-
-        country_level_loc_select = sa.select(
-            PublicRepositoryMetadata.region, PublicRepositoryMetadata.country
-        ).distinct()
-        country_level_locations = set(session.execute(country_level_loc_select).all())
-
-        new_country_level_locations = (
-            country_level_locations - existing_country_level_locs
-        )
-        new_country_level_values = list(
-            map(
-                lambda region_country_tuple: {
-                    "region": region_country_tuple[0],
-                    "country": region_country_tuple[1],
-                    "division": None,
-                    "location": None,
-                },
-                new_country_level_locations,
-            )
-        )
-        if len(new_country_level_values) > 0:
-            new_country_level_locations_insert = Location.__table__.insert().values(
-                new_country_level_values
-            )
-            session.execute(new_country_level_locations_insert)
+        run_insert_select(session, all_countries)
 
         session.commit()
 
