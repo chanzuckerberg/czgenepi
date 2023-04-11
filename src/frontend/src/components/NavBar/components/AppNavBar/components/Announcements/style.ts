@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { Banner, getSpaces } from "czifui";
+import { NewTabLink } from "src/common/components/library/NewTabLink";
 
 export const StyledBanner = styled(Banner)`
   text-align: center;
@@ -21,4 +22,8 @@ export const StyledBanner = styled(Banner)`
   @media (max-width: 790px) {
     height: 90px;
   }
+`;
+
+export const StyledNewTabLink = styled(NewTabLink)`
+  color: white;
 `;
