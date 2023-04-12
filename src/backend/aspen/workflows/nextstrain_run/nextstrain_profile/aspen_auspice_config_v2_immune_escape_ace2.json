@@ -1,0 +1,123 @@
+{
+  "title": "Genomic epidemiology of novel coronavirus",
+  "build_url": "https://github.com/nextstrain/ncov",
+  "maintainers": [
+    {
+      "name": "Chan Zuckerberg Initiative",
+      "url": "https://chanzuckerberg.com"
+    }
+  ],
+  "data_provenance": [
+    {
+      "name": "GenBank",
+      "url": "https://www.ncbi.nlm.nih.gov/genbank/"
+    }
+  ],
+  "colorings": [
+    {
+      "key": "immune_escape",
+      "title": "Immune Escape vs BA.2",
+      "type": "continuous"
+    },
+    {
+      "key": "ace2_binding",
+      "title": "ACE2 binding vs BA.2",
+      "type": "continuous"
+    },
+    {
+      "key": "emerging_lineage",
+      "title": "Emerging Lineage",
+      "type": "categorical"
+    },
+    {
+      "key": "pango_lineage",
+      "title": "Pangolin lineage",
+      "type": "categorical"
+    },
+    {
+      "key": "S1_mutations",
+      "title": "S1 mutations",
+      "type": "continuous"
+    },
+    {
+      "key": "location",
+      "title": "Location",
+      "type": "categorical"
+    },
+    {
+      "key": "division",
+      "title": "Admin Division",
+      "type": "categorical"
+    },
+    {
+      "key": "country",
+      "title": "Country",
+      "type": "categorical"
+    },
+    {
+      "key": "region",
+      "title": "Region",
+      "type": "categorical"
+    },
+    {
+      "key": "QC_missing_data",
+      "title": "Missing data",
+      "type": "categorical"
+    },
+    {
+      "key": "QC_mixed_sites",
+      "title": "Mixed sites",
+      "type": "categorical"
+    },
+    {
+      "key": "reversion_mutations",
+      "title": "Reversion mutations",
+      "type": "categorical"
+    },
+    {
+      "key": "potential_contaminants",
+      "title": "Potential contaminants",
+      "type": "categorical"
+    },
+    {
+      "key": "author",
+      "title": "Authors",
+      "type": "categorical"
+    },
+    {
+      "key": "originating_lab",
+      "title": "Originating Lab",
+      "type": "categorical"
+    },
+    {
+      "key": "submitting_lab",
+      "title": "Submitting Lab",
+      "type": "categorical"
+    },
+    {
+      "key": "gisaid_epi_isl",
+      "type": "categorical"
+    }
+  ],
+  "geo_resolutions": ["location", "division", "country", "region"],
+  "display_defaults": {
+    "color_by": "emerging_lineage",
+    "distance_measure": "div",
+    "geo_resolution": "location",
+    "map_triplicate": false,
+    "branch_label": "clade"
+  },
+  "filters": [
+    "clade_membership",
+    "region",
+    "country",
+    "division",
+    "location",
+    "host",
+    "submitting_lab",
+    "originating_lab",
+    "author",
+    "pango_lineage"
+  ],
+  "panels": ["tree", "map", "entropy"]
+}

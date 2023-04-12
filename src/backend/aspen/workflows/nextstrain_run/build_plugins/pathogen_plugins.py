@@ -1,4 +1,5 @@
 import re
+import dateparser
 
 from aspen.workflows.nextstrain_run.build_plugins.base_plugin import BaseConfigPlugin
 
@@ -9,8 +10,22 @@ class PathogenPlugin(BaseConfigPlugin):
 
 class SC2Plugin(PathogenPlugin):
     def update_config(self, config):
-        pass
+        config["nextclade_dataset"] = "sars-cov-2"
 
+        min_date = self.template_args.get("filter_start_date")
+        if min_date:
+            min_date = dateparser.parse(min_date)
+            if min_date >= dateparser.parse("2022-03-01"):
+                # if all the samples in the tree are after March 2022, 
+                # use the 21L dataset which then will trigger the ncov workflow to 
+                # also compute metrics for immune escape and ace2 binding. 
+                # N.B. this does not cover the edge case where the user force includes 
+                # samples from before this date. Not catastrophic, just means the list 
+                # of mutations shown in the tree will be less relevant.
+                config["nextclade_dataset"] = "sars-cov-2-21L"
+                
+                # adds new colorby options to show the immune escape and ace2 binding metrics 
+                config['files']['auspice_config'] = "my_profiles/aspen/aspen_auspice_config_v2_immune_escape_ace2.json"   
 
 class MPXPlugin(PathogenPlugin):
     def update_config(self, config):
