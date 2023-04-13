@@ -91,16 +91,13 @@ async def test_valid_auspice_link_access(
 
     assert "meta" in res_json.keys()
     assert "tree" in res_json.keys()
-    assert res_json["tree"]["name"] == f"{pathogen_repo_config.prefix}/ROOT"
+    assert res_json["tree"]["name"] == f"ROOT"
     assert res_json["tree"]["branch_attrs"]["labels"]["clade"] == "42"
     test_children = res_json["tree"]["children"]
     for index in range(1, 2):
         child = test_children[index - 1]
         assert child["name"] == f"private_identifier_{index}"
-        assert (
-            child["GISAID_ID"]
-            == f"{pathogen_repo_config.prefix}/public_identifier_{index}"
-        )
+        assert child["GISAID_ID"] == f"public_identifier_{index}"
 
 
 async def test_unauth_user_auspice_link_generation(

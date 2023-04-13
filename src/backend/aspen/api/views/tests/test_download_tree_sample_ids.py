@@ -106,8 +106,8 @@ async def create_phylotree_with_inputs(
         input_entities.append(input_entity)
 
     db_gisaid_samples = [
-        f"{pathogen_repo_config.prefix}/gisaid_identifier",
-        f"{pathogen_repo_config.prefix}/gisaid_identifier2",
+        f"gisaid_identifier",
+        f"gisaid_identifier2",
     ]
 
     phylo_run = phylorun_factory(
@@ -123,7 +123,7 @@ async def create_phylotree_with_inputs(
     )
     tree_gisaid_samples = [
         "gisaid_identifier",
-        f"{pathogen_repo_config.prefix}/GISAID_identifier2",
+        f"GISAID_identifier2",
     ]
     upload_s3_file(mock_s3_resource, phylo_tree, samples, tree_gisaid_samples)
 
@@ -199,10 +199,7 @@ async def test_tree_metadata_download(
         pathogen, "GISAID", async_session
     )
     expected_filename = f"{phylo_tree.id}_sample_ids.tsv"
-    expected_document = (
-        "Sample Identifier\tSelected\r\n"
-        f"{pathogen_repo_config.prefix}/root_identifier_1	no\r\n"
-    )
+    expected_document = "Sample Identifier\tSelected\r\n" f"root_identifier_1	no\r\n"
     for sample in samples:
         expected_document += f"{sample.private_identifier}	no\r\n"
     file_contents = str(res.content, encoding="UTF-8")
@@ -262,12 +259,12 @@ async def test_private_id_matrix(
             "expected_status": 200,
             "expected_data": (
                 "Sample Identifier\tSelected\r\n"
-                f"{pathogen_repo_config.prefix}/root_identifier_1	no\r\n"
-                f"{pathogen_repo_config.prefix}/{samples[0].public_identifier}	yes\r\n"
-                f"{pathogen_repo_config.prefix}/{samples[1].public_identifier}	yes\r\n"
-                f"{pathogen_repo_config.prefix}/{samples[2].public_identifier}	yes\r\n"
-                f"{pathogen_repo_config.prefix}/gisaid_identifier	yes\r\n"
-                f"{pathogen_repo_config.prefix}/GISAID_identifier2	yes\r\n"
+                f"root_identifier_1	no\r\n"
+                f"{samples[0].public_identifier}	yes\r\n"
+                f"{samples[1].public_identifier}	yes\r\n"
+                f"{samples[2].public_identifier}	yes\r\n"
+                f"gisaid_identifier	yes\r\n"
+                f"GISAID_identifier2	yes\r\n"
             ),
         },
     ]
@@ -327,7 +324,7 @@ async def test_tree_metadata_replaces_all_ids(
     assert res.status_code == 200
     expected_data = (
         "Sample Identifier\tSelected\r\n"
-        f"{pathogen_repo_config.prefix}/root_identifier_1	no\r\n"
+        f"root_identifier_1	no\r\n"
         f"{samples[0].private_identifier}	yes\r\n"
         f"{extra_sample.private_identifier}	no\r\n"
     )
@@ -378,9 +375,9 @@ async def test_public_tree_metadata_replaces_all_ids(
     )
     expected_data = (
         "Sample Identifier\tSelected\r\n"
-        f"{pathogen_repo_config.prefix}/root_identifier_1	no\r\n"
-        f"{pathogen_repo_config.prefix}/{samples[0].public_identifier}	yes\r\n"
-        f"{pathogen_repo_config.prefix}/{extra_sample.public_identifier}	no\r\n"
+        f"root_identifier_1	no\r\n"
+        f"{samples[0].public_identifier}	yes\r\n"
+        f"{extra_sample.public_identifier}	no\r\n"
     )
     file_contents = str(res.content, encoding="UTF-8")
     assert file_contents == expected_data
