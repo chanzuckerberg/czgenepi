@@ -6,7 +6,6 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.test_infra.models.location import location_factory
 from aspen.test_infra.models.pathogen import random_pathogen_factory
 from aspen.test_infra.models.pathogen_repo_config import (
@@ -63,9 +62,6 @@ async def test_phylo_tree_rename(
     pathogen = random_pathogen_factory()
     _, default_repo_config = setup_gisaid_and_genbank_repo_configs(
         async_session, pathogen
-    )
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
-        pathogen, "GISAID", async_session
     )
     admin_roles = await grouprole_factory(
         async_session, can_see_group, viewer_group, "admin"
@@ -166,26 +162,26 @@ async def test_phylo_tree_rename(
 
     assert tree["tree"] == {
         "name": "private_identifier_0",
-        "GISAID_ID": f"public_identifier_0",
+        "GISAID_ID": "public_identifier_0",
         "children": [
             {
-                "GISAID_ID": f"public_identifier_can_see_0",
+                "GISAID_ID": "public_identifier_can_see_0",
                 "name": "private_identifier_can_see_0",
             },
             {
-                "GISAID_ID": f"public_identifier_can_see_1",
+                "GISAID_ID": "public_identifier_can_see_1",
                 "name": "private_identifier_can_see_1",
             },
             {
-                "name": f"public_identifier_wrong_0",
+                "name": "public_identifier_wrong_0",
                 "children": [
                     {
-                        "GISAID_ID": f"public_identifier_1",
+                        "GISAID_ID": "public_identifier_1",
                         "name": "private_identifier_1",
                     },
-                    {"name": f"public_identifier_wrong_1"},
-                    {"name": f"public_identifier_nosee_0"},
-                    {"name": f"public_identifier_nosee_1"},
+                    {"name": "public_identifier_wrong_1"},
+                    {"name": "public_identifier_nosee_0"},
+                    {"name": "public_identifier_nosee_1"},
                 ],
             },
         ],

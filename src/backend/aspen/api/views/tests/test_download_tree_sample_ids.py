@@ -106,8 +106,8 @@ async def create_phylotree_with_inputs(
         input_entities.append(input_entity)
 
     db_gisaid_samples = [
-        f"gisaid_identifier",
-        f"gisaid_identifier2",
+        "gisaid_identifier",
+        "gisaid_identifier2",
     ]
 
     phylo_run = phylorun_factory(
@@ -123,7 +123,7 @@ async def create_phylotree_with_inputs(
     )
     tree_gisaid_samples = [
         "gisaid_identifier",
-        f"GISAID_identifier2",
+        "GISAID_identifier2",
     ]
     upload_s3_file(mock_s3_resource, phylo_tree, samples, tree_gisaid_samples)
 
@@ -195,11 +195,8 @@ async def test_tree_metadata_download(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
         headers=auth_headers,
     )
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
-        pathogen, "GISAID", async_session
-    )
     expected_filename = f"{phylo_tree.id}_sample_ids.tsv"
-    expected_document = "Sample Identifier\tSelected\r\n" f"root_identifier_1	no\r\n"
+    expected_document = "Sample Identifier\tSelected\r\n" "root_identifier_1	no\r\n"
     for sample in samples:
         expected_document += f"{sample.private_identifier}	no\r\n"
     file_contents = str(res.content, encoding="UTF-8")
@@ -240,9 +237,6 @@ async def test_private_id_matrix(
     )
     # give the viewer group access to trees from the owner group
     roles = await grouprole_factory(async_session, owner_group, viewer_group)
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
-        pathogen, "GISAID", async_session
-    )
     async_session.add_all(roles + [noaccess_user, viewer_user, phylo_tree])
     await async_session.commit()
     split_client.get_pathogen_treatment.return_value = "GISAID"
@@ -259,12 +253,12 @@ async def test_private_id_matrix(
             "expected_status": 200,
             "expected_data": (
                 "Sample Identifier\tSelected\r\n"
-                f"root_identifier_1	no\r\n"
+                "root_identifier_1	no\r\n"
                 f"{samples[0].public_identifier}	yes\r\n"
                 f"{samples[1].public_identifier}	yes\r\n"
                 f"{samples[2].public_identifier}	yes\r\n"
-                f"gisaid_identifier	yes\r\n"
-                f"GISAID_identifier2	yes\r\n"
+                "gisaid_identifier	yes\r\n"
+                "GISAID_identifier2	yes\r\n"
             ),
         },
     ]
@@ -318,13 +312,10 @@ async def test_tree_metadata_replaces_all_ids(
         f"/v2/orgs/{group.id}/pathogens/{phylo_tree.pathogen.slug}/phylo_trees/{phylo_tree.entity_id}/sample_ids",
         headers=auth_headers,
     )
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
-        pathogen, "GISAID", async_session
-    )
     assert res.status_code == 200
     expected_data = (
         "Sample Identifier\tSelected\r\n"
-        f"root_identifier_1	no\r\n"
+        "root_identifier_1	no\r\n"
         f"{samples[0].private_identifier}	yes\r\n"
         f"{extra_sample.private_identifier}	no\r\n"
     )
@@ -370,12 +361,9 @@ async def test_public_tree_metadata_replaces_all_ids(
         headers=auth_headers,
     )
     assert res.status_code == 200
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
-        pathogen, "GISAID", async_session
-    )
     expected_data = (
         "Sample Identifier\tSelected\r\n"
-        f"root_identifier_1	no\r\n"
+        "root_identifier_1	no\r\n"
         f"{samples[0].public_identifier}	yes\r\n"
         f"{extra_sample.public_identifier}	no\r\n"
     )
