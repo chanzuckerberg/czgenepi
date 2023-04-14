@@ -155,7 +155,7 @@ const SampleIdInput = ({
         variant="outlined"
         rows={!isInEditMode ? 4 : 3}
         value={isInEditMode ? inputValue : inputDisplayValue}
-        placeholder="e.g. U12345, AF123456"
+        placeholder="e.g. USA/CA-CZB-0000/2021, USA/CA-CZB-0001/2021"
         data-test-id="force-include-sample-id"
       />
       {shouldShowAddButton && (
