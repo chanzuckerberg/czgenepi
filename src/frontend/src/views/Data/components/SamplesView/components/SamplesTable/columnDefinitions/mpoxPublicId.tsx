@@ -3,7 +3,7 @@ import { generateWidthStyles } from "src/common/utils/tableUtils";
 import { SortableHeader } from "src/views/Data/components/SortableHeader";
 import DefaultCell from "../components/DefaultCell";
 
-export const mpoxPublicIdColumn: ColumnDef<Sample, any> = {
+export const publicIdColumn: ColumnDef<Sample, any> = {
   id: "publicId",
   accessorKey: "publicId",
   header: ({ header, column }) => (
