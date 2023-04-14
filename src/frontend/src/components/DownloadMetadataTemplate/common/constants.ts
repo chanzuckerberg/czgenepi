@@ -22,7 +22,7 @@ const GENERAL_VIRAL_SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS: Record<
 > = {
   ...BASE_METADATA_HEADERS,
   privateId: "Private ID",
-  publicId: "Public ID" + OPTIONAL_HEADER_MARKER,
+  publicId: "GenBank Isolate Name (Public ID)" + OPTIONAL_HEADER_MARKER,
   sampleId: "Sample Name (from FASTA)",
 };
 
@@ -32,7 +32,7 @@ export const SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS: PathogenConfigType<
   [Pathogen.COVID]: {
     ...BASE_METADATA_HEADERS,
     privateId: "Private ID",
-    publicId: "Public ID" + OPTIONAL_HEADER_MARKER,
+    publicId: "GISAID ID (Public ID)" + OPTIONAL_HEADER_MARKER,
     sampleId: "Sample Name (from FASTA)",
   },
   [Pathogen.MONKEY_POX]: GENERAL_VIRAL_SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
@@ -45,7 +45,7 @@ const GENERAL_VIRAL_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: Record<
   ...BASE_METADATA_HEADERS,
   currentPrivateID: "Current Private ID",
   newPrivateID: "New Private ID" + OPTIONAL_HEADER_MARKER,
-  publicId: "Public ID",
+  publicId: "GenBank Isolate Name (Public ID)",
 };
 
 export const SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: PathogenConfigType<
@@ -55,7 +55,7 @@ export const SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: PathogenConfigType<
     ...BASE_METADATA_HEADERS,
     currentPrivateID: "Current Private ID",
     newPrivateID: "New Private ID" + OPTIONAL_HEADER_MARKER,
-    publicId: "Public ID",
+    publicId: "Public ID (GISAID ID)",
   },
   [Pathogen.MONKEY_POX]: GENERAL_VIRAL_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
 };
