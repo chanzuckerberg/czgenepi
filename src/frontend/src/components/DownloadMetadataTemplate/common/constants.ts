@@ -22,7 +22,7 @@ const GENERAL_VIRAL_SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS: Record<
 > = {
   ...BASE_METADATA_HEADERS,
   privateId: "Private ID",
-  publicId: "Genbank Accession (Public ID)" + OPTIONAL_HEADER_MARKER,
+  publicId: "Public ID" + OPTIONAL_HEADER_MARKER,
   sampleId: "Sample Name (from FASTA)",
 };
 
@@ -32,7 +32,7 @@ export const SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS: PathogenConfigType<
   [Pathogen.COVID]: {
     ...BASE_METADATA_HEADERS,
     privateId: "Private ID",
-    publicId: "GISAID ID (Public ID)" + OPTIONAL_HEADER_MARKER,
+    publicId: "Public ID" + OPTIONAL_HEADER_MARKER,
     sampleId: "Sample Name (from FASTA)",
   },
   [Pathogen.MONKEY_POX]: GENERAL_VIRAL_SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS,
@@ -45,7 +45,7 @@ const GENERAL_VIRAL_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: Record<
   ...BASE_METADATA_HEADERS,
   currentPrivateID: "Current Private ID",
   newPrivateID: "New Private ID" + OPTIONAL_HEADER_MARKER,
-  publicId: "GenBank Accession (Public ID)",
+  publicId: "Public ID",
 };
 
 export const SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: PathogenConfigType<
@@ -55,7 +55,7 @@ export const SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS: PathogenConfigType<
     ...BASE_METADATA_HEADERS,
     currentPrivateID: "Current Private ID",
     newPrivateID: "New Private ID" + OPTIONAL_HEADER_MARKER,
-    publicId: "Public ID (GISAID ID)",
+    publicId: "Public ID",
   },
   [Pathogen.MONKEY_POX]: GENERAL_VIRAL_SAMPLE_EDIT_METADATA_KEYS_TO_HEADERS,
 };
@@ -80,7 +80,7 @@ const GENERAL_VIRAL_UPLOAD_EXAMPLE_ROWS = [
   [
     EXAMPLE_SAMPLE_IDS[0], // sampleId
     "Private sample name", // privateId
-    "(if available) GenBank Accession", // publicId -- here as explainer
+    "(if available) GenBank Isolate Name", // publicId -- here as explainer
     DATE_FORMAT, // collectionDate -- not valid, here as explainer in template
     "North America/USA/California/Los Angeles County", // collectionLocation
     DATE_FORMAT, // sequencingDate -- not valid, here as explainer in template
@@ -114,7 +114,7 @@ export const UPLOAD_EXAMPLE_ROWS: PathogenConfigType<string[][]> = {
     [
       EXAMPLE_SAMPLE_IDS[0], // sampleId
       "Private sample name", // privateId
-      "(if available) GISAID ID", // publicId -- here as explainer
+      "(if available) GenBank Isolate Name or GISAID ID", // publicId -- here as explainer
       DATE_FORMAT, // collectionDate -- not valid, here as explainer in template
       "North America/USA/California/Los Angeles County", // collectionLocation
       DATE_FORMAT, // sequencingDate -- not valid, here as explainer in template
