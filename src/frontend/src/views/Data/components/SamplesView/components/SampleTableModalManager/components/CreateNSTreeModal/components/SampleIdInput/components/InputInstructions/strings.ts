@@ -10,8 +10,7 @@ export const InputInstructionsPathogenStrings: PathogenConfigType<InputInstructi
   {
     [Pathogen.COVID]: {
       publicRepositoryIdType: "GenBank Isolate Names without SARS-CoV-2/human/ prefix",
-      publicRepositoryIdExamples:
-        "USA/CA-CZB-0000/2021",
+      publicRepositoryIdExamples: "USA/CA-CZB-0000/2021",
     },
     [Pathogen.MONKEY_POX]: {
       publicRepositoryIdType: "GenBank accession numbers",
