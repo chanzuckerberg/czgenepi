@@ -22,7 +22,7 @@ const GENERAL_VIRAL_SAMPLE_UPLOAD_METADATA_KEYS_TO_HEADERS: Record<
 > = {
   ...BASE_METADATA_HEADERS,
   privateId: "Private ID",
-  publicId: "Genbank Accession (Public ID)" + OPTIONAL_HEADER_MARKER,
+  publicId: "GenBank Accession (Public ID)" + OPTIONAL_HEADER_MARKER,
   sampleId: "Sample Name (from FASTA)",
 };
 
@@ -114,7 +114,7 @@ export const UPLOAD_EXAMPLE_ROWS: PathogenConfigType<string[][]> = {
     [
       EXAMPLE_SAMPLE_IDS[0], // sampleId
       "Private sample name", // privateId
-      "(if available) GISAID ID", // publicId -- here as explainer
+      "(if available) GenBank Isolate Name or GISAID ID", // publicId -- here as explainer
       DATE_FORMAT, // collectionDate -- not valid, here as explainer in template
       "North America/USA/California/Los Angeles County", // collectionLocation
       DATE_FORMAT, // sequencingDate -- not valid, here as explainer in template
