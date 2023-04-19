@@ -10,6 +10,7 @@ class PathogenPlugin(BaseConfigPlugin):
 
 class SC2Plugin(PathogenPlugin):
     def update_config(self, config):
+        # default reference is still Wuhan-Hu-1 
         config["nextclade_dataset"] = "sars-cov-2"
 
         min_date = self.template_args.get("filter_start_date")
