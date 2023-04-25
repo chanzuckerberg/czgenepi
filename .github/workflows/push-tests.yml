@@ -41,14 +41,20 @@ jobs:
   ts-lint:
     runs-on: ubuntu-20.04
     steps:
-      - name: Configure AWS prod Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+    #   - name: Configure AWS prod Credentials
+    #     uses: aws-actions/configure-aws-credentials@v1
+    #     with:
+    #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #       aws-region: us-west-2
+    #       role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+    #       role-duration-seconds: 900
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 900
+          role-session-name: LintAndBuild
+          aws-region: us-west-2
       - name: Login to ECR
         uses: docker/login-action@v1
         with:
@@ -63,14 +69,20 @@ jobs:
   ts-test:
     runs-on: ubuntu-20.04
     steps:
-      - name: Configure AWS prod Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      # - name: Configure AWS prod Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-west-2
+      #     role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+      #     role-duration-seconds: 900
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 900
+          role-session-name: TestAndBuild
+          aws-region: us-west-2
       - name: Login to ECR
         uses: docker/login-action@v1
         with:
@@ -85,14 +97,20 @@ jobs:
   ts-test-build:
     runs-on: ubuntu-20.04
     steps:
-      - name: Configure AWS prod Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      # - name: Configure AWS prod Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-west-2
+      #     role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+      #     role-duration-seconds: 900
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 900
+          role-session-name: TestAndBuild
+          aws-region: us-west-2
       - name: Login to ECR
         uses: docker/login-action@v1
         with:
@@ -109,14 +127,20 @@ jobs:
   py-lint:
     runs-on: ubuntu-20.04
     steps:
-      - name: Configure AWS prod Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      # - name: Configure AWS prod Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-west-2
+      #     role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+      #     role-duration-seconds: 900
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 900
+          role-session-name: PyLintAndBuild
+          aws-region: us-west-2
       - name: Login to ECR
         uses: docker/login-action@v1
         with:
@@ -170,14 +194,20 @@ jobs:
   py-test:
     runs-on: ubuntu-20.04
     steps:
-      - name: Configure AWS prod Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      # - name: Configure AWS prod Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-west-2
+      #     role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+      #     role-duration-seconds: 900
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 900
+          role-session-name: PyTestAndBuild
+          aws-region: us-west-2
       - name: Login to ECR
         uses: docker/login-action@v1
         with:
@@ -198,14 +228,20 @@ jobs:
   gisaid-test:
     runs-on: ubuntu-20.04
     steps:
-      - name: Configure AWS prod Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      # - name: Configure AWS prod Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-west-2
+      #     role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+      #     role-duration-seconds: 900
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 900
+          role-session-name: TestGisaidWorkflow
+          aws-region: us-west-2
       - name: Login to ECR
         uses: docker/login-action@v1
         with:
@@ -257,14 +293,20 @@ jobs:
             context: ./src/frontend/
             name: genepi-frontend
     steps:
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-west-2
+      #     role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+      #     role-duration-seconds: 900
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 900
+          role-session-name: BuildAndImageCheck
+          aws-region: us-west-2
       - name: Login to ECR
         uses: docker/login-action@v1
         with:
@@ -278,14 +320,20 @@ jobs:
     runs-on: ubuntu-20.04
     if: github.ref == 'refs/heads/trunk'
     steps:
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-west-2
+      #     role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+      #     role-duration-seconds: 900
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 900
+          role-session-name: UpdateStage
+          aws-region: us-west-2
       - name: Login to ECR
         uses: docker/login-action@v1
         with:
