@@ -74,6 +74,7 @@ jobs:
           state: success
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
       - uses: act10ns/slack@v1
         with:
           status: ${{ job.status }}
@@ -86,3 +87,4 @@ jobs:
           state: failure
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
