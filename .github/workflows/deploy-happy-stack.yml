@@ -43,6 +43,13 @@ jobs:
       - name: Install happy dependencies
         run: |
           pip install -r .happy/requirements.txt
+      - uses: avakar/set-deployment-status@v1
+        with:
+          state: in_progress
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: Update deployment
         uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@deploy-happy-stack-v1.7.0
         with:
@@ -62,6 +69,12 @@ jobs:
           echo "TODO - run functional tests against staging!"
       ### Need to write success failure way because Github API doesn't allow doing
       ### "if: always(), state: ${{ success() }}:
+      - name: Set deployment status to success if no errors
+        uses: avakar/set-deployment-status@v1
+        with:
+          state: success
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: act10ns/slack@v1
         with:
           status: ${{ job.status }}
