@@ -13,3 +13,7 @@ Additional Notes relating to the backend are documented [here](docs/backend/).
 ## Additional Frontend Notes
 
 Additional Notes relating to the frontend are documented [here](docs/frontend/).
+
+
+## Statuses
+[![Happy Deployment](https://github.com/chanzuckerberg/czgenepi/actions/workflows/deploy-happy-stack.yml/badge.svg)](https://github.com/chanzuckerberg/czgenepi/actions?query=workflow%3A%22Deploy+Happy%22++)
