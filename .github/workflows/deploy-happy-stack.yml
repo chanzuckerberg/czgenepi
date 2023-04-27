@@ -48,6 +48,9 @@ jobs:
           state: in_progress
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: "<filler>"
+          AWS_SECRET_ACCESS_KEY: "<filler>"
+          AWS_SESSION_TOKEN: "<filler>"
       - name: Update deployment
         uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@deploy-happy-stack-v1.7.0
         with:
