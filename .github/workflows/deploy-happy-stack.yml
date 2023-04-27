@@ -48,6 +48,7 @@ jobs:
           state: in_progress
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
       - name: Update deployment
         uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@deploy-happy-stack-v1.7.0
         with:
@@ -73,6 +74,7 @@ jobs:
           state: success
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
       - uses: act10ns/slack@v1
         with:
           status: ${{ job.status }}
@@ -85,3 +87,4 @@ jobs:
           state: failure
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
