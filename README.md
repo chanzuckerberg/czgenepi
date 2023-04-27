@@ -13,3 +13,7 @@ Additional Notes relating to the backend are documented [here](docs/backend/).
 ## Additional Frontend Notes
 
 Additional Notes relating to the frontend are documented [here](docs/frontend/).
+
+
+## Statuses
+[![staging]](https://github.com/chanzuckerberg/czgenepi/actions?query=workflow%3A%22Deploy+Happy%22++)
