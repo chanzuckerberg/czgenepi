@@ -1,4 +1,4 @@
-FROM node:14.15.4-slim AS base
+FROM node:14.21.3-buster-slim AS base
 WORKDIR /usr/src/app
 RUN chown node:node /usr/src/app
 ENV NODE_ENV=development
