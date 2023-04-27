@@ -45,6 +45,7 @@ def create_phylo_run(
     tree_type: TreeType,
     pathogen: str,
     repository: str,
+    contextual_repository: PublicRepository,
 ):
 
     user = session.query(User).filter(User.email == "hello@czgenepi.org").one()
@@ -64,6 +65,7 @@ def create_phylo_run(
         pathogen=pathogen,
         group=group,
         tree_type=tree_type,
+        contextual_repository=contextual_repository,
     )
     workflow.inputs = [aligned_repo_data]
     workflow.template_args = template_args
@@ -115,6 +117,18 @@ def launch_one(
             .scalars()
             .one()
         )
+        default_contextual_repository = split_client.get_pathogen_treatment(
+            "PATHOGEN_contextual_repository", pathogen
+        )
+        contextual_repository = (
+            db.execute(
+                sa.select(PublicRepository).filter(
+                    PublicRepository.name == default_contextual_repository
+                )
+            )
+            .scalars()
+            .one()
+        )
 
         if re.match(r"^[0-9]+$", group):
             where_clause = Group.id == int(group)
@@ -123,7 +137,7 @@ def launch_one(
         groups_query = sa.select(Group).where(where_clause)  # type: ignore
         group_obj: Group = db.execute(groups_query).scalars().one()
         workflow = create_phylo_run(
-            db, group_obj, template_args_obj, tree_type_obj, pathogen_obj, repository
+            db, group_obj, template_args_obj, tree_type_obj, pathogen_obj, repository, contextual_repository
         )
 
         job = NextstrainScheduledJob(settings)
@@ -271,6 +285,18 @@ def launch_all(pathogen):
             .scalars()
             .one()
         )
+        default_contextual_repository = split_client.get_pathogen_treatment(
+            "PATHOGEN_contextual_repository", pathogen
+        )
+        contextual_repository = (
+            db.execute(
+                sa.select(PublicRepository).filter(
+                    PublicRepository.name == default_contextual_repository
+                )
+            )
+            .scalars()
+            .one()
+        )
 
         all_groups_query = sa.select(Group).options(
             joinedload(Group.default_tree_location)
@@ -298,7 +324,7 @@ def launch_all(pathogen):
                     )
                     continue
                 workflow = create_phylo_run(
-                    db, group, template_args, tree_type, pathogen_obj, repository
+                    db, group, template_args, tree_type, pathogen_obj, repository, contextual_repository
                 )
 
                 job = NextstrainScheduledJob(settings)
