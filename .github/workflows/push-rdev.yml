@@ -45,9 +45,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: BuildAndPushRdevImage
           aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
       - name: Build And Push
         uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@docker-build-push-v1.3.1
         with:
@@ -64,9 +64,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-session-name: CreateUpdateRdev
           aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 900
       - name: Calculate Branch and Base Names
         id: refs
