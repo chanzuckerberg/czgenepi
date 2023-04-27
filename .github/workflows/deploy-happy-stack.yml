@@ -48,8 +48,7 @@ jobs:
           state: in_progress
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        continue-on-error: true
       - name: Update deployment
         uses: chanzuckerberg/github-actions/.github/actions/deploy-happy-stack@deploy-happy-stack-v1.7.0
         with:
@@ -80,10 +79,3 @@ jobs:
           status: ${{ job.status }}
           steps: ${{ toJson(steps) }}
         if: github.event.deployment.environment == 'prod' || failure()
-      - name: Set deployment status to failure if errors
-        uses: avakar/set-deployment-status@v1
-        if: failure()
-        with:
-          state: failure
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
