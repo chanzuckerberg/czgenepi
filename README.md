@@ -16,4 +16,4 @@ Additional Notes relating to the frontend are documented [here](docs/frontend/).
 
 
 ## Statuses
-[![staging]](https://github.com/chanzuckerberg/czgenepi/actions?query=workflow%3A%22Deploy+Happy%22++)
+[![staging](https://github.com/chanzuckerberg/czgenepi/actions/workflows/deploy-happy-stack.yml/badge.svg)](https://github.com/chanzuckerberg/czgenepi/actions?query=workflow%3A%22Deploy+Happy%22++)
