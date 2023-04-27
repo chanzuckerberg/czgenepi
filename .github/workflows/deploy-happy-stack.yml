@@ -79,3 +79,10 @@ jobs:
           status: ${{ job.status }}
           steps: ${{ toJson(steps) }}
         if: github.event.deployment.environment == 'prod' || failure()
+      - name: Set deployment status to failure if errors
+        uses: avakar/set-deployment-status@v1
+        if: failure()
+        with:
+          state: failure
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
