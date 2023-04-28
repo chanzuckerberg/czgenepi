@@ -239,7 +239,7 @@ def get_template_args_for_focal_group(
     return None
 
 
-def get_pathogen_db_objects(db, split_client, pathogen_string):
+def get_pathogen_db_objects(db, split_client, pathogen):
     pathogen_obj = (
         db.execute(sa.select(Pathogen).filter(Pathogen.slug == pathogen))
         .scalars()
