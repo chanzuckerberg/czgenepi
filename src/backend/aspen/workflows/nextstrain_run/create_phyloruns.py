@@ -6,7 +6,7 @@ from typing import Any, Dict, MutableSequence
 import click
 import dateparser
 import sqlalchemy as sa
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, Session
 
 from aspen.api.settings import CLISettings
 from aspen.config.config import Config
@@ -239,7 +239,7 @@ def get_template_args_for_focal_group(
     return None
 
 
-def get_pathogen_db_objects(db, split_client, pathogen):
+def get_pathogen_db_objects(db: Session, split_client: SplitClient, pathogen: str):
     pathogen_obj = (
         db.execute(sa.select(Pathogen).filter(Pathogen.slug == pathogen))
         .scalars()
