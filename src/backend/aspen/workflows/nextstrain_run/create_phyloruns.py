@@ -137,7 +137,13 @@ def launch_one(
         groups_query = sa.select(Group).where(where_clause)  # type: ignore
         group_obj: Group = db.execute(groups_query).scalars().one()
         workflow = create_phylo_run(
-            db, group_obj, template_args_obj, tree_type_obj, pathogen_obj, repository, contextual_repository
+            db,
+            group_obj,
+            template_args_obj,
+            tree_type_obj,
+            pathogen_obj,
+            repository,
+            contextual_repository,
         )
 
         job = NextstrainScheduledJob(settings)
@@ -324,7 +330,13 @@ def launch_all(pathogen):
                     )
                     continue
                 workflow = create_phylo_run(
-                    db, group, template_args, tree_type, pathogen_obj, repository, contextual_repository
+                    db,
+                    group,
+                    template_args,
+                    tree_type,
+                    pathogen_obj,
+                    repository,
+                    contextual_repository,
                 )
 
                 job = NextstrainScheduledJob(settings)
