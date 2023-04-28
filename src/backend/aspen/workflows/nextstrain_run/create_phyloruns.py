@@ -100,34 +100,8 @@ def launch_one(
     split_client = SplitClient(settings)
 
     with session_scope(interface) as db:
-        pathogen_obj = (
-            db.execute(sa.select(Pathogen).filter(Pathogen.slug == pathogen))
-            .scalars()
-            .one()
-        )
-        default_repository = split_client.get_pathogen_treatment(
-            "PATHOGEN_public_repository", pathogen_obj
-        )
-        repository = (
-            db.execute(
-                sa.select(PublicRepository).filter(
-                    PublicRepository.name == default_repository
-                )
-            )
-            .scalars()
-            .one()
-        )
-        default_contextual_repository = split_client.get_pathogen_treatment(
-            "PATHOGEN_contextual_repository", pathogen
-        )
-        contextual_repository = (
-            db.execute(
-                sa.select(PublicRepository).filter(
-                    PublicRepository.name == default_contextual_repository
-                )
-            )
-            .scalars()
-            .one()
+        pathogen_obj, repository, contextual_repository = get_pathogen_db_objects(
+            db, split_client, pathogen
         )
 
         if re.match(r"^[0-9]+$", group):
@@ -265,6 +239,40 @@ def get_template_args_for_focal_group(
     return None
 
 
+def get_pathogen_db_objects(db, split_client, pathogen_string):
+    pathogen_obj = (
+        db.execute(sa.select(Pathogen).filter(Pathogen.slug == pathogen))
+        .scalars()
+        .one()
+    )
+    default_repository = split_client.get_pathogen_treatment(
+        "PATHOGEN_public_repository", pathogen_obj
+    )
+    repository = (
+        db.execute(
+            sa.select(PublicRepository).filter(
+                PublicRepository.name == default_repository
+            )
+        )
+        .scalars()
+        .one()
+    )
+    default_contextual_repository = split_client.get_pathogen_treatment(
+        "PATHOGEN_contextual_repository", pathogen_obj
+    )
+    contextual_repository = (
+        db.execute(
+            sa.select(PublicRepository).filter(
+                PublicRepository.name == default_contextual_repository
+            )
+        )
+        .scalars()
+        .one()
+    )
+
+    return pathogen_obj, repository, contextual_repository
+
+
 @cli.command("launch-all")
 @click.option("--pathogen", type=str, default="SC2")
 def launch_all(pathogen):
@@ -274,36 +282,9 @@ def launch_all(pathogen):
     tree_type = TreeType("OVERVIEW")
     split_client = SplitClient(settings)
     with session_scope(interface) as db:
-        pathogen_obj = (
-            db.execute(sa.select(Pathogen).filter(Pathogen.slug == pathogen))
-            .scalars()
-            .one()
+        pathogen_obj, repository, contextual_repository = get_pathogen_db_objects(
+            db, split_client, pathogen
         )
-        default_repository = split_client.get_pathogen_treatment(
-            "PATHOGEN_public_repository", pathogen_obj
-        )
-        repository = (
-            db.execute(
-                sa.select(PublicRepository).filter(
-                    PublicRepository.name == default_repository
-                )
-            )
-            .scalars()
-            .one()
-        )
-        default_contextual_repository = split_client.get_pathogen_treatment(
-            "PATHOGEN_contextual_repository", pathogen
-        )
-        contextual_repository = (
-            db.execute(
-                sa.select(PublicRepository).filter(
-                    PublicRepository.name == default_contextual_repository
-                )
-            )
-            .scalars()
-            .one()
-        )
-
         all_groups_query = sa.select(Group).options(
             joinedload(Group.default_tree_location)
         )
