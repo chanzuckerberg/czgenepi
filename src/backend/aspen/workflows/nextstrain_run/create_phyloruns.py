@@ -46,7 +46,7 @@ def create_phylo_run(
     pathogen: str,
     repository: str,
     contextual_repository: PublicRepository,
-):
+) -> PhyloRun:
 
     user = session.query(User).filter(User.email == "hello@czgenepi.org").one()
     aligned_repo_data = (
@@ -86,9 +86,9 @@ def cli():
 @click.option("--template-args", type=str, default="{}")
 @click.option("--tree-type", type=str, default="OVERVIEW")
 @click.option("--pathogen", type=str, default="SC2")
-@click.option("--launch-sfn", is_flag=True, default=False)
+@click.option("--dry-run", is_flag=True, default=False)
 def launch_one(
-    group: str, template_args: str, tree_type: str, pathogen: str, launch_sfn: bool
+    group: str, template_args: str, tree_type: str, pathogen: str, dry_run: bool
 ):
     # NOTE/TODO - this currently doesn't do any smart input validation, it will just
     # let python raise an exception and explode if anything doesn't make sense.
@@ -120,12 +120,13 @@ def launch_one(
             contextual_repository,
         )
 
-        job = NextstrainScheduledJob(settings)
         db.commit()
         print(workflow.id)
-        if launch_sfn:
-            job = NextstrainScheduledJob(settings)
-            job.run(workflow, "scheduled")
+        if dry_run:
+            return workflow
+
+        job = NextstrainScheduledJob(settings)
+        job.run(workflow, "scheduled")
 
 
 def retry_template_args_for_focal_group(
@@ -275,7 +276,8 @@ def get_pathogen_db_objects(db: Session, split_client: SplitClient, pathogen: st
 
 @cli.command("launch-all")
 @click.option("--pathogen", type=str, default="SC2")
-def launch_all(pathogen):
+@click.option("--dry-run", is_flag=True, default=False)
+def launch_all(pathogen: str, dry_run: bool):
     settings = CLISettings()
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
@@ -291,6 +293,9 @@ def launch_all(pathogen):
         all_groups: MutableSequence[Group] = (
             db.execute(all_groups_query).scalars().all()
         )
+
+        all_workflows: list[PhyloRun] = []
+
         for group in all_groups:
             schedule_expression = group.tree_parameters.get("schedule_expression", None)
             if (
@@ -320,9 +325,15 @@ def launch_all(pathogen):
                     contextual_repository,
                 )
 
-                job = NextstrainScheduledJob(settings)
                 db.commit()
-                job.run(workflow, "scheduled")
+                all_workflows.append(workflow)
+
+        if dry_run:
+            return all_workflows
+
+        for workflow in all_workflows:
+            job = NextstrainScheduledJob(settings)
+            job.run(workflow, "scheduled")
 
 
 if __name__ == "__main__":
