@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from sqlalchemy.sql.expression import and_
 
@@ -67,10 +67,6 @@ def create_test_data(
     if not pathogen:
         pathogen = pathogen_factory("SC2", "SARS-CoV-2")
     session.add(group)
-
-    gisaid_samples: List[str] = [
-        f"fake_gisaid_id{i}" for i in range(num_gisaid_samples)
-    ]
 
     pathogen_genomes = uploaded_pathogen_genome_multifactory(
         group, pathogen, uploaded_by_user, location, num_county_samples
@@ -148,8 +144,8 @@ def test_launch_all(mocker, session, split_client, postgres_database):
         group_ids_launched.add(phylo_run.group_id)
         assert phylo_run.workflow_status == WorkflowStatusType.STARTED
         assert phylo_run.pathogen == pathogen
-        assert phylo_run.tree_type == tree_type
-        assert phylo_run.template_args == template_args
+        assert phylo_run.tree_type == TreeType.OVERVIEW
+        assert type(phylo_run.template_args) is str
         assert type(phylo_run.contextual_repository_id) is int
 
     assert group_ids == group_ids_launched

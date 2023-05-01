@@ -307,8 +307,8 @@ def launch_all(pathogen: str, dry_run: bool):
                     group,
                     pathogen_obj,
                     repository,
-                    dateparser.parse(DEFAULT_TEMPLATE_ARGS["filter_start_date"]).date(),
-                    dateparser.parse(DEFAULT_TEMPLATE_ARGS["filter_end_date"]).date(),
+                    dateparser.parse(DEFAULT_TEMPLATE_ARGS["filter_start_date"]).date(),  # type: ignore
+                    dateparser.parse(DEFAULT_TEMPLATE_ARGS["filter_end_date"]).date(),  # type: ignore
                 )
                 if not template_args:
                     print(
