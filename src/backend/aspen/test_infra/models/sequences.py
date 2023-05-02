@@ -29,17 +29,18 @@ def uploaded_pathogen_genome_factory(
 
 
 def uploaded_pathogen_genome_multifactory(
-    group, pathogen, uploaded_by_user, location, num_genomes
+    group, pathogen, uploaded_by_user, location, num_genomes, index_offset=0
 ):
     pathogen_genomes = []
     for i in range(num_genomes):
+        suffix = index_offset + i
         sample: Sample = sample_factory(
             group,
             uploaded_by_user,
             location,
             pathogen=pathogen,
-            private_identifier=f"private_identifier_{i}",
-            public_identifier=f"public_identifier_{i}",
+            private_identifier=f"private_identifier_{suffix}",
+            public_identifier=f"public_identifier_{suffix}",
         )
         pathogen_genome: UploadedPathogenGenome = uploaded_pathogen_genome_factory(
             sample,
@@ -65,17 +66,18 @@ def aligned_pathogen_genome_factory(
 
 
 def aligned_pathogen_genome_multifactory(
-    group, pathogen, uploaded_by_user, location, num_genomes
+    group, pathogen, uploaded_by_user, location, num_genomes, index_offset=0
 ):
     pathogen_genomes = []
     for i in range(num_genomes):
+        suffix = i + index_offset
         sample: Sample = sample_factory(
             group,
             uploaded_by_user,
             location,
             pathogen=pathogen,
-            private_identifier=f"private_identifier_{i}",
-            public_identifier=f"public_identifier_{i}",
+            private_identifier=f"private_identifier_{suffix}",
+            public_identifier=f"public_identifier_{suffix}",
         )
         pathogen_genome: AlignedPathogenGenome = aligned_pathogen_genome_factory(
             sample,
