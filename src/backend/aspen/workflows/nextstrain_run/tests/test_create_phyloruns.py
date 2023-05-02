@@ -1,3 +1,4 @@
+import traceback
 from typing import Optional
 
 from click.testing import CliRunner
@@ -110,8 +111,6 @@ def test_launch_one(mocker, session, split_client, postgres_database):
     try:
         assert result.exit_code == 0
     except Exception:
-        import traceback
-
         traceback.print_tb(result.exc_info[2])
         print(result.exc_info[1])
         print(result.exc_info[0])
@@ -130,8 +129,6 @@ def test_launch_all(mocker, session, split_client, postgres_database):
     try:
         assert result.exit_code == 0
     except Exception:
-        import traceback
-
         traceback.print_tb(result.exc_info[2])
         print(result.exc_info[1])
         print(result.exc_info[0])
