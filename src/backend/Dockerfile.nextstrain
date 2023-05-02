@@ -79,4 +79,7 @@ RUN chmod a+w /mpox/ /mpox/config
 # TODO - Mismatch between poetry and augur deps forces us to manually install jsonschema v3 here
 RUN pip install jsonschema==3.*
 
+# Mpox trees need more recursion. (ref: https://discussion.nextstrain.org/t/augur-recursion-limit/201)
+ENV AUGUR_RECURSION_LIMIT=10000
+
 WORKDIR /nextstrain
