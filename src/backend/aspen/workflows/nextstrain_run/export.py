@@ -210,9 +210,11 @@ def export_run_config(
         # Fetch all of a group's samples.
         county_samples: List[PathogenGenome] = []
         if sequence_type == "aligned":
-            county_samples = get_aligned_county_samples(session, group)
+            county_samples = get_aligned_county_samples(
+                session, group, phylo_run.pathogen
+            )
         else:
-            county_samples = get_county_samples(session, group)
+            county_samples = get_county_samples(session, group, phylo_run.pathogen)
 
         # get the aligned upstream run info.
         aligned_repo_data: AlignedRepositoryData = [
@@ -260,11 +262,12 @@ def export_run_config(
         }
 
 
-def get_county_samples(session, group: Group):
+def get_county_samples(session, group: Group, pathogen: Pathogen):
     # Get all samples for the group
     all_samples: Iterable[Sample] = (
         session.query(Sample)
         .filter(Sample.submitting_group_id == group.id)
+        .filter(Sample.pathogen_id == pathogen.id)
         .options(
             joinedload(Sample.uploaded_pathogen_genome, innerjoin=True).undefer(
                 PathogenGenome.sequence
@@ -275,11 +278,12 @@ def get_county_samples(session, group: Group):
     return pathogen_genomes
 
 
-def get_aligned_county_samples(session, group: Group):
+def get_aligned_county_samples(session, group: Group, pathogen: Pathogen):
     # Get all samples for the group
     all_samples: Iterable[Sample] = (
         session.query(Sample)
         .filter(Sample.submitting_group_id == group.id)
+        .filter(Sample.pathogen_id == pathogen.id)
         .options(
             joinedload(Sample.aligned_pathogen_genome, innerjoin=True).undefer(
                 PathogenGenome.sequence

@@ -68,22 +68,32 @@ def create_test_data(
             f"{group.location} Test City",
         )
     repository = random_default_repo_factory(split_client)
-    pathogen: Optional[Pathogen] = (
+    sc2: Optional[Pathogen] = (
         session.query(Pathogen).filter(Pathogen.slug == "SC2").one_or_none()
     )
-    if not pathogen:
-        pathogen = pathogen_factory("SC2", "SARS-CoV-2")
+    if not sc2:
+        sc2 = pathogen_factory("SC2", "SARS-CoV-2")
+    mpx: Optional[Pathogen] = (
+        session.query(Pathogen).filter(Pathogen.slug == "MPX").one_or_none()
+    )
+    if not mpx:
+        mpx = pathogen_factory("MPX", "Mpox")
     session.add(group)
 
     gisaid_samples: List[str] = [
         f"fake_gisaid_id{i}" for i in range(num_gisaid_samples)
     ]
 
-    pathogen_genomes = uploaded_pathogen_genome_multifactory(
-        group, pathogen, uploaded_by_user, location, num_county_samples
+    sc2_genomes = uploaded_pathogen_genome_multifactory(
+        group, sc2, uploaded_by_user, location, num_county_samples
+    )
+    mpx_genomes = uploaded_pathogen_genome_multifactory(
+        group, mpx, uploaded_by_user, location, num_county_samples, num_county_samples
     )
 
-    selected_samples = pathogen_genomes[:num_selected_samples]
+    pathogen = sc2
+    selected_samples = sc2_genomes[:num_selected_samples]
+
     gisaid_dump = aligned_repo_data_factory(
         pathogen=pathogen,
         repository=repository,
@@ -92,7 +102,7 @@ def create_test_data(
     ).outputs[0]
 
     inputs = selected_samples + [gisaid_dump]
-    session.add_all(inputs)
+    session.add_all(sc2_genomes + mpx_genomes + [gisaid_dump])
     if template_args is None:
         template_args = {}
 

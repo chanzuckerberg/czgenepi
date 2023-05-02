@@ -67,31 +67,38 @@ def create_test_data(
             f"{group.location} Test City",
         )
     repository = random_default_repo_factory(split_client)
-    pathogen: Optional[Pathogen] = (
+    sc2: Optional[Pathogen] = (
+        session.query(Pathogen).filter(Pathogen.slug == "SC2").one_or_none()
+    )
+    if not sc2:
+        sc2 = pathogen_factory("SC2", "SARS-CoV-2")
+    mpx: Optional[Pathogen] = (
         session.query(Pathogen).filter(Pathogen.slug == "MPX").one_or_none()
     )
-    if not pathogen:
-        pathogen = pathogen_factory("MPX", "Monkeypox")
+    if not mpx:
+        mpx = pathogen_factory("MPX", "Mpox")
     session.add(group)
 
     gisaid_samples: List[str] = [
         f"fake_gisaid_id{i}" for i in range(num_gisaid_samples)
     ]
 
-    pathogen_genomes = aligned_pathogen_genome_multifactory(
-        group, pathogen, uploaded_by_user, location, num_county_samples
+    sc2_genomes = aligned_pathogen_genome_multifactory(
+        group, sc2, uploaded_by_user, location, num_county_samples
+    )
+    mpx_genomes = aligned_pathogen_genome_multifactory(
+        group, mpx, uploaded_by_user, location, num_county_samples, num_county_samples
     )
 
     # We need to add a "/" to one of the sample names, since mpox tree builds can't handle "/"
     # characters in the accession column, and we need to test that we're replacing that it
     # properly in include.txt, metadata, and fasta files
-    pathogen_genomes[
+    mpx_genomes[
         0
-    ].sample.public_identifier = (
-        f"testing/{pathogen_genomes[0].sample.public_identifier}"
-    )
+    ].sample.public_identifier = f"testing/{mpx_genomes[0].sample.public_identifier}"
 
-    selected_samples = pathogen_genomes[:num_selected_samples]
+    pathogen = mpx
+    selected_samples = mpx_genomes[:num_selected_samples]
     gisaid_dump = aligned_repo_data_factory(
         pathogen=pathogen,
         repository=repository,
@@ -100,7 +107,7 @@ def create_test_data(
     ).outputs[0]
 
     inputs = selected_samples + [gisaid_dump]
-    session.add_all(inputs)
+    session.add_all(sc2_genomes + mpx_genomes + [gisaid_dump])
     if template_args is None:
         template_args = {}
 
