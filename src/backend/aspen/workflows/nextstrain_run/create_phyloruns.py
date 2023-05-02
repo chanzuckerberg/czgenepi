@@ -120,11 +120,12 @@ def launch_one(
             contextual_repository,
         )
 
+        if dry_run:
+            db.rollback()
+            return
+
         db.commit()
         print(workflow.id)
-        if dry_run:
-            return workflow
-
         job = NextstrainScheduledJob(settings)
         job.run(workflow, "scheduled")
 
@@ -249,6 +250,16 @@ def get_pathogen_db_objects(db: Session, split_client: SplitClient, pathogen: st
     default_repository = split_client.get_pathogen_treatment(
         "PATHOGEN_public_repository", pathogen_obj
     )
+    import logging
+
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    logger.debug(f"pathogen: {pathogen_obj.slug}")
+    logger.debug(f"split_repo_value for pathogen: {default_repository}")
+    all_repos = db.execute(sa.select(PublicRepository)).scalars().all()
+    for repo in all_repos:
+        logger.debug(f"Repo {repo.id}: {repo.name}")
+
     repository = (
         db.execute(
             sa.select(PublicRepository).filter(
@@ -325,12 +336,13 @@ def launch_all(pathogen: str, dry_run: bool):
                     contextual_repository,
                 )
 
-                db.commit()
                 all_workflows.append(workflow)
 
         if dry_run:
-            return all_workflows
+            db.rollback()
+            return
 
+        db.commit()
         for workflow in all_workflows:
             job = NextstrainScheduledJob(settings)
             job.run(workflow, "scheduled")

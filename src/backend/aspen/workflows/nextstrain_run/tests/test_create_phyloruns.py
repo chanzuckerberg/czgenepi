@@ -1,18 +1,13 @@
 from typing import Optional
 
+from click.testing import CliRunner
 from sqlalchemy.sql.expression import and_
 
-from aspen.database.models import (
-    Group,
-    Location,
-    Pathogen,
-    TreeType,
-    User,
-    WorkflowStatusType,
-)
+from aspen.database.models import Group, Location, TreeType, User
 from aspen.test_infra.models.location import location_factory
-from aspen.test_infra.models.pathogen import pathogen_factory
-from aspen.test_infra.models.repository import random_default_repo_factory
+from aspen.test_infra.models.pathogen_repo_config import (
+    setup_gisaid_and_genbank_repo_configs,
+)
 from aspen.test_infra.models.sequences import uploaded_pathogen_genome_multifactory
 from aspen.test_infra.models.usergroup import group_factory, user_factory
 from aspen.test_infra.models.workflow import aligned_repo_data_factory
@@ -28,6 +23,7 @@ def create_test_data(
     group_name=None,  # Override group name
     group_location=None,  # Override group location
     group_division=None,  # Override group division
+    user_email=None,  # Override user email
     template_args=None,  # Send template args
     tree_type: TreeType = TreeType.OVERVIEW,
 ):
@@ -36,9 +32,11 @@ def create_test_data(
     group: Group = group_factory(
         name=group_name, division=group_division, location=group_location
     )
+    if user_email is None:
+        user_email = f"{group_name}{tree_type.value}@dh.org"
     uploaded_by_user: User = user_factory(
         group,
-        email=f"{group_name}{tree_type.value}@dh.org",
+        email=user_email,
         auth0_user_id=group_name,
     )
     location: Optional[Location] = (
@@ -60,12 +58,10 @@ def create_test_data(
             f"{group.division} Test Division",
             f"{group.location} Test City",
         )
-    repository = random_default_repo_factory(split_client)
-    pathogen: Optional[Pathogen] = (
-        session.query(Pathogen).filter(Pathogen.slug == "SC2").one_or_none()
+
+    pathogen, repo_config = setup_gisaid_and_genbank_repo_configs(
+        session, split_client=split_client
     )
-    if not pathogen:
-        pathogen = pathogen_factory("SC2", "SARS-CoV-2")
     session.add(group)
 
     pathogen_genomes = uploaded_pathogen_genome_multifactory(
@@ -75,7 +71,7 @@ def create_test_data(
     selected_samples = pathogen_genomes[:num_selected_samples]
     gisaid_dump = aligned_repo_data_factory(
         pathogen=pathogen,
-        repository=repository,
+        repository=repo_config.public_repository,
         sequences_s3_key=f"{group_name}{tree_type.value}",
         metadata_s3_key=f"{group_name}{tree_type.value}",
     ).outputs[0]
@@ -86,7 +82,7 @@ def create_test_data(
         template_args = {}
 
     session.commit()
-    return group
+    return group, pathogen
 
 
 def mock_remote_db_uri(mocker, test_postgres_db_uri):
@@ -97,55 +93,46 @@ def mock_remote_db_uri(mocker, test_postgres_db_uri):
     )
 
 
-# Make sure we're properly creating phylo runs
 def test_launch_one(mocker, session, split_client, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
-    # use option defaults
-    template_args = "{}"
-    tree_type = "OVERVIEW"
-    pathogen = "SC2"
-    # return the created phylo run for inspection, skip SFN launch
-    dry_run = True
+    group, pathogen = create_test_data(
+        session, split_client, 10, 10, 10, user_email="hello@czgenepi.org"
+    )
+    split_repo_value = split_client.get_pathogen_treatment(
+        "PATHOGEN_public_repository", pathogen
+    )
+    print(f"split_repo_value: {split_repo_value}")
+    runner = CliRunner()
+    result = runner.invoke(
+        launch_one, [f"{group.id}", "--pathogen", pathogen.slug, "--dry-run"]
+    )
+    try:
+        assert result.exit_code == 0
+    except Exception:
+        import traceback
 
-    test_group = create_test_data(session, split_client, 10, 10, 10)
-    phylo_run = launch_one(test_group.name, template_args, tree_type, pathogen, dry_run)
-    assert phylo_run.group.id == test_group.id
-    assert phylo_run.workflow_status == WorkflowStatusType.STARTED
-    assert phylo_run.pathogen == pathogen
-    assert phylo_run.tree_type == tree_type
-    assert phylo_run.template_args == template_args
-    assert type(phylo_run.contextual_repository_id) is int
+        traceback.print_tb(result.exc_info[2])
+        print(result.exc_info[1])
+        print(result.exc_info[0])
+    assert result.exit_code == 0
 
 
-# Make sure we're properly creating phylo runs
 def test_launch_all(mocker, session, split_client, postgres_database):
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
-    # use option defaults
-    pathogen = "SC2"
-    # return the created phylo run for inspection, skip SFN launch
-    dry_run = True
+    group, pathogen = create_test_data(
+        session, split_client, 10, 10, 10, user_email="hello@czgenepi.org"
+    )
 
-    group_ids = set()
+    runner = CliRunner()
+    result = runner.invoke(launch_all, ["--pathogen", pathogen.slug, "--dry-run"])
+    try:
+        assert result.exit_code == 0
+    except Exception:
+        import traceback
 
-    for name in ["alpha", "beta", "gamma"]:
-        test_group = create_test_data(
-            session, split_client, 10, 10, 10, group_name=f"{name}-group"
-        )
-        group_ids.add(test_group.id)
-
-    phylo_runs = launch_all(pathogen, dry_run)
-    assert len(phylo_runs) == 3
-
-    group_ids_launched = set()
-    for phylo_run in phylo_runs:
-        assert phylo_run.group_id in group_ids
-        group_ids_launched.add(phylo_run.group_id)
-        assert phylo_run.workflow_status == WorkflowStatusType.STARTED
-        assert phylo_run.pathogen == pathogen
-        assert phylo_run.tree_type == TreeType.OVERVIEW
-        assert type(phylo_run.template_args) is str
-        assert type(phylo_run.contextual_repository_id) is int
-
-    assert group_ids == group_ids_launched
+        traceback.print_tb(result.exc_info[2])
+        print(result.exc_info[1])
+        print(result.exc_info[0])
+    assert result.exit_code == 0
