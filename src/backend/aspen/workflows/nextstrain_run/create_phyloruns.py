@@ -250,16 +250,6 @@ def get_pathogen_db_objects(db: Session, split_client: SplitClient, pathogen: st
     default_repository = split_client.get_pathogen_treatment(
         "PATHOGEN_public_repository", pathogen_obj
     )
-    import logging
-
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
-    logger.debug(f"pathogen: {pathogen_obj.slug}")
-    logger.debug(f"split_repo_value for pathogen: {default_repository}")
-    all_repos = db.execute(sa.select(PublicRepository)).scalars().all()
-    for repo in all_repos:
-        logger.debug(f"Repo {repo.id}: {repo.name}")
-
     repository = (
         db.execute(
             sa.select(PublicRepository).filter(
