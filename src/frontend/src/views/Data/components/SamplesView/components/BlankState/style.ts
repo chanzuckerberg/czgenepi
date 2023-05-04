@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import {
+  Button,
   CommonThemeProps,
   fontBodyM,
   fontHeaderM,
@@ -49,6 +50,22 @@ export const StyledLink = styled(Link)`
   display: flex;
   flex-direction: row;
   cursor: pointer;
+`;
+
+export const StyledButtonLink = styled(Button)`
+  ${(props: CommonThemeProps) => {
+    const spaces = getSpaces(props);
+    return `
+      padding: 0;
+      margin: ${spaces?.l}px 0;
+      justify-content: flex-start;
+
+      &:hover {
+        background-color: unset;
+        text-decoration: underline;
+      }
+    `;
+  }}
 `;
 
 export const StyledLinkText = styled.p`
