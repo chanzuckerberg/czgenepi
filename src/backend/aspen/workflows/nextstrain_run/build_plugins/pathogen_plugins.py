@@ -16,8 +16,8 @@ class SC2Plugin(PathogenPlugin):
         min_date = self.template_args.get("filter_start_date")
         if min_date:
             min_date = dateparser.parse(min_date)
-            if min_date >= dateparser.parse("2022-03-01"):
-                # if all the samples in the tree are after March 2022, 
+            if min_date >= dateparser.parse("2022-05-01"):
+                # if all the samples in the tree are after May 1 2022, 
                 # use the 21L dataset which then will trigger the ncov workflow to 
                 # also compute metrics for immune escape and ace2 binding. 
                 # N.B. this does not cover the edge case where the user force includes 
