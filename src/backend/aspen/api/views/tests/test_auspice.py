@@ -8,7 +8,6 @@ from botocore.client import ClientError
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from aspen.api.utils.pathogens import get_pathogen_repo_config_for_pathogen
 from aspen.api.views.tests.data.location_data import TEST_COUNTRY_DATA
 from aspen.api.views.tests.data.phylo_tree_data import TEST_TREE
 from aspen.api.views.tests.test_update_phylo_run_and_tree import make_shared_test_data
@@ -57,9 +56,6 @@ async def test_valid_auspice_link_access(
     user, group, samples, phylo_run, phylo_tree, pathogen = await make_shared_test_data(
         async_session
     )
-    pathogen_repo_config = await get_pathogen_repo_config_for_pathogen(
-        pathogen, "GISAID", async_session
-    )
     # We need to create the bucket since this is all in Moto's 'virtual' AWS account
     try:
         mock_s3_resource.meta.client.head_bucket(Bucket=phylo_tree.s3_bucket)
@@ -91,16 +87,13 @@ async def test_valid_auspice_link_access(
 
     assert "meta" in res_json.keys()
     assert "tree" in res_json.keys()
-    assert res_json["tree"]["name"] == f"{pathogen_repo_config.prefix}/ROOT"
+    assert res_json["tree"]["name"] == "ROOT"
     assert res_json["tree"]["branch_attrs"]["labels"]["clade"] == "42"
     test_children = res_json["tree"]["children"]
     for index in range(1, 2):
         child = test_children[index - 1]
         assert child["name"] == f"private_identifier_{index}"
-        assert (
-            child["GISAID_ID"]
-            == f"{pathogen_repo_config.prefix}/public_identifier_{index}"
-        )
+        assert child["GISAID_ID"] == f"public_identifier_{index}"
 
 
 async def test_unauth_user_auspice_link_generation(

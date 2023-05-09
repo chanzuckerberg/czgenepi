@@ -6,7 +6,7 @@ from typing import Any, Dict, MutableSequence
 import click
 import dateparser
 import sqlalchemy as sa
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, Session
 
 from aspen.api.settings import CLISettings
 from aspen.config.config import Config
@@ -45,7 +45,8 @@ def create_phylo_run(
     tree_type: TreeType,
     pathogen: str,
     repository: str,
-):
+    contextual_repository: PublicRepository,
+) -> PhyloRun:
 
     user = session.query(User).filter(User.email == "hello@czgenepi.org").one()
     aligned_repo_data = (
@@ -64,6 +65,7 @@ def create_phylo_run(
         pathogen=pathogen,
         group=group,
         tree_type=tree_type,
+        contextual_repository=contextual_repository,
     )
     workflow.inputs = [aligned_repo_data]
     workflow.template_args = template_args
@@ -84,9 +86,9 @@ def cli():
 @click.option("--template-args", type=str, default="{}")
 @click.option("--tree-type", type=str, default="OVERVIEW")
 @click.option("--pathogen", type=str, default="SC2")
-@click.option("--launch-sfn", is_flag=True, default=False)
+@click.option("--dry-run", is_flag=True, default=False)
 def launch_one(
-    group: str, template_args: str, tree_type: str, pathogen: str, launch_sfn: bool
+    group: str, template_args: str, tree_type: str, pathogen: str, dry_run: bool
 ):
     # NOTE/TODO - this currently doesn't do any smart input validation, it will just
     # let python raise an exception and explode if anything doesn't make sense.
@@ -98,22 +100,8 @@ def launch_one(
     split_client = SplitClient(settings)
 
     with session_scope(interface) as db:
-        pathogen_obj = (
-            db.execute(sa.select(Pathogen).filter(Pathogen.slug == pathogen))
-            .scalars()
-            .one()
-        )
-        default_repository = split_client.get_pathogen_treatment(
-            "PATHOGEN_public_repository", pathogen_obj
-        )
-        repository = (
-            db.execute(
-                sa.select(PublicRepository).filter(
-                    PublicRepository.name == default_repository
-                )
-            )
-            .scalars()
-            .one()
+        pathogen_obj, repository, contextual_repository = get_pathogen_db_objects(
+            db, split_client, pathogen
         )
 
         if re.match(r"^[0-9]+$", group):
@@ -123,15 +111,23 @@ def launch_one(
         groups_query = sa.select(Group).where(where_clause)  # type: ignore
         group_obj: Group = db.execute(groups_query).scalars().one()
         workflow = create_phylo_run(
-            db, group_obj, template_args_obj, tree_type_obj, pathogen_obj, repository
+            db,
+            group_obj,
+            template_args_obj,
+            tree_type_obj,
+            pathogen_obj,
+            repository,
+            contextual_repository,
         )
 
-        job = NextstrainScheduledJob(settings)
+        if dry_run:
+            db.rollback()
+            return
+
         db.commit()
         print(workflow.id)
-        if launch_sfn:
-            job = NextstrainScheduledJob(settings)
-            job.run(workflow, "scheduled")
+        job = NextstrainScheduledJob(settings)
+        job.run(workflow, "scheduled")
 
 
 def retry_template_args_for_focal_group(
@@ -245,39 +241,62 @@ def get_template_args_for_focal_group(
     return None
 
 
+def get_pathogen_db_objects(db: Session, split_client: SplitClient, pathogen: str):
+    pathogen_obj = (
+        db.execute(sa.select(Pathogen).filter(Pathogen.slug == pathogen))
+        .scalars()
+        .one()
+    )
+    default_repository = split_client.get_pathogen_treatment(
+        "PATHOGEN_public_repository", pathogen_obj
+    )
+    repository = (
+        db.execute(
+            sa.select(PublicRepository).filter(
+                PublicRepository.name == default_repository
+            )
+        )
+        .scalars()
+        .one()
+    )
+    default_contextual_repository = split_client.get_pathogen_treatment(
+        "PATHOGEN_contextual_repository", pathogen_obj
+    )
+    contextual_repository = (
+        db.execute(
+            sa.select(PublicRepository).filter(
+                PublicRepository.name == default_contextual_repository
+            )
+        )
+        .scalars()
+        .one()
+    )
+
+    return pathogen_obj, repository, contextual_repository
+
+
 @cli.command("launch-all")
 @click.option("--pathogen", type=str, default="SC2")
-def launch_all(pathogen):
+@click.option("--dry-run", is_flag=True, default=False)
+def launch_all(pathogen: str, dry_run: bool):
     settings = CLISettings()
 
     interface: SqlAlchemyInterface = init_db(get_db_uri(Config()))
     tree_type = TreeType("OVERVIEW")
     split_client = SplitClient(settings)
     with session_scope(interface) as db:
-        pathogen_obj = (
-            db.execute(sa.select(Pathogen).filter(Pathogen.slug == pathogen))
-            .scalars()
-            .one()
+        pathogen_obj, repository, contextual_repository = get_pathogen_db_objects(
+            db, split_client, pathogen
         )
-        default_repository = split_client.get_pathogen_treatment(
-            "PATHOGEN_public_repository", pathogen_obj
-        )
-        repository = (
-            db.execute(
-                sa.select(PublicRepository).filter(
-                    PublicRepository.name == default_repository
-                )
-            )
-            .scalars()
-            .one()
-        )
-
         all_groups_query = sa.select(Group).options(
             joinedload(Group.default_tree_location)
         )
         all_groups: MutableSequence[Group] = (
             db.execute(all_groups_query).scalars().all()
         )
+
+        all_workflows: list[PhyloRun] = []
+
         for group in all_groups:
             schedule_expression = group.tree_parameters.get("schedule_expression", None)
             if (
@@ -289,8 +308,8 @@ def launch_all(pathogen):
                     group,
                     pathogen_obj,
                     repository,
-                    dateparser.parse(DEFAULT_TEMPLATE_ARGS["filter_start_date"]).date(),
-                    dateparser.parse(DEFAULT_TEMPLATE_ARGS["filter_end_date"]).date(),
+                    dateparser.parse(DEFAULT_TEMPLATE_ARGS["filter_start_date"]).date(),  # type: ignore
+                    dateparser.parse(DEFAULT_TEMPLATE_ARGS["filter_end_date"]).date(),  # type: ignore
                 )
                 if not template_args:
                     print(
@@ -298,12 +317,25 @@ def launch_all(pathogen):
                     )
                     continue
                 workflow = create_phylo_run(
-                    db, group, template_args, tree_type, pathogen_obj, repository
+                    db,
+                    group,
+                    template_args,
+                    tree_type,
+                    pathogen_obj,
+                    repository,
+                    contextual_repository,
                 )
 
-                job = NextstrainScheduledJob(settings)
-                db.commit()
-                job.run(workflow, "scheduled")
+                all_workflows.append(workflow)
+
+        if dry_run:
+            db.rollback()
+            return
+
+        db.commit()
+        for workflow in all_workflows:
+            job = NextstrainScheduledJob(settings)
+            job.run(workflow, "scheduled")
 
 
 if __name__ == "__main__":

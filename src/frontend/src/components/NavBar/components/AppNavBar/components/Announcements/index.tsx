@@ -22,7 +22,7 @@ export const Announcements = (): JSX.Element => {
       >
         <StyledBanner sdsType="primary">
           <B>
-            As of 4/11/23, we have switched from using GISAID for phylo tree
+            As of 4/13/23, we have switched from using GISAID for phylo tree
             focal and contextual samples to using GenBank.&nbsp;
           </B>
           <StyledNewTabLink
