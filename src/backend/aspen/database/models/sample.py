@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 
+from re import sub
+
 from sqlalchemy import (
     Boolean,
     Column,
@@ -213,17 +215,20 @@ class Sample(idbase, DictMixin):  # type: ignore
         if self.public_identifier:
             return
 
+        FORBIDDEN_NAME_CHARACTERS_REGEX = "/[^a-zA-Z0-9._/-]/"
         country = self.collection_location.country
         group_prefix = self.submitting_group.prefix
         current_year: str = datetime.today().strftime("%Y")
         if already_exists:
             id = self.id
-            self.public_identifier = (
+            raw_public_identifier = (
                 f"{prefix}/{country}/{group_prefix}-{id}/{current_year}"
             )
+            self.public_identifier = sub(FORBIDDEN_NAME_CHARACTERS_REGEX, "", raw_public_identifier)
         else:
-            self.public_identifier = func.concat(
+            raw_public_identifier = func.concat(
                 f"{prefix}/{country}/{group_prefix}-",
                 text("currval('aspen.samples_id_seq')"),
                 f"/{current_year}",
             )
+            self.public_identifier = sub(FORBIDDEN_NAME_CHARACTERS_REGEX, "", raw_public_identifier)
