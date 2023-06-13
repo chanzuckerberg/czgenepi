@@ -70,7 +70,7 @@ export const MAX_NAME_LENGTH = 120;
 // All the characters that we do NOT allow for sample name.
 // Effectively just a whitelist of characters, then negated to produce what's forbidden.
 // Allowed characters: all latin alphabet, all digits, ` ` (space), `.`, `_`, `/`, `-`
-export const FORBIDDEN_NAME_CHARACTERS_REGEX = /[^a-zA-Z0-9 ._/-]/;
+export const FORBIDDEN_NAME_CHARACTERS_REGEX = /[^a-zA-Z0-9._/-]/;
 // Above is generally preferable for clarity of intent, but in some cases we
 // have to test for the positive, allowed case instead (i.e., Yup validation)
 // Start of string to end of string, only use allowed chars (see above).
