@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from re import sub
 from typing import Optional, TYPE_CHECKING
 
 from sqlalchemy import (
@@ -213,8 +214,15 @@ class Sample(idbase, DictMixin):  # type: ignore
         if self.public_identifier:
             return
 
-        country = self.collection_location.country
-        group_prefix = self.submitting_group.prefix
+        FORBIDDEN_NAME_CHARACTERS_REGEX = "[^a-zA-Z0-9._/-]"
+        prefix = sub(FORBIDDEN_NAME_CHARACTERS_REGEX, "", prefix)
+        country = sub(
+            FORBIDDEN_NAME_CHARACTERS_REGEX, "", self.collection_location.country
+        )
+        print(country)
+        group_prefix = sub(
+            FORBIDDEN_NAME_CHARACTERS_REGEX, "", self.submitting_group.prefix
+        )
         current_year: str = datetime.today().strftime("%Y")
         if already_exists:
             id = self.id
