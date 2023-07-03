@@ -42,9 +42,9 @@ RUN apt-get update && apt-get install -y  \
 # The cov-lineages projects aren't available on PyPI, so install via git URLs.
 RUN pip3 install snakemake==6.8.0
 RUN pip3 install git+https://github.com/cov-lineages/pangolin.git@v4.3
-RUN pip3 install git+https://github.com/cov-lineages/pangolin-data.git@v1.20
+RUN pip3 install git+https://github.com/cov-lineages/pangolin-data.git@v1.21
 RUN pip3 install git+https://github.com/cov-lineages/scorpio.git@v0.3.17
-RUN pip3 install git+https://github.com/cov-lineages/constellations.git@v0.1.10
+RUN pip3 install git+https://github.com/cov-lineages/constellations.git@v0.1.12
 RUN pip3 install pysam==0.19.1
 
 # libtbb doesn't install well on bullseye:
