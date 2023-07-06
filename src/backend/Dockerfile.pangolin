@@ -40,18 +40,17 @@ RUN apt-get update && apt-get install -y  \
 
 # Install Pangolin and PangoLEARN + deps (for ncov)
 # The cov-lineages projects aren't available on PyPI, so install via git URLs.
-RUN pip3 install snakemake==6.8.0
+RUN pip3 install snakemake==7.30.1
 RUN pip3 install git+https://github.com/cov-lineages/pangolin.git@v4.3
 RUN pip3 install git+https://github.com/cov-lineages/pangolin-data.git@v1.21
 RUN pip3 install git+https://github.com/cov-lineages/scorpio.git@v0.3.17
 RUN pip3 install git+https://github.com/cov-lineages/constellations.git@v0.1.12
-RUN pip3 install pysam==0.19.1
 
 # libtbb doesn't install well on bullseye:
 RUN ln -s /usr/lib/x86_64-linux-gnu/libtbb.so.2 /usr/lib/x86_64-linux-gnu/libtbb_preview.so.2
 
 # Download gofasta and minimap2 for Pangolin
-RUN curl -fsSL https://github.com/virus-evolution/gofasta/releases/download/v0.0.6/gofasta-linux-amd64 \
+RUN curl -fsSL https://github.com/virus-evolution/gofasta/releases/download/v1.2.0/gofasta-linux-amd64 \
  -o /usr/local/bin/gofasta && chmod a+x /usr/local/bin/gofasta
 RUN curl -fsSL https://github.com/lh3/minimap2/releases/download/v2.24/minimap2-2.24_x64-linux.tar.bz2 \
   | tar xjvpf - --no-same-owner --strip-components=1 -C /usr/local/bin minimap2-2.24_x64-linux/minimap2 \
