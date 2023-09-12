@@ -58,6 +58,7 @@ types-dateparser = "^1.0.12"
 splitio-client = {version = "9.1.0", extras = ["cpphash"]}
 oso = "0.25.1"
 sqlalchemy-oso = {path = "sqlalchemy-oso"}
+pytz-deprecation-shim = "^0.1.0.post0"
 
 [tool.poetry.dev-dependencies]
 alembic = "^1.7.3"
