@@ -258,7 +258,7 @@ async def test_callback_syncs_auth0_user_roles(
 
     res = await http_client.get(
         "/v2/auth/callback",
-        allow_redirects=False,
+        follow_redirects=False,
     )
     assert res.status_code == 307
     assert auth0_apiclient.get_user_orgs.call_count == 1  # type: ignore
@@ -285,7 +285,7 @@ async def test_callback_doesnt_sync_localdev_roles(
 
     res = await http_client.get(
         "/v2/auth/callback",
-        allow_redirects=False,
+        follow_redirects=False,
     )
     assert res.status_code == 307
     assert auth0_apiclient.get_user_orgs.call_count == 0  # type: ignore
@@ -315,7 +315,7 @@ async def test_callback_ff_doesnt_sync_auth0_user_roles(
 
     res = await http_client.get(
         "/v2/auth/callback",
-        allow_redirects=False,
+        follow_redirects=False,
     )
     assert res.status_code == 307
     assert auth0_apiclient.get_user_orgs.call_count == 0  # type: ignore
@@ -340,7 +340,7 @@ async def test_callback_error_redirects(
 ):
     res = await http_client.get(
         "/v2/auth/callback",
-        allow_redirects=False,
+        follow_redirects=False,
         params={"error_description": "invitation not found or already used"},
     )
     assert res.status_code == 307
@@ -349,7 +349,7 @@ async def test_callback_error_redirects(
 
     res = await http_client.get(
         "/v2/auth/callback",
-        allow_redirects=False,
+        follow_redirects=False,
         params={"error_description": "expired"},
     )
     assert res.status_code == 307
@@ -387,7 +387,7 @@ async def test_redirect_to_samples_if_exists(
 
     res = await http_client.get(
         "/v2/auth/callback",
-        allow_redirects=False,
+        follow_redirects=False,
     )
     assert res.status_code == 307
     assert auth0_apiclient.get_user_orgs.call_count == 0  # type: ignore
@@ -422,7 +422,7 @@ async def test_redirect_to_group_welcome_if_new(
 
     res = await http_client.get(
         "/v2/auth/callback",
-        allow_redirects=False,
+        follow_redirects=False,
     )
     assert res.status_code == 307
     assert res.is_redirect
