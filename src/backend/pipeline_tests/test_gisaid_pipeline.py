@@ -31,7 +31,7 @@ def test_public_repo_db_objects_were_created(session):
     assert sample.region == "North America"
     assert sample.country == "USA"
     assert sample.division == "Texas"
-    assert sample.location == ""
+    assert sample.location == None  # noqa: E711
     # TODO - I have no idea how this ISL is fetched by ncov-ingest
     assert sample.isl == "EPI_ISL_4630413"
 
