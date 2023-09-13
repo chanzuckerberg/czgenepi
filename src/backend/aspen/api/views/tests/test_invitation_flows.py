@@ -102,7 +102,7 @@ async def make_login_request(
         "/v2/auth/login",
         params=login_params,
         headers=auth_headers,
-        allow_redirects=False,
+        follow_redirects=False,
     )
     return res
 
@@ -264,7 +264,7 @@ async def test_callback_redirect(
     res = await http_client.get(
         "/v2/auth/callback",
         headers=auth_headers,
-        allow_redirects=False,
+        follow_redirects=False,
     )
     assert "process_invitation" in res.headers["Location"]
     _, _, path, _, query, _ = urlparse(res.headers["Location"])
@@ -306,7 +306,7 @@ async def test_process_invitation_success(
         "/v2/auth/process_invitation",
         params=login_params,
         headers=auth_headers,
-        allow_redirects=False,
+        follow_redirects=False,
     )
     auth0_org = {"id": group.auth0_org_id, "display_name": "", "name": ""}
     auth0_apiclient.add_org_member.assert_called_once_with(  # type: ignore
@@ -353,7 +353,7 @@ async def test_process_invitation_failures(
         "/v2/auth/process_invitation",
         params=login_params,
         headers=auth_headers,
-        allow_redirects=False,
+        follow_redirects=False,
     )
     assert res.status_code == 400
 
@@ -368,7 +368,7 @@ async def test_process_invitation_failures(
         "/v2/auth/process_invitation",
         params=login_params,
         headers=auth_headers,
-        allow_redirects=False,
+        follow_redirects=False,
     )
     assert res.headers["Location"] == "/v2/auth/callback"
     redirect_kwargs = auth0_oauth.authorize_redirect.call_args.kwargs
@@ -386,6 +386,6 @@ async def test_process_invitation_failures(
         "/v2/auth/process_invitation",
         params=login_params,
         headers=auth_headers,
-        allow_redirects=False,
+        follow_redirects=False,
     )
     assert res.status_code == 401

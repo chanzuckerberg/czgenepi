@@ -1113,6 +1113,7 @@ async def test_update_samples_success(
         f"/v2/orgs/{group_id}/pathogens/{pathogen_slug}/samples",
         json=request_data,
         headers=auth_headers,
+        follow_redirects=True,
     )
     api_response = {row["id"]: row for row in res.json()["samples"]}
 
@@ -1205,6 +1206,7 @@ async def test_update_samples_access_denied(
         f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples",
         json=data,
         headers=auth_headers,
+        follow_redirects=True,
     )
     assert res.status_code == 404
 
@@ -1309,6 +1311,7 @@ async def test_update_samples_request_failures(
             f"/v2/orgs/{group.id}/pathogens/{pathogen.slug}/samples",
             json=data,
             headers=auth_headers,
+            follow_redirects=True,
         )
         assert res.status_code == response_code
 
