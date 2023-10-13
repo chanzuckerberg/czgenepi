@@ -26,6 +26,7 @@ from aspen.api.views import (
     qc_mutations,
     samples,
     sequences,
+    sunset,
     users,
     usher,
 )
@@ -138,6 +139,9 @@ def get_app() -> FastAPI:
     )
     _app.include_router(
         pathogens.router, prefix="/v2/pathogens", dependencies=[Depends(get_auth_user)]
+    )
+    _app.include_router(
+        sunset.router, prefix="/v2/sunset", dependencies=[Depends(get_auth_user)]
     )
     _app.add_exception_handler(
         AspenException,

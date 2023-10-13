@@ -5,6 +5,8 @@ from aspen.api.utils.pathogens import (  # noqa: F401
     get_pathogen_repo_config_for_pathogen,
 )
 from aspen.api.utils.phylo import (  # noqa: F401
+    _set_colors,
+    _rename_nodes_on_tree,
     extract_accessions,
     process_phylo_tree,
     verify_and_access_phylo_tree,

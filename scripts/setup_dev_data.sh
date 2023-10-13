@@ -177,6 +177,7 @@ ${local_aws} s3api head-bucket --bucket genepi-external-auspice-data || ${local_
 ${local_aws} s3api head-bucket --bucket genepi-db-data || ${local_aws} s3 mb s3://genepi-db-data
 ${local_aws} s3api head-bucket --bucket genepi-gisaid-data || ${local_aws} s3 mb s3://genepi-gisaid-data
 ${local_aws} s3api head-bucket --bucket genepi-batch || ${local_aws} s3 mb s3://genepi-batch
+${local_aws} s3api head-bucket --bucket genepi-sunset || ${local_aws} s3 mb s3://genepi-sunset
 echo
 echo "Dev env is up and running!"
 echo "  Frontend: ${FRONTEND_URL}"

@@ -341,6 +341,22 @@ def cli(ctx, env, org, pathogen_slug, debug, api, stack):
 
 
 @cli.group()
+def sunset():
+    pass
+
+
+@sunset.command(name="create-tree-download")
+@click.argument("group_id", nargs=1)
+@click.pass_context
+def create_tree_download(ctx, group_id):
+    api_client = ctx.obj["api_client"]
+    payload = {"group_id": group_id}
+    resp = api_client.post("/v2/sunset/create_tree_download", json=payload)
+    resp_info = resp.json()
+    print(resp_info)
+
+
+@cli.group()
 def usher():
     pass
 
