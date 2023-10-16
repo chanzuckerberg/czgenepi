@@ -22,7 +22,11 @@ export const Announcements = (): JSX.Element => {
       {shouldShowSunsetBanner && (
         <StyledBanner sdsType="primary">
           <B>CZ GEN EPI will shut down on March 7, 2024. Click&nbsp;</B>
-          <StyledNewTabLink href={"https://help.czgenepi.org/hc/en-us"}>
+          <StyledNewTabLink
+            href={
+              "https://help.czgenepi.org/hc/en-us/articles/20083048785684-Sunset-FAQs"
+            }
+          >
             here
           </StyledNewTabLink>
           <B>&nbsp;to learn more.</B>
