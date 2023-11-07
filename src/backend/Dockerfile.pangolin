@@ -15,7 +15,7 @@ RUN wget http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/faSize
 RUN chmod 775 *
 ## Checkout latest release
 RUN git clone https://github.com/yatisht/usher.git
-RUN cd usher && git checkout v0.6.2 && ./install/installUbuntu.sh
+RUN cd usher && git checkout v0.6.3 && ./install/installUbuntu.sh
 
 FROM python:3.10-slim-bullseye AS base
 ENV FLASK_APP=aspen.main
