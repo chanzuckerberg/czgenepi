@@ -227,7 +227,7 @@ module pangolin_sfn_config {
   source   = "../sfn_config"
   app_name = "pangolin-sfn"
   image    = local.pangolin_image
-  memory   = 16000
+  memory   = 120000
   wdl_path = "workflows/pangolin.wdl"
   custom_stack_name     = local.custom_stack_name
   deployment_stage      = local.deployment_stage
