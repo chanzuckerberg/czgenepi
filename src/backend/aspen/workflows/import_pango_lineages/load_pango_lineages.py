@@ -85,7 +85,7 @@ def get_lineages(lineage_notes_file: io.TextIOBase) -> list[str]:
     """
     # First line is header, no lineage data, but we use as a safety check.
     first_line = next(lineage_notes_file)
-    first_line = first_line.replace(" ", "") # remove any extra spaces that could interfere with safety check
+    first_line = first_line.replace(" ", "")  # remove any extra spaces that could interfere with safety check
     safety_check_first_line(first_line)
 
     # Now we parse remainder of lines from file and extract lineages
