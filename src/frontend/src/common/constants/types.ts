@@ -15,4 +15,4 @@ export const TreeTypes = {
   Overview: "OVERVIEW",
 };
 
-export type TreeType = (typeof TreeTypes)[keyof typeof TreeTypes];
+export type TreeType = typeof TreeTypes[keyof typeof TreeTypes];
