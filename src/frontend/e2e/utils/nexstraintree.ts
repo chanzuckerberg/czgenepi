@@ -1,4 +1,3 @@
-import { faker } from "@faker-js/faker";
 import { sample } from "lodash";
 import { getADateInThePast, getValueOrDefault } from "./common";
 
@@ -11,7 +10,7 @@ export class NextstrainUtil {
     const treeTypes = ["OVERVIEW", "TARGETED"];
 
     return {
-      name: getValueOrDefault(defaults?.name, faker.name.fullName()) as string,
+      name: getValueOrDefault(defaults?.name, "Some Name") as string,
       samples: defaults?.samples !== undefined ? defaults?.samples : [],
       tree_type: getValueOrDefault(
         defaults?.tree_type,
