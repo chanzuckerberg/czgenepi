@@ -46,7 +46,7 @@ jobs:
           environment: staging
           owner: chanzuckerberg
           repo: czgenepi
-          happy_version: "0.41.0"
+          happy_version: "0.41.3"
       - name: Generate payload
         run: |
           if [ -n "${{ github.event.inputs.image_tag }}" ]; then

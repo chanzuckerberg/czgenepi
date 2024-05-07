@@ -92,4 +92,4 @@ jobs:
         with:
           tfe-token: ${{ secrets.TFE_TOKEN }}
           stack-name: ${{ steps.stack-name.outputs.stack-name }}
-          happy_version: "0.41.0"
+          happy_version: "0.41.3"

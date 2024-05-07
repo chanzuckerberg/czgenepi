@@ -149,7 +149,7 @@ jobs:
   #     - name: Install happy
   #       uses: chanzuckerberg/github-actions/.github/actions/install-happy@install-happy-v1.4.0
   #       with:
-  #         happy_version: "0.41.0"
+  #         happy_version: "0.41.3"
   #         install_globally: "true"
   #     - name: Playwright tests
   #       run: |
@@ -186,7 +186,7 @@ jobs:
       - name: Install happy
         uses: chanzuckerberg/github-actions/.github/actions/install-happy@install-happy-v1.4.0
         with:
-          happy_version: "0.41.0"
+          happy_version: "0.41.3"
           install_globally: "true"
       - name: Test Python
         run: |
@@ -213,7 +213,7 @@ jobs:
       - name: Install happy
         uses: chanzuckerberg/github-actions/.github/actions/install-happy@405f86e7f30b41403677c5df2d8d3339afa3c6d7
         with:
-          happy_version: "0.41.0"
+          happy_version: "0.41.3"
           install_globally: "true"
       - name: Test Gisaid workflow
         run: |
@@ -297,7 +297,7 @@ jobs:
         with:
           source-tag: ${{ env.SOURCE_TAG }}
           dest-tag: ${{ env.DEST_TAG }}
-          happy_version: "0.41.0"
+          happy_version: "0.41.3"
       - name: Generate payload
         run: |
           echo "payload={\"tag\":\"sha-${GITHUB_SHA:0:8}\"}" >> $GITHUB_ENV
