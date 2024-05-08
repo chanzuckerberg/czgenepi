@@ -103,6 +103,7 @@ services:
         aliases:
           - backend.genepinet.localdev
   localstack:
+    platform: linux/amd64
     image: localstack/localstack:0.13.0
     profiles: [ "backend", "web", "gisaid", "all" ]
     ports:
@@ -125,6 +126,7 @@ services:
         aliases:
           - localstack.genepinet.localdev
   oidc:
+    platform: linux/amd64
     image: ghcr.io/soluto/oidc-server-mock:latest
     profiles: [ "backend", "web", "gisaid", "all" ]
     ports:
