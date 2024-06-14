@@ -38,10 +38,10 @@ import {
 export default function StaticPageNavBar(): JSX.Element {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const flag = useTreatments([USER_FEATURE_FLAGS.multi_pathogen]);
-  const isMultiPathogenFlagOn = isUserFlagOn(
+  const flag = useTreatments([USER_FEATURE_FLAGS.transfer_banner]);
+  const isTransferBannerFlagOn = isUserFlagOn(
     flag,
-    USER_FEATURE_FLAGS.multi_pathogen
+    USER_FEATURE_FLAGS.transfer_banner
   );
 
   function toggleMobileNav() {
@@ -122,15 +122,16 @@ export default function StaticPageNavBar(): JSX.Element {
 
   return (
     <HeaderContainer data-test-id="navbar-landing">
-      {isMultiPathogenFlagOn && (
+      {isTransferBannerFlagOn && (
         <Banner sdsType="primary">
-          CZ GEN EPI now supports multiple pathogens. &nbsp;
+          THEIAGEN GLOBAL HEALTH INITIATIVE WILL MANAGE CZ GEN EPI ON OCTOBER 25, 2024. CLICK&nbsp;
           <Link
-            href="https://help.czgenepi.org/hc/en-us/articles/7082825141012-Which-pathogens-can-I-investigate-through-CZ-GEN-EPI-"
+            href="https://help.czgenepi.org/hc/en-us/articles/20083077583764-FAQs-CZ-GEN-EPI-Transfer-to-Theiagen-Global-Health-Initiative-TGHI"
             sdsStyle="dashed"
           >
-            Learn More.
+            HERE
           </Link>
+          &nbsp;FOR MORE INFORMATION.
         </Banner>
       )}
       <HeaderMaxWidthContainer>
