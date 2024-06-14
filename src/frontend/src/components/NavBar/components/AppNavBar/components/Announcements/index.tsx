@@ -5,31 +5,30 @@ import { useTreatments } from "@splitsoftware/splitio-react";
 import { isUserFlagOn } from "src/components/Split";
 
 // Note: this was previously for privacy policy announcements
-// It was pretty convenient to reuse - maybe we want to keep
-// it around for one-off banners.
+// It was pretty convenient to reuse so we use it for one off announcements.
 
-// Show Banner to let users know we are sunsetting the app
+// Show Banner to let users know we are transferring the app
 export const Announcements = (): JSX.Element => {
-  const flag = useTreatments([USER_FEATURE_FLAGS.sunset_banner]);
+  const flag = useTreatments([USER_FEATURE_FLAGS.transfer_banner]);
 
-  const shouldShowSunsetBanner = isUserFlagOn(
+  const shouldShowTransferBanner = isUserFlagOn(
     flag,
-    USER_FEATURE_FLAGS.sunset_banner
+    USER_FEATURE_FLAGS.transfer_banner
   );
 
   return (
     <>
-      {shouldShowSunsetBanner && (
+      {shouldShowTransferBanner && (
         <StyledBanner sdsType="primary">
-          <B>CZ GEN EPI will shut down on March 7, 2024. Click&nbsp;</B>
+          <B>THEIAGEN GLOBAL HEALTH INITIATIVE WILL MANAGE CZ GEN EPI ON OCTOBER 25, 2024. CLICK&nbsp;</B>
           <StyledNewTabLink
             href={
-              "https://help.czgenepi.org/hc/en-us/articles/20083048785684-Sunset-FAQs"
+              "https://help.czgenepi.org/hc/en-us/articles/20083077583764-FAQs-CZ-GEN-EPI-Transfer-to-Theiagen-Global-Health-Initiative-TGHI"
             }
           >
-            here
+            HERE
           </StyledNewTabLink>
-          <B>&nbsp;to learn more.</B>
+          <B>&nbsp;FOR MORE INFORMATION.</B>
         </StyledBanner>
       )}
     </>

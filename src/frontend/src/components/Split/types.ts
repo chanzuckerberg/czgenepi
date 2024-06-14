@@ -20,6 +20,7 @@ export enum USER_FEATURE_FLAGS {
   internal_user = "internal_user",
   multi_pathogen = "multi_pathogen",
   sunset_banner = "sunset_banner",
+  transfer_banner = "transfer_banner",
 }
 
 /**
