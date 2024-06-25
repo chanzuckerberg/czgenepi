@@ -25,6 +25,10 @@ FROM python:3.10-slim-bullseye AS base
 ENV FLASK_APP=aspen.main
 EXPOSE 3000
 
+# Install DB certs.
+ADD https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem /usr/local/share/ca-certificates/global-bundle.crt
+RUN update-ca-certificates
+
 # Utility
 RUN apt-get update && apt-get install -y vim procps wget make jq nano
 

@@ -49,6 +49,10 @@ RUN apt-get -qq update && apt-get -qq -y install \
 
 ENV FLASK_ENV=development
 
+# Install DB certs.
+ADD https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem /usr/local/share/ca-certificates/global-bundle.crt
+RUN update-ca-certificates
+
 # Install poetry
 RUN apt install -y libdigest-sha-perl
 ENV POETRY_VERSION=1.3.2

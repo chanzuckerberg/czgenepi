@@ -38,6 +38,10 @@ RUN apt-get update && apt-get install -y  \
         libprotobuf23 \
         libtbb2
 
+# Install DB certs.
+ADD https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem /usr/local/share/ca-certificates/global-bundle.crt
+RUN update-ca-certificates
+
 # Install Pangolin and PangoLEARN + deps (for ncov)
 # The cov-lineages projects aren't available on PyPI, so install via git URLs.
 RUN pip3 install snakemake==7.30.1

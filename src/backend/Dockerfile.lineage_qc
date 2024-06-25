@@ -13,6 +13,10 @@ WORKDIR /usr/src/app
 
 RUN apt-get update && apt-get install -y make wget git jq gcc unzip
 
+# Install DB certs.
+ADD https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem /usr/local/share/ca-certificates/global-bundle.crt
+RUN update-ca-certificates
+
 # install nextclade, check it installed correctly
 RUN apt-get --yes install curl
 RUN cd /usr/local/bin && curl -fsSL "https://github.com/nextstrain/nextclade/releases/download/2.14.0/nextclade-x86_64-unknown-linux-gnu" -o "nextclade" && chmod +x nextclade
