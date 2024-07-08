@@ -1,0 +1,158 @@
+name: Docker Image Build
+
+on:
+  workflow_call:
+    inputs:
+      envs:
+        description: 'Env names, comma delimited'
+        required: true
+        type: string
+      path_filters:
+        description: 'Glob patterns to match against changed files in the repository, comma delimited'
+        required: true
+        type: string
+      branches:
+        description: 'Branches to build on, comma delimited'
+        required: false
+        type: string
+        default: '*'
+      branches_ignore:
+        description: 'Branches to skip build on, comma delimited'
+        required: false
+        type: string
+        default: ''
+      ecr_registry:
+        type: string
+        required: true
+        description: ECR registry to store the built images
+      images:
+        description: 'JSON array of images to build (required keys: dockerfile, context, name, platform)'
+        required: true
+        type: string
+
+jobs:
+  prep:
+    name: Prep for Build
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, '[no-deploy]') == false
+    outputs:
+      image-tag: ${{ steps.build-tags.outputs.IMAGE_TAG }}
+      images: ${{ steps.parse-images.outputs.images }}
+      envs: ${{ steps.parse-envs.outputs.envs }}
+    permissions:
+        id-token: write
+        contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get build tag
+        id: build-tags
+        run: |
+          echo "IMAGE_TAG=sha-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: Parse images
+        id: parse-images
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const images = JSON.parse(`${{ inputs.images }}`);
+            core.setOutput('images', images);
+      - name: Parse envs
+        id: parse-envs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const envs = `${{ inputs.envs }}`.split(',').map(env => env.trim());
+            core.setOutput('envs', envs.join(' '));
+  build-docker:
+    name: Build Docker Image
+    needs: [prep]
+    runs-on: ubuntu-20.04
+    env:
+      IMAGE_TAG: ${{ needs.prep.outputs.image-tag }}
+    if: needs.prep.outputs.image-tag != '' && needs.prep.outputs.image-tag != 'sha-' && needs.prep.outputs.images != '[]'
+    permissions:
+      id-token: write
+      contents: read
+    strategy:
+      matrix:
+        image: ${{ fromJson(needs.prep.outputs.images) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: ${{ github.event.repository.name }}
+      # TODO:
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     aws-region: us-west-2
+      #     role-to-assume: arn:aws:iam::533267185808:role/gh_actions_core_platform_infra_prod_eks
+      #     role-session-name: ContainerBuildTest
+
+      # TODO:
+      # - name: Generate token
+      #   id: generate_token
+      #   uses: chanzuckerberg/github-app-token@v1.1.4
+      #   with:
+      #     app_id: ${{ secrets.CZI_GITHUB_HELPER_APP_ID }}
+      #     private_key: ${{ secrets.CZI_GITHUB_HELPER_PK }}
+      # - uses: actions/checkout@v4
+      #   with:
+      #     repository: chanzuckerberg/core-platform-settings
+      #     path: core-platform-settings
+      #     # token: ${{ steps.generate_token.outputs.token }}
+
+      # - name: Create ECR repo if necessary
+      #   uses: int128/create-ecr-repository-action@v1
+      #   with:
+      #     repository: core-platform/${{ github.event.repository.name }}/${{ matrix.image.name }}
+      #     lifecycle-policy: core-platform-settings/ecr/lifecycle-policy.json
+      #     repository-policy: core-platform-settings/ecr/repository-policy.json
+      - name: Build And Push
+        uses: chanzuckerberg/github-actions/.github/actions/docker-build-push@docker-build-push-v1.6.0
+        with:
+          dockerfile: ${{ github.event.repository.name }}/${{ matrix.image.dockerfile }}
+          context: ${{ github.event.repository.name }}/${{ matrix.image.context }}
+          name: ${{ matrix.image.name }}
+          registry: ${{ inputs.ecr_registry }}
+          custom_tag: ${{ env.IMAGE_TAG }}
+          platforms: ${{ matrix.image.platform == 'linux/amd64' && 'linux/amd64' || 'linux/arm64' }}
+          build_args: IMAGE_TAG=${{ env.IMAGE_TAG }}
+
+  # update-manifests:
+  #   name: Update ArgoCD manifests
+  #   needs: [prep, build-docker]
+  #   runs-on: ubuntu-20.04
+  #   env:
+  #     IMAGE_TAG: ${{ needs.prep.outputs.image-tag }}
+  #   if: needs.prep.outputs.image-tag != '' && needs.prep.outputs.image-tag != 'sha-' && needs.prep.outputs.images != '[]'
+  #   permissions:
+  #       id-token: write
+  #       contents: read
+  #   steps:
+  #     - run: |
+  #         echo IMAGE_TAG=$IMAGE_TAG
+  #     - name: Generate token
+  #       id: generate_token
+  #       uses: chanzuckerberg/github-app-token@v1.1.4
+  #       with:
+  #         app_id: ${{ secrets.CZI_RELEASE_PLEASE_APP_ID }}
+  #         private_key: ${{ secrets.CZI_RELEASE_PLEASE_PK }}
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  #         token: ${{ steps.generate_token.outputs.token }}
+  #     - name: Update Manifest
+  #       shell: bash
+  #       run: |
+  #         for env in ${{ needs.prep.outputs.envs }}
+  #         do
+  #           sed -i 's/tag: sha-\w\+/tag: ${{ env.IMAGE_TAG }}/g' .infra/${env}/values.yaml
+  #           cat .infra/${env}/values.yaml
+  #         done
+  #     - name: Update Argus manifests
+  #       uses: EndBug/add-and-commit@v9
+  #       with:
+  #         add: -A
+  #         message: 'chore: Updated [${{ needs.prep.outputs.envs }}] values.yaml image tags to ${{ env.IMAGE_TAG }}'

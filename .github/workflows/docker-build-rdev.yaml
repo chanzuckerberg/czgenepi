@@ -1,0 +1,22 @@
+name: Docker Image Build
+
+on:
+  - push
+
+jobs:
+  rdev_argus_builder:
+    uses: ./.github/workflows/docker-build-workflow.yaml
+    secrets: inherit
+    with:
+      envs: rdev
+      path_filters: src/**,.github/**
+      branches_ignore: main,release-please--branches--main
+      images: |
+        [
+          {
+            "name": "frontend",
+            "context": "./src/frontend",
+            "dockerfile": "src/frontend/Dockerfile",
+            "platform": "linux/amd64"
+          }
+        ]
