@@ -55,7 +55,7 @@ jobs:
           dockerfile: ${{ matrix.image.dockerfile }}
           context: ${{ matrix.image.context }}
           name: ${{ matrix.image.name }}
-          registry: ${{ secrets.ECR_REPO }}
+          registry: 654654542669.dkr.ecr.us-west-2.amazonaws.com
 
   create-update-rdev:
     runs-on: ubuntu-20.04
