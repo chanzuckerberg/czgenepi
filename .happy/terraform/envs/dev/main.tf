@@ -5,7 +5,7 @@ module "stack" {
   happymeta_          = var.happymeta_
   happy_config_secret = var.happy_config_secret
   image_tag           = local.image_tag
-  image_tags          = jsondecode(local.image_tags)
+  image_tags          = {}
   priority            = var.priority
   stack_name          = var.stack_name
   deployment_stage    = "dev"
