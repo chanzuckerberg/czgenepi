@@ -74,7 +74,6 @@ GENBANK_CSV_FIELDS = [
     "date_submitted",
     "sra_accession",
     "abbr_authors",
-    "reverse",
     "clade",
     "outbreak",
     "lineage",
