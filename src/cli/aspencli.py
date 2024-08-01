@@ -12,7 +12,9 @@ import dateparser
 import keyring
 import requests
 from auth0.v3.authentication.token_verifier import (
-    AsymmetricSignatureVerifier, JwksFetcher)
+    AsymmetricSignatureVerifier,
+    JwksFetcher,
+)
 from tabulate import tabulate
 
 
@@ -222,7 +224,7 @@ class ApiClient:
 
 class CliConfig:
     api_urls = {
-        "staging": "https://api.staging.czgenepi.org",
+        "staging": "https://api.staging.testing-theiagenepi.org",
         "prod": "https://api.czgenepi.org",
         "rdev": "https://{stack}-backend.dev.czgenepi.org",
         "local": "http://backend.genepinet.localdev:3000",
