@@ -50,7 +50,7 @@ RUN pip3 install snakemake==7.30.1
 # for now pinning pulp to 2.7.0 works
 RUN pip3 install pulp==2.7.0
 RUN pip3 install git+https://github.com/cov-lineages/pangolin.git@v4.3.1
-RUN pip3 install git+https://github.com/cov-lineages/pangolin-data.git@v1.28
+RUN pip3 install git+https://github.com/cov-lineages/pangolin-data.git@v1.29
 RUN pip3 install git+https://github.com/cov-lineages/scorpio.git@v0.3.19
 RUN pip3 install git+https://github.com/cov-lineages/constellations.git@v0.1.12
 
