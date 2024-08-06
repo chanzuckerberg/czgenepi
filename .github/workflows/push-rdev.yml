@@ -59,7 +59,7 @@ jobs:
       - name: print the tag
         shell: python
         run: |
-          print( str(${{ steps.build_outputs.outputs.tags }} ) )
+          print( str(${{ steps.build_outputs.outputs.tags.[1] }} ) )
       # TODO: figure out whether {{ secrets.GITHUB_TOKEN }} is enough for this step:
       # - name: Update the file
       #   uses: EndBug/add-and-commit@v9
