@@ -60,7 +60,7 @@ jobs:
         run: |
           {
             echo 'IMAGE_SHA<<EOL'
-            steps.build_outputs.outputs.tags
+            ${{ steps.build_outputs.outputs.tags }}
             echo EOL
           } >> "$GITHUB_ENV"
       - name: print the tag
