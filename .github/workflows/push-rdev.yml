@@ -59,7 +59,7 @@ jobs:
       - name: echo the tags to github output
         run: |
             echo 'IMAGE_SHA<<EOF'  >> "$GITHUB_ENV"
-            echo ${{ steps.build_outputs.outputs.tags }} >> "$GITHUB_ENV"
+            echo '${{ steps.build_outputs.outputs.tags }}' >> "$GITHUB_ENV"
             echo 'EOF'  >> "$GITHUB_ENV"
       - name: print the tag
         shell: bash
