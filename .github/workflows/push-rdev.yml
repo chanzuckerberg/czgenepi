@@ -65,7 +65,9 @@ jobs:
         shell: python
         run: |
           import os
-          print(os.environ["IMAGE_SHA"])
+          image_lines = os.environ["IMAGE_SHA"]
+          for image in image_lines.split("\n"):
+            print(image)
       # - name: print the tag
       #   shell: bash
       #   run: echo ${{ env.IMAGE_SHA }} 
