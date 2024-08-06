@@ -1,1 +1,5 @@
-{"locals": {"image_tag": "sha-7ec47ca8"}}
+{
+    "locals": {
+        "image_tag": "sha-b5eb0e3"
+    }
+}
