@@ -67,7 +67,9 @@ jobs:
           import os
           image_lines = os.environ["IMAGE_SHA"]
           for image in image_lines.split("\n"):
-            print(image)
+            print(f"image is {image}")
+          
+          print(os.listdir() )
       # - name: print the tag
       #   shell: bash
       #   run: echo ${{ env.IMAGE_SHA }} 
