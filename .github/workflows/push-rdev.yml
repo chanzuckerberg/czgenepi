@@ -65,17 +65,19 @@ jobs:
         shell: python
         run: |
           import os
-          # image_lines = os.environ["IMAGE_SHA"]
-          # for image in image_lines.split("\n"):
-          #   tag = image.split(":")[-1] # colons are illegal in branch names
-          #   print(f"tag is {tag}")
+          image_lines = os.environ["IMAGE_SHA"]
+          vars = {"locals": {}}
+          for image in image_lines.split("\n"):
+            tag = image.split(":")[-1] # colons are illegal in branch names
+            if tag[:4] == "sha-" and len(tag) <= 11:
+              vars[locals]["image_tag"] = tag
+              print(f"tag is {tag}")
 
-          vars = {"locals": {"image_tag": "sha-7ec47ca8"}}
           # next: try to write to the .happy/terraform/envs/dev/locals.tf.json
           import json
           with open('.happy/terraform/envs/dev/locals.tf.json', 'w') as fp:
               json.dump(vars, fp)
-          print(os.listdir() )
+          # print(os.listdir() )
       # - name: print the tag
       #   shell: bash
       #   run: echo ${{ env.IMAGE_SHA }} 
