@@ -76,7 +76,7 @@ jobs:
           # next: try to write to the .happy/terraform/envs/dev/locals.tf.json
           import json
           with open('.happy/terraform/envs/dev/locals.tf.json', 'w') as fp:
-              json.dump(vars, fp)
+              json.dump(vars, fp, indent = 4)
           # print(os.listdir() )
       # - name: print the tag
       #   shell: bash
