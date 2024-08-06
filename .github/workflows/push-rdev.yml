@@ -58,11 +58,9 @@ jobs:
           registry: 654654542669.dkr.ecr.us-west-2.amazonaws.com
       - name: echo the tags to github output
         run: |
-          {
-            echo 'IMAGE_SHA<<EOF'
-            ${{ steps.build_outputs.outputs.tags }}
-            echo EOF
-          } >> "$GITHUB_ENV"
+            echo 'IMAGE_SHA<<EOF'  >> "$GITHUB_ENV"
+            ${{ steps.build_outputs.outputs.tags }} >> "$GITHUB_ENV"
+            echo EOF  >> "$GITHUB_ENV"
       - name: print the tag
         shell: bash
         run: echo "The image sha is $IMAGE_SHA"
