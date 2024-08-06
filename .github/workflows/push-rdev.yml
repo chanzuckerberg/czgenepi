@@ -56,10 +56,12 @@ jobs:
           context: ${{ matrix.image.context }}
           name: ${{ matrix.image.name }}
           registry: 654654542669.dkr.ecr.us-west-2.amazonaws.com
-      - name: print the tag
-        shell: python
+      - name: echo the tags to github output
         run: |
-          print( str(${{ steps.build_outputs.outputs.tags[1] }} ) )
+          echo "{IMAGE_SHA}=${{ steps.build_outputs.outputs.tags }} " >> "$GITHUB_ENV"
+      - name: print the tag
+        shell: bash
+        run: echo "The image sha is $IMAGE_SHA"
       # TODO: figure out whether {{ secrets.GITHUB_TOKEN }} is enough for this step:
       # - name: Update the file
       #   uses: EndBug/add-and-commit@v9
