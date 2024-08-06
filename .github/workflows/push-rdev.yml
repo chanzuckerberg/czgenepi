@@ -73,8 +73,8 @@ jobs:
           vars = {"locals": {"image_tag": "sha-7ec47ca8"}}
           # next: try to write to the .happy/terraform/envs/dev/locals.tf.json
           import json
-          with open('result.json', 'w') as fp:
-              json.dump(sample, fp)
+          with open('.happy/terraform/envs/dev/locals.tf.json', 'w') as fp:
+              json.dump(vars, fp)
           print(os.listdir() )
       # - name: print the tag
       #   shell: bash
