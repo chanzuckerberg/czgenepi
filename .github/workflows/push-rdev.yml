@@ -58,15 +58,17 @@ jobs:
           registry: 654654542669.dkr.ecr.us-west-2.amazonaws.com
       # checkout the latest changes
       - name: echo the tags to github output
+      # Multi-line handling is tricky. Needed this link to help:
+      # https://medium.com/@ibraheemabukaff/github-actions-exporting-multi-line-one-line-value-environment-variable-5bb86d01e866
         run: |
-            echo 'IMAGE_SHA<<EOF'  >> $GITHUB_ENV
+            echo 'IMAGE_TAGS<<EOF'  >> $GITHUB_ENV
             echo '${{ steps.build_outputs.outputs.tags }}' >> $GITHUB_ENV
             echo 'EOF'  >> $GITHUB_ENV
       - name: use python parse the output
         shell: python
         run: |
           import os
-          image_lines = os.environ["IMAGE_SHA"]
+          image_lines = os.environ["IMAGE_TAGS"]
           vars = {"locals": {}}
           for image in image_lines.split("\n"):
             tag = image.split(":")[-1] # colons are illegal in branch names
