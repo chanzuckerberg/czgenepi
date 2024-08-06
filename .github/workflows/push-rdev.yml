@@ -61,9 +61,14 @@ jobs:
             echo 'IMAGE_SHA<<EOF'  >> $GITHUB_ENV
             echo '${{ steps.build_outputs.outputs.tags }}' >> $GITHUB_ENV
             echo 'EOF'  >> $GITHUB_ENV
-      - name: print the tag
-        shell: bash
-        run: echo ${{ env.IMAGE_SHA }} 
+      - name: use python parse the output
+        shell: python
+        run: |
+          import os
+          print(os.environ)
+      # - name: print the tag
+      #   shell: bash
+      #   run: echo ${{ env.IMAGE_SHA }} 
       # TODO: figure out whether {{ secrets.GITHUB_TOKEN }} is enough for this step:
       # - name: Update the file
       #   uses: EndBug/add-and-commit@v9
