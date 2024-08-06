@@ -64,7 +64,7 @@ jobs:
       - name: use python parse the output
         shell: python
         run: |
-          # import os
+          import os
           # image_lines = os.environ["IMAGE_SHA"]
           # for image in image_lines.split("\n"):
           #   tag = image.split(":")[-1] # colons are illegal in branch names
