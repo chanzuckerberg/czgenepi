@@ -2,14 +2,14 @@
 #
 locals {
   default_env_vars = {
-    "REMOTE_DEV_PREFIX" : "${var.remote_dev_prefix}",
+    "REMOTE_DEV_PREFIX" : var.remote_dev_prefix,
     "GENEPI_CONFIG_SECRET_NAME" : "${var.deployment_stage}/genepi-config",
-    "DEPLOYMENT_STAGE" : "${var.deployment_stage}",
-    "AWS_REGION" : "${data.aws_region.current.name}",
-    "FRONTEND_URL" : "${var.frontend_url}",
-    "API_URL" : "${var.api_url}",
+    "DEPLOYMENT_STAGE" : var.deployment_stage,
+    "AWS_REGION" : data.aws_region.current.name,
+    "FRONTEND_URL" : var.frontend_url,
+    "API_URL" : var.api_url,
     "FLASK_ENV" : "production",
-    "AWS_DEFAULT_REGION" : "${data.aws_region.current.name}",
+    "AWS_DEFAULT_REGION" : data.aws_region.current.name,
   }
   env_vars = [for k, v in merge(local.default_env_vars, var.extra_env_vars) : { "name" : k, "value" : v }]
 }
