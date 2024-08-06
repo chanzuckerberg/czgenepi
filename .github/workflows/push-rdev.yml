@@ -57,7 +57,6 @@ jobs:
           name: ${{ matrix.image.name }}
           registry: 654654542669.dkr.ecr.us-west-2.amazonaws.com
       # checkout the latest changes
-      - 
       - name: echo the tags to github output
         run: |
             echo 'IMAGE_SHA<<EOF'  >> $GITHUB_ENV
