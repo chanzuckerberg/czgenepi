@@ -64,21 +64,27 @@ jobs:
       - name: use python parse the output
         shell: python
         run: |
-          import os
-          image_lines = os.environ["IMAGE_SHA"]
-          for image in image_lines.split("\n"):
-            print(f"image is {image}")
-          
+          # import os
+          # image_lines = os.environ["IMAGE_SHA"]
+          # for image in image_lines.split("\n"):
+          #   tag = image.split(":")[-1] # colons are illegal in branch names
+          #   print(f"tag is {tag}")
+
+          vars = {"locals": {"image_tag": "sha-7ec47ca8"}}
+          # next: try to write to the .happy/terraform/envs/dev/locals.tf.json
+          import json
+          with open('result.json', 'w') as fp:
+              json.dump(sample, fp)
           print(os.listdir() )
       # - name: print the tag
       #   shell: bash
       #   run: echo ${{ env.IMAGE_SHA }} 
       # TODO: figure out whether {{ secrets.GITHUB_TOKEN }} is enough for this step:
-      # - name: Update the file
-      #   uses: EndBug/add-and-commit@v9
-      #   with:
-      #     add: -A
-      #     message: 'chore: Updated locals.tf.json file with new image tag'
+      - name: Update the file
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: -A
+          message: 'chore: Updated locals.tf.json file with new image tag'
 
   create-update-rdev:
     runs-on: ubuntu-20.04
