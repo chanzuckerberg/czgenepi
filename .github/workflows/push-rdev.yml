@@ -70,7 +70,7 @@ jobs:
           for image in image_lines.split("\n"):
             tag = image.split(":")[-1] # colons are illegal in branch names
             if tag[:4] == "sha-" and len(tag) <= 11:
-              vars[locals]["image_tag"] = tag
+              vars["locals"]["image_tag"] = tag
               print(f"tag is {tag}")
 
           # next: try to write to the .happy/terraform/envs/dev/locals.tf.json
