@@ -6,8 +6,8 @@ workflow LoadGenBankMPX {
         String aws_region = "us-west-2"
         String genepi_config_secret_name
         String remote_dev_prefix = ""
-        String genbank_metadata_url = "https://data.nextstrain.org/files/workflows/monkeypox/metadata.tsv.gz"
-        String genbank_alignment_url = "https://data.nextstrain.org/files/workflows/monkeypox/alignment.fasta.xz"
+        String genbank_metadata_url = "https://data.nextstrain.org/files/workflows/mpox/metadata.tsv.gz"
+        String genbank_alignment_url = "https://data.nextstrain.org/files/workflows/mpox/alignment.fasta.xz"
     }
 
     call IngestGenBankMPX {
