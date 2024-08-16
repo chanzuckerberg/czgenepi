@@ -20,7 +20,7 @@ shopt -s inherit_errexit  # no silent breaking
 # This is where we will store Nextclade's dataset for the target pathogen.
 NEXTCLADE_DATASET_DIR=nextclade_dataset_bundle
 # Inside the dataset, Nextclade uses this file to tag the dataset.
-NEXTCLADE_TAG_FILENAME=tag.json
+NEXTCLADE_TAG_FILENAME=pathogen.json
 
 # Certain bits of info need to be passed around during the workflow.
 # Using JSON file as an easy way to pass them around to various processes.

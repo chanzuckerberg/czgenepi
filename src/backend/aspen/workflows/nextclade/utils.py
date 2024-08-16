@@ -24,7 +24,7 @@ def extract_dataset_info(nextclade_tag_fh: IO[str]) -> Dict[str, str]:
     """
     nextclade_tag = json.load(nextclade_tag_fh)
     return {
-        "name": nextclade_tag["name"],
-        "accession": nextclade_tag["reference"]["accession"],
-        "tag": nextclade_tag["tag"],
+        "name": nextclade_tag["attributes"]["name"],
+        "accession": nextclade_tag["attributes"]["reference accession"],
+        "tag": nextclade_tag["version"]["tag"],
     }
