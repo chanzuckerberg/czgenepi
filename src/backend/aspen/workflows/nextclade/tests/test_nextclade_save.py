@@ -63,7 +63,6 @@ def mock_remote_db_uri(mocker, test_postgres_db_uri):
 
 
 def test_nextclade_save_new_entries(mocker, session, postgres_database):
-
     group, samples, pathogen_genomes = create_test_data(session)
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
@@ -71,7 +70,7 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
     nextclade_fasta: PosixPath = Path(
         Path(__file__).parent, "data", "nextclade.aligned.fasta"
     )
-    tag_json: PosixPath = Path(Path(__file__).parent, "data", "tag.json")
+    tag_json: PosixPath = Path(Path(__file__).parent, "data", "pathogen.json")
 
     runner: CliRunner = CliRunner()
     result: Result = runner.invoke(
@@ -121,16 +120,15 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
     assert qc_metrics.qc_software_version == "v1.1"
     assert lineage.lineage == "21J (Delta)"
     # matched against value from test tag.json in test data directory
-    assert qc_metrics.reference_dataset_name == "sars-cov-2"
+    assert qc_metrics.reference_dataset_name == "SARS-CoV-2"
     assert qc_metrics.reference_sequence_accession == "MN908947"
-    assert qc_metrics.reference_dataset_tag == "2022-11-15T12:00:00Z"
+    assert qc_metrics.reference_dataset_tag == "2024-07-17--12-57-03Z"
     # matched against tag.json and nextclade.aligned.fasta in test data dir
     assert aligned_pathogen_genome.reference_name == "MN908947"
     assert aligned_pathogen_genome.sequence == "A" * 1001
 
 
 def test_nextclade_save_overwrite(mocker, session, postgres_database):
-
     group, samples, pathogen_genomes = create_test_data(session)
     mock_remote_db_uri(mocker, postgres_database.as_uri())
 
@@ -176,7 +174,7 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
     nextclade_fasta: PosixPath = Path(
         Path(__file__).parent, "data", "nextclade.aligned.fasta"
     )
-    tag_json: PosixPath = Path(Path(__file__).parent, "data", "tag.json")
+    tag_json: PosixPath = Path(Path(__file__).parent, "data", "pathogen.json")
 
     runner: CliRunner = CliRunner()
     result: Result = runner.invoke(
@@ -222,9 +220,9 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
     assert qc_metrics.qc_software_version == "v1.1"
     assert lineage.lineage == "21J (Delta)"
     # matched against value from test tag.json in test data directory
-    assert qc_metrics.reference_dataset_name == "sars-cov-2"
+    assert qc_metrics.reference_dataset_name == "SARS-CoV-2"
     assert qc_metrics.reference_sequence_accession == "MN908947"
-    assert qc_metrics.reference_dataset_tag == "2022-11-15T12:00:00Z"
+    assert qc_metrics.reference_dataset_tag == "2024-07-17--12-57-03Z"
     # matched against tag.json and nextclade.aligned.fasta in test data dir
     assert aligned_pathogen_genome.reference_name == "MN908947"
     assert aligned_pathogen_genome.sequence == "A" * 1001
