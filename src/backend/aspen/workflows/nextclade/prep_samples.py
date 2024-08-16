@@ -128,13 +128,6 @@ def cli(
         # generalized case and we'll need to figure out how to handle that,
         # but right now the workflow is hardcoded to always expecting dataset.
         nextclade_dataset_name = target_pathogen.nextclade_dataset_name
-        # Nextclade 3.2.8 has new names for datasets vs the 2.1 names in the db.
-        new_nextclade_dataset_names = {
-            "SARS-CoV": "nextstrain/sars-cov-2/wuhan-hu-1/orfs",
-            "hMPXV": "nextstrain/mpox/all-clades",
-        }
-        if nextclade_dataset_name in new_nextclade_dataset_names:
-            nextclade_dataset_name = new_nextclade_dataset_names[nextclade_dataset_name]
         if not nextclade_dataset_name:
             print("No nextclade_dataset_name for this pathogen in the DB.")
             if run_type == RunType.REFRESH_STALE:
