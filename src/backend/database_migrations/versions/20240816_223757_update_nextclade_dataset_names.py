@@ -3,8 +3,7 @@
 Create Date: 2024-08-16 22:38:01.098160
 
 """
-import enumtables  # noqa: F401
-import sqlalchemy as sa
+
 from alembic import op
 
 # revision identifiers, used by Alembic.
