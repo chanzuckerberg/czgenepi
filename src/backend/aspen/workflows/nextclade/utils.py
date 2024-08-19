@@ -26,5 +26,5 @@ def extract_dataset_info(nextclade_tag_fh: IO[str]) -> Dict[str, str]:
     return {
         "name": nextclade_tag["attributes"]["name"],
         "accession": nextclade_tag["attributes"]["reference accession"],
-        "tag": nextclade_tag["version"]["tag"],
+        "tag": nextclade_tag["version"]["tag"].replace("--", "T"),
     }
