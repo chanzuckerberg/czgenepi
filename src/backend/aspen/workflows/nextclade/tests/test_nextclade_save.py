@@ -122,7 +122,7 @@ def test_nextclade_save_new_entries(mocker, session, postgres_database):
     # matched against value from test tag.json in test data directory
     assert qc_metrics.reference_dataset_name == "SARS-CoV-2"
     assert qc_metrics.reference_sequence_accession == "MN908947"
-    assert qc_metrics.reference_dataset_tag == "2024-07-17--12-57-03Z"
+    assert qc_metrics.reference_dataset_tag == "2024-07-17T12-57-03Z"
     # matched against tag.json and nextclade.aligned.fasta in test data dir
     assert aligned_pathogen_genome.reference_name == "MN908947"
     assert aligned_pathogen_genome.sequence == "A" * 1001
@@ -222,7 +222,7 @@ def test_nextclade_save_overwrite(mocker, session, postgres_database):
     # matched against value from test tag.json in test data directory
     assert qc_metrics.reference_dataset_name == "SARS-CoV-2"
     assert qc_metrics.reference_sequence_accession == "MN908947"
-    assert qc_metrics.reference_dataset_tag == "2024-07-17--12-57-03Z"
+    assert qc_metrics.reference_dataset_tag == "2024-07-17T12-57-03Z"
     # matched against tag.json and nextclade.aligned.fasta in test data dir
     assert aligned_pathogen_genome.reference_name == "MN908947"
     assert aligned_pathogen_genome.sequence == "A" * 1001
