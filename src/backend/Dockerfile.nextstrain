@@ -58,7 +58,7 @@ RUN mkdir /mpox && \
     git remote add origin https://github.com/chanzuckerberg/monkeypox.git && \
     git fetch origin subsampling && \
     git reset --hard fd74f4b5f219035c9cbb7909b6f84f8a06fda76d
-RUN chown nextstrain:nextstrain /mpox/config/exclude_accessions_mpxv.txt
+RUN chown nextstrain:nextstrain /mpox/config/exclude_accessions_mpxv.txt /mpox/config/clades.tsv
 
 RUN mkdir -p /ncov/auspice
 RUN mkdir -p /ncov/logs
