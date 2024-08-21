@@ -31,9 +31,10 @@ echo "* set \$aspen_s3_db_bucket"
 aspen_s3_db_bucket="$(jq -r .S3_db_bucket <<< "$genepi_config")"
 set -x
 
-# Download the latest mpox exclusions list. This happens at RUN time, not BUILD time so that
+# Download the latest mpox exclusions and clades list. This happens at RUN time, not BUILD time so that
 # we are always building trees with the latest upstream filters.
 wget https://raw.githubusercontent.com/nextstrain/mpox/master/phylogenetic/defaults/exclude_accessions.txt -O /mpox/config/exclude_accessions_mpxv.txt
+wget https://raw.githubusercontent.com/nextstrain/mpox/master/phylogenetic/defaults/clades.tsv -O /mpox/config/clades.tsv
 
 mkdir -p /mpox/data
 key_prefix="phylo_run/${S3_FILESTEM}/${WORKFLOW_ID}"
