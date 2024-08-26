@@ -1,7 +1,8 @@
 ## Dockerfile for aspen batch jobs
 ##
-##
-FROM nextstrain/base:build-20221207T221900Z
+## Using most recent docker image from nextstrain's base image as of Aug 26,
+## 2024 as we do work to update tree building to work correctly for mpox.
+FROM nextstrain/base:build-20240822T213558Z
 ARG DEBIAN_FRONTEND=noninteractive
 
 LABEL maintainer = "CZ Gen Epi"
@@ -44,14 +45,17 @@ ENV FLASK_ENV=development
 RUN pip3 install nextstrain-cli csv-diff s3fs[boto3] aiobotocore[awscli,boto3] envdir fsspec pandas
 RUN pip3 uninstall -y pangoLEARN
 
+# Using most recent commit from nextstrain's ncov as of Aug 26, 2024 as we do work
+# to update tree building to work correctly for mpox.
 RUN mkdir /ncov && \
     cd /ncov && \
     git init && \
-    git remote add origin https://github.com/chanzuckerberg/ncov.git && \
-    git fetch origin czgenepi && \
-    git reset --hard FETCH_HEAD
+    git remote add origin https://github.com/nextstrain/ncov.git && \
+    git fetch origin master && \
+    git reset --hard e42576751a3e89a36d260aff70f9f6bbc62a9d32
 
 # Add support for our custom mpox workflow
+# TODO [Vincent & Dan; Aug 2024]: Update the `mpox` workflow content.
 RUN mkdir /mpox && \
     cd /mpox && \
     git init && \
