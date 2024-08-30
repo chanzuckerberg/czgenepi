@@ -176,7 +176,7 @@ def dump_yaml_template(
             session, phylo_run.pathogen, phylo_run.template_args, group
         )
         builder: TemplateBuilder = TemplateBuilder(
-            phylo_run.tree_type, phylo_run.group, resolved_template_args, **context
+            phylo_run.tree_type, phylo_run.pathogen, phylo_run.group, resolved_template_args, **context
         )
         builder.write_file(builds_file_fh)
 
