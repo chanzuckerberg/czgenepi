@@ -63,25 +63,25 @@ subsampling:
 
   OVERVIEW:
     group:
-      max_sequences: 2000
+      max_sequences: 500
       query: --query "(location == '{location}') & (division == '{division}')"
 
     state:
-      max_sequences: 500
+      max_sequences: 300
       query: --query "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
       priorities:
         type: "proximity"
         focus: "group"
 
     country:
-      max_sequences: 400
+      max_sequences: 300
       query: --query "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
       priorities:
         type: "proximity"
         focus: "group"
 
     international:
-      max_sequences: 100
+      max_sequences: 300
       query: --query "(country != '{country}')" # exclude add'l samples from USA
       priorities:
           type: "proximity"
@@ -142,5 +142,5 @@ subsampling:
   NON_CONTEXTUALIZED:
     group:
       group_by: "year"
-      max_sequences: 2000
+      max_sequences: 1000
       query: --query "(location == '{location}') & (division == '{division}')"
