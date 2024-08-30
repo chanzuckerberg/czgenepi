@@ -1,21 +1,33 @@
-subsampling_scheme: "OVERVIEW"
+builds:
+  aspen_mpx:
+    region: global
+    country: {country}
+    division: {division}
+    location: {location}
+    subsampling_scheme: {tree_type}
+    title: CZ Gen Epi MPX Tree  # VOODOO verify gets replaced with a more specific title in builder_base.py
 
-exclude: "config/exclude_accessions_mpxv.txt"
-reference: "config/reference.fasta"
-genemap: "config/genemap.gff"
-genbank_reference: "config/reference.gb"
-colors: "config/colors_mpxv.tsv"
-lat_longs: "config/lat_longs.tsv"
-auspice_config: "config/auspice_config_mpxv.json"
-description: "config/description.md"
-clades: "config/clades.tsv"
-tree_mask: "config/tree_mask.tsv"
+# make sure build_name matches the sub-key of `builds` above.
+# Not sure how to consolidate it, but not going to try to figure it out now.
+build_name: "aspen_mpx"
+auspice_name: "monkeypox_mpxv"  # VOODOO Unclear if this gets used or will be overwritten
+
+reference: "defaults/reference.fasta"
+genome_annotation: "defaults/genome_annotation.gff3"
+genbank_reference: "defaults/reference.gb"
+include: "data/include.txt"  # add this to our template
+clades: "defaults/clades.tsv"
+lat_longs: "defaults/lat_longs.tsv"
+auspice_config: "defaults/hmpxv1/auspice_config.json" # replace this with our own
+description: "defaults/description.md" # replace this with our own
+tree_mask: "defaults/tree_mask.tsv"
 
 strain_id_field: "accession"
-display_strain_field: "strain_original"
+display_strain_field: "strain"
 
-build_name: "mpxv"
-auspice_name: "monkeypox_mpxv"
+filter:
+  min_date: 1950
+  min_length: 100000
 
 ## align
 max_indel: 10000
@@ -25,10 +37,15 @@ seed_spacing: 1000
 fix_tree: true
 
 ## refine
-timetree: false
+timetree: true
 root: "min_dev"
 clock_rate: 3e-6
 clock_std_dev: 6e-6
+divergence_units: "mutations"
+
+traits:
+  columns: ""
+  sampling_bias_correction: 3
 
 ## recency
 recency: true
@@ -36,103 +53,102 @@ recency: true
 mask:
   from_beginning: 1350
   from_end: 6422
-  maskfile: "config/mask_overview.bed"
+  maskfile: "defaults/mask_overview.bed"
+
+priorities:
+  crowding_penalty: 0
 
 ## Subsampling schemas
 subsampling:
 
   OVERVIEW:
     group:
-      subsample-max-sequences: 500
-      query: "(location == '{location}') & (division == '{division}')" 
-      min-length: 100000
-      
+      group_by: "year month"
+      max_sequences: 2000
+      query: --query "(location == '{location}') & (division == '{division}')"
+
     state:
-      subsample-max-sequences: 300
-      query: "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
+      group_by: "location year month"
+      max_sequences: 500
+      query: --query "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
       priorities:
         type: "proximity"
         focus: "group"
-      min-length: 100000
 
     country:
-      subsample-max-sequences: 300
-      query: "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
+      group_by: "division year month"
+      max_sequences: 400
+      query: --query "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
       priorities:
         type: "proximity"
         focus: "group"
-      min-length: 100000
-      
+
     international:
-      subsample-max-sequences: 300
-      query: "(country != '{country}')" # this should capture samples that have no division or location info
+      group_by: "region year" # VOODOO [copied Jess approach and comment] lots of samples have no "month" so in order to include them, we'll only go by "year"
+      max_sequences: 100
+      query: --query "(country != '{country}')" # exclude add'l samples from USA
       priorities:
           type: "proximity"
           focus: "group"
-      min-length: 100000
-      
-    international_serial_sampling:
-      group-by: ["region", "year"]  # lots of samples have no "month" so in order to include them, we'll only go by "year"
-      sequences-per-group: 2
-      query: "(country != '{country}')"
-      min-length: 100000
 
+    international_serial_sampling:
+      group_by: "region year" # VOODOO [copied Jess approach and comment] lots of samples have no "month" so in order to include them, we'll only go by "year"
+      seq_per_group: 2
+      query: --query "(country != '{country}')"
+
+  ########################
 
   TARGETED:
     focal:
-      exclude-all: true
-      
+      exclude: "--exclude-all"
+
     closest:
-      subsample-max-sequences: 100   # this changes with number of samples in include.txt and that's good
+      max_sequences: 100
       priorities:
         type: "proximity"
         focus: "focal"
-      min-length: 100000
 
     group:
-      subsample-max-sequences: 25
-      query: "(location == '{location}') & (division == '{division}')"
+      group_by: "year month"
+      max_sequences: 25
+      query: --query "(location == '{location}') & (division == '{division}')"
       priorities:
         type: "proximity"
         focus: "focal"
-      min-length: 100000
-       
+
     state:
-      subsample-max-sequences: 25
-      query: "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
+      group_by: "location year month"
+      max_sequences: 25
+      query: --query "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
       priorities:
         type: "proximity"
         focus: "focal"
-      min-length: 100000
 
     country:
-      subsample-max-sequences: 25
-      query: "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
+      group_by: "division year month"
+      max_sequences: 25
+      query: --query "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
       priorities:
         type: "proximity"
         focus: "focal"
-      min-length: 100000
-      
+
     international:
-      subsample-max-sequences: 25
-      query: "(country != '{country}')" # this should capture samples that have no division or location info
+      group_by: "region year" # VOODOO [copied Jess approach and comment] lots of samples have no "month" so in order to include them, we'll only go by "year"
+      max_sequences: 25
+      query: --query "(country != '{country}')" # VOODOO: huh? Original comment: "exclude add'l samples from USA"
       priorities:
-          type: "proximity"
-          focus: "focal"
-      min-length: 100000
-      
+        type: "proximity"
+        focus: "focal"
+
     international_serial_sampling:
-      group-by: ["region", "year"]  # lots of samples have no "month" so in order to include them, we'll only go by "year"
-      sequences-per-group: 2
-      query: "(country != '{country}')"
-      min-length: 100000
-      
-      
+      group_by: "region year" # VOODOO [copied Jess approach and comment] lots of samples have no "month" so in order to include them, we'll only go by "year"
+      seq_per_group: 2
+      query: --query "(country != '{country}')"
+
+  ########################
 
   NON_CONTEXTUALIZED:
     group:
-      group-by:
-        - "year"
-      subsample-max-sequences: 1000
-      query: "(location == '{location}') & (division == '{division}')"
-      min-length: 100000
+      group_by: "year month" # VOODOO: old MPX did just year, not year+month
+      max_sequences: 2000
+      query: --query "(location == '{location}') & (division == '{division}')"
