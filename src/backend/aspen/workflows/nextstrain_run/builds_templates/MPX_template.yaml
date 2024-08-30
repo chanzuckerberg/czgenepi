@@ -1,5 +1,5 @@
 builds:
-  aspen_mpx:
+  aspen:
     region: global
     country: {country}
     division: {division}
@@ -9,7 +9,7 @@ builds:
 
 # make sure build_name matches the sub-key of `builds` above.
 # Not sure how to consolidate it, but not going to try to figure it out now.
-build_name: "aspen_mpx"
+build_name: "aspen"
 auspice_name: "monkeypox_mpxv"  # VOODOO Unclear if this gets used or will be overwritten
 
 reference: "defaults/reference.fasta"
@@ -18,8 +18,8 @@ genbank_reference: "defaults/reference.gb"
 include: "data/include.txt"  # add this to our template
 clades: "defaults/clades.tsv"
 lat_longs: "defaults/lat_longs.tsv"
-auspice_config: "defaults/hmpxv1/auspice_config.json" # replace this with our own
-description: "defaults/description.md" # replace this with our own
+auspice_config: "defaults/hmpxv1/auspice_config.json" # VOODOO port over Jess' version of auspice_config.json
+description: "defaults/description.md" # VOODOO Port over Jess' current description, Dan will follow up with more edits
 tree_mask: "defaults/tree_mask.tsv"
 
 strain_id_field: "accession"
@@ -37,7 +37,7 @@ seed_spacing: 1000
 fix_tree: true
 
 ## refine
-timetree: true
+timetree: false
 root: "min_dev"
 clock_rate: 3e-6
 clock_std_dev: 6e-6
@@ -56,19 +56,17 @@ mask:
   maskfile: "defaults/mask_overview.bed"
 
 priorities:
-  crowding_penalty: 0
+  crowding_penalty: 0 # Gets set by treetype during `export.py`
 
 ## Subsampling schemas
 subsampling:
 
   OVERVIEW:
     group:
-      group_by: "year month"
       max_sequences: 2000
       query: --query "(location == '{location}') & (division == '{division}')"
 
     state:
-      group_by: "location year month"
       max_sequences: 500
       query: --query "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
       priorities:
@@ -76,7 +74,6 @@ subsampling:
         focus: "group"
 
     country:
-      group_by: "division year month"
       max_sequences: 400
       query: --query "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
       priorities:
@@ -84,7 +81,6 @@ subsampling:
         focus: "group"
 
     international:
-      group_by: "region year" # VOODOO [copied Jess approach and comment] lots of samples have no "month" so in order to include them, we'll only go by "year"
       max_sequences: 100
       query: --query "(country != '{country}')" # exclude add'l samples from USA
       priorities:
@@ -92,7 +88,7 @@ subsampling:
           focus: "group"
 
     international_serial_sampling:
-      group_by: "region year" # VOODOO [copied Jess approach and comment] lots of samples have no "month" so in order to include them, we'll only go by "year"
+      group_by: "region year" # lots of samples have no "month" so in order to include them, we'll only go by "year"
       seq_per_group: 2
       query: --query "(country != '{country}')"
 
@@ -109,7 +105,6 @@ subsampling:
         focus: "focal"
 
     group:
-      group_by: "year month"
       max_sequences: 25
       query: --query "(location == '{location}') & (division == '{division}')"
       priorities:
@@ -117,7 +112,6 @@ subsampling:
         focus: "focal"
 
     state:
-      group_by: "location year month"
       max_sequences: 25
       query: --query "(location != '{location}') & (division == '{division}')" # exclude add'l samples from {location}
       priorities:
@@ -125,7 +119,6 @@ subsampling:
         focus: "focal"
 
     country:
-      group_by: "division year month"
       max_sequences: 25
       query: --query "(division != '{division}') & (country == '{country}')" # exclude add'l samples from CA
       priorities:
@@ -133,7 +126,6 @@ subsampling:
         focus: "focal"
 
     international:
-      group_by: "region year" # VOODOO [copied Jess approach and comment] lots of samples have no "month" so in order to include them, we'll only go by "year"
       max_sequences: 25
       query: --query "(country != '{country}')" # VOODOO: huh? Original comment: "exclude add'l samples from USA"
       priorities:
@@ -141,7 +133,7 @@ subsampling:
         focus: "focal"
 
     international_serial_sampling:
-      group_by: "region year" # VOODOO [copied Jess approach and comment] lots of samples have no "month" so in order to include them, we'll only go by "year"
+      group_by: "region year" # lots of samples have no "month" so in order to include them, we'll only go by "year"
       seq_per_group: 2
       query: --query "(country != '{country}')"
 
@@ -149,6 +141,6 @@ subsampling:
 
   NON_CONTEXTUALIZED:
     group:
-      group_by: "year month" # VOODOO: old MPX did just year, not year+month
+      group_by: "year"
       max_sequences: 2000
       query: --query "(location == '{location}') & (division == '{division}')"
