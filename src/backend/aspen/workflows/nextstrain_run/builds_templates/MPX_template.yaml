@@ -5,12 +5,12 @@ builds:
     division: {division}
     location: {location}
     subsampling_scheme: {tree_type}
-    title: CZ Gen Epi MPX Tree  # VOODOO verify gets replaced with a more specific title in builder_base.py
+    title: CZ Gen Epi MPX Tree
 
 # make sure build_name matches the sub-key of `builds` above.
 # Not sure how to consolidate it, but not going to try to figure it out now.
 build_name: "aspen"
-auspice_name: "monkeypox_mpxv"  # VOODOO Unclear if this gets used or will be overwritten
+auspice_name: "monkeypox_mpxv"
 
 reference: "defaults/reference.fasta"
 genome_annotation: "defaults/genome_annotation.gff3"
