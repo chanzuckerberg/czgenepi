@@ -56,13 +56,14 @@ RUN mkdir /ncov && \
 
 # Add support for our custom mpox workflow
 # TODO [Vincent & Dan; Aug 2024]: Update the `mpox` workflow content.
+# TODO Convert to a specifc commit rather than overall subsample_by_distance branch
 RUN mkdir /mpox && \
     cd /mpox && \
     git init && \
-    git remote add origin https://github.com/chanzuckerberg/monkeypox.git && \
-    git fetch origin subsampling && \
-    git reset --hard fd74f4b5f219035c9cbb7909b6f84f8a06fda76d
-RUN chown nextstrain:nextstrain /mpox/config/exclude_accessions_mpxv.txt /mpox/config/clades.tsv
+    git remote add origin https://github.com/chanzuckerberg/mpox.git && \
+    git fetch origin subsample_by_distance && \
+    git reset --hard origin/subsample_by_distance
+RUN chown nextstrain:nextstrain /mpox/phylogenetic/defaults/exclude_accessions.txt /mpox/phylogenetic/defaults/clades.tsv
 
 RUN mkdir -p /ncov/auspice
 RUN mkdir -p /ncov/logs
@@ -83,7 +84,8 @@ COPY . .
 # Install the aspen package
 RUN poetry install
 RUN chmod a+w /ncov/auspice /ncov/logs
-RUN chmod a+w /mpox/ /mpox/config
+# [Vince] I'm not totally sure we need all three of these, but let's start with them.
+RUN chmod a+w /mpox/ /mpox/phylogenetic /mpox/phylogenetic/defaults
 
 # TODO - Mismatch between poetry and augur deps forces us to manually install jsonschema v3 here
 RUN pip install jsonschema==3.*
