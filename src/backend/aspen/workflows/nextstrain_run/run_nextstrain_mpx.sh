@@ -33,10 +33,10 @@ set -x
 
 # Download the latest mpox exclusions and clades list. This happens at RUN time, not BUILD time so that
 # we are always building trees with the latest upstream filters.
-wget https://raw.githubusercontent.com/nextstrain/mpox/master/phylogenetic/defaults/exclude_accessions.txt -O /mpox/config/exclude_accessions_mpxv.txt
-wget https://raw.githubusercontent.com/nextstrain/mpox/master/phylogenetic/defaults/clades.tsv -O /mpox/config/clades.tsv
+wget https://raw.githubusercontent.com/nextstrain/mpox/master/phylogenetic/defaults/exclude_accessions.txt -O /mpox/phylogenetic/defaults/exclude_accessions.txt
+wget https://raw.githubusercontent.com/nextstrain/mpox/master/phylogenetic/defaults/clades.tsv -O /mpox/phylogenetic/defaults/clades.tsv
 
-mkdir -p /mpox/data
+mkdir -p /mpox/phylogenetic/data
 key_prefix="phylo_run/${S3_FILESTEM}/${WORKFLOW_ID}"
 s3_prefix="s3://${aspen_s3_db_bucket}/${key_prefix}"
 
@@ -52,12 +52,12 @@ mpox_git_rev=$(cd /mpox && git rev-parse HEAD)
 aligned_upstream_location=$(
     python3 /usr/src/app/aspen/workflows/nextstrain_run/export.py        \
            --phylo-run-id "${WORKFLOW_ID}"                               \
-           --sequences /mpox/data/sequences_czge.fasta                   \
-           --metadata /mpox/data/metadata_czge.tsv                       \
-           --selected /mpox/data/include.txt                             \
+           --sequences /mpox/phylogenetic/data/sequences_czge.fasta      \
+           --metadata /mpox/phylogenetic/data/metadata_czge.tsv          \
+           --selected /mpox/phylogenetic/data/include.txt                \
            --sequence-type aligned                                       \
            --resolved-template-args "${RESOLVED_TEMPLATE_ARGS_SAVEFILE}" \
-           --builds-file /mpox/config/build_czge.yaml                    \
+           --builds-file /mpox/phylogenetic/build_czge.yaml              \
            --reset-status
 )
 
@@ -66,33 +66,33 @@ aligned_upstream_sequences_s3_key=$(echo "${aligned_upstream_location}" | jq -r 
 aligned_upstream_metadata_s3_key=$(echo "${aligned_upstream_location}" | jq -r .metadata_key)
 
 # fetch the upstream dataset
-if [ ! -e /mpox/data/upstream_sequences.fasta ]; then
-    $aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_sequences_s3_key}" /mpox/data/upstream_sequences.fasta.xz
-    unxz /mpox/data/*.xz
+if [ ! -e /mpox/phylogenetic/data/upstream_sequences.fasta ]; then
+    $aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_sequences_s3_key}" /mpox/phylogenetic/data/upstream_sequences.fasta.xz
+    unxz /mpox/phylogenetic/data/*.xz
 fi
-if [ ! -e /mpox/data/upstream_metadata.tsv ]; then
-    $aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_metadata_s3_key}" /mpox/data/upstream_metadata.tsv.xz
-    unxz /mpox/data/*.xz
+if [ ! -e /mpox/phylogenetic/data/upstream_metadata.tsv ]; then
+    $aws s3 cp --no-progress "s3://${aligned_upstream_s3_bucket}/${aligned_upstream_metadata_s3_key}" /mpox/phylogenetic/data/upstream_metadata.tsv.xz
+    unxz /mpox/phylogenetic/data/*.xz
 fi
 
 # If we've written out any samples, add them to the upstream metadata/fasta files
-if [ -e /mpox/data/sequences_czge.fasta ]; then
-    python3 /usr/src/app/aspen/workflows/nextstrain_run/merge_mpx.py --required-metadata /mpox/data/metadata_czge.tsv --required-sequences /mpox/data/sequences_czge.fasta --upstream-metadata /mpox/data/upstream_metadata.tsv --upstream-sequences /mpox/data/upstream_sequences.fasta --destination-metadata /mpox/data/metadata.tsv --destination-sequences /mpox/data/sequences.fasta --required-match-column strain --upstream-match-column accession
+if [ -e /mpox/phylogenetic/data/sequences_czge.fasta ]; then
+    python3 /usr/src/app/aspen/workflows/nextstrain_run/merge_mpx.py --required-metadata /mpox/phylogenetic/data/metadata_czge.tsv --required-sequences /mpox/phylogenetic/data/sequences_czge.fasta --upstream-metadata /mpox/phylogenetic/data/upstream_metadata.tsv --upstream-sequences /mpox/phylogenetic/data/upstream_sequences.fasta --destination-metadata /mpox/phylogenetic/data/metadata.tsv --destination-sequences /mpox/phylogenetic/data/sequences.fasta --required-match-column strain --upstream-match-column accession
 else
-    cp /mpox/data/upstream_metadata.tsv /mpox/data/metadata.tsv
-    cp /mpox/data/upstream_sequences.fasta /mpox/data/sequences.fasta
+    cp /mpox/phylogenetic/data/upstream_metadata.tsv /mpox/phylogenetic/data/metadata.tsv
+    cp /mpox/phylogenetic/data/upstream_sequences.fasta /mpox/phylogenetic/data/sequences.fasta
 fi;
 
 # Persist the build config we generated.
-$aws s3 cp /mpox/config/build_czge.yaml "${s3_prefix}/build_czge.yaml"
-$aws s3 cp /mpox/data/include.txt "${s3_prefix}/include.txt"
+$aws s3 cp /mpox/phylogenetic/build_czge.yaml "${s3_prefix}/build_czge.yaml"
+$aws s3 cp /mpox/phylogenetic/data/include.txt "${s3_prefix}/include.txt"
 
 # run snakemake, if run fails export the logs from snakemake to s3
-(cd /mpox && snakemake --printshellcmds --configfile config/build_czge.yaml --resources=mem_mb=312320) || { $aws s3 cp /mpox/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /mpox/results/mpxv/filter.log "${s3_prefix}/logs/mpox/" --recursive ; }
+(cd /mpox/phylogenetic && snakemake --printshellcmds --configfile build_czge.yaml --resources=mem_mb=312320) || { $aws s3 cp /mpox/phylogenetic/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /mpox/phylogenetic/results/mpxv/filter.log "${s3_prefix}/logs/mpox/" --recursive ; }
 
 # upload the tree to S3. The variable key is created to use later
 key="${key_prefix}/mpx_czge.json"
-$aws s3 cp /mpox/auspice/monkeypox_mpxv.json "s3://${aspen_s3_db_bucket}/${key}"
+$aws s3 cp /mpox/phylogenetic/auspice/monkeypox_mpxv.json "s3://${aspen_s3_db_bucket}/${key}"
 
 # update aspen
 aspen_workflow_rev=WHATEVER
@@ -111,4 +111,4 @@ python3 /usr/src/app/aspen/workflows/nextstrain_run/save.py                 \
     --bucket "${aspen_s3_db_bucket}"                                        \
     --key "${key}"                                                          \
     --resolved-template-args "${RESOLVED_TEMPLATE_ARGS_SAVEFILE}"           \
-    --tree-path /mpox/auspice/monkeypox_mpxv.json                           \
+    --tree-path /mpox/phylogenetic/auspice/monkeypox_mpxv.json              \
