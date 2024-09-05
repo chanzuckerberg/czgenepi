@@ -132,11 +132,6 @@ subsampling:
         type: "proximity"
         focus: "focal"
 
-    international_serial_sampling:
-      group_by: "region year" # lots of samples have no "month" so in order to include them, we'll only go by "year"
-      seq_per_group: 2
-      query: --query "(country != '{country}')"
-
   ########################
 
   NON_CONTEXTUALIZED:
