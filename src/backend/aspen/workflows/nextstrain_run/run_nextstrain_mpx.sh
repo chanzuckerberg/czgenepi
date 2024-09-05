@@ -88,7 +88,7 @@ $aws s3 cp /mpox/phylogenetic/build_czge.yaml "${s3_prefix}/build_czge.yaml"
 $aws s3 cp /mpox/phylogenetic/data/include.txt "${s3_prefix}/include.txt"
 
 # run snakemake, if run fails export the logs from snakemake to s3
-(cd /mpox/phylogenetic && snakemake --printshellcmds --configfile build_czge.yaml --resources=mem_mb=312320) || { $aws s3 cp /mpox/phylogenetic/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /mpox/phylogenetic/results/mpxv/filter.log "${s3_prefix}/logs/mpox/" --recursive ; }
+(cd /mpox/phylogenetic && snakemake --printshellcmds --configfile build_czge.yaml --resources=mem_mb=312320) || { $aws s3 cp /mpox/phylogenetic/.snakemake/log/ "${s3_prefix}/logs/snakemake/" --recursive ; $aws s3 cp /mpox/phylogenetic/results/aspen/logs/ "${s3_prefix}/logs/mpox/" --recursive ; }
 
 # upload the tree to S3. The variable key is created to use later
 key="${key_prefix}/mpx_czge.json"
