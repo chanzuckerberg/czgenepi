@@ -271,43 +271,40 @@ def update_subsampling_for_division(subsampling):
 
 
 def apply_filters(config, subsampling, template_args):
-    # MPX format
-    include_arguments_in_filters = False
-    lineage_field = "lineage"
-    if "--query" in subsampling["group"]["query"]:
-        # SC2 format
-        include_arguments_in_filters = True
-        lineage_field = "pango_lineage"
+    """NOTE: The filters do NOT currently support filtering MPX by lineage.
 
+    It probably would not be a big lift to change the config builder to support
+    lineage filtering on mpox, but it's unclear if that should happen here in the
+    tree type plugins where we handle the rest of the filters, or somehow get
+    shoehorned into the pathogen plugins instead.
+    Regardless, the filters currently only support "pango_lineage" for SC2 lineage
+    filtering. There is currently no FE or BE code to provide lineage filter support
+    for mpox, and that's where most of the eng effort will be if we want to release
+    mpox lineage filtering in the future. Once the user has a way to pass those params
+    to filter mpox trees using lineage though, it will still be necessary to change
+    the config building process here so lineage filter is correctly handled for mpox
+    and integrates with the downstream snakemake workflow that builds the tree."""
     min_date = template_args.get("filter_start_date")
     if min_date:
         # Support date expressions like "5 days ago" in our cron schedule.
         min_date = dateparser.parse(min_date).strftime("%Y-%m-%d")
-        if include_arguments_in_filters:
-            subsampling["group"][
-                "min_date"
-            ] = f"--min-date {min_date}"  # ex: --max-date 2020-01-01
-        else:
-            subsampling["group"]["min-date"] = str(min_date)  # ex: max-date: 2020-01-01
+        subsampling["group"][
+            "min_date"
+        ] = f"--min-date {min_date}"  # ex: --max-date 2020-01-01
     max_date = template_args.get("filter_end_date")
     if max_date:
         # Support date expressions like "5 days ago" in our cron schedule.
         max_date = dateparser.parse(max_date).strftime("%Y-%m-%d")
-        if include_arguments_in_filters:
-            subsampling["group"][
+        subsampling["group"][
+            "max_date"
+        ] = f"--max-date {max_date}"  # ex: --max-date 2020-01-01
+        if "international_serial_sampling" in subsampling:
+            subsampling["international_serial_sampling"][
                 "max_date"
             ] = f"--max-date {max_date}"  # ex: --max-date 2020-01-01
-            if "international_serial_sampling" in subsampling:
-                subsampling["international_serial_sampling"][
-                    "max_date"
-                ] = f"--max-date {max_date}"  # ex: --max-date 2020-01-01
-        else:
-            subsampling["group"]["max-date"] = str(max_date)  # ex: max-date: 2020-01-01
-            if "international_serial_sampling" in subsampling:
-                subsampling["international_serial_sampling"]["max-date"] = str(
-                    max_date
-                )  # ex: max-date: 2020-01-01
 
+    # Only SC2 supports lineage filtering right now. See above note for details.
+    LINEAGE_FIELD = "pango_lineage"
     pango_lineages = template_args.get("filter_pango_lineages")
     if pango_lineages:
         # Nextstrain is rather particular about the acceptable syntax for
@@ -322,5 +319,5 @@ def apply_filters(config, subsampling, template_args):
         if old_query.endswith('"'):
             end_string = '"'
             old_query = old_query[:-1]
-        pango_query = " & (" + lineage_field + " in {pango_lineage})"
+        pango_query = " & (" + LINEAGE_FIELD + " in {pango_lineage})"
         subsampling["group"]["query"] = old_query + pango_query + end_string
