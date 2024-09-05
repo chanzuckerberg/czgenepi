@@ -143,13 +143,13 @@ def test_overview_config_no_filters(mocker, session, postgres_database, split_cl
     phylo_run, location = create_test_data(session, split_client, tree_type, 10, 0, 0)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    subsampling_scheme = nextstrain_config["subsampling"]
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
-    assert subsampling_scheme["group"]["subsample-max-sequences"] == 500
+    assert subsampling_scheme["group"]["max_sequences"] == 500
     assert (
         subsampling_scheme["group"]["query"]
-        == f"(location == '{location.location}') & (division == '{location.division}')"
+        == f'''--query "(location == '{location.location}') & (division == '{location.division}')"'''
     )
     assert "min-date" not in subsampling_scheme["group"]
     assert "max-date" not in subsampling_scheme["group"]
@@ -168,27 +168,25 @@ def test_overview_config_ondemand(mocker, session, postgres_database, split_clie
     query = {
         "filter_start_date": "2021-04-30",
         "filter_end_date": "10 days ago",
-        "filter_pango_lineages": ["AY", "B.1.116"],
     }
     phylo_run, location = create_test_data(
         session, split_client, tree_type, 10, 5, 5, template_args=query
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    subsampling_scheme = nextstrain_config["subsampling"]
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     max_date = dateparser.parse("10 days ago").strftime("%Y-%m-%d")
     # Order does not matter for lineages, just verify matched sets.
-    assert subsampling_scheme["group"]["min-date"] == "2021-04-30"
-    assert subsampling_scheme["group"]["max-date"] == f"{max_date}"
+    assert subsampling_scheme["group"]["min_date"] == "--min-date 2021-04-30"
+    assert subsampling_scheme["group"]["max_date"] == f"--max-date {max_date}"
     assert (
-        subsampling_scheme["international_serial_sampling"]["max-date"] == f"{max_date}"
+        subsampling_scheme["international_serial_sampling"]["max_date"] == f"--max-date {max_date}"
     )
-    assert subsampling_scheme["group"]["subsample-max-sequences"] == 500
-    filter_pango_lineages = "['" + "', '".join(query["filter_pango_lineages"]) + "']"
+    assert subsampling_scheme["group"]["max_sequences"] == 500
     assert (
         subsampling_scheme["group"]["query"]
-        == f"(location == '{location.location}') & (division == '{location.division}') & (lineage in {filter_pango_lineages})"
+        == f'''--query "(location == '{location.location}') & (division == '{location.division}')"'''
     )
     assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
@@ -219,14 +217,14 @@ def test_overview_config_chicago(mocker, session, postgres_database, split_clien
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    subsampling_scheme = nextstrain_config["subsampling"]
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Make sure our query got updated properly
     assert (
         subsampling_scheme["group"]["query"]
-        == f"((location == '{location.location}') & (division == '{location.division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"
+        == f'''--query "((location == '{location.location}') & (division == '{location.division}')) | submitting_lab == 'RIPHL at Rush University Medical Center'"'''
     )
-    assert subsampling_scheme["group"]["subsample-max-sequences"] == 500
+    assert subsampling_scheme["group"]["max_sequences"] == 500
     assert len(selected.splitlines()) == 0  # No selected sequences
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
@@ -240,10 +238,10 @@ def test_non_contextualized_config(mocker, session, postgres_database, split_cli
     phylo_run, location = create_test_data(session, split_client, tree_type, 10, 5, 5)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    subsampling_scheme = nextstrain_config["subsampling"]
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
-    assert subsampling_scheme["group"]["subsample-max-sequences"] == 1000
+    assert subsampling_scheme["group"]["max_sequences"] == 1000
     assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
@@ -281,21 +279,21 @@ def test_non_contextualized_regions(mocker, session, postgres_database, split_cl
     }.items():
         sequences, selected, metadata, nextstrain_config = generate_run(run.id)
 
-        subsampling_scheme = nextstrain_config["subsampling"]
+        subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
         if run_type == "state":
             assert (
                 subsampling_scheme["group"]["query"]
-                == f"(division == '{state_location.division}') & (country == '{state_location.country}')"
+                == f'''--query "(division == '{state_location.division}') & (country == '{state_location.country}')"'''
             )
         else:
             assert (
                 subsampling_scheme["group"]["query"]
-                == f"(country == '{country_location.country}')"
+                == f'''--query "(country == '{country_location.country}')"'''
             )
 
         # Just some placeholder sanity-checks
-        assert subsampling_scheme["group"]["subsample-max-sequences"] == 1000
+        assert subsampling_scheme["group"]["max_sequences"] == 1000
         assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
         assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
         assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
@@ -309,14 +307,14 @@ def test_targeted_config_simple(mocker, session, postgres_database, split_client
     phylo_run, location = create_test_data(session, split_client, tree_type, 10, 5, 5)
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    subsampling_scheme = nextstrain_config["subsampling"]
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
-    assert subsampling_scheme["closest"]["subsample-max-sequences"] == 100
-    assert subsampling_scheme["group"]["subsample-max-sequences"] == 50
-    assert subsampling_scheme["state"]["subsample-max-sequences"] == 50
-    assert subsampling_scheme["country"]["subsample-max-sequences"] == 25
-    assert subsampling_scheme["international"]["subsample-max-sequences"] == 25
+    assert subsampling_scheme["closest"]["max_sequences"] == 100
+    assert subsampling_scheme["group"]["max_sequences"] == 50
+    assert subsampling_scheme["state"]["max_sequences"] == 50
+    assert subsampling_scheme["country"]["max_sequences"] == 25
+    assert subsampling_scheme["international"]["max_sequences"] == 25
     assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
@@ -354,26 +352,26 @@ def test_targeted_config_regions(mocker, session, postgres_database, split_clien
     }.items():
         sequences, selected, metadata, nextstrain_config = generate_run(run.id)
 
-        subsampling_scheme = nextstrain_config["subsampling"]
+        subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
         if run_type == "state":
             assert "state" not in subsampling_scheme.keys()
             assert (
                 subsampling_scheme["group"]["query"]
-                == f"(division == '{state_location.division}') & (country == '{state_location.country}')"
+                == f'''--query "(division == '{state_location.division}') & (country == '{state_location.country}')"'''
             )
         else:
             assert "state" not in subsampling_scheme.keys()
             assert "country" not in subsampling_scheme.keys()
             assert (
                 subsampling_scheme["group"]["query"]
-                == f"(country == '{country_location.country}')"
+                == f'''--query "(country == '{country_location.country}')"'''
             )
 
         # Just some placeholder sanity-checks
-        assert subsampling_scheme["closest"]["subsample-max-sequences"] == 100
-        assert subsampling_scheme["group"]["subsample-max-sequences"] == 50
-        assert subsampling_scheme["international"]["subsample-max-sequences"] == 100
+        assert subsampling_scheme["closest"]["max_sequences"] == 100
+        assert subsampling_scheme["group"]["max_sequences"] == 50
+        assert subsampling_scheme["international"]["max_sequences"] == 100
         assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
         assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
         assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
@@ -416,14 +414,14 @@ def test_targeted_config_large(mocker, session, postgres_database, split_client)
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
-    subsampling_scheme = nextstrain_config["subsampling"]
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
-    assert subsampling_scheme["closest"]["subsample-max-sequences"] == 120
-    assert subsampling_scheme["group"]["subsample-max-sequences"] == 60
-    assert subsampling_scheme["state"]["subsample-max-sequences"] == 60
-    assert subsampling_scheme["country"]["subsample-max-sequences"] == 30
-    assert subsampling_scheme["international"]["subsample-max-sequences"] == 30
+    assert subsampling_scheme["closest"]["max_sequences"] == 120
+    assert subsampling_scheme["group"]["max_sequences"] == 60
+    assert subsampling_scheme["state"]["max_sequences"] == 60
+    assert subsampling_scheme["country"]["max_sequences"] == 30
+    assert subsampling_scheme["international"]["max_sequences"] == 30
     assert len(selected.splitlines()) == 120  # 10 gisaid samples + 110 selected samples
     assert len(metadata.splitlines()) == 201  # 200 samples + 1 header line
     assert len(sequences.splitlines()) == 400  # 200 county samples, @2 lines each
@@ -469,15 +467,15 @@ def test_overview_config_division(mocker, session, postgres_database, split_clie
         group_location="",
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
-    subsampling_scheme = nextstrain_config["subsampling"]
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Make sure our query got updated properly
-    assert subsampling_scheme["country"]["subsample-max-sequences"] == 800
-    assert subsampling_scheme["international"]["subsample-max-sequences"] == 200
+    assert subsampling_scheme["country"]["max_sequences"] == 800
+    assert subsampling_scheme["international"]["max_sequences"] == 200
     assert "state" not in subsampling_scheme.keys()
     assert (
         subsampling_scheme["group"]["query"]
-        == f"(division == '{location.division}') & (country == '{location.country}')"
+        == f'''--query "(division == '{location.division}') & (country == '{location.country}')"'''
     )
 
 
@@ -498,14 +496,16 @@ def test_overview_config_country(mocker, session, postgres_database, split_clien
         group_division="",
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
-    subsampling_scheme = nextstrain_config["subsampling"]
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Make sure our query got updated properly
     assert "state" not in subsampling_scheme.keys()
     assert "country" not in subsampling_scheme.keys()
-    assert subsampling_scheme["international"]["subsample-max-sequences"] == 1000
-    assert subsampling_scheme["group"]["query"] == f"(country == '{location.country}')"
-
+    assert subsampling_scheme["international"]["max_sequences"] == 1000
+    assert (
+        subsampling_scheme["group"]["query"]
+        == f'''--query "(country == '{location.country}')"'''
+    )
 
 # make sure we handle quotes sanely!!!
 def test_string_escapes(mocker, session, postgres_database, split_client):
@@ -524,14 +524,14 @@ def test_string_escapes(mocker, session, postgres_database, split_client):
         group_division="A'Zaz",
     )
     sequences, selected, metadata, nextstrain_config = generate_run(run.id)
-    subsampling_scheme = nextstrain_config["subsampling"]
+    subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
     assert (
         subsampling_scheme["group"]["query"]
-        == "(location == 'Cote d\\'Ivoire') & (division == 'A\\'Zaz')"
+        == '''--query "(location == 'Cote d\\'Ivoire') & (division == 'A\\'Zaz')"'''
     )
 
     # Just some placeholder sanity-checks
-    assert subsampling_scheme["group"]["subsample-max-sequences"] == 1000
+    assert subsampling_scheme["group"]["max_sequences"] == 1000
     assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
     assert len(metadata.splitlines()) == 11  # 10 samples + 1 header line
     assert len(sequences.splitlines()) == 20  # 10 county samples, @2 lines each
