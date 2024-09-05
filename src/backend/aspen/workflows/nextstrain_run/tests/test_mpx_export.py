@@ -181,7 +181,8 @@ def test_overview_config_ondemand(mocker, session, postgres_database, split_clie
     assert subsampling_scheme["group"]["min_date"] == "--min-date 2021-04-30"
     assert subsampling_scheme["group"]["max_date"] == f"--max-date {max_date}"
     assert (
-        subsampling_scheme["international_serial_sampling"]["max_date"] == f"--max-date {max_date}"
+        subsampling_scheme["international_serial_sampling"]["max_date"]
+        == f"--max-date {max_date}"
     )
     assert subsampling_scheme["group"]["max_sequences"] == 500
     assert (
@@ -506,6 +507,7 @@ def test_overview_config_country(mocker, session, postgres_database, split_clien
         subsampling_scheme["group"]["query"]
         == f'''--query "(country == '{location.country}')"'''
     )
+
 
 # make sure we handle quotes sanely!!!
 def test_string_escapes(mocker, session, postgres_database, split_client):
