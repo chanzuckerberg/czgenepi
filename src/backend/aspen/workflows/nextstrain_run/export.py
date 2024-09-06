@@ -490,6 +490,7 @@ def populate_aligned_row(sample, sequence):
     row: MutableMapping[str, Any] = {
         # NOTE: mpox tree builds can't handle "/" in accessions names!
         # However, it uses the "strain" metadata field to populate labels in the final tree.
+        # QC_ columns are left empty since these stats aren't readily available in our database
         "accession": sample.public_identifier.replace("/", "_"),
         "strain": sample.public_identifier,
         "date": sample.collection_date.strftime("%Y-%m-%d"),
