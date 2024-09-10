@@ -21,6 +21,7 @@ export enum USER_FEATURE_FLAGS {
   multi_pathogen = "multi_pathogen",
   sunset_banner = "sunset_banner",
   transfer_banner = "transfer_banner",
+  mpox_update_banner = "mpox_update_banner",
 }
 
 /**
