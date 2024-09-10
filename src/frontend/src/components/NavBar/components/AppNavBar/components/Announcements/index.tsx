@@ -41,9 +41,7 @@ export const Announcements = (): JSX.Element => {
       )}
       {shouldShowMpoxUpdateBanner && (
         <StyledBanner sdsType="primary">
-          <B>
-            MPOX TREE BUILDS ARE NOW UPDATED.&nbsp;
-          </B>
+          <B>MPOX TREE BUILDS ARE NOW UPDATED.&nbsp;</B>
           <StyledNewTabLink
             href="https://help.czgenepi.org/hc/en-us/articles/30224919249684-Tree-Building-Updates-09-06-2024"
             sdsStyle="dashed"
