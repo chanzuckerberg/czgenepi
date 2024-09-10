@@ -311,7 +311,7 @@ def test_targeted_config_simple(mocker, session, postgres_database, split_client
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
-    assert subsampling_scheme["closest"]["max_sequences"] == 100
+    assert subsampling_scheme["closest"]["max_sequences"] == 250
     assert subsampling_scheme["group"]["max_sequences"] == 50
     assert subsampling_scheme["state"]["max_sequences"] == 50
     assert subsampling_scheme["country"]["max_sequences"] == 25
@@ -370,7 +370,7 @@ def test_targeted_config_regions(mocker, session, postgres_database, split_clien
             )
 
         # Just some placeholder sanity-checks
-        assert subsampling_scheme["closest"]["max_sequences"] == 100
+        assert subsampling_scheme["closest"]["max_sequences"] == 250
         assert subsampling_scheme["group"]["max_sequences"] == 50
         assert subsampling_scheme["international"]["max_sequences"] == 100
         assert len(selected.splitlines()) == 10  # 5 gisaid samples + 5 selected samples
@@ -411,21 +411,21 @@ def test_targeted_config_large(mocker, session, postgres_database, split_client)
 
     tree_type = TreeType.TARGETED
     phylo_run, location = create_test_data(
-        session, split_client, tree_type, 200, 110, 10
+        session, split_client, tree_type, 400, 270, 10
     )
     sequences, selected, metadata, nextstrain_config = generate_run(phylo_run.id)
 
     subsampling_scheme = nextstrain_config["subsampling"][tree_type.value]
 
     # Just some placeholder sanity-checks
-    assert subsampling_scheme["closest"]["max_sequences"] == 120
-    assert subsampling_scheme["group"]["max_sequences"] == 60
-    assert subsampling_scheme["state"]["max_sequences"] == 60
-    assert subsampling_scheme["country"]["max_sequences"] == 30
-    assert subsampling_scheme["international"]["max_sequences"] == 30
-    assert len(selected.splitlines()) == 120  # 10 gisaid samples + 110 selected samples
-    assert len(metadata.splitlines()) == 201  # 200 samples + 1 header line
-    assert len(sequences.splitlines()) == 400  # 200 county samples, @2 lines each
+    assert subsampling_scheme["closest"]["max_sequences"] == 280
+    assert subsampling_scheme["group"]["max_sequences"] == 140
+    assert subsampling_scheme["state"]["max_sequences"] == 140
+    assert subsampling_scheme["country"]["max_sequences"] == 70
+    assert subsampling_scheme["international"]["max_sequences"] == 70
+    assert len(selected.splitlines()) == 280  # 10 gisaid samples + 270 selected samples
+    assert len(metadata.splitlines()) == 401  # 200 samples + 1 header line
+    assert len(sequences.splitlines()) == 800  # 200 county samples, @2 lines each
 
 
 def generate_run(phylo_run_id, reset_status=False):
