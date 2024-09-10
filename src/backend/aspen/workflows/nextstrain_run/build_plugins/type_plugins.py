@@ -209,7 +209,7 @@ class TargetedPlugin(TreeTypePlugin):
         # Adjust group sizes if we have a lot of samples.
         closest_max_sequences = 250
         other_max_sequences = 25
-        if self.num_included_samples >= 200:
+        if self.num_included_samples >= 250:
             closest_max_sequences = self.num_included_samples
             other_max_sequences = int(ceil(self.num_included_samples / 4.0))
 
