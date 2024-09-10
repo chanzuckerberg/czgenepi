@@ -99,7 +99,7 @@ subsampling:
       exclude: "--exclude-all"
 
     closest:
-      max_sequences: 100
+      max_sequences: 250
       priorities:
         type: "proximity"
         focus: "focal"
