@@ -207,9 +207,9 @@ class TargetedPlugin(TreeTypePlugin):
               subsampling["international"]["mynewsetting"] = "mynewvalue"
         """
         # Adjust group sizes if we have a lot of samples.
-        closest_max_sequences = 100
+        closest_max_sequences = 250
         other_max_sequences = 25
-        if self.num_included_samples >= 100:
+        if self.num_included_samples >= 200:
             closest_max_sequences = self.num_included_samples
             other_max_sequences = int(ceil(self.num_included_samples / 4.0))
 
