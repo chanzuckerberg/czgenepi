@@ -37,14 +37,12 @@ def get_allowed_origins() -> List[str]:
 
     Gets list of all allowed origins for cross origin requests. This is pretty
     simple right now: we only serve the FE of our app and Galago with content
-    from our BE, so that's all this needs to cover. For ease, the Galago URLs
-    are just hardcoded. If we ever need to start handling a lot more CORS
-    requests or the Galago URLs become more dynamic, we should reevaluate
-    current process.
+    from our BE, so that's all this needs to cover. For ease, the Galago URL is
+    just hardcoded. If we ever need to start handling a lot more CORS requests,
+    we should reevaluate the current process.
     """
     allowed_origins = [
-        "https://galago.czgenepi.org",
-        "https://galago-labs.czgenepi.org",
+        "https://galago.cziscience.com",
     ]
     frontend_url = os.getenv("FRONTEND_URL")
     if frontend_url:
