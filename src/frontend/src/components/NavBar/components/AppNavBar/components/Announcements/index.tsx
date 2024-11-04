@@ -41,14 +41,14 @@ export const Announcements = (): JSX.Element => {
       )}
       {shouldShowMpoxUpdateBanner && (
         <StyledBanner sdsType="primary">
-          <B>MPOX TREE BUILDS ARE NOW UPDATED.&nbsp;</B>
+          <B>PLANNED OUTAGE FROM NOVEMBER 15 AT 8 AM PST UNTIL NOVEMBER 18 AT 12 PM PST. THEIAGENEPI WILL REPLACE CZ GEN EPI. CLICK &nbsp;</B>
           <StyledNewTabLink
-            href="https://help.czgenepi.org/hc/en-us/articles/30224919249684-Tree-Building-Updates-09-06-2024"
+            href="https://help.czgenepi.org/hc/en-us/articles/20083077583764-FAQs-CZ-GEN-EPI-Transfer-to-Theiagen-Global-Health-Initiative-TGHI"
             sdsStyle="dashed"
           >
-            LEARN MORE
+            HERE
           </StyledNewTabLink>
-          <B>.</B>
+          <B>&nbsp;FOR MORE INFORMATION.</B>
         </StyledBanner>
       )}
     </>
