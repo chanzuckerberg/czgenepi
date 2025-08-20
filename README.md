@@ -17,3 +17,7 @@ Additional Notes relating to the backend are documented [here](docs/backend/).
 ## Additional Frontend Notes
 
 Additional Notes relating to the frontend are documented [here](docs/frontend/).
+
+## Code of Conduct
+
+See other tab for our contributor covenant
