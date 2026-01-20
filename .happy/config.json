@@ -65,7 +65,7 @@
     },
     "environments": {
         "rdev": {
-            "aws_profile": "genepi-dev",
+            "aws_profile": "theia",
             "secret_arn": "happy/env-dev-config",
             "terraform_directory": ".happy/terraform/envs/dev",
             "log_group_prefix": "/genepi/dev",
@@ -73,7 +73,7 @@
             "auto_run_migrations": true
         },
         "staging": {
-            "aws_profile": "genepi-dev",
+            "aws_profile": "theia",
             "secret_arn": "happy/env-gestaging-config",
             "terraform_directory": ".happy/terraform/envs/staging",
             "delete_protected": true,
@@ -82,7 +82,7 @@
             "task_launch_type": "fargate"
         },
         "prod": {
-            "aws_profile": "genepi-prod",
+            "aws_profile": "theia",
             "secret_arn": "happy/env-geprod-config",
             "terraform_directory": ".happy/terraform/envs/prod",
             "delete_protected": true,

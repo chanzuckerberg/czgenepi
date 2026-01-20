@@ -1,11 +1,11 @@
-module stack {
+module "stack" {
   source              = "./modules/ecs-stack"
   aws_account_id      = var.aws_account_id
   aws_role            = var.aws_role
   happymeta_          = var.happymeta_
   happy_config_secret = var.happy_config_secret
-  image_tag           = var.image_tag
-  image_tags          = jsondecode(var.image_tags)
+  image_tag           = local.image_tag
+  image_tags          = jsondecode(local.image_tags)
   priority            = var.priority
   stack_name          = var.stack_name
   deployment_stage    = "geprod"

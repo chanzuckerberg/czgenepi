@@ -32,13 +32,20 @@ jobs:
   tf-lint:
     runs-on: ubuntu-20.04
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: us-west-2
+          role-session-name: JustLint
+          role-duration-seconds: 900
       - uses: terraform-linters/setup-tflint@v1
         name: Setup TFLint
         with:
           tflint_version: v0.28.1
       - uses: hashicorp/setup-terraform@v1
         with:
-          terraform_version: 0.13.5
+          terraform_version: 1.6.0
       - uses: actions/checkout@v2
       - name: run tflint
         run: |
